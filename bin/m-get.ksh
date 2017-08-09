@@ -104,8 +104,8 @@ done
 # regenerate fetchmail with all accounts enables
 $accToFetch
 
-msgCount=$(egrep -c '^From ' /var/mail/tw)
-(($msgCount))|| { notify "Nothing more to do, quitting."; return 0; }
+msgCount=$(from|wc -l)
+((msgCount))|| { notify "Nothing more to do, quitting."; return 0; }
 
 mark +inbox all -sequence oldhat 2>/dev/null
 notify 'Incorporating new mail'

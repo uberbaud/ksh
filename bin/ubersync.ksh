@@ -62,7 +62,7 @@ for t in *; do
 	  }
 	original="$REPLY"
 	SHA384="$(cksum -qa sha384b "$original")"
-	gsub '/' '-' "$SHA384"
+	gsub '/' '_' "$SHA384"
 	SHA384="$REPLY"
 	if [[ -f ../$SHA384 ]]; then
 		warn "sha384b already exists for ^B$t^b."

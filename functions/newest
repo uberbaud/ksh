@@ -1,0 +1,42 @@
+# @(#)[:vl{{BTw@SX_|*z)P#UKp: 2017-08-09 20:43:56 Z tw@csongor]
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+# SYNOPSIS: Show the newest file
+
+function newest {
+	local L count=1 c=0 filelist tmp
+	# get any count
+	if (($#==1)); then
+		[[ -f $1 ]]|| { [[ $1 == *[!0-9]* ]]|| { count=$1; shift; } }
+	elif (($#>1)); then
+		eval "L=\"\$$#\""
+		[[ -f $1 ]]|| { [[ $1 == *[!0-9]* ]]|| { count=$1; shift; ((c++)) } }
+		[[ -f $L ]]|| { [[ $L == *[!0-9]* ]]|| {
+			count=$L; ((c++))
+			set -A tmp -- "$@"; unset tmp[$#-1]; set -- "${tmp[@]}"
+		  } }
+		((c>1))&& warn '^Bcount^b was set twice, using last.'
+	fi
+
+	if (($#==0)); then
+		set -A filelist -- *
+	elif (($#==1)); then
+		if [[ -d $1 ]]; then
+			set -A filelist -- "$1"/*
+		else
+			set -A filelist -- "$1"
+		fi
+	else
+		set -A filelist -- "$@"
+	fi
+
+	((count))|| die 'Useless count of zero (0).'
+
+	stat -f '%Hp%t%m%t%N' "${filelist[@]}" |
+		awk -F'\t' '$1 == "10" { print $2"\t"$3; }' |
+		sort -nr | cut -f 2 | head -n $count
+
+}
+
+
+# Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

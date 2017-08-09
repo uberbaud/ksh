@@ -1,0 +1,12 @@
+# @(#)[:UX7ZU{ea+a#3csO^r|Yj: 2017-08-06 19:14:37 Z tw@csongor]
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+# SYNOPSIS: cowsay through lolcat
+
+function lolcow {
+	needs cowsay lolcat
+	cowsay "$@" | lolcat
+}
+
+
+# Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

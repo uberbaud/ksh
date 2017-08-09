@@ -1,0 +1,124 @@
+^Btest^b ^U^Bexpression^b^u
+^B[^b ^U^Bexpression^b^u ^B]^b
+        ^Btest^b evaluates the ^U^Bexpression^b^u and returns zero status if true, 1
+        if false, or greater than 1 if there was an error.  It is
+        normally used as the condition command of ^Bif^b and ^Bwhile^b
+        statements.  Symbolic links are followed for all ^U^Bfile^b^u expressions
+        except ^B-h^b and ^B-L^b.
+
+        The following basic expressions are available:
+
+        ^B-a^b ^U^Bfile^b^u            ^U^Bfile^b^u exists.
+
+        ^B-b^b ^U^Bfile^b^u            ^U^Bfile^b^u is a block special device.
+
+        ^B-c^b ^U^Bfile^b^u            ^U^Bfile^b^u is a character special device.
+
+        ^B-d^b ^U^Bfile^b^u            ^U^Bfile^b^u is a directory.
+
+        ^B-e^b ^U^Bfile^b^u            ^U^Bfile^b^u exists.
+
+        ^B-f^b ^U^Bfile^b^u            ^U^Bfile^b^u is a regular file.
+
+        ^B-G^b ^U^Bfile^b^u            ^U^Bfile^b^u's group is the shell's effective group
+                           ID.
+
+        ^B-g^b ^U^Bfile^b^u            ^U^Bfile^b^u's mode has the setgid bit set.
+
+        ^B-h^b ^U^Bfile^b^u            ^U^Bfile^b^u is a symbolic link.
+
+        ^B-k^b ^U^Bfile^b^u            ^U^Bfile^b^u's mode has the sticky(8) bit set.
+
+        ^B-L^b ^U^Bfile^b^u            ^U^Bfile^b^u is a symbolic link.
+
+        ^B-O^b ^U^Bfile^b^u            ^U^Bfile^b^u's owner is the shell's effective user ID.
+
+        ^B-o^b ^U^Boption^b^u          Shell ^U^Boption^b^u is set (see the ^Bset^b command above
+                           for a list of options).  As a non-standard
+                           extension, if the option starts with a ‘!’,
+                           the test is negated; the test always fails if
+                           ^U^Boption^b^u doesn't exist (so [ -o foo -o -o !foo ]
+                           returns true if and only if option ^U^Bfoo^b^u
+                           exists).
+
+        ^B-p^b ^U^Bfile^b^u            ^U^Bfile^b^u is a named pipe.
+
+        ^B-r^b ^U^Bfile^b^u            ^U^Bfile^b^u exists and is readable.
+
+        ^B-S^b ^U^Bfile^b^u            ^U^Bfile^b^u is a unix(4)-domain socket.
+
+        ^B-s^b ^U^Bfile^b^u            ^U^Bfile^b^u is not empty.
+
+        ^B-t^b [^U^Bfd^b^u]            File descriptor ^U^Bfd^b^u is a tty(4) device.  If the
+                           ^Bposix^b option is not set, ^U^Bfd^b^u may be left out,
+                           in which case it is taken to be 1 (the
+                           behaviour differs due to the special POSIX
+                           rules described above).
+
+        ^B-u^b ^U^Bfile^b^u            ^U^Bfile^b^u's mode has the setuid bit set.
+
+        ^B-w^b ^U^Bfile^b^u            ^U^Bfile^b^u exists and is writable.
+
+        ^B-x^b ^U^Bfile^b^u            ^U^Bfile^b^u exists and is executable.
+
+        ^U^Bfile1^b^u ^B-nt^b ^U^Bfile2^b^u    ^U^Bfile1^b^u is newer than ^U^Bfile2^b^u or ^U^Bfile1^b^u exists and
+                           ^U^Bfile2^b^u does not.
+
+        ^U^Bfile1^b^u ^B-ot^b ^U^Bfile2^b^u    ^U^Bfile1^b^u is older than ^U^Bfile2^b^u or ^U^Bfile2^b^u exists and
+                           ^U^Bfile1^b^u does not.
+
+        ^U^Bfile1^b^u ^B-ef^b ^U^Bfile2^b^u    ^U^Bfile1^b^u is the same file as ^U^Bfile2^b^u.
+
+        ^U^Bstring^b^u             ^U^Bstring^b^u has non-zero length.
+
+        ^B-n^b ^U^Bstring^b^u          ^U^Bstring^b^u is not empty.
+
+        ^B-z^b ^U^Bstring^b^u          ^U^Bstring^b^u is empty.
+
+        ^U^Bstring^b^u = ^U^Bstring^b^u    Strings are equal.
+
+        ^U^Bstring^b^u == ^U^Bstring^b^u   Strings are equal.
+
+        ^U^Bstring^b^u != ^U^Bstring^b^u   Strings are not equal.
+
+        ^U^Bnumber^b^u ^B-eq^b ^U^Bnumber^b^u  Numbers compare equal.
+
+        ^U^Bnumber^b^u ^B-ne^b ^U^Bnumber^b^u  Numbers compare not equal.
+
+        ^U^Bnumber^b^u ^B-ge^b ^U^Bnumber^b^u  Numbers compare greater than or equal.
+
+        ^U^Bnumber^b^u ^B-gt^b ^U^Bnumber^b^u  Numbers compare greater than.
+
+        ^U^Bnumber^b^u ^B-le^b ^U^Bnumber^b^u  Numbers compare less than or equal.
+
+        ^U^Bnumber^b^u ^B-lt^b ^U^Bnumber^b^u  Numbers compare less than.
+
+        The above basic expressions, in which unary operators have
+        precedence over binary operators, may be combined with the
+        following operators (listed in increasing order of precedence):
+
+              expr -o expr            Logical OR.
+              expr -a expr            Logical AND.
+              ! expr                  Logical NOT.
+              ( expr )                Grouping.
+
+        On operating systems not supporting ^U^B/dev/fd/n^b^u devices (where ^U^Bn^b^u is
+        a file descriptor number), the ^Btest^b command will attempt to fake
+        it for all tests that operate on files (except the ^B-e^b test).  For
+        example, [ -w /dev/fd/2 ] tests if file descriptor 2 is writable.
+
+        Note that some special rules are applied (courtesy of POSIX) if
+        the number of arguments to ^Btest^b or ^B[^b ^B...^b ^B]^b is less than five: if
+        leading ‘!’ arguments can be stripped such that only one argument
+        remains then a string length test is performed (again, even if
+        the argument is a unary operator); if leading ‘!’ arguments can
+        be stripped such that three arguments remain and the second
+        argument is a binary operator, then the binary operation is
+        performed (even if the first argument is a unary operator,
+        including an unstripped ‘!’).
+
+        ^BNote^b: A common mistake is to use “if [ $foo = bar ]” which fails
+        if parameter “foo” is NULL or unset, if it has embedded spaces
+        (i.e. IFS characters), or if it is a unary operator like ‘!’ or
+        ‘^B-n^b’.  Use tests like “if [ "X$foo" = Xbar ]” instead.
+

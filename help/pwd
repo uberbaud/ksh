@@ -1,0 +1,8 @@
+^Bpwd^b [^B-LP^b]
+        Print the present working directory.  If the ^B-L^b option is used or
+        if the ^Bphysical^b option isn't set (see the ^Bset^b command below), the
+        logical path is printed (i.e. the path used to ^Bcd^b to the current
+        directory).  If the ^B-P^b option (physical path) is used or if the
+        ^Bphysical^b option is set, the path determined from the filesystem
+        (by following ‘..’ directories to the root directory) is printed.
+

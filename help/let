@@ -1,0 +1,8 @@
+^Blet^b [^U^Bexpression^b^u ^U^B...^b^u]
+        Each expression is evaluated (see ^U^BArithmetic^b^u ^U^Bexpressions^b^u above).
+        If all expressions are successfully evaluated, the exit status is
+        0 (1) if the last expression evaluated to non-zero (zero).  If an
+        error occurs during the parsing or evaluation of an expression,
+        the exit status is greater than 1.  Since expressions may need to
+        be quoted, (( ^U^Bexpr^b^u )) is syntactic sugar for let "^U^Bexpr^b^u".
+

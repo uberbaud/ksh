@@ -1,0 +1,18 @@
+# @(#)[:uq11iLeXaz4K_#oH-b)}: 2017-08-04 16:59:46 Z tw@csongor]
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+# SYNOPSIS: Wrapper for TODO
+
+function newcd {
+	(($#))|| set "$HOME"
+	builtin cd "$@" && {
+		[[ -f TODO ]]&& {
+			printf '  \e[1;38;5;12m== TODO ==\e[0m\n'
+			show-todos
+		  }
+		true # leave on a good note since `cd` did
+	  }
+}
+
+
+# Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

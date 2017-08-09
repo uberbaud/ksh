@@ -1,0 +1,31 @@
+# @(#)[:F_-`rfuuGd$u~GO2EGi+: 2017/07/31 18:04:18 tw@csongor.lan]
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+# SYNOPSIS: Notes that a file should be synced.
+
+function trackfile {
+	[[ -f "$1" ]]|| {
+		warn "Can't track a non-existent file." "$1"
+		return 1
+	  }
+	[[ $1 == *secret* ]]&& return 0
+	typeset t="$(readlink -nf "$1")" p=''
+	[[ -n "$t" ]]|| { warn 'File disappeared!'; return 1; }
+
+	typeset trackdir="$HOME"/hold/DOCSTORE/TRACK
+	[[ -d $trackdir ]]|| mkdir -p "$trackdir" || {
+		warn 'Could not [1mmkdir [22m $HOME/hold/DOCSTORE/TRACK'
+		return 1
+	  }
+
+	# Since we want the encoding to be decodeable, we need to escape 
+	# percent signs (%), which means we also need to escape whatever we 
+	# use to escape. We'll just use the common backslash for that.
+	while [[ "$t" == *\\* ]] { p="$p${t%%\\*}\\\\"; t="${t#*\\}"; }
+	while [[ "$t" == *%* ]] { p="$p${t%%%*}\\%"; t="${t#*%}"; }
+	while [[ "$t" == */* ]] { p="$p${t%%/*}%"; t="${t#*/}"; }
+	: >"$trackdir/$p$t"
+}
+
+
+# Copyright © setEnv YEAR} by Tom Davis <tom@greyshirt.net>.

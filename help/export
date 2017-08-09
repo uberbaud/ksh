@@ -1,0 +1,10 @@
+^Bexport^b [^B-p^b] [^U^Bparameter^b^u[=^U^Bvalue^b^u]]
+        Sets the export attribute of the named parameters.  Exported
+        parameters are passed in the environment to executed commands.
+        If values are specified, the named parameters are also assigned.
+
+        If no parameters are specified, the names of all parameters with
+        the export attribute are printed one per line, unless the ^B-p^b
+        option is used, in which case ^Bexport^b commands defining all
+        exported parameters, including their values, are printed.
+

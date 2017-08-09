@@ -1,0 +1,15 @@
+
+   The following command aliases are defined automatically by the shell:
+
+           ^Bautoload^b='typeset -fu'
+           ^Bfunctions^b='typeset -f'
+           ^Bhash^b='alias -t'
+           ^Bhistory^b='fc -l'
+           ^Binteger^b='typeset -i'
+           ^Blocal^b='typeset'
+           ^Blogin^b='exec login'
+           ^Bnohup^b='nohup '
+           ^Br^b='fc -s'
+           ^Bstop^b='kill -STOP'
+           ^Btype^b='whence -v'
+

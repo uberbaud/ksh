@@ -1,0 +1,28 @@
+# @(#)[:3j@ZP!#K8U1K}Lh9~hJ2: 2017/08/01 02:50:25 tw@csongor.lan]
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+# SYNOPSIS: read things
+
+function r {
+	typeset readme=''
+	if (($#)); then
+		[[ $1 == '-h' ]]&& {
+			sparkle <<----
+				   ^F{4}Usage^f: ^Tr^t ^[^T-h^t^|^Ufile^u^] 
+				       Reads ^Ufile^ or a readme in the current directory.
+				---
+			return 0
+		  }
+		readme="$1"
+	else
+		set -- [Rr][Ee][Aa][Dd][Mm][Ee]{.[Mm]{[Dd],arkdown},}*
+		for p; do
+			[[ -f "$p" ]]&& { readme="$p"; break; }
+		done
+		[[ -n "$readme" ]]|| die 'No README found.'
+	fi
+	vim -MR "$readme"
+}
+
+
+# Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

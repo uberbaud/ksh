@@ -1,0 +1,5 @@
+^Bexit^b [^U^Bstatus^b^u]
+        The shell exits with the specified exit status.  If ^U^Bstatus^b^u is not
+        specified, the exit status is the current value of the ^B$?^b
+        parameter.
+

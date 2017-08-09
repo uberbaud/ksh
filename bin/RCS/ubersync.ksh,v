@@ -1,0 +1,122 @@
+head	1.2;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.2
+date	2017.08.09.02.34.58;	author tw;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2017.08.08.20.15.42;	author tw;	state Exp;
+branches;
+next	;
+
+
+desc
+@Update hold/DOCSTORE and sync with uberbaud.net
+@
+
+
+1.2
+log
+@
+@
+text
+@#!/bin/ksh
+# @@(#)[:TpT~W!fOPp~o^JMNTd&8: 2017-08-08 19:26:18 Z tw@@csongor]
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
+
+: ${FPATH:?Run from within KSH}
+: ${KDOTDIR:?}
+
+# Usage {{{1
+typeset -- this_pgm="${0##*/}"
+function usage {
+	desparkle "$this_pgm"
+	PGM="$REPLY"
+	sparkle >&2 <<-\
+	===SPARKLE===
+	^F{4}Usage^f: ^T${PGM}^t
+	         Update hold/DOCSTORE and sync with uberbaud.net.
+	       ^T${PGM} -h^t
+	         Show this help message.
+	===SPARKLE===
+	exit 0
+} # }}}
+# process -options {{{1
+function bad_programmer {	# {{{2
+	die 'Programmer error:'	\
+		"  No getopts action defined for [1m-$1[22m."
+  };	# }}}2
+while getopts ':h' Option; do
+	case $Option in
+		h)	usage;													;;
+		\?)	die "Invalid option: [1m-$OPTARG[22m.";				;;
+		\:)	die "Option [1m-$OPTARG[22m requires an argument.";	;;
+		*)	bad_programmer "$Option";								;;
+	esac
+done
+# remove already processed arguments
+shift $(($OPTIND - 1))
+# ready to process non '-' prefixed arguments
+# /options }}}1
+
+docstore=$HOME/hold/DOCSTORE
+tracking=$docstore/TRACK
+[[ -d $tracking ]]|| die 'Could not find ^Btracking^b directory.'
+cd $tracking || die 'Could not ^Bcd^b to ^Btracking^b directory.'
+
+FS=''
+GS=''
+
+notify 'Updating DOCSTORE'
+for t in *; do
+	[[ -h $t ]]&& continue
+	[[ -f $t ]]|| continue
+	[[ -s $t ]]&& continue
+	gsub '\\'  "$FS" "$t"
+	gsub '\%'  "$GS" "$REPLY"
+	gsub '%'   '/'   "$REPLY"
+	gsub "$GS" '%'   "$REPLY"
+	gsub "$FS" '\'   "$REPLY"
+	[[ -f $REPLY ]]|| {
+		warn "^B$t^b has moved." 'Erasing tracking info.'
+		rm "$t"
+		continue
+	  }
+	original="$REPLY"
+	SHA384="$(cksum -qa sha384b "$original")"
+	gsub '/' '-' "$SHA384"
+	SHA384="$REPLY"
+	if [[ -f ../$SHA384 ]]; then
+		warn "sha384b already exists for ^B$t^b."
+	else
+		echo "$original" >../"$SHA384"
+		cat "$original" >>../"$SHA384"
+		chflags uchg ../"$SHA384"
+	fi
+	echo "$SHA384" >"$t"
+done
+
+notify "Syncing with ^Buberbaud.net^b."
+cd "$docstore"
+$KDOTDIR/bin/synrdir.ksh uberbaud.net:"$PWD" "$PWD"
+
+
+# Copyright (C) 2017 by Tom Davis <tom@@greyshirt.net>.
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d54 1
+a54 1
+	gsub '%%'  "$GS" "$REPLY"
+@

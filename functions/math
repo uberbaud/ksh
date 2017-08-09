@@ -1,0 +1,10 @@
+# @(#)[:TP4`IRxb#g>$amLTUb3w: 2017-08-06 19:06:45 Z tw@csongor]
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+# SYNOPSIS: Do math on the command line.
+
+function math {
+	echo "$*" |bc
+}
+
+# Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

@@ -1,0 +1,17 @@
+# @(#)[:z4AO*%OX13brDaGoh<?J: 2017-08-08 01:55:09 Z tw@csongor]
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+# SYNOPSIS: gsub old new text
+#           Replaces old occurences in text with new
+#           result is placed in $REPLY
+
+function gsub {
+	local p='' old="$1" new="$2" text="$3"
+	while [[ $text == *$old* ]]; do
+		p="$p${text%%$old*}$new"
+		text="${text#*$old}"
+	done
+	REPLY="$p$text"
+}
+
+# Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

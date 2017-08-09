@@ -1,0 +1,27 @@
+# @(#)[:YIzyYkF*R6nH(Bc#Ct42: 2017-08-04 17:02:36 Z tw@csongor]
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+# SYNOPSIS: If you find a TODO file, show it
+
+function show-todos {
+	local needsep=false showit=false ln
+	[[ -f TODO ]]|| return 0
+	splitstr "$NL" "$(<TODO)" todo
+	for ln in "${todo[@]}"; do
+		[[ $ln == \@* ]]&& {
+			if [[ $ln == *' DONE '* ]]; then
+				showit=false
+			else
+				showit=true
+			fi
+			$needsep && printf ' -----\n'
+			needsep=true
+			continue
+		  }
+		printf '%s\n' "$ln"
+	done | sparkle
+	unset todo
+}
+
+
+# Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

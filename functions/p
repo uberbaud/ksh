@@ -1,0 +1,38 @@
+# @(#)[:L>;)e;b((ePib;UkIowI: 2017-08-06 03:08:17 Z tw@csongor]
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+# SYNOPSIS: choose and cd to a subdirectory of play
+
+function p {
+	cd ~/play
+	(($#))|| return 0 # no directory given so we're done
+	((1<$#))&& {
+		sparkle >&2 <<-\
+		==SPARKLE==
+		  ^F{4}usage^f ^F{2}p^f ^Udir^u
+		==SPARKLE==
+		return 0
+	  }
+
+	local possibles
+	set -A possibles -- *"$1"*
+
+	local choice='-'
+	if ((${#possibles[*]}>1)); then
+		choice="$( umenu "${possibles[@]}" )"
+	elif [[ $possibles == "*$1*" ]]; then
+		choice="$(umenu "<$1>" *)"
+		[[ $choice == "<$1>" ]]&&
+			choice="$1"
+	else
+		choice="${possibles[0]}"
+	fi
+
+	[[ -n $choice ]]|| return
+	[[ -d $choice ]]|| mkdir -p "$choice"
+
+	cd $choice
+}
+
+
+# Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

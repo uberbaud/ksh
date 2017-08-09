@@ -1,0 +1,11 @@
+^Bkill^b [^B-s^b ^U^Bsigname^b^u | -^U^Bsignum^b^u | -^U^Bsigname^b^u] { ^U^Bjob^b^u | ^U^Bpid^b^u | ^U^Bpgrp^b^u } ^U^B...^b^u
+        Send the specified signal to the specified jobs, process IDs, or
+        process groups.  If no signal is specified, the TERM signal is
+        sent.  If a job is specified, the signal is sent to the job's
+        process group.  See ^U^BJob^b^u ^U^Bcontrol^b^u below for the format of ^U^Bjob^b^u.
+
+^Bkill^b ^B-l^b [^U^Bexit-status^b^u ^U^B...^b^u]
+        Print the signal name corresponding to ^U^Bexit-status^b^u.  If no
+        arguments are specified, a list of all the signals, their
+        numbers, and a short description of them are printed.
+

@@ -1,0 +1,17 @@
+^Bprint^b [^B-nprsu^b[^U^Bn^b^u] | ^B-R^b [^B-en^b]] [^U^Bargument^b^u ^U^B...^b^u]
+        ^Bprint^b prints its arguments on the standard output, separated by
+        spaces and terminated with a newline.  The ^B-n^b option suppresses
+        the newline.  By default, certain C escapes are translated.
+        These include ‘\b’, ‘\f’, ‘\n’, ‘\r’, ‘\t’, ‘\v’, and ‘\0###’
+        (‘#’ is an octal digit, of which there may be 0 to 3).  ‘\c’ is
+        equivalent to using the ^B-n^b option.  ‘\’ expansion may be
+        inhibited with the ^B-r^b option.  The ^B-s^b option prints to the
+        history file instead of standard output; the ^B-u^b option prints to
+        file descriptor ^U^Bn^b^u (^U^Bn^b^u defaults to 1 if omitted); and the ^B-p^b option
+        prints to the co-process (see ^U^BCo-processes^b^u above).
+
+        The ^B-R^b option is used to emulate, to some degree, the BSD echo(1)
+        command, which does not process ‘\’ sequences unless the ^B-e^b
+        option is given.  As above, the ^B-n^b option suppresses the trailing
+        newline.
+

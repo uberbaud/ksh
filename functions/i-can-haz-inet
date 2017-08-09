@@ -1,0 +1,19 @@
+# @(#)[:AYZjUWu53ym1?%1>1nxN: 2017-08-07 15:06:09 Z tw@csongor]
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+# SYNOPSIS: Is the internet available?
+
+function i-can-haz-inet {
+    local NAME='uberbaud.net' ADDR='208.167.249.143' digopts
+    # @8.8.8.8      : google DNS
+    # +short        : inet address only
+    # +time=1       : 1 second to timeout instead of default 5 seconds
+    # A             : section type
+    set -A digopts -- +short +time=1 $NAME A
+    local DIG="$(dig "${digopts[@]}")"
+    [[ -n $DIG ]]||         return 2
+    [[ $DIG == $ADDR ]]
+}
+
+
+# Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

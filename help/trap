@@ -1,0 +1,30 @@
+^Btrap^b [^U^Bhandler^b^u ^U^Bsignal^b^u ^U^B...^b^u]
+        Sets a trap handler that is to be executed when any of the
+        specified signals are received.  ^U^Bhandler^b^u is either a NULL string,
+        indicating the signals are to be ignored, a minus sign (‘-’),
+        indicating that the default action is to be taken for the signals
+        (see signal(3)), or a string containing shell commands to be
+        evaluated and executed at the first opportunity (i.e. when the
+        current command completes, or before printing the next PS1
+        prompt) after receipt of one of the signals.  ^U^Bsignal^b^u is the name
+        of a signal (e.g. PIPE or ALRM) or the number of the signal (see
+        the ^Bkill^b ^B-l^b command above).
+
+        There are two special signals: EXIT (also known as 0), which is
+        executed when the shell is about to exit, and ERR, which is
+        executed after an error occurs (an error is something that would
+        cause the shell to exit if the ^B-e^b or ^Berrexit^b option were set -
+        see the ^Bset^b command above).  EXIT handlers are executed in the
+        environment of the last executed command.  Note that for non-
+        interactive shells, the trap handler cannot be changed for
+        signals that were ignored when the shell started.
+
+        With no arguments, ^Btrap^b lists, as a series of ^Btrap^b commands, the
+        current state of the traps that have been set since the shell
+        started.  Note that the output of ^Btrap^b cannot be usefully piped
+        to another process (an artifact of the fact that traps are
+        cleared when subprocesses are created).
+
+        The original Korn shell's DEBUG trap and the handling of ERR and
+        EXIT traps in functions are not yet implemented.
+

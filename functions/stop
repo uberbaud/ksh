@@ -1,0 +1,17 @@
+# @(#)[:XCw5&LzrAyUF5x1@BJtx: 2017-08-06 19:30:53 Z tw@csongor]
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+# SYNOPSIS: Stop the aMuse player. Like pause but discards the
+#           pause information.
+
+function stop {
+	set-amuse-env
+	: ${paused_at:?} ${paused_song:?}
+	needs pause
+	pause
+	: >$paused_at
+	: >$paused_song
+}
+
+
+# Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

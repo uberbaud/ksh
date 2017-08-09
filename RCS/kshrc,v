@@ -1,0 +1,741 @@
+head	1.29;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.29
+date	2017.08.09.02.09.57;	author tw;	state Exp;
+branches;
+next	1.28;
+
+1.28
+date	2017.08.07.14.59.39;	author tw;	state Exp;
+branches;
+next	1.27;
+
+1.27
+date	2017.08.06.19.16.26;	author tw;	state Exp;
+branches;
+next	1.26;
+
+1.26
+date	2017.08.06.19.09.08;	author tw;	state Exp;
+branches;
+next	1.25;
+
+1.25
+date	2017.08.06.17.22.15;	author tw;	state Exp;
+branches;
+next	1.24;
+
+1.24
+date	2017.08.06.15.33.51;	author tw;	state Exp;
+branches;
+next	1.23;
+
+1.23
+date	2017.08.05.00.23.11;	author tw;	state Exp;
+branches;
+next	1.22;
+
+1.22
+date	2017.08.04.17.47.35;	author tw;	state Exp;
+branches;
+next	1.21;
+
+1.21
+date	2017.08.04.17.16.48;	author tw;	state Exp;
+branches;
+next	1.20;
+
+1.20
+date	2017.08.02.13.45.47;	author tw;	state Exp;
+branches;
+next	1.19;
+
+1.19
+date	2017.08.01.22.46.22;	author tw;	state Exp;
+branches;
+next	1.18;
+
+1.18
+date	2017.08.01.02.53.59;	author tw;	state Exp;
+branches;
+next	1.17;
+
+1.17
+date	2017.08.01.02.52.19;	author tw;	state Exp;
+branches;
+next	1.16;
+
+1.16
+date	2017.07.30.01.37.31;	author tw;	state Exp;
+branches;
+next	1.15;
+
+1.15
+date	2017.07.28.05.05.25;	author tw;	state Exp;
+branches;
+next	1.14;
+
+1.14
+date	2017.07.28.04.26.23;	author tw;	state Exp;
+branches;
+next	1.13;
+
+1.13
+date	2017.07.28.04.15.53;	author tw;	state Exp;
+branches;
+next	1.12;
+
+1.12
+date	2017.07.28.04.13.32;	author tw;	state Exp;
+branches;
+next	1.11;
+
+1.11
+date	2017.07.26.00.39.33;	author tw;	state Exp;
+branches;
+next	1.10;
+
+1.10
+date	2017.07.17.04.33.49;	author tw;	state Exp;
+branches;
+next	1.9;
+
+1.9
+date	2017.07.07.09.07.39;	author tw;	state Exp;
+branches;
+next	1.8;
+
+1.8
+date	2017.07.05.12.22.34;	author tw;	state Exp;
+branches;
+next	1.7;
+
+1.7
+date	2017.07.05.06.01.08;	author tw;	state Exp;
+branches;
+next	1.6;
+
+1.6
+date	2017.07.05.05.10.58;	author tw;	state Exp;
+branches;
+next	1.5;
+
+1.5
+date	2017.05.21.08.07.09;	author tw;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	2017.05.21.06.31.23;	author tw;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	2017.05.20.19.07.58;	author tw;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2017.04.14.01.47.47;	author tw;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2016.12.30.19.25.44;	author tw;	state Exp;
+branches;
+next	;
+
+
+desc
+@ksh user experience
+@
+
+
+1.29
+log
+@
+@
+text
+@# @@(#)[:SR4?YKx^=i2MU(j$#uH?: 2017/08/01 02:52:13 tw@@csongor.lan]
+# ksh profile
+# vim: ts=4 ft=ksh
+
+# we are NOT sourcing /etc/ksh.kshrc because it does way too much stuff we 
+# don't need. But these come from there.
+export me=$HOME/work/clients/me
+export UID=${UID:-$(id -u)}
+export USER=${USER:-$(id -un)}
+export LOGNAME=$USER
+export HOME="$(getent passwd $USER | awk -F: '{print $6}')"
+TTY="${TTY:-$(basename "$(tty)")}"
+export HOSTNAME=${HOSTNAME:-$(uname -n)}
+export HOST=${HOSTNAME%%.*}
+[[ -n $console ]]|| {
+	console=$(sysctl kern.consdev)
+	console=${console#*=}
+  }
+
+export SYSLOCAL=/usr/local
+export ISO_DATE='%Y-%m-%d %H:%M:%S %z'
+
+# XDG paths
+if [[ -d ${XDG_CONFIG_HOME:-~/.config} ]]; then
+	XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-~/.config}
+	if [[ -f $XDG_CONFIG_HOME/user-dirs.dirs ]]; then
+		. $XDG_CONFIG_HOME/user-dirs.dirs
+	fi
+	for v in $(typeset +); do [[ $v == XDG_* ]]&& export $v; done
+
+	if [[ -d $XDG_CONFIG_HOME/ksh ]]; then
+		export KDOTDIR=$XDG_CONFIG_HOME/ksh
+		K=$KDOTDIR
+		F=$K/functions
+		B=$K/bin
+	fi
+fi
+xdgdata=$XDG_DATA_HOME
+xdgcfg=$XDG_CONFIG_HOME
+xdgcache=$XDG_CACHE_HOME
+
+# paths
+export FPATH=${KDOTDIR}/functions
+export LOCALBIN=${xdgdata}/bin
+export PERL_CPANM_HOME=${xdgdata}/cpanm
+export PERLBREW_ROOT=${xdgdata}/perl5/perlbrew
+export PERLBREW_BIN=${PERLBREW_ROOT}/bin
+export PERLBREW_MANPATH=$PERLBREW_ROOT/perls/perl-5.24.1/man
+export PERLBREW_PERL=perl-5.24.1
+export PERLBREW_PATH=$PERLBREW_BIN:$PERLBREW_ROOT/perls/perl-5.24.1/bin
+export PERLBREW_HOME=${xdgcache}/perlbrew
+export PERLBREW_SKIP_INIT=''
+export PERLBREW_LIB=''
+export PERL5LIB=${xdgdata}/lib/perl
+export TEMPLATES_FOLDER=${xdgdata}/templates
+export TMPDIR=${xdgdata}/temp
+export USRBIN=${HOME}/bin/ksh
+export USRLIB=${xdgdata}/lib
+export USR_CLIB=${xdgdata}/lib/c
+export PERL_UNICODE=AS
+export USR_PLIB=$PERL5LIB
+
+[[ :$PATH: == *:$PERLBREW_PATH:*	]]|| PATH=$PERLBREW_PATH:$PATH
+[[ :$PATH: == *:$LOCALBIN:*			]]|| PATH=$LOCALBIN:$PATH
+[[ :$PATH: == *:$USRBIN:*			]]|| PATH=$USRBIN:$PATH
+
+# input, locale, and such
+set -o vi -o vi-tabcomplete
+set -o braceexpand -o vi -o ignoreeof -o physical
+
+export GTK_IM_MODULE=xim
+export INPUTRC=$xdgcfg/init/input.rc
+export LANG=en_US.UTF-8
+for v in ALL COLLATE CTYPE MESSAGES MONETARY NUMERIC TIME; do
+	export LC_$v=$LANG
+done
+export PRINTER=poco
+export QT_IM_MODULE=xim
+export XCOMPOSEFILE=$xdgcfg/x11/Compose.tw
+export XMODIFIERS='@@im=none'
+
+# init files and paths
+export BC_ENV_ARG=$xdgcfg/etc/bc.rc
+export BZR_HOME=$xdgcfg/bzr
+export CALENDAR_DIR=$xdgcfg/calendar
+export HGRCPATH=$xdgcfg/hg
+
+# editor
+export MYVIM=$xdgcfg/vim
+export MYVIMRC=$MYVIM/vimrc
+export VIMINIT="so $MYVIMRC"
+
+# default apps
+export BROWSER=$HOME/bin/start-firefox
+export CC=$SYSLOCAL/bin/clang
+export EDITOR=$SYSLOCAL/bin/vim
+export PAGER=/usr/bin/less
+
+# mail
+export EMAIL='tom@@greyshirt.net'
+export FETCHMAILHOME=$xdgcfg/fetchmail
+export MAILCHECK=-1
+export MAILDROP=/var/mail/$USER
+export MAILPATH=''
+export MAIL_HOME=$xdgcfg/mail
+export MAILRC=$MAIL_HOME/mail.rc
+export MBOX=$MAIL_HOME/mbox
+export NMH=$xdgcfg/nmh
+export MH=$NMH/config
+
+# misc
+export CLICOLOR=1
+export COLORTERM=truecolor
+export CSONGOR_XTERM_WINDOW_BG='#FFFFFF' CSONGOR_XTERM_WINDOW_FG='#000000'
+export CVSROOT='anoncvs@@anoncvs4.usa.openbsd.org:/cvs'
+export GNUPGHOME=$xdgdata/gnupg
+export GPG_AGENT=$SYSLOCAL/bin/gpg-agent
+export ISO_DATE='%Y-%m-%d %H:%M:%S %z'
+export ISO_WEEK='%G-W%V-%u'
+export LESS='-RcgiSw#8'
+export LESSHISTFILE='-'
+export LS_OPTIONS='-FG'
+
+osrev=$(uname -r)
+osarc=$(uname -m)
+PKG_PATH=ftp://ftp4.usa.openbsd.org/pub/OpenBSD/$osrev/packages/$osarc
+export PKG_PATH
+export POD_TO_TEXT_ANSI=1
+export TZ=EST5EDT
+
+#-----8<------8<-----
+export dskBROWSER=1
+export dskWIDGIT=7
+export dskXAPP=6
+#----->8------>8-----
+
+TAB='	'
+NL='
+'
+
+LOGPS1='\n'\
+'%:KSH:% \D{%Y.%m.%d.%H.%M.%S.%z} \w\n'\
+'\[\e[33m\]['\
+'\[\e[32m\]$( local E=$?; ((E))|| printf "ok" )'\
+'\[\e[48;5;224;31m\]$( local E=$?; ((E))&& printf " %d " $E )'\
+'\[\e[0;33m\]]'\
+'\[\\e[0;34m\]\$'\
+'\[\e[0m\] '
+
+export PS1=\
+'$(forceline)'\
+'\[\e[33m\]['\
+'\[\e[31m\]KSH '\
+'\[\e[32m\]\u'\
+'\[\e[33m\]@@'\
+'\[\e[32m\]\h '\
+'\[\e[34m\]\W'\
+'\[\e[33m\]]'\
+'\[\e[48;5;224;31m\]$( local E=$?; ((E))&& printf "[%d]" $E )'\
+'\[\e[0m\]\$ '
+
+unalias stop r
+typeset -fu r help
+
+alias cd='newcd'
+alias cls='clear; ls'
+alias doas='doas '
+alias ls='/usr/local/bin/colorls ${LS_OPTIONS}'
+alias math='noglob math'
+alias noglob='set -f;noglob '; function noglob { "$@@"; set +f; }
+alias prn="printf '  \e[35m｢\e[39m%s\e[35m｣\e[39m\n'"
+alias cowmath='noglob cowmath'
+
+. ${KDOTDIR}/completions
+@
+
+
+1.28
+log
+@cd is now newcd, used by alias, so do that.
+@
+text
+@d34 2
+@
+
+
+1.27
+log
+@
+@
+text
+@a159 1
+typeset -fu cd r help
+d161 1
+@
+
+
+1.26
+log
+@
+@
+text
+@d170 1
+@
+
+
+1.25
+log
+@
+@
+text
+@d167 1
+@
+
+
+1.24
+log
+@
+@
+text
+@d7 1
+@
+
+
+1.23
+log
+@
+@
+text
+@a168 1
+
+@
+
+
+1.22
+log
+@
+@
+text
+@d159 1
+a159 1
+typeset -fu cd r
+@
+
+
+1.21
+log
+@
+@
+text
+@d162 3
+a165 1
+alias cls='clear; ls'
+a166 1
+alias doas='doas '
+@
+
+
+1.20
+log
+@add useful aliases
+@
+text
+@d7 4
+a10 4
+UID=${UID:-$(id -u)}
+USER=${USER:-$(id -un)}
+LOGNAME=$USER
+HOME="$(getent passwd $USER | awk -F: '{print $6}')"
+d12 2
+a13 2
+HOSTNAME=${HOSTNAME:-$(uname -n)}
+HOST=${HOSTNAME%%.*}
+d18 1
+a18 1
+export UID USER HOME HOST HOSTNAME LOGNAME
+a19 1
+
+d134 3
+a136 1
+
+@
+
+
+1.19
+log
+@
+@
+text
+@d164 2
+@
+
+
+1.18
+log
+@
+@
+text
+@d87 3
+a89 4
+MYVIM=$xdgcfg/vim
+MYVIMRC=$MYVIM/vimrc
+VIMINIT="so $MYVIMRC"
+export MYVIM MYVIMRC VIMINIT
+a166 2
+
+# vim: filetype=zsh ts=4
+@
+
+
+1.17
+log
+@
+@
+text
+@d3 1
+a3 1
+# vim: ts=4 ft=sh
+d160 1
+@
+
+
+1.16
+log
+@
+@
+text
+@d1 1
+a1 1
+# @@(#)[:SR4?YKx^=i2MU(j$#uH?: 2017/07/28 05:05:21 tw@@csongor.lan]
+d159 1
+a159 1
+typeset -fu cd
+@
+
+
+1.15
+log
+@
+@
+text
+@d163 2
+@
+
+
+1.14
+log
+@
+@
+text
+@d1 1
+a1 1
+# @@(#)[:SR4?YKx^=i2MU(j$#uH?: 2017/07/28 04:26:21 tw@@csongor.lan]
+d21 2
+d38 1
+d43 9
+d58 2
+d61 3
+a63 2
+[[ :$PATH: == *:$LOCALBIN:* ]]|| PATH=$LOCALBIN:$PATH
+[[ :$PATH: == *:$USRBIN:*   ]]|| PATH=$USRBIN:$PATH
+d135 2
+@
+
+
+1.13
+log
+@
+@
+text
+@d1 1
+a1 1
+# @@(#)[:SR4?YKx^=i2MU(j$#uH?: 2017/07/28 04:15:48 tw@@csongor.lan]
+d46 3
+@
+
+
+1.12
+log
+@
+@
+text
+@d1 1
+a1 1
+# @@(#)[:SR4?YKx^=i2MU(j$#uH?: 2017/07/26 00:39:28 tw@@csongor.lan]
+d38 8
+a45 8
+FPATH=$KDOTDIR/functions
+LOCALBIN=$xdgdata/bin
+TEMPLATES_FOLDER=$xdgdata/templates
+TMPDIR=$xdgdata/temp
+USRBIN=$HOME/bin/ksh
+USRLIB=$xdgdata/lib
+USR_CLIB=$xdgdata/lib/c
+export FPATH LOCALBIN TEMPLATES_FOLDER TMPDIR USRBIN USRLIB USR_CLIB
+a146 1
+PERL5LIB=/home/tw/.local/lib/perl
+@
+
+
+1.11
+log
+@
+@
+text
+@d147 1
+@
+
+
+1.10
+log
+@
+@
+text
+@d1 1
+a1 1
+# @@(#)[:SR4?YKx^=i2MU(j$#uH?: 2017/07/17 04:33:48 tw@@csongor.lan]
+d30 1
+a30 1
+		KDOTDIR=$XDG_CONFIG_HOME/ksh
+d45 1
+a45 1
+export LOCALBIN TEMPLATES_FOLDER TMPDIR USRBIN USRLIB USR_CLIB
+@
+
+
+1.9
+log
+@[syn] change show => showvar
+@
+text
+@d1 1
+a1 1
+# @@(#)[:SR4?YKx^=i2MU(j$#uH?: 2017/07/07 09:07:16 tw@@csongor.lan]
+d42 1
+a42 1
+USRBIN=$HOME/bin
+@
+
+
+1.8
+log
+@
+@
+text
+@d1 1
+a1 1
+# @@(#)[:SR4?YKx^=i2MU(j$#uH?: 2017/07/05 12:22:33 tw@@csongor.lan]
+d139 1
+a139 1
+typeset -fu cd show
+@
+
+
+1.7
+log
+@
+@
+text
+@d1 1
+a1 1
+# @@(#)[:SR4?YKx^=i2MU(j$#uH?: 2017/07/05 06:01:05 tw@@csongor.lan]
+d139 1
+a139 1
+typeset -fu cd
+@
+
+
+1.6
+log
+@better handle vim stuff
+@
+text
+@d1 1
+a1 1
+# @@(#)[:SR4?YKx^=i2MU(j$#uH?: 2017/05/21 06:31:21 tw@@csongor.lan]
+d48 2
+a49 2
+set -o vi
+set -o vi-tabcomplete
+@
+
+
+1.5
+log
+@add completions
+@
+text
+@d67 6
+a72 1
+export VIMINIT="so $xdgcfg/vim/vimrc"
+@
+
+
+1.4
+log
+@
+@
+text
+@d139 2
+@
+
+
+1.3
+log
+@
+@
+text
+@d1 1
+a1 1
+# @@(#)[:SR4?YKx^=i2MU(j$#uH?: 2017/05/20 19:07:43 tw@@csongor.lan]
+d5 15
+a19 1
+. /etc/ksh.kshrc
+d21 93
+a113 1
+export PS1='\n'\
+d122 11
+a132 1
+export LS_OPTIONS='-FG'
+d134 1
+a134 12
+function die { # {{{1
+	printf '  \e[31mFAILED\e[0m: %s\n' "$1"; shift
+	printf '          %s\n' "$@@"
+	kill -QUIT $$
+} >&2 #}}}1
+function warn { # {{{1
+	printf '  \e[38;5;172mwarning\e[0m: %s\n' "$1"; shift
+	printf '           %s\n' "$@@"
+} >&2 #}}}1
+function ls { /usr/local/bin/colorls $LS_OPTIONS "$@@"; }
+function mcd { mkdir -p "$1"; cd "$1"; }
+function cd { (($#))|| set $HOME; builtin cd $1; }
+d139 1
+a139 5
+set -o vi
+set -o vi-tabcomplete
+
+#SHELL=/bin/ksh
+alias script="script \$(mktemp $HOME/log/script/sXXXXXXXXX)"
+@
+
+
+1.2
+log
+@
+@
+text
+@d1 1
+a1 1
+# @@(#)[:SR4?YKx^=i2MU(j$#uH?: 2017/04/14 01:47:46 tw@@csongor.lan]
+d4 2
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d1 1
+a1 1
+# @@(#)[:SR4?YKx^=i2MU(j$#uH?: 2016/12/30 19:25:29 tw@@csongor.lan]
+d5 2
+a6 1
+PS1=\
+d8 1
+a8 2
+'\[\e[32m\]\W'\
+'\[\e[33m\]]'\
+d10 2
+a11 1
+'\[\\e[0;34m\]>'\
+d14 2
+d29 3
+d34 3
+@

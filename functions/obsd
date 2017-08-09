@@ -1,0 +1,85 @@
+# @(#)[:fO6biwH<kVqG@*~VQi<P: 2017-08-07 21:17:56 Z tw@csongor]
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+# SYNOPSIS: Handle mail from the OpenBSD CVS change list specially.
+
+function obsd {
+	local P="${PAGER:-less}" filter='' W=10 refold=''
+	needs show fold awk $P cat
+
+	# arbitary number after which the file list will be shown as "*"
+	MAXFILES=${OBSD_MAXFILE_LIST:-7}
+	(($MAXFILES))|| warn 'OBSD_MAXFILE_LIST is set to 0, no files listed.'
+	filter="$(cat)" <<-\
+		\==AWK==
+		# |>>> inbox:5          ← when there's more than one (1) message
+		/^>>> [a-z]+:[0-9]+$/			{ N=$2; p=0; }
+		# |(Message inbox:5)    ← when there's only one (1) message
+		/^\(Message [a-z]+:[0-9]+\)$/	{ sub("\\)",""); N=$2; p=0; }
+		# from start of log message excluding the header
+		/^Modified files:/				{ Fa="";  f=1; next; }
+		/^Added files:/					{ Fa="+"; f=1; next; }
+		/^Removed files:/				{ Fa="-"; f=1; next; }
+		f==1 && /^$/					{ f=0; next; }
+		f==1 {
+			if ($1 ~ /:$/)		{ i=2; }
+			else if ($2 == ":")	{ i=3; }
+			else				{ i=1; }
+			while (i<=NF) { F[Fa$i]++; i++; }
+		  }
+		/^Log [Mm]essage:/ {
+			p=1;
+			B=0;
+			printf( "%s%s\n", L, N);
+			x="(";
+			if (length(F) > MAXFILES)
+				printf("(*");
+			else
+				for (k in F) {printf( "%s%s", x, k ); x=" "}
+			printf( ") " );
+			delete F;
+			Fx=0;
+			L = "\n";
+			next;
+		  }
+		# until a blank line
+		p==0						{next;}
+		/^$/						{B=1; next}
+		# |ok kettenis@[ dhill@]
+		/^[Oo][Kk]( [a-z]+@,?)+$/	{next;}
+		B==1				{printf( "\n\n" ); B=0;}
+		# always
+							{printf( "%s ", $0 );}
+		==AWK==
+
+	refold="$(cat)" <<-\
+	==AWK==
+	/^[a-z]+:[0-9]+\$/ {X=\$0;next}
+		{printf "%-${W}s%s\n",X,\$0;X="";}
+	==AWK==
+
+#printf '%s\n' "$refold"
+
+	show +inbox obsd -nocheckmime -form mhl.body	|
+		awk -v MAXFILES=$MAXFILES "$filter"			|
+		fold -s -w $((COLUMNS-W-2))					|
+		awk "$refold"
+
+	return 0
+
+	local OUTPUT linecount
+	OUTPUT="$( show +inbox obsd -nocheckmime -form mhl.body	|
+				awk -v MAXFILES=$MAXFILES "$filter"			|
+				fold -s -w $((COLUMNS-W-2))					|
+				awk "$refold"
+			)"
+	linecount=$(print "$OUTPUT"|wc -l|tr -cd '[0-9')
+
+	[[ -t 1 ]]||			P=cat
+	((linecount<LINES))&&	P=cat
+
+	print "$OUTPUT"|$P
+}
+
+
+# Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

@@ -1,0 +1,83 @@
+# @(#)[:o1P4h|tu^H9H?RjM$FaZ: 2017/07/17 04:31:09 tw@csongor.lan]
+
+# Shows information about a variable.
+#
+# Because the variable is accessed by name and any variable assignment 
+# inside the function would potentially overwrite the information we 
+# would need to access later, all variable handling is done with 
+# positional variables/parameters of the function.
+#
+# Consequently, this is more complex and obfuscated than it could have 
+# otherwise been.
+
+function showvar {
+	(($#==1))|| die 'usage: showvar var'
+	[[ "${1:-x}" == @(_|\!|\$|\-|IFS) ]] && {
+		printf '  \e[1m%s\e[22m is a \e[1mksh special\e[22m with a value of:\n' $1
+		case $1 in
+			\_)		printf "  '%s'\n" $_;							;;
+			\!)		printf "  '%s'\n" $!;							;;
+			\$)		printf "  '%s'\n" $$;							;;
+			\-)		printf "  '%s'\n" $-;							;;
+			IFS)	printf "  '%s'\n" "$(echo -n "$IFS"|cat -te)";	;;
+			*)  printf '  \e[31mBad Programmer!\e[0m\n';			;;
+		esac
+		return 0
+	}
+	(eval ": \${$1?}" 2>/dev/null) ||
+		die 'showvar: variable is null or not set.'
+	[[ $1 == @(\@|\*|\#|\?|LINENO) ]]&& die 'showvar: special variable, not available.'
+	[[ $1 == +([0-9]) ]]&& die 'showvar: positional variable, not available.'
+	[[ $1 == *(0) ]]&& die 'showvar: variable not available.'
+
+	printf '  \e[1m%s\e[22m is ' "$1"
+
+	set -- "$(typeset|egrep '[[:<:]]'"$1"'$')" $(typeset +|egrep "^$1"'(\[[0-9]+\])?$')
+
+	if (($#==1)); then
+		printf 'an \e[1mempty array\e[0m.'
+	elif (($#>2)); then
+		shift
+		printf 'an \e[1marray\e[0m with \e[1m%d\e[0m slots.\n' $#
+		while (($#)); do
+			set -- "${1#*\[}" "$@"
+			set -- "${1%\]}" "$@"
+			eval set -- "\"\${$3}\"" "$@"
+			printf "%4d: '%s'\n" $2 "$1"
+			shift 4
+		done
+	elif [[ "$2" == *'[0]' ]]; then
+		printf 'an \e[1marray\e[0m with \e[1m1\e[0m slot.\n'
+		eval set -- "\"\${$2}\""
+		printf "%4d: '%s'\n" 1 "$1"
+	else
+		set -- $1
+		shift
+		if [[ " $* " == *' -i '* ]]; then
+			printf 'an \e[1minteger'
+		elif [[ " $* " == *' -U '* ]]; then
+			printf 'an \e[1munsigned'
+		else
+			printf 'a \e[1mscalar'
+		fi
+
+		while (($#>1)); do
+			case $1 in
+				-L*)	printf '-left(%d)' ${1#-L};			;;
+				-l)		printf '-lowercase';				;;
+				-R*)	printf '-right(%d)' ${1#-R};		;;
+				-r)		printf '-readonly';					;;
+				-r)		printf '-tag';						;;
+				-u)		printf '-uppercase';				;;
+				-x)		printf '-export';					;;
+				-Z*)	printf '-zerofill(%d)' ${1#-Z};		;;
+			esac
+			shift
+		done
+		printf '\e[0m with a value of:\n'
+		eval set -- "\"\${$1}\""
+		printf "  '%s'\n" "$1"
+	fi
+}
+
+# vim: ft=zsh ts=4 nowrap

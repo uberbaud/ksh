@@ -1,0 +1,4 @@
+^Bbreak^b [^U^Blevel^b^u]
+        Exit the ^U^Blevel^b^uth inner-most ^Bfor^b, ^Bselect^b, ^Buntil^b, or ^Bwhile^b loop.
+        ^U^Blevel^b^u defaults to 1.
+

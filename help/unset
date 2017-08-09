@@ -1,0 +1,5 @@
+^Bunset^b [^B-fv^b] ^U^Bparameter^b^u ^U^B...^b^u
+        Unset the named parameters (^B-v^b, the default) or functions (^B-f^b).
+        The exit status is non-zero if any of the parameters have the
+        read-only attribute set, zero otherwise.
+

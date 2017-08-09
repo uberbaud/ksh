@@ -1,0 +1,12 @@
+# @(#)[:x?<9ZxZ#-OWIoVJ8hKXX: 2017/07/27 03:54:08 tw@csongor.lan]
+
+# Double carets ( '^' → '^^' ), which is quoted for
+# inclusion in a sparkle. Result ⇒ REPLY
+
+function desparkle {
+	typeset -- t="$*" p=''
+	while [[ "$t" == *'^'* ]] { p="$p${t%%^*}^^"; t="${t#*^}"; }
+	REPLY="$p$t"
+}
+
+# vim: ft=ksh ts=4

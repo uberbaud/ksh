@@ -1,0 +1,40 @@
+^Bgetopts^b ^U^Boptstring^b^u ^U^Bname^b^u [^U^Barg^b^u ^U^B...^b^u]
+        Used by shell procedures to parse the specified arguments (or
+        positional parameters, if no arguments are given) and to check
+        for legal options.  ^U^Boptstring^b^u contains the option letters that
+        ^Bgetopts^b is to recognize.  If a letter is followed by a colon, the
+        option is expected to have an argument.  Options that do not take
+        arguments may be grouped in a single argument.  If an option
+        takes an argument and the option character is not the last
+        character of the argument it is found in, the remainder of the
+        argument is taken to be the option's argument; otherwise, the
+        next argument is the option's argument.
+
+        Each time ^Bgetopts^b is invoked, it places the next option in the
+        shell parameter ^U^Bname^b^u and the index of the argument to be
+        processed by the next call to ^Bgetopts^b in the shell parameter
+        OPTIND.  If the option was introduced with a ‘+’, the option
+        placed in ^U^Bname^b^u is prefixed with a ‘+’.  When an option requires
+        an argument, ^Bgetopts^b places it in the shell parameter OPTARG.
+
+        When an illegal option or a missing option argument is
+        encountered, a question mark or a colon is placed in ^U^Bname^b^u
+        (indicating an illegal option or missing argument, respectively)
+        and OPTARG is set to the option character that caused the
+        problem.  Furthermore, if ^U^Boptstring^b^u does not begin with a colon,
+        a question mark is placed in ^U^Bname^b^u, OPTARG is unset, and an error
+        message is printed to standard error.
+
+        When the end of the options is encountered, ^Bgetopts^b exits with a
+        non-zero exit status.  Options end at the first (non-option
+        argument) argument that does not start with a ‘-’, or when a ‘--’
+        argument is encountered.
+
+        Option parsing can be reset by setting OPTIND to 1 (this is done
+        automatically whenever the shell or a shell procedure is
+        invoked).
+
+        Warning: Changing the value of the shell parameter OPTIND to a
+        value other than 1, or parsing different sets of arguments
+        without resetting OPTIND, may lead to unexpected results.
+

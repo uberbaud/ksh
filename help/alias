@@ -1,0 +1,25 @@
+^Balias^b [^B-d^b | ^B-t^b [^B-r^b] | ^B+-x^b] [^B-p^b] [^B+^b] [^U^Bname^b^u [=^U^Bvalue^b^u] ^U^B...^b^u]
+        Without arguments, ^Balias^b lists all aliases.  For any name without
+        a value, the existing alias is listed.  Any name with a value
+        defines an alias (see ^U^BAliases^b^u above).
+
+        When listing aliases, one of two formats is used.  Normally,
+        aliases are listed as ^U^Bname^b^u=^U^Bvalue^b^u, where ^U^Bvalue^b^u is quoted.  If
+        options were preceded with ‘+’, or a lone ‘+’ is given on the
+        command line, only ^U^Bname^b^u is printed.
+
+        The ^B-d^b option causes directory aliases, which are used in tilde
+        expansion, to be listed or set (see ^U^BTilde^b^u ^U^Bexpansion^b^u above).
+
+        If the ^B-p^b option is used, each alias is prefixed with the string
+        “alias ”.
+
+        The ^B-t^b option indicates that tracked aliases are to be listed/set
+        (values specified on the command line are ignored for tracked
+        aliases).  The ^B-r^b option indicates that all tracked aliases are
+        to be reset.
+
+        The ^B-x^b option sets (^B+x^b clears) the export attribute of an alias
+        or, if no names are given, lists the aliases with the export
+        attribute (exporting an alias has no effect).
+

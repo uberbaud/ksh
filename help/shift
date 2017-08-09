@@ -1,0 +1,4 @@
+^Bshift^b [^U^Bnumber^b^u]
+        The positional parameters ^U^Bnumber^b^u+1, ^U^Bnumber^b^u+2, etc. are renamed to
+        ‘1’, ‘2’, etc.  ^U^Bnumber^b^u defaults to 1.
+

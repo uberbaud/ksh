@@ -1,0 +1,12 @@
+^Bexec^b [^U^Bcommand^b^u [^U^Barg^b^u ^U^B...^b^u]]
+        The command is executed without forking, replacing the shell
+        process.
+
+        If no command is given except for I/O redirection, the I/O
+        redirection is permanent and the shell is not replaced.  Any file
+        descriptors greater than 2 which are opened or dup(2)'d in this
+        way are not made available to other executed commands (i.e.
+        commands that are not built-in to the shell).  Note that the
+        Bourne shell differs here; it does pass these file descriptors
+        on.
+

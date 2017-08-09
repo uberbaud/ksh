@@ -1,0 +1,13 @@
+# @(#)[:CRDAX(x!ZH`;Y8;R0ppb: 2017-08-06 19:02:04 Z tw@csongor]
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+# SYNOPSIS: Pause the aMuse player.
+
+function pause {
+	set-amuse-env
+	command pkill -SIGINT -f "${amusePlayerId:?}"
+	sleep 0.1
+}
+
+
+# Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

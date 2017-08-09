@@ -1,0 +1,176 @@
+^Bset^b [^B+-abCefhkmnpsuvXx^b] [^B+-o^b ^U^Boption^b^u] [^B+-A^b ^U^Bname^b^u] [^B--^b] [^U^Barg^b^u ^U^B...^b^u]
+        The ^Bset^b command can be used to set (^B-^b) or clear (^B+^b) shell
+        options, set the positional parameters, or set an array
+        parameter.  Options can be changed using the ^B+-o^b ^U^Boption^b^u syntax,
+        where ^U^Boption^b^u is the long name of an option, or using the ^B+-^b^U^Bletter^b^u
+        syntax, where ^U^Bletter^b^u is the option's single letter name (not all
+        options have a single letter name).  The following table lists
+        both option letters (if they exist) and long names along with a
+        description of what the option does:
+
+        ^B-A^b ^U^Bname^b^u          Sets the elements of the array parameter ^U^Bname^b^u to
+                         ^U^Barg^b^u ^U^B...^b^u If ^B-A^b is used, the array is reset (i.e.
+                         emptied) first; if ^B+A^b is used, the first N
+                         elements are set (where N is the number of
+                         arguments); the rest are left untouched.
+
+        ^B-a^b | ^Ballexport^b   All new parameters are created with the export
+                         attribute.
+
+        ^B-b^b | ^Bnotify^b      Print job notification messages asynchronously,
+                         instead of just before the prompt.  Only used if
+                         job control is enabled (^B-m^b).
+
+        ^B-C^b | ^Bnoclobber^b   Prevent ^B>^b redirection from overwriting existing
+                         files.  Instead, ^B>|^b must be used to force an
+                         overwrite.
+
+        ^B-e^b | ^Berrexit^b     Exit (after executing the ERR trap) as soon as
+                         an error occurs or a command fails (i.e. exits
+                         with a non-zero status).  This does not apply to
+                         commands whose exit status is explicitly tested
+                         by a shell construct such as ^Bif^b, ^Buntil^b, ^Bwhile^b,
+                         or ^B!^b statements.  For ^B&&^b or ^B||^b, only the status
+                         of the last command is tested.
+
+        ^B-f^b | ^Bnoglob^b      Do not expand file name patterns.
+
+        ^B-h^b | ^Btrackall^b    Create tracked aliases for all executed commands
+                         (see ^U^BAliases^b^u above).  Enabled by default for
+                         non-interactive shells.
+
+        ^B-k^b | ^Bkeyword^b     Parameter assignments are recognized anywhere in
+                         a command.
+
+        ^B-m^b | ^Bmonitor^b     Enable job control (default for interactive
+                         shells).
+
+        ^B-n^b | ^Bnoexec^b      Do not execute any commands.  Useful for
+                         checking the syntax of scripts (ignored if
+                         interactive).
+
+        ^B-p^b | ^Bprivileged^b  The shell is a privileged shell.  It is set
+                         automatically if, when the shell starts, the
+                         real UID or GID does not match the effective UID
+                         (EUID) or GID (EGID), respectively.  See above
+                         for a description of what this means.
+
+        ^B-s^b | ^Bstdin^b       If used when the shell is invoked, commands are
+                         read from standard input.  Set automatically if
+                         the shell is invoked with no arguments.
+
+                         When ^B-s^b is used with the ^Bset^b command it causes
+                         the specified arguments to be sorted before
+                         assigning them to the positional parameters (or
+                         to array ^U^Bname^b^u, if ^B-A^b is used).
+
+        ^B-u^b | ^Bnounset^b     Referencing of an unset parameter is treated as
+                         an error, unless one of the ‘-’, ‘+’, or ‘=’
+                         modifiers is used.
+
+        ^B-v^b | ^Bverbose^b     Write shell input to standard error as it is
+                         read.
+
+        ^B-X^b | ^Bmarkdirs^b    Mark directories with a trailing ‘/’ during file
+                         name generation.
+
+        ^B-x^b | ^Bxtrace^b      Print commands and parameter assignments when
+                         they are executed, preceded by the value of PS4.
+
+        ^Bbgnice^b           Background jobs are run with lower priority.
+
+        ^Bbraceexpand^b      Enable brace expansion (a.k.a. alternation).
+
+        ^Bcsh-history^b      Enables a subset of csh(1)-style history editing
+                         using the ‘!’ character.
+
+        ^Bemacs^b            Enable BRL emacs-like command-line editing
+                         (interactive shells only); see ^U^BEmacs^b^u ^U^Bediting^b^u
+                         ^U^Bmode^b^u.
+
+        ^Bemacs-usemeta^b    In emacs command-line editing, use the 8th bit
+                         as meta (^^[) prefix.  This is the default.
+
+        ^Bgmacs^b            Enable gmacs-like command-line editing
+                         (interactive shells only).  Currently identical
+                         to emacs editing except that transpose (^^T) acts
+                         slightly differently.
+
+        ^Bignoreeof^b        The shell will not (easily) exit when end-of-
+                         file is read; ^Bexit^b must be used.  To avoid
+                         infinite loops, the shell will exit if EOF is
+                         read 13 times in a row.
+
+        ^Binteractive^b      The shell is an interactive shell.  This option
+                         can only be used when the shell is invoked.  See
+                         above for a description of what this means.
+
+        ^Blogin^b            The shell is a login shell.  This option can
+                         only be used when the shell is invoked.  See
+                         above for a description of what this means.
+
+        ^Bnohup^b            Do not kill running jobs with a SIGHUP signal
+                         when a login shell exits.  Currently set by
+                         default; this is different from the original
+                         Korn shell (which doesn't have this option, but
+                         does send the SIGHUP signal).
+
+        ^Bnolog^b            No effect.  In the original Korn shell, this
+                         prevents function definitions from being stored
+                         in the history file.
+
+        ^Bphysical^b         Causes the ^Bcd^b and ^Bpwd^b commands to use “physical”
+                         (i.e. the filesystem's) ‘..’ directories instead
+                         of “logical” directories (i.e. the shell handles
+                         ‘..’, which allows the user to be oblivious of
+                         symbolic links to directories).  Clear by
+                         default.  Note that setting this option does not
+                         affect the current value of the PWD parameter;
+                         only the ^Bcd^b command changes PWD.  See the ^Bcd^b and
+                         ^Bpwd^b commands above for more details.
+
+        ^Bposix^b            Enable POSIX mode.  See ^U^BPOSIX^b^u ^U^Bmode^b^u above.
+
+        ^Brestricted^b       The shell is a restricted shell.  This option
+                         can only be used when the shell is invoked.  See
+                         above for a description of what this means.
+
+        ^Bsh^b               Enable strict Bourne shell mode (see ^U^BStrict^b^u
+                         ^U^BBourne^b^u ^U^Bshell^b^u ^U^Bmode^b^u above).
+
+        ^Bvi^b               Enable vi(1)-like command-line editing
+                         (interactive shells only).
+
+        ^Bvi-esccomplete^b   In vi command-line editing, do command and file
+                         name completion when escape (^^[) is entered in
+                         command mode.
+
+        ^Bvi-show8^b         Prefix characters with the eighth bit set with
+                         ‘M-’.  If this option is not set, characters in
+                         the range 128-160 are printed as is, which may
+                         cause problems.
+
+        ^Bvi-tabcomplete^b   In vi command-line editing, do command and file
+                         name completion when tab (^^I) is entered in
+                         insert mode.  This is the default.
+
+        ^Bviraw^b            No effect.  In the original Korn shell, unless
+                         ^Bviraw^b was set, the vi command-line mode would
+                         let the tty(4) driver do the work until ESC (^^[)
+                         was entered.  ^Bksh^b is always in viraw mode.
+
+        These options can also be used upon invocation of the shell.  The
+        current set of options (with single letter names) can be found in
+        the parameter ‘$-’.  ^Bset^b ^B-o^b with no option name will list all the
+        options and whether each is on or off; ^Bset^b ^B+o^b will print the
+        current shell options in a form that can be reinput to the shell
+        to achieve the same option settings.
+
+        Remaining arguments, if any, are positional parameters and are
+        assigned, in order, to the positional parameters (i.e. $1, $2,
+        etc.).  If options end with ‘--’ and there are no remaining
+        arguments, all positional parameters are cleared.  If no options
+        or arguments are given, the values of all names are printed.  For
+        unknown historical reasons, a lone ‘-’ option is treated
+        specially - it clears both the ^B-x^b and ^B-v^b options.
+

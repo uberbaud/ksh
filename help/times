@@ -1,0 +1,7 @@
+^Btimes^b   Print the accumulated user and system times used both by the
+        shell and by processes that the shell started which have exited.
+        The format of the output is:
+
+              0m0.00s 0m0.00s
+              0m0.00s 0m0.00s
+

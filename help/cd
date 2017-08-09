@@ -1,0 +1,22 @@
+^Bcd^b [^B-LP^b] [^U^Bdir^b^u]
+        Set the working directory to ^U^Bdir^b^u.  If the parameter CDPATH is
+        set, it lists the search path for the directory containing ^U^Bdir^b^u.
+        A NULL path means the current directory.  If ^U^Bdir^b^u is found in any
+        component of the CDPATH search path other than the NULL path, the
+        name of the new working directory will be written to standard
+        output.  If ^U^Bdir^b^u is missing, the home directory HOME is used.  If
+        ^U^Bdir^b^u is ‘-’, the previous working directory is used (see the
+        OLDPWD parameter).
+
+        If the ^B-L^b option (logical path) is used or if the ^Bphysical^b option
+        isn't set (see the ^Bset^b command below), references to ‘..’ in ^U^Bdir^b^u
+        are relative to the path used to get to the directory.  If the ^B-P^b
+        option (physical path) is used or if the ^Bphysical^b option is set,
+        ‘..’ is relative to the filesystem directory tree.  The PWD and
+        OLDPWD parameters are updated to reflect the current and old
+        working directory, respectively.
+
+^Bcd^b [^B-LP^b] ^U^Bold^b^u ^U^Bnew^b^u
+        The string ^U^Bnew^b^u is substituted for ^U^Bold^b^u in the current directory,
+        and the shell attempts to change to the new directory.
+

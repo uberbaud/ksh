@@ -1,0 +1,180 @@
+head	1.8;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.8
+date	2017.08.08.03.19.41;	author tw;	state Exp;
+branches;
+next	1.7;
+
+1.7
+date	2017.08.07.15.11.29;	author tw;	state Exp;
+branches;
+next	1.6;
+
+1.6
+date	2017.08.06.19.50.24;	author tw;	state Exp;
+branches;
+next	1.5;
+
+1.5
+date	2017.08.06.19.48.34;	author tw;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	2017.08.06.19.45.34;	author tw;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	2017.08.06.15.54.54;	author tw;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2017.08.06.15.54.35;	author tw;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2017.08.06.14.14.24;	author tw;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.8
+log
+@
+@
+text
+@@@ 2017-08-06 04:01:58 Z
+    ^F{5}=amuse=^f
+        :-:music-in-fs      amuse
+
+    ^F{5}=other=^f
+        forever       pk          rem:desc            stemma-header
+        note          pkg         requires-write
+@
+
+
+1.7
+log
+@
+@
+text
+@a4 4
+    ^F{5}=mail=^f
+        msg:filter      msg:headers       msg:to          msg:done
+        msg:from        msg:parts         obsd
+
+d6 2
+a7 4
+        forever                pk                  requires-write
+                               pkg                 stemma-header
+        note                   rem:desc            timestamp-to-epoch
+        msg-at
+@
+
+
+1.6
+log
+@
+@
+text
+@d11 1
+a11 1
+        i-can-haz-inet         pkg                 stemma-header
+@
+
+
+1.5
+log
+@sparkle
+@
+text
+@d3 1
+a3 1
+    :-:music-in-fs	amuse
+d6 2
+a7 2
+    msg:filter	msg:headers	msg:to		msg:done
+    msg:from	msg:parts	obsd
+d10 4
+a13 4
+    forever			pk			requires-write
+    i-can-haz-inet		pkg			stemma-header
+    note			rem:desc		timestamp-to-epoch
+    msg-at
+@
+
+
+1.4
+log
+@
+@
+text
+@d2 1
+a2 1
+    =amuse=
+d5 1
+a5 1
+    =mail=
+d9 1
+a9 1
+    ==other==
+@
+
+
+1.3
+log
+@add
+@
+text
+@d2 12
+a13 19
+    :-:amuse-env		msg:filter		requires-write
+    :-:music-in-fs		msg:from		reshell
+    again			msg:headers		restart
+    amuse			msg:parts		sam
+    clearout			msg:to			skip
+    final			obsd			stemma-header
+    forever			pause			stop
+    fortune			pk			timestamp-to-epoch
+    i-can-haz-inet		pkg			uberbaud
+    kclt			playing			usage
+    knyc			pushZ			vultr
+    msg-at			reZ			yes-or-no
+    msg:done			rem:desc		yt
+    lolcow			math			cowmath
+    note			todo/t
+@@ 2017-08-06 15:54:35 Z
+    plus
+@@ 2017-08-06 15:54:54 Z
+    again
+@
+
+
+1.2
+log
+@add
+@
+text
+@d19 2
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d17 2
+@

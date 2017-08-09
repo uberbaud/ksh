@@ -1,0 +1,46 @@
+^Bulimit^b [^B-acdfHlmnpSst^b [^U^Bvalue^b^u]] ^U^B...^b^u
+        Display or set process limits.  If no options are used, the file
+        size limit (^B-f^b) is assumed.  ^U^Bvalue^b^u, if specified, may be either
+        an arithmetic expression starting with a number or the word
+        “unlimited”.  The limits affect the shell and any processes
+        created by the shell after a limit is imposed; limits may not be
+        increased once they are set.
+
+        ^B-a^b     Display all limits; unless ^B-H^b is used, soft limits are
+               displayed.
+
+        ^B-c^b ^U^Bn^b^u   Impose a size limit of ^U^Bn^b^u blocks on the size of core dumps.
+
+        ^B-d^b ^U^Bn^b^u   Impose a size limit of ^U^Bn^b^u kilobytes on the size of the data
+               area.
+
+        ^B-f^b ^U^Bn^b^u   Impose a size limit of ^U^Bn^b^u blocks on files written by the
+               shell and its child processes (files of any size may be
+               read).
+
+        ^B-H^b     Set the hard limit only (the default is to set both hard
+               and soft limits).
+
+        ^B-l^b ^U^Bn^b^u   Impose a limit of ^U^Bn^b^u kilobytes on the amount of locked
+               (wired) physical memory.
+
+        ^B-m^b ^U^Bn^b^u   Impose a limit of ^U^Bn^b^u kilobytes on the amount of physical
+               memory used.  This limit is not enforced.
+
+        ^B-n^b ^U^Bn^b^u   Impose a limit of ^U^Bn^b^u file descriptors that can be open at
+               once.
+
+        ^B-p^b ^U^Bn^b^u   Impose a limit of ^U^Bn^b^u processes that can be run by the user
+               at any one time.
+
+        ^B-S^b     Set the soft limit only (the default is to set both hard
+               and soft limits).
+
+        ^B-s^b ^U^Bn^b^u   Impose a size limit of ^U^Bn^b^u kilobytes on the size of the
+               stack area.
+
+        ^B-t^b ^U^Bn^b^u   Impose a time limit of ^U^Bn^b^u CPU seconds spent in user mode to
+               be used by each process.
+
+        As far as ^Bulimit^b is concerned, a block is 512 bytes.
+

@@ -1,0 +1,18 @@
+# @(#)[:gT;8wdu5$3YgaDWnKwMB: 2017-08-07 16:08:35 Z tw@csongor]
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+# SYNOPSIS: output a warning to stderr
+
+function warn {
+	(($#))|| set '^GNo message provided^g'
+	local ln1="$1"; shift
+	if (($#)); then
+		printf '  ^Wwarning^w: %s\n' "$ln1"
+		printf '           %s\n' "$@"
+	else
+		printf '  ^Wwarning^w: %s\n' "$ln1"
+	fi | sparkle
+  } >&2
+
+
+# vim: ft=ksh ts=4

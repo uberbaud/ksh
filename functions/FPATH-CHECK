@@ -1,0 +1,10 @@
+# @(#)[:j}D-rhn?lWZw~07ff?Cl: 2017-08-01 19:53:16 Z tw@csongor]
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+# SYNOPSIS: returns true, but only if it's found meaning FPATH is
+#           set to here.
+
+function FPATH-CHECK { :; }
+
+
+# Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

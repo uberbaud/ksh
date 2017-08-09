@@ -1,0 +1,7 @@
+^Bhash^b [^B-r^b] [^U^Bname^b^u ^U^B...^b^u]
+        Without arguments, any hashed executable command pathnames are
+        listed.  The ^B-r^b option causes all hashed commands to be removed
+        from the hash table.  Each ^U^Bname^b^u is searched as if it were a
+        command name and added to the hash table if it is an executable
+        command.
+

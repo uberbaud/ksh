@@ -1,0 +1,32 @@
+^Bbind^b [^B-l^b]
+        The current bindings are listed.  If the ^B-l^b flag is given, ^Bbind^b
+        instead lists the names of the functions to which keys may be
+        bound.  See ^U^BEmacs^b^u ^U^Bediting^b^u ^U^Bmode^b^u for more information.
+
+^Bbind^b [^B-m^b] ^U^Bstring^b^u=[^U^Bsubstitute^b^u] ^U^B...^b^u
+^Bbind^b ^U^Bstring^b^u=[^U^Bediting-command^b^u] ^U^B...^b^u
+        The specified editing command is bound to the given ^U^Bstring^b^u.
+        Future input of the ^U^Bstring^b^u will cause the editing command to be
+        immediately invoked.  If the ^B-m^b flag is given, the specified
+        input ^U^Bstring^b^u will afterwards be immediately replaced by the given
+        ^U^Bsubstitute^b^u string, which may contain editing commands.  Control
+        characters may be written using caret notation.  For example, ^^X
+        represents Control-X.
+
+        If a certain character occurs as the first character of any bound
+        multi-character ^U^Bstring^b^u sequence, that character becomes a command
+        prefix character.  Any character sequence that starts with a
+        command prefix character but that is not bound to a command or
+        substitute is implicitly considered as bound to the ‘error’
+        command.  By default, two command prefix characters exist: Escape
+        (^^[) and Control-X (^X).
+
+        The following default bindings show how the arrow keys on an ANSI
+        terminal or xterm are bound (of course some escape sequences
+        won't work out quite this nicely):
+
+              bind '^^[[A'=up-history
+              bind '^^[[B'=down-history
+              bind '^^[[C'=forward-char
+              bind '^^[[D'=backward-char
+

@@ -1,0 +1,12 @@
+# @(#)[:Xu~&zw2?Y6`JrGXdvwK>: 2017-08-06 19:18:40 Z tw@csongor]
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+# SYNOPSIS: Skip the rest of the song
+
+function skip {
+	set-amuse-env
+	command pkill -SIGUSR1 -f ${amusePlayerId:?}
+}
+
+
+# Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

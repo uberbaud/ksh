@@ -1,0 +1,14 @@
+# @(#)[:C#7Xz|QVrq3d+cf8SmHn: 2017-08-06 19:10:13 Z tw@csongor]
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+# SYNOPSIS: Zero out paused-at to restart a paused song.
+
+function restart {
+	set-amuse-env
+	local p="${amuse_run:?}"/paused-at
+	[[ -s $p ]]|| pause
+	echo 0.0 >"$p"
+}
+
+
+# Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

@@ -1,0 +1,19 @@
+# @(#)[:ew^|t~X#Mv8F?;@N3~>u: 2017-08-06 19:21:29 Z tw@csongor]
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+# SYNOPSIS: Wrapper if stdout is a terminal
+
+function fortune {
+	needs fortune
+	(($#))|| set -- all
+
+	if [[ -t 1 ]]; then
+		needs cowsay lolcat
+		command fortune "$@" | cowsay -n | lolcat
+	else
+		command fortune "$@"
+	fi
+}
+
+
+# Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

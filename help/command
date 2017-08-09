@@ -1,0 +1,25 @@
+^Bcommand^b [^B-pVv^b] ^U^Bcmd^b^u [^U^Barg^b^u ^U^B...^b^u]
+        If neither the ^B-v^b nor ^B-V^b option is given, ^U^Bcmd^b^u is executed exactly
+        as if ^Bcommand^b had not been specified, with two exceptions:
+        firstly, ^U^Bcmd^b^u cannot be an alias or a shell function; and
+        secondly, special built-in commands lose their specialness (i.e.
+        redirection and utility errors do not cause the shell to exit,
+        and command assignments are not permanent).
+
+        If the ^B-p^b option is given, a default search path is used instead
+        of the current value of PATH (the actual value of the default
+        path is system dependent: on POSIX-ish systems, it is the value
+        returned by ^Bgetconf^b ^BPATH^b).  Nevertheless, reserved words,
+        aliases, shell functions, and builtin commands are still found
+        before external commands.
+
+        If the ^B-v^b option is given, instead of executing ^U^Bcmd^b^u, information
+        about what would be executed is given (and the same is done for
+        ^U^Barg^b^u ^U^B...^b^u).  For special and regular built-in commands and
+        functions, their names are simply printed; for aliases, a command
+        that defines them is printed; and for commands found by searching
+        the PATH parameter, the full path of the command is printed.  If
+        no command is found (i.e. the path search fails), nothing is
+        printed and ^Bcommand^b exits with a non-zero status.  The ^B-V^b option
+        is like the ^B-v^b option, except it is more verbose.
+

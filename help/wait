@@ -1,0 +1,16 @@
+^Bwait^b [^U^Bjob^b^u ^U^B...^b^u]
+        Wait for the specified job(s) to finish.  The exit status of ^Bwait^b
+        is that of the last specified job; if the last job is killed by a
+        signal, the exit status is 128 + the number of the signal (see
+        ^Bkill^b ^B-l^b ^U^Bexit-status^b^u above); if the last specified job can't be
+        found (because it never existed, or had already finished), the
+        exit status of ^Bwait^b is 127.  See ^U^BJob^b^u ^U^Bcontrol^b^u below for the format
+        of ^U^Bjob^b^u.  ^Bwait^b will return if a signal for which a trap has been
+        set is received, or if a SIGHUP, SIGINT, or SIGQUIT signal is
+        received.
+
+        If no jobs are specified, ^Bwait^b waits for all currently running
+        jobs (if any) to finish and exits with a zero status.  If job
+        monitoring is enabled, the completion status of jobs is printed
+        (this is not the case when jobs are explicitly specified).
+

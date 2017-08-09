@@ -1,0 +1,12 @@
+^Bumask^b [^B-S^b] [^U^Bmask^b^u]
+        Display or set the file permission creation mask, or umask (see
+        umask(2)).  If the ^B-S^b option is used, the mask displayed or set
+        is symbolic; otherwise, it is an octal number.
+
+        Symbolic masks are like those used by chmod(1).  When used, they
+        describe what permissions may be made available (as opposed to
+        octal masks in which a set bit means the corresponding bit is to
+        be cleared).  For example, “ug=rwx,o=” sets the mask so files
+        will not be readable, writable, or executable by “others”, and is
+        equivalent (on most systems) to the octal mask “007”.
+

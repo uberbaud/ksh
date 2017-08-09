@@ -1,0 +1,5 @@
+^Beval^b ^U^Bcommand^b^u ^U^B...^b^u
+        The arguments are concatenated (with spaces between them) to form
+        a single string which the shell then parses and executes in the
+        current environment.
+

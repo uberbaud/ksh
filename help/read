@@ -1,0 +1,24 @@
+^Bread^b [^B-prsu^b[^U^Bn^b^u]] [^U^Bparameter^b^u ^U^B...^b^u]
+        Reads a line of input from the standard input, separates the line
+        into fields using the IFS parameter (see ^U^BSubstitution^b^u above), and
+        assigns each field to the specified parameters.  If there are
+        more parameters than fields, the extra parameters are set to
+        NULL, or alternatively, if there are more fields than parameters,
+        the last parameter is assigned the remaining fields (inclusive of
+        any separating spaces).  If no parameters are specified, the
+        REPLY parameter is used.  If the input line ends in a backslash
+        and the ^B-r^b option was not used, the backslash and the newline are
+        stripped and more input is read.  If no input is read, ^Bread^b exits
+        with a non-zero status.
+
+        The first parameter may have a question mark and a string
+        appended to it, in which case the string is used as a prompt
+        (printed to standard error before any input is read) if the input
+        is a tty(4) (e.g. ^Bread^b ^Bnfoo?'number^b ^Bof^b ^Bfoos:^b ^B'^b).
+
+        The ^B-u^b^U^Bn^b^u and ^B-p^b options cause input to be read from file
+        descriptor ^U^Bn^b^u (^U^Bn^b^u defaults to 0 if omitted) or the current co-
+        process (see ^U^BCo-processes^b^u above for comments on this),
+        respectively.  If the ^B-s^b option is used, input is saved to the
+        history file.
+

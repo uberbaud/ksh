@@ -1,0 +1,11 @@
+^Bwhence^b [^B-pv^b] [^U^Bname^b^u ^U^B...^b^u]
+        For each ^U^Bname^b^u, the type of command is listed (reserved word,
+        built-in, alias, function, tracked alias, or executable).  If the
+        ^B-p^b option is used, a path search is performed even if ^U^Bname^b^u is a
+        reserved word, alias, etc.  Without the ^B-v^b option, ^Bwhence^b is
+        similar to ^Bcommand^b ^B-v^b except that ^Bwhence^b won't print aliases as
+        alias commands.  With the ^B-v^b option, ^Bwhence^b is the same as
+        ^Bcommand^b ^B-V^b.  Note that for ^Bwhence^b, the ^B-p^b option does not affect
+        the search path used, as it does for ^Bcommand^b.  If the type of one
+        or more of the names could not be determined, the exit status is
+        non-zero.

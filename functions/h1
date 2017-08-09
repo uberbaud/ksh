@@ -1,0 +1,15 @@
+# @(#)[:4HN(?sG5`~dxyjLF`s`O: 2017-08-06 18:07:37 Z tw@csongor]
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+# SYNOPSIS: Prints a banner with given text
+
+function h1 {
+	if [[ -t 1 ]]; then
+		printf "\e[1;44;37m%${COLUMNS}s\r ─ %s ─\e[0m\n" '' "$*"
+	else
+		printf "===[[ %s ]]===\n" "$*"
+	fi
+}
+
+
+# Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

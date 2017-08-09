@@ -1,0 +1,5 @@
+^Bbg^b [^U^Bjob^b^u ^U^B...^b^u]
+        Resume the specified stopped job(s) in the background.  If no
+        jobs are specified, ^B%+^b is assumed.  See ^U^BJob^b^u ^U^Bcontrol^b^u below for
+        more information.
+

@@ -1,0 +1,10 @@
+^Bjobs^b [^B-lnp^b] [^U^Bjob^b^u ^U^B...^b^u]
+        Display information about the specified job(s); if no jobs are
+        specified, all jobs are displayed.  The ^B-n^b option causes
+        information to be displayed only for jobs that have changed state
+        since the last notification.  If the ^B-l^b option is used, the
+        process ID of each process in a job is also listed.  The ^B-p^b
+        option causes only the process group of each job to be printed.
+        See ^U^BJob^b^u ^U^Bcontrol^b^u below for the format of ^U^Bjob^b^u and the displayed
+        job.
+

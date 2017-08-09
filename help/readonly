@@ -1,0 +1,11 @@
+^Breadonly^b [^B-p^b] [^U^Bparameter^b^u [=^U^Bvalue^b^u] ^U^B...^b^u]
+        Sets the read-only attribute of the named parameters.  If values
+        are given, parameters are set to them before setting the
+        attribute.  Once a parameter is made read-only, it cannot be
+        unset and its value cannot be changed.
+
+        If no parameters are specified, the names of all parameters with
+        the read-only attribute are printed one per line, unless the ^B-p^b
+        option is used, in which case ^Breadonly^b commands defining all
+        read-only parameters, including their values, are printed.
+

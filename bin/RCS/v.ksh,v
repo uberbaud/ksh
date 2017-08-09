@@ -1,0 +1,623 @@
+head	1.10;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.10
+date	2017.08.07.20.20.33;	author tw;	state Exp;
+branches;
+next	1.9;
+
+1.9
+date	2017.08.07.18.26.25;	author tw;	state Exp;
+branches;
+next	1.8;
+
+1.8
+date	2017.08.07.18.14.55;	author tw;	state Exp;
+branches;
+next	1.7;
+
+1.7
+date	2017.08.07.18.01.34;	author tw;	state Exp;
+branches;
+next	1.6;
+
+1.6
+date	2017.08.02.18.23.48;	author tw;	state Exp;
+branches;
+next	1.5;
+
+1.5
+date	2017.08.02.18.12.25;	author tw;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	2017.07.31.17.55.28;	author tw;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	2017.07.28.05.35.11;	author tw;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2017.07.26.02.18.27;	author tw;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2017.07.17.04.44.04;	author tw;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.10
+log
+@
+@
+text
+@#!/bin/ksh
+# @@(#)[:GpEYZa*c{{hMx~)jN6Sk: 2017/08/02 18:23:45 tw@@csongor.lan]
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
+
+typeset -- VIMCACHE="${HOME}/.local/vim/cache"
+
+[[ -d $VIMCACHE ]]|| die 'VIMCACHE does not exist.'
+[[ -n $LOCALBIN ]] || die '[36m$LOCALBIN[39m is not set.'
+[[ -d $LOCALBIN ]] || die '[36m$LOCALBIN[39m is not a directory.'
+[[ :"$PATH": == *:"$LOCALBIN":* ]]|| PATH="${PATH%:}:$LOCALBIN"
+
+[[ " ${DEBUG:-} " == *' v.zsh '* ]]&& set -x
+
+typeset -- this_pgm="${0##*/}"
+function usage { # {{{1
+	desparkle "$this_pgm"
+	PGM="$REPLY"
+	sparkle <<-\
+	==SPARKLE==
+	^F{4}Usage^f: ^T${PGM}^t  ^[^T-f^t^] ^Ufile^u ^[^Umessage^u^]
+	         ^T-f^t  Force edit even if ^Ufile^u isn't text.
+	       ^T${PGM} -h^t
+	         Show this help message.
+	==SPARKLE==
+	exit 0
+} # }}}
+# process -options {{{1
+function bad_programmer {	# {{{2
+	die 'Programmer error:'	\
+		"  No getopts action defined for [1m-$1[22m."
+  };	# }}}2
+typeset -- warnOrDie='die';
+typeset hasmsg=false rcsmsg=''
+while getopts ':m:fh' Option; do
+	case $Option in
+		f)	warnOrDie='warn';										;;
+		m) hasmsg=true; rcsmsg="$OPTARG";							;;
+		h)	usage;													;;
+		\?)	die "Invalid option: [1m-$OPTARG[22m.";				;;
+		\:)	die "Option [1m-$OPTARG[22m requires an argument.";	;;
+		*)	bad_programmer "$Option";								;;
+	esac
+done
+# remove already processed arguments
+shift $(($OPTIND - 1))
+# ready to process non '-' prefixed arguments
+# /options }}}1
+function warnOrDie { #{{{1
+	case $warnOrDie in
+		die)  die "$@@" 'Use [1m-f[22m to force an edit.';		;;
+		warn) warn "$@@";											;;
+		*)    die '[1mProgrammer error[22m:' \
+					'warnOrDie is [1m${warnOrDie}[22m.';		;;
+	esac
+} # }}}1
+
+(($#))||		die 'Missing required argument [4mfile-name[24m.'
+[[ -a $1 ]]||	die "No such file [1m${1}[22m."
+
+typeset hasmsg=false rcsmsg=''
+(($#>1))&& {
+	hasmsg=true
+	typeset -A rcsmsg_a -- "$@@"
+	unset rcsmsg_a[1]
+	typeset -- rcsmsg="${rcsmsg_a[*]}"
+	unset rcsmsg_a
+}
+
+function X { # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+	# wrap script guts in anonymous function so edits on the file don't 
+	# affect running instances.
+
+typeset -- f_fullpath="$( readlink -fn -- $1 )"
+
+[[ -n $f_fullpath ]]||	die 'Could not follow link.'
+[[ -f $f_fullpath ]]||	die "[1m${1}[22m is [1mnot[22m a file."
+[[ $f_fullpath == *,v ]]&& warnOrDie "Seems to be an [1mRCS archive[22m file."
+typeset -- ftype="$( /usr/bin/file -b $f_fullpath )"
+[[ $ftype == *text* || $ftype == *XML* ]]||
+						warnOrDie "Does not seem to be a text file."
+
+# because we've `readlink`ed the arg, it's guaranteed to have at least 
+# one (1) forward slash ('/') as (and at) the root.
+typeset -- f_path=${f_fullpath%/*}
+typeset -- f_name=${f_fullpath##*/}
+
+typeset -- swapglob="$f_fullpath" p='' s=''
+while [[ $swapglob == */* ]]; do
+	p="${swapglob%%/*}"; s="${swapglob#*/}"; swapglob="${p}%${s}"
+done
+swapglob="$swapglob"
+set -A swaps -- $VIMCACHE/$swapglob.s??
+
+[[ ${swaps[1]} == $VIMCACHE/$swapglob'.s??' ]]&&
+	die 'Swap files exist. Vim or Crash?'
+
+cd $f_path || die "Could not [32mcd[39m to [1m${f_path}[22m."
+
+typeset -- has_rcs=false
+[[ -d RCS && -f RCS/$f_name,v ]] && {
+	has_rcs=true
+	rcsdiff -q ./$f_name ||
+		die 'RCS and checked out versions differ.'
+	co -q -l ./$f_name ||
+		die "Could not [32mco -l[39m [1m${f_name}[22m."
+  }
+
+#typeset -- stemma="$( egrep -o '@@\(#\)\[:[^]]+]' "$f_name")"
+#stemma="${stemma#*:}"; stemma="${stemma%%:*}"
+
+# we could just use ./$f_name
+# BUT then the vim process would not have a command including the path, 
+# SO, let's use $f_fullpath
+vim "$f_fullpath"
+
+trackfile "$f_fullpath"
+
+if [[ -d RCS ]]; then
+	# use an array so expansion will work without weird quoting issues
+	set -A rcsopts -- -u
+	if $has_rcs; then
+		$hasmsg && set -A rcsopts -- "${rsopts[@@]}" -m"$rcsmsg"
+		rcsdiff -q ./$f_name
+		ci -q -j "${rcsopts[@@]}" ./$f_name
+	else
+		# without the dash at the beginning of rcsmsg, the message would 
+		# be taken from a file named in $rcsmsg
+		$hasmsg && set -A rcsopts -- -t-"$rcsmsg"
+		ci -i "${rcsopts[@@]}" ./$f_name
+	fi
+elif $hasmsg; then
+	warn 'No [35mRCS/[39m.'
+fi
+
+#cd $start_wd # no need if 
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+}
+
+X "$@@" # run the script-as-anonymous-function
+
+# Copyright (C) 2016 by Tom Davis <tom@@greyshirt.net>.
+@
+
+
+1.9
+log
+@[undebug]
+@
+text
+@d53 1
+a53 1
+					'warnOrDie is [1m${warnOrDie}[22m.'
+@
+
+
+1.8
+log
+@[compat] make compatible with older (zsh/bash) versions
+[debug] m takes an arg so use m: not just m in getopts
+@
+text
+@a13 2
+printf '  <%s>\n' "$@@"
+
+@
+
+
+1.7
+log
+@We're doing the message differently.
+@
+text
+@d14 2
+d35 2
+a36 1
+while getopts ':mfh' Option; do
+d39 1
+@
+
+
+1.6
+log
+@
+@
+text
+@d20 1
+a20 3
+	^F{4}Usage^f: ^T${PGM}^t [^T-m^t ^Umessage^u] [^T-f^t] ^Ufile^u
+	         ^T-m^t  Use ^Umessage^u as rcs checkin message.
+	         ^T-s^t  Create new stemma and replace any existing.
+d33 1
+a33 1
+while getopts ':fh' Option; do
+@
+
+
+1.5
+log
+@
+@
+text
+@d2 1
+a2 1
+# @@(#)[:GpEYZa*c{{hMx~)jN6Sk: 2017/08/02 18:12:21 tw@@csongor.lan]
+d18 2
+a19 2
+	sparkle <<-
+	-SPARKLE-
+d26 1
+a26 1
+	-SPARKLE-
+@
+
+
+1.4
+log
+@add file tracking
+@
+text
+@d2 1
+a2 1
+# @@(#)[:GpEYZa*c{{hMx~)jN6Sk: 2017/07/31 17:55:21 tw@@csongor.lan]
+d18 2
+a19 1
+	sparkle <<----
+d26 1
+a26 1
+	---
+@
+
+
+1.3
+log
+@[debug] ksh (unlike zsh) requires quotes around $@@ (which is of course redundant)
+@
+text
+@d2 2
+a3 2
+# @@(#)[:GpEYZa*c{{hMx~)jN6Sk: 2017/07/26 02:18:25 tw@@csongor.lan]
+# vim: filetype=sh tabstop=4 textwidth=72 noexpandtab nowrap
+d114 2
+@
+
+
+1.2
+log
+@
+@
+text
+@d49 2
+a50 2
+		die)  die $@@ 'Use [1m-f22m to force an edit.';		;;
+		warn) warn $@@;											;;
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d1 3
+a3 3
+#!/usr/bin/env zsh
+# @@(#)[:GpEYZa*c{{hMx~)jN6Sk: 2017/06/12 19:05:33 tw@@csongor.lan]
+# vim: filetype=zsh tabstop=4 textwidth=72 noexpandtab nowrap
+d5 1
+a5 1
+. $USR_ZSHLIB/common.zsh|| exit 86
+d7 4
+a10 2
+[[ -d $LOCALBIN ]] || -die '%F{6}$LOCALBIN%f is not set.'
+path+=( $LOCALBIN )
+d12 1
+a12 1
+[[ " ${DEBUG:-} " =~ ' v.zsh ' ]]&& set -x
+d14 14
+a27 12
+# Usage {{{1
+typeset -- this_pgm=${0##*/}
+# %T/%t => terminal (green fg)
+# %S/%s => special  (magenta fg)
+typeset -a Usage=(
+	"%T${this_pgm:gs/%/%%}%t [%T-m%t %Umessage%u] [%T-f%t] %Ufile%u"
+	'  %T-m%t  Use %Umessage%u as rcs checkin message.'
+	'  %T-s%t  Create new stemma and replace any existing.'
+	"  %T-f%t  Force edit even if %Ufile%u isn't text."
+	"%T${this_pgm:gs/%/%%} -h%t"
+	'  Show this help message.'
+); # }}}1
+d30 2
+a31 1
+	-die '%BProgrammer error%b:' "  No %Tgetopts%t action defined for %T-$1%t."
+a32 2
+typeset -- hasmsg=false;
+typeset -- newStemma=false
+d34 1
+a34 2
+typeset -- rcsmsg='';
+while getopts ':fshm:' Option; do
+d36 5
+a40 7
+		f)	warnOrDie='warn';									;;
+		s)	newStemma=true;										;;
+		h)	-usage $Usage;										;;
+		m)	hasmsg=true; rcsmsg=$OPTARG;						;;
+		\?)	-die "Invalid option: '-$OPTARG'.";					;;
+		\:)	-die "Option '-$OPTARG' requires an argument.";		;;
+		*)	bad_programmer "$Option";							;;
+a42 2
+# cleanup
+unset -f bad_programmer
+d49 4
+a52 3
+		die)  -die $@@ 'Use %T-f%t to force an edit.';	;;
+		warn) -warn $@@;									;;
+		*)    -die '%BProgrammer error%b:' 'warnOrDie is %B${warnOrDie:gs/%/%%}%b.'
+d56 2
+a57 3
+(($#))||	-die 'Missing required argument %Ufile-name%u.'
+((2<=$#))&&	-die 'Too many arguments.' "Expected one (1) %Ufile-name%u."
+[[ -a $1 ]]		|| -die "No such file %B${1:gs/%/%%}%b."
+d59 10
+a68 1
+(){ # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+d72 1
+a72 1
+readonly clean_stemma=( sed -e 's#[_&\\]#\\&#g' )
+d74 5
+a78 11
+typeset -- f_fullpath
+if [[ -x $USRBIN/getTrueName ]]; then
+	f_fullpath="$( $USRBIN/getTrueName $1 )"
+else
+	f_fullpath="$( readlink -fn -- $1 )"
+fi
+
+[[ -n $f_fullpath ]]	|| -die 'Could not follow link.'
+[[ -f $f_fullpath ]]	|| -die "%B${1:gs/%/%%}%b is %Bnot%b a file."
+[[ $f_fullpath == *,v ]]&& warnOrDie "Seems to be an %BRCS archive%b file."
+[[ $( /usr/bin/file -b $f_fullpath ) =~ 'text|XML' ]]||
+d84 1
+a84 1
+typeset -- f_name=${f_fullpath:$#f_path+1}
+d86 6
+a91 4
+# we're in the directory with $f_fullpath, SO we could just vim $f_name, 
+# BUT then the vim process would not have a command including the path, 
+# SO, let's use $f_fullpath
+typeset -a edit_cmd=( ${EDITOR:-$SYSLOCAL/bin/vim} $f_fullpath )
+d93 2
+a94 4
+typeset -- swapinfo
+swapinfo=$( :vim-swap-info $f_fullpath )
+[[ -z $swapinfo || $swapinfo == <-> ]]||
+	-die "${swapinfo:gs/%/%%} for %B${f_name:gs/%/%%}%b."
+d96 1
+a96 36
+if [[ -n $swapinfo ]]; then
+	typeset -i wid=0
+	wid=$( :x11-get-winid-from-pid $swapinfo )
+	on_error	-die	"Being edited by process %B${swapinfo:gs/%/%%}%b,"	\
+						'but no %Bwindow id%b available (1).'
+	(($wid)) ||	-die	"Being edited by process %B${swapinfo:gs/%/%%}%b,"	\
+						'but no %Bwindow id%b available (2).'
+	typeset -i dsk=0
+	dsk=$( xdotool get_desktop_for_window $wid )
+	on_error	-die	"Being edited by process %B${swapinfo:gs/%/%%}%b,"	\
+						"in window %B${wid:gs/%/%%}%b,"						\
+						"but could not get the desktop."
+	# the desktop returned by xdotool is zero (0) based, whereas evilwm 
+	# uses a one (1) based keyboard shortcut system, so let's use that 
+	# here.
+	(( dsk++ ))
+	typeset -i cur_dsktp
+	cur_dsktp=$(( $( xdotool get_desktop ) + 1 ))
+	typeset -a msg=()
+	if (( dsk == cur_dsktp )); then
+		msg=(
+			"Currently being edited"
+			"on %Bthis%b desktop %G(${dsk:gs/%/%%})%g,"
+			"in window %S${wid:gs/%/%%}%b."
+		  )
+	else
+		msg=(
+			"Currently being edited"
+			"on desktop %S${dsk:gs/%/%%}%s,"
+			"in window %S${wid:gs/%/%%}%b."
+			"  %GCurrent desktop is %g%S${cur_dsktp}%s%G.%g"
+		  )
+	fi
+	(( dsk == cur_dsktp )) && highlight-window $wid &
+	-die $msg
+fi
+a97 10
+typeset -- start_wd=$PWD
+cd $f_path || -die "Could not %F{2}cd%f to %B${f_path:gs/%/%%}%b."
+
+:git:current:branch | :assign repo
+[[ ${repo:-:} =~ ':$' ]]|| {
+	warnOrDie	\
+	"This is the %B%S${${repo%:*}:gs/%/%%}%s branch%b of a %Bgit%b repo." \
+	"which tracks %S${${repo#*:}:gs/%/%%}%s."
+  }
+
+d101 4
+a104 28
+	rcsdiff -q ./$f_name || { # Handle changed but not `RCS-co`ed {{{1
+		typeset -- N='\e[0;48;5;117;30m' B='\e[1;4;48;5;12;38;5;15m' F=''
+		F+=' '$N'  The file was changed after check-in. '
+		F+=$B'U'$N'se it anyway, '
+		F+=$B'R'$N'evert, or '
+		F+=$B'A'$N'bort edit?'
+		F+='  \e[0m\n'
+		printf $F
+		typeset -l key=''
+		while :; do
+			read -rsk key
+			[[ $key == [ura] ]]&& break
+			printf '  \e[4mU\e[24mse it anyway, \e[4mR\e[24mevert, or \e[4mA\e[24mbort (\e[1mura\e[22m).\n'
+		done
+		case $key in
+			'a') -warn 'Quitting.'; exit 0;								;;
+			'r') (){ rm $1; co -u $1; } ./$f_name;						;;
+			'u') (){
+					local v=RCS/$1,v
+					local mode=$(stat -f %Mp%Lp $v)
+					rcs -q -l $1	# allow a checkin
+					chmod $mode $v	# reset RCS version (rcs mucks it up)
+					ci -q $1		# checkin
+				  } ./$f_name;											;;
+			*) -die "Bad Programmer. Key is %B${key:gs/%/%%}%b.";		;;
+		esac
+	} # }}}1
+	co -q -l ./$f_name || -die "Could not %F{2}co -l%f %B${f_name:gs/%/%%}%b."
+d107 2
+a108 14
+# different OSes have different ways of getting the sha384, and of 
+# providing that in base64, additionally
+# macOS sed requires an "unattached" parameter for -i (eg none => `-i 
+# ''`), whereas linux and openbsd require an "attached" parameter (eg 
+# none => `-i`).
+typeset -a inplace=( -i )
+if [[ $(uname) == Darwin ]]; then
+	shaid() { echo ${$(shasum -a 384 ./$1)[1]} | xxd -r -p | base64; }
+	inplace+=( '' )
+elif [[ $(uname) == Linux ]]; then
+	shaid() { echo ${$(sha384sum ./$1)[1]} | xxd -r -p | base64; }
+else
+	shaid() { cksum -a sha384b ./$1; }
+fi
+d110 4
+a113 19
+typeset -- stemma=''
+typeset -- scmd='/@@''(#)/{ s/^[^)]*)//p;q;}'; scmd=${scmd//;/$'\n'}
+if [[ $(sed -n -e $scmd ./$f_name ) =~ '\[:([[:print:]]+): ' ]]; then
+	stemma=$match[1]
+	if (( $#stemma != 20 )); then
+		stemma=$(uuid85|tr '>' , )
+		printf '  \e[36m1. stemma reset to %s\e[0m\n' $stemma >&2
+		newStemma=true
+	elif $newStemma; then
+		typeset -- old=$stemma
+		stemma=$(uuid85|tr '>' , )
+		printf '  \e[36m1. stemma reset from %s to %s\e[0m\n' $old $stemma >&2
+		unset old
+	else
+		printf '  \e[36m1. stemma set to %s\e[0m\n' $stemma >&2
+	fi
+elif $newStemma; then
+	-warn 'No %Bstemma%b found, so not resetting one.'
+fi
+a114 63
+# TEMPORARY !!! Note the superfluous quotes to keep egrep from matching 
+# any of the `egrep` or `sed` lines
+typeset -a now=( $(date -u +'%Y/%m/%d %H:%M:%S') )
+typeset -- newid
+egrep -q '\$Id'': ' ./$f_name && { # previously checked in
+	-warn 'Updating %SRCS:Id%s line.'
+
+	[[ -n $stemma ]]|| {
+		stemma=$(uuid85|tr '>' , )
+		printf '  \e[36m2. stemma set to %s\e[0m\n' $stemma >&2
+	}
+	printf ':%s: %s %s %s@@%s' $stemma $now $USERNAME $HOST |
+		$clean_stemma |
+		:assign newid
+
+	sed "${(@@)inplace}" -E '/@@\(#\)/s_\[[^\]*\]_['$newid']_' ./$f_name
+	sed "${(@@)inplace}" -E '/\$Id: v.ksh,v 1.1 2017/07/17 04:44:04 tw Exp tw $]+\$/s__@@''(#)['$newid']_' ./$f_name
+}
+egrep -q '\$Id''\$' ./$f_name && { # never been kissed
+	-warn 'Updating (empty) %SRCS:Id%s line.'
+	[[ -n $stemma ]]|| {
+		stemma=$(uuid85|tr '>' , )
+		printf '  \e[36m3. stemma set to %s\e[0m\n' $stemma >&2
+	}
+	printf ':%s: %s %s %s@@%s' $stemma $now $USERNAME $HOST |
+		$clean_stemma |
+		:assign newid
+	sed "${(@@)inplace}" -E '/\$Id\$/s__@@''(#)['$newid']_' ./$f_name
+}
+# END OF TEMPORARY
+
+typeset -- CKSUM=$(shaid $f_name)
+
+# do the CKSUM before this to force a save
+$newStemma && {
+	-warn 'Updating current file with new stemma.'
+	printf ':%s: %s %s %s@@%s' $stemma $now $USERNAME $HOST |
+		$clean_stemma |
+		:assign newid
+	sed "${(@@)inplace}" -e '/@@''(#)/s_\[[^\]*\]_['$newid']_' ./$f_name
+}
+
+$edit_cmd
+
+
+# UPDATE the @@''(#)[…] string
+# 1. If there is such a string, and
+egrep -q '@@''\(#\)\[' ./$f_name && {
+	# 2. if there were changes
+	[[ $CKSUM == $(shaid $f_name) ]]|| {
+		now=( $(date -u +'%Y/%m/%d %H:%M:%S') )
+		[[ -n $stemma ]]|| {
+			stemma=$(uuid85|tr '>' ',' )
+			printf '  \e[36m4. stemma set to %s\e[0m\n' $stemma >&2
+		}
+		# escape any of separator _, whole match &, or escape \
+		printf ':%s: %s %s %s@@%s' $stemma $now $USERNAME $HOST |
+			$clean_stemma |
+			:assign newid
+		sed "${(@@)inplace}" -e '/@@''(#)/s_\[[^\]*\]_['$newid']_' ./$f_name
+	}
+}
+
+d116 2
+a117 1
+	typeset -a rcsopts=( -u )
+d119 1
+a119 1
+		$hasmsg && rcsopts+=( -m"$rcsmsg" )
+d121 1
+a121 1
+		ci -j $rcsopts ./$f_name
+d125 2
+a126 2
+		$hasmsg && rcsopts+=( -t-"$rcsmsg" )
+		ci -i $rcsopts ./$f_name
+d129 1
+a129 1
+	-warn 'No %SRCS/%s but you wanted to use a %Tci%t message.'
+d134 3
+a136 1
+} $@@ # run the script-as-anonymous-function
+@

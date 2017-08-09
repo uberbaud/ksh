@@ -1,0 +1,8 @@
+^Bsuspend^b
+        Stops the shell as if it had received the suspend character from
+        the terminal.  It is not possible to suspend a login shell unless
+        the parent process is a member of the same terminal session but
+        is a member of a different process group.  As a general rule, if
+        the shell was started by another shell or via su(1), it can be
+        suspended.
+

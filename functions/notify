@@ -1,0 +1,18 @@
+# @(#)[:Fzs)Z!rvu`a=mKyS{^|0: 2017-08-07 19:56:33 Z tw@csongor]
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+# SYNOPSIS: output a notice to stderr
+
+function notify {
+	(($#))|| set '^GNo message provided.^g'
+	local ln1="$1"; shift
+	if (($#)); then
+		printf ' ^N>>>^n %s\n' "$ln1"
+		printf '     %s\n' "$@"
+	else
+		printf ' ^N>>>^n %s\n' "$ln1"
+	fi | sparkle
+} >&2
+
+
+# Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

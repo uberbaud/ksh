@@ -1,0 +1,28 @@
+# @(#)[:v}?-gKt3hIPbHz!)JRm): 2017-08-04 19:39:13 Z tw@csongor]
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+# SYNOPSIS: my own help system for ksh
+
+function help {
+	local helpdir=${KDOTDIR:?}/help
+	local funcdir=$KDOTDIR/functions
+	if [[ -f $funcdir/$1 ]]; then
+		local awkpgm
+		awkpgm="$(cat)" <<-\
+			==AWK==
+				/^# SYNOPSIS:/	{p=1}
+				/^$/ && p		{ exit; }
+				p				{ sub( /^#/, " ");print;}
+			==AWK==
+		awk "$awkpgm" $funcdir/$1
+	elif   [[ -f $helpdir/$1 ]]; then
+		local pager=${PAGER:-less}
+		(($(wc -l $helpdir/$1|tr -cd [0-9])<LINES))&& pager=cat
+		sparkle < $helpdir/$1 | $pager
+	else
+		die "No help for [1m$1[22m"
+	fi
+}
+
+
+# Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

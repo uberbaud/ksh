@@ -1,0 +1,14 @@
+# @(#)[:k{_?TN$cf>6uq{cBl`dm: 2017-08-01 21:43:54 Z tw@csongor]
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+# SYNOPSIS: Dies if missing needed executables
+
+function needs {
+	local badlist=''
+	for x { [[ -n "$(whence "$x")" ]] || badlist="$badlist $x"; }
+	[[ -z $badlist ]]||
+		die "Missing needed executables: [1m$badlist[0m"
+}
+
+
+# Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

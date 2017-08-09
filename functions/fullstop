@@ -1,0 +1,12 @@
+# @(#)[:-i;_#Mc$(&Ii;5z<kjw%: 2017-08-06 17:55:13 Z tw@csongor]
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+# SYNOPSIS: Like die but less dramatic
+
+function fullstop {
+	print -ru2 "  $*"
+	kill -QUIT $$
+}
+
+
+# Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

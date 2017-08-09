@@ -1,0 +1,87 @@
+^Btypeset^b [[^B+-lprtUux^b] [^B-L^b[^U^Bn^b^u]] [^B-R^b[^U^Bn^b^u]] [^B-Z^b[^U^Bn^b^u]] [^B-i^b[^U^Bn^b^u]] | ^B-f^b [^B-tux^b]] [^U^Bname^b^u
+        [=^U^Bvalue^b^u] ^U^B...^b^u]
+        Display or set parameter attributes.  With no ^U^Bname^b^u arguments,
+        parameter attributes are displayed; if no options are used, the
+        current attributes of all parameters are printed as ^Btypeset^b
+        commands; if an option is given (or ‘-’ with no option letter),
+        all parameters and their values with the specified attributes are
+        printed; if options are introduced with ‘+’, parameter values are
+        not printed.
+
+        If ^U^Bname^b^u arguments are given, the attributes of the named
+        parameters are set (^B-^b) or cleared (^B+^b).  Values for parameters may
+        optionally be specified.  If ^Btypeset^b is used inside a function,
+        any newly created parameters are local to the function.
+
+        When ^B-f^b is used, ^Btypeset^b operates on the attributes of functions.
+        As with parameters, if no ^U^Bname^b^u arguments are given, functions are
+        listed with their values (i.e. definitions) unless options are
+        introduced with ‘+’, in which case only the function names are
+        reported.
+
+        ^B-f^b      Function mode.  Display or set functions and their
+                attributes, instead of parameters.
+
+        ^B-i^b[^U^Bn^b^u]   Integer attribute.  ^U^Bn^b^u specifies the base to use when
+                displaying the integer (if not specified, the base given
+                in the first assignment is used).  Parameters with this
+                attribute may be assigned values containing arithmetic
+                expressions.
+
+        ^B-L^b[^U^Bn^b^u]   Left justify attribute.  ^U^Bn^b^u specifies the field width.  If
+                ^U^Bn^b^u is not specified, the current width of a parameter (or
+                the width of its first assigned value) is used.  Leading
+                whitespace (and zeros, if used with the ^B-Z^b option) is
+                stripped.  If necessary, values are either truncated or
+                space padded to fit the field width.
+
+        ^B-l^b      Lower case attribute.  All upper case characters in
+                values are converted to lower case.  (In the original
+                Korn shell, this parameter meant “long integer” when used
+                with the ^B-i^b option.)
+
+        ^B-p^b      Print complete ^Btypeset^b commands that can be used to re-
+                create the attributes (but not the values) of parameters.
+                This is the default action (option exists for ksh93
+                compatibility).
+
+        ^B-R^b[^U^Bn^b^u]   Right justify attribute.  ^U^Bn^b^u specifies the field width.
+                If ^U^Bn^b^u is not specified, the current width of a parameter
+                (or the width of its first assigned value) is used.
+                Trailing whitespace is stripped.  If necessary, values
+                are either stripped of leading characters or space padded
+                to make them fit the field width.
+
+        ^B-r^b      Read-only attribute.  Parameters with this attribute may
+                not be assigned to or unset.  Once this attribute is set,
+                it cannot be turned off.
+
+        ^B-t^b      Tag attribute.  Has no meaning to the shell; provided for
+                application use.
+
+                For functions, ^B-t^b is the trace attribute.  When functions
+                with the trace attribute are executed, the ^Bxtrace^b (^B-x^b)
+                shell option is temporarily turned on.
+
+        ^B-U^b      Unsigned integer attribute.  Integers are printed as
+                unsigned values (only useful when combined with the ^B-i^b
+                option).  This option is not in the original Korn shell.
+
+        ^B-u^b      Upper case attribute.  All lower case characters in
+                values are converted to upper case.  (In the original
+                Korn shell, this parameter meant “unsigned integer” when
+                used with the ^B-i^b option, which meant upper case letters
+                would never be used for bases greater than 10.  See the
+                ^B-U^b option.)
+
+                For functions, ^B-u^b is the undefined attribute.  See
+                ^U^BFunctions^b^u above for the implications of this.
+
+        ^B-x^b      Export attribute.  Parameters (or functions) are placed
+                in the environment of any executed commands.  Exported
+                functions are not yet implemented.
+
+        ^B-Z^b[^U^Bn^b^u]   Zero fill attribute.  If not combined with ^B-L^b, this is
+                the same as ^B-R^b, except zero padding is used instead of
+                space padding.
+

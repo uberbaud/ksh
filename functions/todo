@@ -1,0 +1,17 @@
+# @(#)[:xT;m3F%!VoaSgSW>IBIA: 2017-08-06 14:22:04 Z tw@csongor]
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+# SYNOPSIS: Add new todo items
+
+function todo {
+	local now="$(date -u +'%Y-%m-%d %H:%M:%S Z')"
+	local H="@ $now" TODO="$*"
+	[[ -n $TODO ]]|| TODO="$(vtmp TODO)"
+	splitstr NL "$TODO" todo
+	[[ -f RCS/TODO,v ]]&& co -q -l TODO
+	{ printf '%s\n' "$H"; printf '    %s\n' "${todo[@]}"; } >>TODO
+	[[ -f RCS/TODO,v ]]&& ci -q -m'add' -u TODO
+}
+
+
+# Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

@@ -1,0 +1,6 @@
+^Bunalias^b [^B-adt^b] [^U^Bname^b^u ^U^B...^b^u]
+        The aliases for the given names are removed.  If the ^B-a^b option is
+        used, all aliases are removed.  If the ^B-t^b or ^B-d^b options are used,
+        the indicated operations are carried out on tracked or directory
+        aliases, respectively.
+

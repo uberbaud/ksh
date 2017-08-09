@@ -1,0 +1,20 @@
+^Bfc^b [^B-e^b ^U^Beditor^b^u | ^B-l^b [^B-n^b]] [^B-r^b] [^U^Bfirst^b^u [^U^Blast^b^u]]
+        Fix command.  ^U^Bfirst^b^u and ^U^Blast^b^u select commands from the history.
+        Commands can be selected by history number or a string specifying
+        the most recent command starting with that string.  The ^B-l^b option
+        lists the command on standard output, and ^B-n^b inhibits the default
+        command numbers.  The ^B-r^b option reverses the order of the list.
+        Without ^B-l^b, the selected commands are edited by the editor
+        specified with the ^B-e^b option, or if no ^B-e^b is specified, the
+        editor specified by the FCEDIT parameter (if this parameter is
+        not set, ^U^B/bin/ed^b^u is used), and then executed by the shell.
+
+^Bfc^b ^B-s^b [^B-g^b] [^U^Bold^b^u=^U^Bnew^b^u] [^U^Bprefix^b^u]
+        Re-execute the most recent command beginning with ^U^Bprefix^b^u, or the
+        previous command if no ^U^Bprefix^b^u is specified, performing the
+        optional substitution of ^U^Bold^b^u with ^U^Bnew^b^u.  If ^B-g^b is specified, all
+        occurrences of ^U^Bold^b^u are replaced with ^U^Bnew^b^u.  The editor is not
+        invoked when the ^B-s^b flag is used.  The obsolescent equivalent “^B-e^b
+        -” is also accepted.  This command is usually accessed with the
+        predefined ^Balias^b ^Br='fc^b ^B-s'^b.
+

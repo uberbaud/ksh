@@ -1,0 +1,25 @@
+% remark v2
+% Korn Shell Review
+% Tom Davis
+% 2017-04-13
+% Copyright © 2017 by Tom Davis <tom@greyshirt.net>.
+
+(1Overview)
+
+(2Initialization Files)
+
+  (. Login
+    (. /etc/profile)
+    (. $HOME/.profile))
+
+  (.Privileged: Does not read /etc/profile or $HOME/.profile
+    (. /etc/suid_profile))
+
+  (.Interactive: If ENV is set eg:
+    (`export ENV=$XDG_CONFIG_HOME/ksh/kshrc)
+    then the file named by $ENV is executed.)
+
+
+
+; @(#)[:ELZhedcic05Sx8t)@wmc: 2017/04/13 05:55:29 tw@csongor.lan]
+; vim: filetype=remark expandtab tabstop=4 textwidth=72

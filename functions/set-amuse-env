@@ -1,0 +1,37 @@
+# @(#)[:mOX>6AIT8nEWh)#!wN8A: 2017-08-06 17:18:50 Z tw@csongor]
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+# SYNOPSIS: Set common variables for aMuse functions
+
+function set-amuse-env {
+	: ${HOME:?} ${XDG_MUSIC_DIR:?} ${me:?}
+	amusePlayerId='aMuse player'
+	music_dir="${XDG_MUSIC_DIR:-${HOME}/media/music}"
+		export music_dir
+
+	amuse_home="${me}"/util/amuse
+	amuse_db="${amuse_home}"/amuse.db
+	amuse_bin="${amuse_home}"/amuse-master.zsh
+	amuse_run="${XDG_DATA_HOME}"/run/amuse
+	amuse_pid="${amuse_run}"/amuse-pid
+		export amuse_home amuse_db amuse_bin amuse_run amuse_pid
+
+	now_playing="${amuse_run}"/playing
+	paused_at="${amuse_run}"/paused-at
+	paused_song="${amuse_run}"/paused-song
+	missing_bytes="${amuse_run}"/missing-bytes
+	final="${amuse_run}"/final
+	again="${amuse_run}"/again
+	fflog="${amuse_run}"/fflog
+
+	music_list="${amuse_run}"/togo.lst
+		export music_list
+
+	[[ -d $amuse_home ]]|| die "No such directory [1m$amuse_home[0m."
+	[[ -d $amuse_run  ]]|| die "No such directory [1m$amuse_run[0m."
+	[[ -d $music_dir  ]]|| die "No such directory [1m$music_dir[0m."
+
+}
+
+
+# Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

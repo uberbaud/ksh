@@ -11,6 +11,7 @@ function todo {
 	[[ -f RCS/TODO,v ]]&& co -q -l TODO
 	{ printf '%s\n' "$H"; printf '    %s\n' "${todo[@]}"; } >>TODO
 	[[ -f RCS/TODO,v ]]&& ci -q -m'add' -u TODO
+	true # leave on a good note, even if there is no RCS
 }
 
 

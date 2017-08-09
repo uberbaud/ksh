@@ -1,5 +1,28 @@
-#!/bin/ksh
-# @(#)[:PR<=y0!-k6cUZ@mE5G=f: 2017-08-09 02:36:22 Z tw@csongor]
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	2017.08.09.03.21.56;	author tw;	state Exp;
+branches;
+next	;
+
+
+desc
+@push to github
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@#!/bin/ksh
+# @@(#)[:PR<=y0!-k6cUZ@@mE5G=f: 2017-08-09 02:36:22 Z tw@@csongor]
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
 
 : ${FPATH:?Run from within KSH}
@@ -37,8 +60,8 @@ shift $(($OPTIND - 1))
 # /options }}}1
 function warnOrDie { #{{{1
 	case $warnOrDie in
-		die)  die "$@" 'Use [1m-f22m to force an edit.';		;;
-		warn) warn "$@";											;;
+		die)  die "$@@" 'Use [1m-f22m to force an edit.';		;;
+		warn) warn "$@@";											;;
 		*)    die '[1mProgrammer error[22m:' \
 					'warnOrDie is [1m${warnOrDie}[22m.';		;;
 	esac
@@ -60,8 +83,8 @@ branch="$(git rev-parse --abbrev-ref HEAD 2>/dev/null)"
 	# add untracked and unignored files, if any
 	set -A untracked -- $(git ls-files --exclude-standard --others)
 	((${#untracked}))&& {
-		warn "Adding ${untracked[@]}"
-		git add "${untracked[@]}" || FAIL
+		warn "Adding ${untracked[@@]}"
+		git add "${untracked[@@]}" || FAIL
 	  }
 
 	# check for unstaged changes in the working tree
@@ -88,4 +111,5 @@ git merge $HOST			|| die "^Bmerge $HOST^b"
 git push				|| die '^Bpush^b'
 git checkout $HOST		|| die "^Bcheckout $HOST^b"
 
-# Copyright (C) 2017 by Tom Davis <tom@greyshirt.net>.
+# Copyright (C) 2017 by Tom Davis <tom@@greyshirt.net>.
+@

@@ -1,6 +1,6 @@
 @ 2017-08-06 04:01:58 Z
     ^F{5}=amuse=^f
-        :-:music-in-fs      amuse
+        amuse
 
     ^F{5}=other=^f
         forever       pk          rem:desc            stemma-header

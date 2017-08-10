@@ -196,7 +196,6 @@ $i_am_the_local && { # {{{1
 	tmppath="$(mktemp -d)"
 	trap 'l-cleanup' EXIT
 
-	printf 'TEMP DIRECTORY: "%s"\n' "$tmppath"
 	rlst=$tmppath/r.lst
 	llst=$tmppath/l.lst
 
@@ -217,7 +216,6 @@ $i_am_the_local && { # {{{1
 		[[ $status == listing && $files == files ]]|| s-quit
 		while ((filecount--)); do
 			read -pr filename
-			printf '    <%s>\n' "$filename" >&2
 			printf '%s\n' "$filename"
 		done | sort >$rlst
 		read -pr status

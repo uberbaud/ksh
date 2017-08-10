@@ -60,13 +60,14 @@ export USR_CLIB=${xdgdata}/lib/c
 export PERL_UNICODE=AS
 export USR_PLIB=$PERL5LIB
 
-[[ :$PATH: == *:$PERLBREW_PATH:*	]]|| PATH=$PERLBREW_PATH:$PATH
-[[ :$PATH: == *:$LOCALBIN:*			]]|| PATH=$LOCALBIN:$PATH
-[[ :$PATH: == *:$USRBIN:*			]]|| PATH=$USRBIN:$PATH
+[[ :$PATH: == *:$PERLBREW_PATH:*	]]|| PATH="$PERLBREW_PATH:$PATH"
+[[ :$PATH: == *:$LOCALBIN:*			]]|| PATH="$LOCALBIN:$PATH"
+[[ :$PATH: == *:$USRBIN:*			]]|| PATH="$USRBIN:$PATH"
+PATH="$FPATH:$PATH"
 
 # input, locale, and such
 set -o vi -o vi-tabcomplete
-set -o braceexpand -o vi -o ignoreeof -o physical
+set -o braceexpand -o ignoreeof -o physical
 
 export GTK_IM_MODULE=xim
 export INPUTRC=$xdgcfg/init/input.rc

@@ -1,7 +1,9 @@
 # @(#)[:k{_?TN$cf>6uq{cBl`dm: 2017-08-01 21:43:54 Z tw@csongor]
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-# SYNOPSIS: Dies if missing needed executables
+#: FUNCTION ^Ucmd name1^u ^[^Ucmd name…N^u^u^]
+#:   Dies if any of the named commands aren't functions or
+#:   executables in ^S$PATH^s.
 
 function needs {
 	local badlist=''

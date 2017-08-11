@@ -1,10 +1,11 @@
 # @(#)[:gf7pvi?q>tx0|VW8y<-5: 2017-08-06 18:55:51 Z tw@csongor]
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-# SYNOPSIS: Skip the rest of the song
+#: FUNCTION ^G(no arguments)^g
+#   Skip the rest of the currently playing song.
 
-function final {
-	set-amuse-env
+function amuse-final {
+	amuse-set-env
 	echo 'true' >"${final:?}"
 }
 

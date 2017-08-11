@@ -1,7 +1,8 @@
 # @(#)[:rQBfn$sX41^M0hKZ9LqL: 2017-08-04 17:08:06 Z tw@csongor]
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-# SYNOPSIS: splits a string ($2) on $1 into array $3 (or $reply)
+#: FUNCTION ^Ucharstr^u ^Ustring^u ^[^Uarray name^u^]
+#:   Splits a ^Ustring^u on ^Ucharstr^u into ^Uarray name^u (or ^S$reply^s).
 
 function splitstr {
 	local IFS="$1"

@@ -1,7 +1,8 @@
 # @(#)[:L>;)e;b((ePib;UkIowI: 2017-08-06 03:08:17 Z tw@csongor]
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-# SYNOPSIS: choose and cd to a subdirectory of play
+#: FUNCTION ^[^Uplay path fragment^u^|^Unew play directory^u^]
+#:   Choose (^Tomenu^t), possibly create, and ^Tcd^t to a subdirectory of play.
 
 function p {
 	cd ~/play

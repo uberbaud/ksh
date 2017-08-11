@@ -1,7 +1,9 @@
 # @(#)[:O3wZ=BdMRTgIKEBz}si`: 2017-08-06 18:02:34 Z tw@csongor]
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-# SYNOPSIS: Empties a directory, then removes it.
+#: FUNCTION ^[^T-f^t^]
+#:   Empties the current directory, then removes it.
+#:    ^T-f^t  does it without asking.
 
 function clearout {
 	local askperm=true

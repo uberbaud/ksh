@@ -1,7 +1,0 @@
-# @(#)[Init]
-
-function go {
-	eval "$( $LOCALBIN/go $@ )"
-  }
-
-# vim: ft=ksh ts=4

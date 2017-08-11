@@ -1,0 +1,11 @@
+# @(#)[:MOrl{lrh%KnOsZF|mW&h: 2017/08/11 17:59:15 tw@csongor.lan]
+
+#: FUNCTION
+#:   Wrapper for the ^Tgo^t command, necessary to actually ^Tcd^t.
+#:   Use ^Tgo -h^t for help
+
+function f-go {
+	eval "$( $LOCALBIN/go $@ )"
+  }
+
+# vim: ft=ksh ts=4

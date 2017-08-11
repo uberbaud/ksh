@@ -1,7 +1,7 @@
 #!/bin/ksh
 # vim: ft=ksh
 
-FPATH-CHECK || exit 86
+${FPATH:?No FPATH, are you running in ksh}
 
 BKSP=''
 

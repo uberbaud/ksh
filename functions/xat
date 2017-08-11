@@ -1,19 +1,13 @@
 # @(#)[:8u%T&LCmr3tPLn1vebGX: 2017-08-07 15:12:10 Z tw@csongor]
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-# SYNOPSIS: Show an X11 messagebox at specified time.
+#: FUNCTION ^Utime^u ^[^Umessage ...^u^]
+#:   Show an X11 messagebox at specified time, where time is either
+#:     a fixed time ^UH^u^T:^t^UMM^u, or
+#:     an interval ^[^UH^u^Th^t^]^UM^u^[^Tm^t^]
 
 function xat {
-	(($#))|| {
-		sparkle >&2 <<-\
-			=sparkle=
-			  ^NUsage^n: ^Tmsg-at^t ^Utime^u ^[^Umessage ...^u^]
-			         Where time is either
-			           a fixed time ^UH^u^T:^t^UMM^u, or
-			           an interval ^[^UH^u^Th^t^]^UM^u^[^Tm^t^]
-			=sparkle=
-		return 0
-	}
+	(($#))|| return 0
 
 	needs date
 	local NOW="$(date +%s)" THEN='' DAY='today'
@@ -52,6 +46,7 @@ function xat {
 	local alfile="$alarms"/$THEN
 	[[ -s $alfile ]]|| date -r $THEN +"%Y-%m-%d $HHMM" >>$alfile
 	shift
+	(($#))|| set "WAKE UP!${NL}IT'S THAT TIME!"
 	echo -e "$*" >>$alfile
 }
 

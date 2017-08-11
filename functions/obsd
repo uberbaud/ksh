@@ -1,7 +1,8 @@
 # @(#)[:fO6biwH<kVqG@*~VQi<P: 2017-08-07 21:17:56 Z tw@csongor]
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-# SYNOPSIS: Handle mail from the OpenBSD CVS change list specially.
+#: FUNCTION ^G(no arguments)^g
+#:   Handle mail from the OpenBSD CVS change list specially.
 
 function obsd {
 	local P="${PAGER:-less}" filter='' W=10 refold=''

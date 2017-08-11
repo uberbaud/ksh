@@ -1,7 +1,9 @@
 # @(#)[:DwH80m)+DFMaj`bw=dC~: 2017-08-08 18:23:32 Z tw@csongor]
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-# SYNOPSIS: Set terminal default colors using ansi escape sequences.
+#: FUNCTION ^Ubg^u ^Ufg^u
+#:   Set terminal default colors using ansi escape sequences. The colors
+#:   can be in ^B#RRGGBB^b form.
 
 function set-colors-bg-fg {
 	printf '\e]11;%s\a\e]10;%s\a' "$1" "$2"

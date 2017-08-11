@@ -103,11 +103,15 @@ export POD_TO_TEXT_ANSI=1
 TAB='	'
 NL='
 '
+# For functions whose name conflicts with an executable in PATH, ksh 
+# prefers the executable. To avoid this and allow explicit calls to the 
+# functions or the executables, we name those functions with the 'f-' 
+# prefix and then alias those to the name without the 'f-'. Everybody 
+# wins.
+for f in $F/f-*; { f="${f#$F/}"; alias "${f#f-}=$f"; }
+# do the same for amuse functions
+for f in $F/amuse-*; { f="${f#$F/}"; alias "${f#amuse-}=$f"; }
 
-unalias stop r
-typeset -fu r help
-
-alias cd='newcd'
 alias cls='clear; ls'
 alias doas='doas '
 alias ls='/usr/local/bin/colorls ${LS_OPTIONS}'

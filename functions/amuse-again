@@ -1,12 +1,13 @@
 # @(#)[:$-hMN^*UYl1|LyW=sW=Z: 2017-08-06 17:32:08 Z tw@csongor]
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-# SYNOPSIS: Repeat the current song (aMuse player)
+#: FUNCTION ^G(no arguments)^g
+#:   Repeat the currently playing song (aMuse player)
 
-needs set-amuse-env pgrep fullstop die
+needs amuse-set-env pgrep fullstop die
 
-function again {
-	set-amuse-env; : ${again:?}
+function amuse-again {
+	amuse-set-env; : ${again:?}
 	pgrep -qf $amusePlayerId ||
 		fullstop "$amusePlayerId is not playing."
 	

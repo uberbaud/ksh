@@ -1,7 +1,8 @@
 # @(#)[:Y|)gjvbs^rsAnvpU3OLr: 2017-08-02 13:48:05 Z tw@csongor]
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-# SYNOPSIS: Print items one per line enclosed in markers.
+#: FUNCTION ^Uword1^u ^[^Uword…N^u^]
+#:   Print items one per line enclosed in markers.
 
 function pc { printf '%s\n' "$@" | column; }
 

@@ -1,7 +1,8 @@
 # @(#)[:Ss=p6|#hM2Hm0N>z!#v?: 2017-08-06 19:17:30 Z tw@csongor]
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-# SYNOPSIS: Like math but from a cow's point of view.
+#: FUNCTION ^Uexpression^u
+#:  Like math but from a cow's point of view.
 
 function cowmath {
 	needs cowsay bc lolcat

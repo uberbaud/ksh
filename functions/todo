@@ -1,7 +1,9 @@
 # @(#)[:xT;m3F%!VoaSgSW>IBIA: 2017-08-06 14:22:04 Z tw@csongor]
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-# SYNOPSIS: Add new todo items
+# FUNCTION ^[^Udescription text^u^]
+#   Add new todo item with ^Udescription text^u or open a window to edit 
+#   the description text if none is given. Uses ^S./TODO^s.
 
 function todo {
 	local now="$(date -u +'%Y-%m-%d %H:%M:%S Z')"

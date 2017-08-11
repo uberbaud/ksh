@@ -1,8 +1,9 @@
 # @(#)[:9!KKhgT4FS9FdhZUw3HL: 2017/07/28 04:55:10 tw@csongor]
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-# vim: filetype=zsh tabstop=4 textwidth=72 noexpandtab
-
-# SYNOPSIS: Show current timestamp
+#: FUNCTION ^[^U-u^u^]
+#:   Show current timestamp in the local timezone.
+#:   ^T-u^t  Show the UTC version.
 
 function now {
 	(($#>1))&& die 'Too many arguments (at most "-u").'

@@ -1,7 +1,15 @@
 # @(#)[:vl{{BTw@SX_|*z)P#UKp: 2017-08-09 20:43:56 Z tw@csongor]
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-# SYNOPSIS: Show the newest file
+#: FUNCTION ^[^Ucount^u^] ^[^Ufile list^u^|^Udirectory^u^] ^[^Ucount^u^]
+#:   Show the newest ^Ucount^u file(s) from the ^Ulist^u, or from ^Udirectory/^S*^s^u, or
+#:   from the current directory if no file list or directory is given.
+#:   (^Inewest^i is based on the modification date.)
+#:
+#:   The ^Ucount^u may appear before or after the list.
+#:
+#:   ^WBUG^w: If there is a file in the current directory named ^Ucount^u,
+#:        ^UFUNCTION^u will use it as a file, not a count.
 
 function newest {
 	local L count=1 c=0 filelist tmp

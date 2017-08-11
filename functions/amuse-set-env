@@ -1,9 +1,10 @@
 # @(#)[:mOX>6AIT8nEWh)#!wN8A: 2017-08-06 17:18:50 Z tw@csongor]
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-# SYNOPSIS: Set common variables for aMuse functions
+#: FUNCTION ^G(no arguments)^g
+#:   Set and sanity-check common ^IaMuse^i variables.
 
-function set-amuse-env {
+function amuse-set-env {
 	: ${HOME:?} ${XDG_MUSIC_DIR:?} ${me:?}
 	amusePlayerId='aMuse player'
 	music_dir="${XDG_MUSIC_DIR:-${HOME}/media/music}"

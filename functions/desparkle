@@ -1,7 +1,8 @@
 # @(#)[:x?<9ZxZ#-OWIoVJ8hKXX: 2017/07/27 03:54:08 tw@csongor.lan]
 
-# Double carets ( '^' → '^^' ), which is quoted for
-# inclusion in a sparkle. Result ⇒ REPLY
+#: FUNCTION ^Ustr1^u ^[^Ustr…N^u^]
+#:   Double carets ( '^' → '^^' ) concatenated command line parameters,
+#:   I.e. quote text for inclusion in a sparkle. Result ⇒ ^SREPLY^s
 
 function desparkle {
 	typeset -- t="$*" p=''

@@ -1,7 +1,8 @@
 # @(#)[:Mf$>o}P_JCzCwO{tgmfv: 2017-08-08 18:25:01 Z tw@csongor]
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-# SYNOPSIS: Set terminal to csongor colors.
+#: FUNCTION ^G(no arguments)^g
+#:   Set terminal to csongor colors.
 
 function csongor-colors {
 	local bg="${CSONGOR_XTERM_WINDOW_BG:?}"

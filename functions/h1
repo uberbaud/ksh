@@ -1,7 +1,8 @@
 # @(#)[:4HN(?sG5`~dxyjLF`s`O: 2017-08-06 18:07:37 Z tw@csongor]
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-# SYNOPSIS: Prints a banner with given text
+#: FUNCTION ^Umsg word1^u ^[^Umsg word…N^u^]
+#:   Prints a banner with given text.
 
 function h1 {
 	if [[ -t 1 ]]; then

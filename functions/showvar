@@ -1,7 +1,8 @@
 # @(#)[:o1P4h|tu^H9H?RjM$FaZ: 2017/07/17 04:31:09 tw@csongor.lan]
 
-# Shows information about a variable.
-#
+# FUNCTION ^Uvarname^u
+#:  Shows information about a variable.
+
 # Because the variable is accessed by name and any variable assignment 
 # inside the function would potentially overwrite the information we 
 # would need to access later, all variable handling is done with 

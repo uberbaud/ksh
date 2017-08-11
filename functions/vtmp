@@ -1,14 +1,18 @@
 # @(#)[:#zH*FhppTLTN#rKi4Gf8: 2017-08-06 14:45:38 Z tw@csongor]
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-# SYNOPSIS: Create & edit a temporary file then output the contents
-#           to stdout
+#: FUNCTION ^[^Ufilename^u^]
+#:   Create & edit a temporary file then output the contents to ^SSTDOUT^s,
+#:   and finally, delete the temporary file.
+#:
+#:   The ^Ufilename^u is only useful if your ^S$EDITOR^s uses it to determine
+#:   syntax highlighting.
 
 function vtmp {
 	cd $(mktemp -d)|| die 'Could not `mktemp -d`.'
 	(($#))|| set tempfile
 	touch	"$1"
-	$EDITOR	"$1" 1>&2
+	$EDITOR	"$1" 1>&2 # output TUI to STDERR since we're collecting STDOUT
 	cat		"$1"
 	rm		"$1"
 	rmdir $PWD

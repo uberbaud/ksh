@@ -1,7 +1,7 @@
 # @(#)[:gT;8wdu5$3YgaDWnKwMB: 2017-08-07 16:08:35 Z tw@csongor]
-# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-# SYNOPSIS: output a warning to stderr
+#: FUNCTION ^Umsg line1^u ^[^Umsg line…N^u^]
+#:   Output a warning to ^SSTDERR^s.
 
 function warn {
 	(($#))|| set '^GNo message provided^g'

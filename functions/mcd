@@ -1,4 +1,8 @@
-# @(#)[Init]
+# @(#)[:K;}d3agg?eg$ErMgS)GZ: 2017/08/11 19:05:36 tw@csongor.lan]
+
+#: FUNCTION ^Unew path^u
+#:   ^Tmkdir -p^t ^Unew path^u, and then ^Tcd^t there.
+
 function mcd {
 	mkdir -p "$1"
 	cd "$1"

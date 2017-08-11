@@ -1,7 +1,8 @@
 # @(#)[:YIzyYkF*R6nH(Bc#Ct42: 2017-08-04 17:02:36 Z tw@csongor]
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-# SYNOPSIS: If you find a TODO file, show it
+#: FUNCTION ^G(no arguments)^g
+#:   If there's a ^STODO^s file, show it.
 
 function show-todos {
 	local needsep=false showit=false ln

@@ -1,9 +1,11 @@
 # @(#)[:3j@ZP!#K8U1K}Lh9~hJ2: 2017/08/01 02:50:25 tw@csongor.lan]
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-# SYNOPSIS: read things
+#: FUNCTION ^[^Ufile name^u^]
+#:   Read something, a given ^Ufile name^u or a file whose name is
+#:   vaguely ^Ireadme^i-like.
 
-function r {
+function f-r {
 	typeset readme=''
 	if (($#)); then
 		[[ $1 == '-h' ]]&& {
@@ -15,7 +17,7 @@ function r {
 		  }
 		readme="$1"
 	else
-		set -- [Rr][Ee][Aa][Dd][Mm][Ee]{.[Mm]{[Dd],arkdown},}*
+		set -- [Rr][Ee][Aa][Dd]+([Mm][Ee]){.[Mm]{[Dd],arkdown},}*
 		for p; do
 			[[ -f "$p" ]]&& { readme="$p"; break; }
 		done

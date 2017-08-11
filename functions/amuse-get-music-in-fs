@@ -1,9 +1,11 @@
 # @(#)[:ux4}n)@u`0PO88fO6cup: 2017-08-09 04:13:43 Z tw@csongor]
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-# SYNOPSIS: Get all music files in given directories.
+#: FUNCTION ^Udirectories^u ^= ^B$reply^b
+#:   Put names of all music files in the given ^Udirectories^u
+#:   into array ^Sreply^s.
 
-function get-music-in-fs {
+function amuse-get-music-in-fs {
 	musics='aac acm aif aiff flac m4a m4v mp3 mp4 mpa ogg opus spx wav'
 	# missing 'mid', 'midi' and 'snd'
 

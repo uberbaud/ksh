@@ -1,9 +1,11 @@
 # @(#)[:uq11iLeXaz4K_#oH-b)}: 2017-08-04 16:59:46 Z tw@csongor]
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-# SYNOPSIS: Wrapper for TODO
+#: FUNCTION ^[^Unew-path^u^]
+#:   Wraps the builtin to provide a default ^Unew-path^u of ^S$HOME^s
+#:   Also shows any todo ^Bitems^b for the new directory.
 
-function newcd {
+function f-cd {
 	(($#))|| set "$HOME"
 	builtin cd "$@" && {
 		[[ -f TODO ]]&& {

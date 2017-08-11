@@ -1,10 +1,11 @@
 # @(#)[:u?S6iYZ`9XgY(jpf?k#6: 2017-08-06 19:04:54 Z tw@csongor]
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-# SYNOPSIS: What's the aMuse player playing?
+#: FUNCTION ^G(no arguments)^g
+#:   What's the aMuse player playing?
 
-function playing {
-	set-amuse-env
+function amuse-playing {
+	amuse-set-env
 	cat ${now_playing:?}
 }
 

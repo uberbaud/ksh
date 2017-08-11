@@ -1,7 +1,9 @@
 # @(#)[:F_-`rfuuGd$u~GO2EGi+: 2017/07/31 18:04:18 tw@csongor.lan]
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-# SYNOPSIS: Notes that a file should be synced.
+#: FUNCTION ^Ufile name^u
+#:   Notes that a file should be synced. ^BQuietly^b ignores requests for files
+#:   whose full path name includes the string ^Isecret^i.
 
 function trackfile {
 	[[ -f "$1" ]]|| {

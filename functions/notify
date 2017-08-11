@@ -1,7 +1,8 @@
 # @(#)[:Fzs)Z!rvu`a=mKyS{^|0: 2017-08-07 19:56:33 Z tw@csongor]
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-# SYNOPSIS: output a notice to stderr
+#: FUNCTION ^Umsg line1^u ^[^Umsg line…N^u^]
+#:   Output a notice to ^SSTDERR^s.
 
 function notify {
 	(($#))|| set '^GNo message provided.^g'

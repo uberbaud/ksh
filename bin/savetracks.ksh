@@ -37,12 +37,40 @@ shift $(($OPTIND - 1))
 # ready to process non '-' prefixed arguments
 # /options }}}1
 
-notify "Updating ^SDOCSTORE^s"
-$KDOTDIR/bin/savetracks.ksh
+docstore=$HOME/hold/DOCSTORE
+tracking=$docstore/TRACK
+[[ -d $tracking ]]|| die 'Could not find ^Btracking^b directory.'
+cd $tracking || die 'Could not ^Bcd^b to ^Btracking^b directory.'
 
-notify "Syncing with ^Buberbaud.net^b."
-cd "$docstore"
-$KDOTDIR/bin/synrdir.ksh uberbaud.net:"$PWD" "$PWD"
+FS=''
+GS=''
 
+for t in *; do
+	[[ -h $t ]]&& continue
+	[[ -f $t ]]|| continue
+	[[ -s $t ]]&& continue
+	gsub '\\'  "$FS" "$t"
+	gsub '\%'  "$GS" "$REPLY"
+	gsub '%'   '/'   "$REPLY"
+	gsub "$GS" '%'   "$REPLY"
+	gsub "$FS" '\'   "$REPLY"
+	[[ -f $REPLY ]]|| {
+		warn "^B$t^b has moved." 'Erasing tracking info.'
+		rm "$t"
+		continue
+	  }
+	original="$REPLY"
+	SHA384="$(cksum -qa sha384b "$original")"
+	gsub '/' '_' "$SHA384"
+	SHA384="$REPLY"
+	if [[ -f ../$SHA384 ]]; then
+		warn "sha384b already exists for ^B$t^b."
+	else
+		echo "$original" >../"$SHA384"
+		cat "$original" >>../"$SHA384"
+		chflags uchg ../"$SHA384"
+	fi
+	echo "$SHA384" >"$t"
+done
 
 # Copyright (C) 2017 by Tom Davis <tom@greyshirt.net>.

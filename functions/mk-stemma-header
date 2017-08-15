@@ -1,0 +1,16 @@
+# @(#)[:oYxHl8PWDlj?Mgw!-zaI: 2017-08-15 18:38:26 Z tw@csongor]
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^G(no arguments)^g ^= ^SSTDOUT^s
+#:   Outputs marker+stemma+date+user@machine
+
+function mk-stemma-header {
+	needs uuid85 date id uname
+	printf '\x40\x28\x23\x29[:%s: %s %s@%s]'	\
+		"$(uuid85)"								\
+		"$(date -u +'%Y/%m/%d %H:%M:%S')"		\
+		"$(id -un)"								\
+		"$(uname -n)"
+}
+
+# Copyright © 2017 by Tom Davis,,, <tom@greyshirt.net>.

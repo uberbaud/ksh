@@ -1,0 +1,19 @@
+# @(#)[:zpOe6T@RK_S;L$XrT%S): 2017-08-15 19:38:58 Z tw@csongor]
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Ucommand1^u ^[^Ucommand…N^u^]
+#:   Like ^Twhence^t or ^Twhich^t that can list all possible outputs.
+
+function whall {
+	splitstr : "$FPATH" fpath
+	for c; do
+		whence -v "$c"
+		typeset -f "$c"
+		which -a "$c"
+		for f in "${fpath[@]}"; do
+			[[ -f $f/$c ]]&& print "$c is in FPATH"
+		done
+	done 2>/dev/null
+}
+
+# Copyright © 2017 by Tom Davis,,, <tom@greyshirt.net>.

@@ -1,0 +1,15 @@
+# @(#)[:VlQadx5-mjt0Mi`}_Lq4: 2017-08-15 18:01:30 Z tw@csongor]
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Uexecutable name^u ^= ^SSTDOUT^s
+#:   Get the fullpath of the bin called and running.
+
+function realbin {
+	[[ $1 == */* ]]|| {
+		set -- "$(which $1 2>/dev/null)"
+		[[ -n $1 ]]|| return 1
+	  }
+	readlink -f "$1"
+}
+
+# Copyright © 2017 by Tom Davis,,, <tom@greyshirt.net>.

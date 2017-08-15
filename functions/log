@@ -1,0 +1,24 @@
+# @(#)[:pP*Ci?$87zot|D2#8;q&: 2017-08-15 05:00:16 Z tw@csongor]
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Ulogfile^u ^Ulog message^u
+#:   Standardize output format for user logs.
+#:   Writes to ^S$HOME/log/^Ulogfile^u^s
+#:   Sets ^S$REPLY^s with any errors
+
+function log {
+	local logdir logfile
+	REPLY=''
+	logdir="$HOME"/log
+	[[ -d $logdir ]]|| {
+		REPLY="$REPLY, $logdir is not a directory, writing to \$HOME"
+		logdir="$HOME"
+	  }
+	logfile="$logdir/$1"; shift
+	print "$(date -u +'%Y-%m-%d %H:%M:%S Z')  " "$@" >"$logfile" ||
+		REPLY="$REPLY, problem writing to $logfile."
+	REPLY="${REPLY#, }"
+	[[ -z $REPLY ]]
+}
+
+# Copyright © 2017 by Tom Davis,,, <tom@greyshirt.net>.

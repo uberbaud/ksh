@@ -1,0 +1,44 @@
+# @(#)[:k7)~|=Hdg5w)uWrfh3Gr: 2017-08-15 04:06:15 Z tw@csongor]
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^G(no arguments)^g
+#:   Give a clean shell experience.
+
+function reshell {
+	needs getent readlink /usr/bin/env
+	local k keepvars s setenvs v x
+	set -A keepvars	FCEDIT HOME TERM			\
+					DISPLAY WINDOWID WINDOWPATH	\
+					SSH_AGENT_PID SSH_AUTH_SOCK
+	s=$(getent shells $(which "$1"))
+	desparkle "$1"
+	[[ -n $s ]]|| die "^B$REPLY^b is not a recognized shell."
+	shift
+	REPLY=''
+
+	local ENV=${XDG_CONFIG_HOME:-$HOME/.config}/${s##*/}/env
+	[[ -f $ENV ]]&& {
+		ENV=$(readlink -fn $ENV)
+		if [[ -f $ENV ]]; then
+			keepvars[${#keepvars[*]}]=ENV
+		else
+			warn '^Benv^b exists but links to a non-existent file.'
+		fi
+	  }
+	for k in "${keepvars[@]}"; do
+		eval 'v="$'"$k"'"'
+		[[ -n $v ]]&& setenvs[${#setenvs[*]}]="$k=$v"
+	done
+
+	COLUMNS=$(tput cols)
+	# we're entering the new shell so let the user know
+	printf "\e[1;43;37m%${COLUMNS}s\r = %s =\e[0m\n" '' "$s" # banner
+
+	printf '  %s\n' "${setenvs[@]}"
+	/usr/bin/env -i "${setenvs[@]}" "$s" -l "$@"
+
+	# when we're done, let the user know
+	printf "\e[1;43;37m%${COLUMNS}s\r = %s =\e[0m\n" '' "$SHELL" # banner
+}
+
+# Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

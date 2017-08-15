@@ -15,6 +15,7 @@ export HOST=${HOSTNAME%%.*}
 	console=$(sysctl kern.consdev)
 	console=${console#*=}
   }
+export TERM
 
 export SYSLOCAL=/usr/local
 export ISO_DATE='%Y-%m-%d %H:%M:%S %z'
@@ -52,6 +53,9 @@ export USR_PLIB=$PERL5LIB
 
 ####### IMPORT LOCAL BITS
 [[ -f $KDOTDIR/$HOST.kshrc ]]&& . $KDOTDIR/$HOST.kshrc
+
+[[ -d $HOME/bin ]]&& {
+[[ :$PATH: == *:$HOME/bin:*			]]|| PATH="$HOME/bin:$PATH"; }
 
 [[ :$PATH: == *:$PERLBREW_PATH:*	]]|| PATH="$PERLBREW_PATH:$PATH"
 [[ :$PATH: == *:$LOCALBIN:*			]]|| PATH="$LOCALBIN:$PATH"
@@ -121,5 +125,11 @@ alias math='noglob math'
 alias noglob='set -f;noglob '; function noglob { "$@"; set +f; }
 alias prn="printf '  \e[35m｢\e[39m%s\e[35m｣\e[39m\n'"
 alias cowmath='noglob cowmath'
+
+for s in $(getent shells); do
+	[[ $s == $SHELL ]]&& continue
+	alias ${s##*/}="reshell $s"
+done
+unset s
 
 . $KDOTDIR/completions

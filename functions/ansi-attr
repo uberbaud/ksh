@@ -1,8 +1,8 @@
 # @(#)[:NPBr_n9D~`@SC|s^(9H}: 2017-08-15 02:08:05 Z tw@csongor]
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-# FUNCTION ^G(no arguments)^g
-#   Print simple color and attribute examples.
+#: FUNCTION ^G(no arguments)^g
+#:   Print simple color and attribute examples.
 
 function ansi-attr {
 	print '  \033[47;38m    \\e[#m   \\e[3#m  \\e[4#m  \033[0m'

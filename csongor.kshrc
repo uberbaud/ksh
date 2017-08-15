@@ -53,8 +53,9 @@ LOGPS1='\n'\
 '\[\\e[0;34m\]\$'\
 '\[\e[0m\] '
 
+typeset -fu pre-prompt
 export PS1=\
-'$(forceline)'\
+'$(pre-prompt)'\
 '\[\e[33m\]['\
 '\[\e[31m\]KSH '\
 '\[\e[32m\]\u'\

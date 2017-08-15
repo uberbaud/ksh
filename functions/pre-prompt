@@ -1,0 +1,13 @@
+# @(#)[:4+}3Rlw(!Ty=$O>X?mVX: 2017-08-15 23:41:04 Z tw@csongor]
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^G(no arguments)^g
+#:   Handle all the tidbits before a prompt is drawn.
+
+function pre-prompt {
+	# window title
+	print -nu2 "\033]0;$HOSTNAME ($PWD)\007"
+	forceline
+}
+
+# Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

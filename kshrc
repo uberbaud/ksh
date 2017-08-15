@@ -40,6 +40,7 @@ xdgcfg=$XDG_CONFIG_HOME
 xdgcache=$XDG_CACHE_HOME
 
 # paths
+export me=$HOME/work/clients/me
 export FPATH=${KDOTDIR}/functions
 export LOCALBIN=${xdgdata}/bin
 export PERL5LIB=${xdgdata}/lib/perl

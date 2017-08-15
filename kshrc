@@ -57,9 +57,9 @@ export USR_PLIB=$PERL5LIB
 [[ -d $HOME/bin ]]&& {
 [[ :$PATH: == *:$HOME/bin:*			]]|| PATH="$HOME/bin:$PATH"; }
 
-[[ :$PATH: == *:$PERLBREW_PATH:*	]]|| PATH="$PERLBREW_PATH:$PATH"
 [[ :$PATH: == *:$LOCALBIN:*			]]|| PATH="$LOCALBIN:$PATH"
 [[ :$PATH: == *:$USRBIN:*			]]|| PATH="$USRBIN:$PATH"
+[[ :$PATH: == *:/usr/games:*		]]|| PATH="$PATH:/usr/games"
 
 # input, locale, and such
 set -o vi -o vi-tabcomplete
@@ -85,6 +85,15 @@ export HGRCPATH=$xdgcfg/hg
 export MYVIM=$xdgcfg/vim
 export MYVIMRC=$MYVIM/vimrc
 export VIMINIT="so $MYVIMRC"
+
+# perl5
+export PERL_CPANM_HOME=$xdgdata/cpanm
+export PERLBREW_ROOT=$xdgdata/perl5/perlbrew
+export PERLBREW_HOME=$xdgcache/perlbrew
+export PERLBREW_SKIP_INIT=''
+export PERLBREW_LIB=''
+perlbrew_rc=$PERLBREW_ROOT/etc/perlbrew.ksh
+[[ -f $perlbrew_rc ]]&& . $perlbrew_rc
 
 # default apps
 export CC=$SYSLOCAL/bin/clang
@@ -115,16 +124,14 @@ NL='
 for p in f amuse; do
 	for f in $F/$p-*; { f="${f#$F/}"; alias "${f#$p-}=$f"; }
 done
+for f in cowmath find math note; { alias $f="noglob $f"; }
 unset p f
 
 alias cls='clear colorls ${LS_OPTIONS}'
 alias doas='doas '
-alias find='noglob find'
 alias ls='/usr/local/bin/colorls ${LS_OPTIONS}'
-alias math='noglob math'
 alias noglob='set -f;noglob '; function noglob { "$@"; set +f; }
 alias prn="printf '  \e[35m｢\e[39m%s\e[35m｣\e[39m\n'"
-alias cowmath='noglob cowmath'
 
 for s in $(getent shells); do
 	[[ $s == $SHELL ]]&& continue

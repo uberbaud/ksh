@@ -1,0 +1,46 @@
+# @(#)[:J-9XbW76RCnxhGB9=KRC: 2017-08-15 07:58:21 Z tw@csongor]
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^[^Unote text^u^]
+#:   Jot a quick note.
+
+function note {
+	needs xclip
+	local NOTES="$PWD"/NOTES OLDPWD="$PWD"
+	local noterepo=${XDG_DATA_HOME:-$HOME/.local}/sysdata/notes
+	[[ $NOTES == $HOME ]]&& NOTES=${XDG_DOCUMENTS_DIR:-$HOME/docs}/NOTES
+	[[ -d $noterepo ]]|| {
+		mkdir -p "$noterepo" ||
+			die "Could not ^Tmkdir^t ^B$noterepo^b."
+	  }
+	[[ -d "$NOTES"/RCS ]]|| {
+		mkdir -p "$NOTES"/RCS || die "Could not ^Tmkdir^t ^B$NOTES^b."
+	  }
+	cd "$NOTES"
+	set -A Q -- *.note
+	local seqnum=0 q=$((${#Q[*]}-1))
+	[[ $q -eq 1 && ${Q[0]} == \*.note ]]|| {
+		[[ ${Q[q]} == +([0-9]).note ]]|| die "IMPOSSIBLE THING #1."
+		seqnum=${Q[q]%.note}
+	  }
+	# just in case everyone is trying to create a new note in the same 
+	# directory!
+	local TMPFILE="$( mktemp note-XXXXXXXXX )" tries=5
+	while ((tries--)); do
+		((seqnum++))
+		seqnote=$seqnum.note
+		ln $TMPFILE $seqnote && break
+		octet="$(dd bs=1 count=1 status=none if=/dev/urandom)"
+		sleep 0.$(printf '%03d' \'$octet)
+	done
+	rm "$TMPFILE"
+	((tries))|| die 'Could not create ^Bnote^b.'
+	new -nz note "$*"
+	xclip -out -selection clipboard >$seqnote
+	ln -s $PWD/$seqnote \
+		"$noterepo/$(date -u +'%Y-%m-%dz')${OLDPWD##*/}-$seqnum"
+	(($#))|| v $seqnote '.'
+	cd "$OLDPWD"
+}
+
+# Copyright © 2017 by Tom Davis,,, <tom@greyshirt.net>.

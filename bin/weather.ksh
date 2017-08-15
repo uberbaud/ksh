@@ -95,8 +95,8 @@ function doit {
 	curl -o "$chart" -sL "$graph_url?$graph_opts"
 	eval "$(get-img-w-h "$chart")"
 	kill $infoPid
-	display -immutable -geometry ${w}x${h}+$((W-O-w))+$O "$chart" &
-#	rm "$chart"
+	display -immutable -geometry ${w}x${h}+$((W-O-w))+$O "$chart" &&
+		rm "$chart"
 }
 
 set +o nohup

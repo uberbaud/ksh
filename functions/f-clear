@@ -1,0 +1,21 @@
+# @(#)[:*umV=tK25FNS3dQp>DxO: 2017-08-13 20:50:13 Z tw@csongor]
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+# FUNCTION ^[^Tcmd ^Uargs...^u^t^]
+#   Reimplement ^Tclear^t to clear buffer too, possibly draw a banner 
+#   and run a second command whose name and argument are in the banner
+
+function f-clear {
+	print -u2 '\033[H\033[2J\033[3J\033[H\c'
+	((!$#)) || {
+		local banner="$*"
+		((${#banner}<(COLUMNS-6)))|| {
+			local -L $((COLUMNS-7)) t="$banner"
+			banner="$t…"
+		  }
+		printf "\e[1;44;37m%${COLUMNS}s\r ─ %s ─\e[0m\n" '' "$banner" >&2
+		"$@"
+	}
+}
+
+# Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

@@ -108,12 +108,14 @@ NL='
 # functions or the executables, we name those functions with the 'f-' 
 # prefix and then alias those to the name without the 'f-'. Everybody 
 # wins.
-for f in $F/f-*; { f="${f#$F/}"; alias "${f#f-}=$f"; }
-# do the same for amuse functions
-for f in $F/amuse-*; { f="${f#$F/}"; alias "${f#amuse-}=$f"; }
+for p in f amuse; do
+	for f in $F/$p-*; { f="${f#$F/}"; alias "${f#$p-}=$f"; }
+done
+unset p f
 
-alias cls='clear; ls'
+alias cls='clear colorls ${LS_OPTIONS}'
 alias doas='doas '
+alias find='noglob find'
 alias ls='/usr/local/bin/colorls ${LS_OPTIONS}'
 alias math='noglob math'
 alias noglob='set -f;noglob '; function noglob { "$@"; set +f; }

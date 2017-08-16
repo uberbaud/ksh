@@ -16,7 +16,7 @@ export PKG_PATH
 export TZ=EST5EDT
 
 export PS1=\
-'$(forceline)'\
+'$(pre-prompt)'\
 '\[\e[38;5;80m\]['\
 '\[\e[38;5;21m\]KSH '\
 '\[\e[38;5;12m\]\u'\

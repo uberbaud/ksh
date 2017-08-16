@@ -60,9 +60,10 @@ i-can-haz-inet || case $? in
 	esac
 
 accToFetch=${XDG_CONFIG_HOME:?}/fetchmail/accTofetch.ksh
-needs $accToFetch inc pick scan mark
+needs $accToFetch inc pick scan mark fetchmail
 
 notify 'Generating ^Sfetchmailrc^s.'
+(($#))|| set -- \*
 $accToFetch "$@"
 
 function P { printf '      ^F{4}─^f %s\n' "$1" | sparkle >&2; }

@@ -87,15 +87,6 @@ export MYVIM=$xdgcfg/vim
 export MYVIMRC=$MYVIM/vimrc
 export VIMINIT="so $MYVIMRC"
 
-# perl5
-export PERL_CPANM_HOME=$xdgdata/cpanm
-export PERLBREW_ROOT=$xdgdata/perl5/perlbrew
-export PERLBREW_HOME=$xdgcache/perlbrew
-export PERLBREW_SKIP_INIT=''
-export PERLBREW_LIB=''
-perlbrew_rc=$PERLBREW_ROOT/etc/perlbrew.ksh
-[[ -f $perlbrew_rc ]]&& . $perlbrew_rc
-
 # default apps
 export CC=$SYSLOCAL/bin/clang
 export EDITOR=$SYSLOCAL/bin/vim

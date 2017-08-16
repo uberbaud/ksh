@@ -3,22 +3,20 @@
 # vim: ts=4 ft=ksh
 
 # paths
-export PERL_CPANM_HOME=${xdgdata}/cpanm
-export PERLBREW_ROOT=${xdgdata}/perl5/perlbrew
-export PERLBREW_BIN=${PERLBREW_ROOT}/bin
-export PERLBREW_MANPATH=$PERLBREW_ROOT/perls/perl-5.24.1/man
-export PERLBREW_PERL=perl-5.24.1
-export PERLBREW_PATH=$PERLBREW_BIN:$PERLBREW_ROOT/perls/perl-5.24.1/bin
-export PERLBREW_HOME=${xdgcache}/perlbrew
+export PERL_CPANM_HOME=$xdgdata/cpanm
+export PERLBREW_ROOT=$xdgdata/perl5/perlbrew
+export PERLBREW_HOME=$xdgcache/perlbrew
 export PERLBREW_SKIP_INIT=''
 export PERLBREW_LIB=''
-export PRINTER=poco
+perlbrew_rc=$PERLBREW_ROOT/etc/perlbrew.ksh
+[[ -f $perlbrew_rc ]]&& . $perlbrew_rc
 
 # default apps
 export BROWSER=$HOME/bin/surf
 
 # mail
 export EMAIL='tom@greyshirt.net'
+export FETCHMAILHOME=$xdgcfg/fetchmail
 export MAILCHECK=-1
 export MAILDROP=/var/mail/$USER
 export MAILPATH=''
@@ -29,8 +27,12 @@ export NMH=$xdgcfg/nmh
 export MH=$NMH/config
 
 # misc
+export dskBROWSER=1
+export dskWIDGIT=7
+export dskXAPP=6
 export CSONGOR_XTERM_WINDOW_BG='#FFFFFF' CSONGOR_XTERM_WINDOW_FG='#000000'
 export CVSROOT='anoncvs@anoncvs4.usa.openbsd.org:/cvs'
+export PRINTER=poco
 
 osrev=$(uname -r)
 osarc=$(uname -m)
@@ -38,11 +40,7 @@ PKG_PATH=ftp://ftp4.usa.openbsd.org/pub/OpenBSD/$osrev/packages/$osarc
 export PKG_PATH
 export TZ=EST5EDT
 
-#-----8<------8<-----
-export dskBROWSER=1
-export dskWIDGIT=7
-export dskXAPP=6
-#----->8------>8-----
+alias s=show
 
 LOGPS1='\n'\
 '%:KSH:% \D{%Y.%m.%d.%H.%M.%S.%z} \w\n'\

@@ -7,7 +7,7 @@
 function ssh-askfirst {
 	local cmdmsg='one of ^Bssh^b, ^Bscp^b, ^Bsftp^b, or ^Brsync^b'
 	(($#))|| die "Missing ^Tcmd^t, $cmdmsg."
-	local cmd="$1" host="$2:-"; shift 2
+	local cmd="$1" host="${2:-}"; shift 2
 	[[ $cmd == @(ssh|scp|sftp|rsync) ]]||
 		die 'Unrecognized command' "Expected $cmdmsg."
 	[[ -n $host ]]||
@@ -26,7 +26,7 @@ function ssh-askfirst {
 		sftp)	/usr/bin/sftp "$host" "$@";							;;
 		rsync)	rsync "$host" "$@";									;;
 		ssh)
-			(($@))|| print -nu2 "\033]0;SSH -> $host\007"
+			(($#))|| print -nu2 "\033]0;SSH -> $host\007"
 			/usr/bin/ssh "$host" "$@"
 			$HOST-colors
 			;;

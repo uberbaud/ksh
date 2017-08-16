@@ -6,6 +6,13 @@
 #:   Returns ^B0^b if it is, ^B2^b if not at all, and ^B1^b if it seems
 #:   to be but there is possibly a ^Iman-in-the-middle^i issue.
 
+# TODO: route [-n] default
+#        ↑ returns false when there is no default route
+#       sysctl net.inet[6]
+#       ifconfig -a |
+#           awk -F: '/^[^\t]/ {d=$1;next} d~/^lo/ {next} /^\tinet6?  
+#           / {print d":"$0}'
+
 function i-can-haz-inet {
     local NAME='uberbaud.net' ADDR='208.167.249.143' digopts
     # @8.8.8.8      : google DNS

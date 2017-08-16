@@ -114,10 +114,14 @@ NL='
 # prefix and then alias those to the name without the 'f-'. Everybody 
 # wins.
 for p in f amuse; do
-	for f in $F/$p-*; { f="${f#$F/}"; alias "${f#$p-}=$f"; }
+	for i in $F/$p-*; { i="${i#$F/}"; alias "${i#$p-}=$i"; }
 done
-for f in cowmath find math note; { alias $f="noglob $f"; }
-unset p f
+for i in cowmath find math note; { alias $i="noglob $i"; }
+set -A known_hosts -- $(awk -F'[ ,]' '{print $1}' $xdgcfg/ssh/known_hosts)
+for i in "${known_hosts[@]}";	{ alias "$i=ssh $i"; }
+for i in ssh scp sftp rsync;	{ alias "$i=ssh-askfirst $i"; }
+unset p i
+
 
 alias cls='clear colorls ${LS_OPTIONS}'
 alias doas='doas '

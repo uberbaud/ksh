@@ -2,14 +2,11 @@
 # @(#)[:2nY0@+6ypedP@#VB~2}J: 2017-08-15 05:12:04 Z tw@csongor]
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
 
-: ${FPATH:?Run from within KSH}
-
-needs apm xlock log ${LOCALBIN:?}/set-bg-per-battery.sh
-log timesheet xlock begin || warn $REPLY
-
+apmarg=''
 # Usage {{{1
 typeset -- this_pgm="${0##*/}"
 function usage {
+	: ${FPATH:?}
 	desparkle "$this_pgm"
 	PGM="$REPLY"
 	sparkle >&2 <<-\
@@ -24,33 +21,43 @@ function usage {
 	===SPARKLE===
 	exit 0
 } # }}}
-# process -options {{{1
-function bad_programmer {	# {{{2
-	die 'Programmer error:'	\
-		"  No getopts action defined for [1m-$1[22m."
-  };	# }}}2
-apmarg=''
-while getopts ':hZzS' Option; do
-	case $Option in
-		Z)	apmarg=-Z;												;;
-		z)	apmarg=-z;												;;
-		S)	apmarg=-S;												;;
-		h)	usage;													;;
-		\?)	die "Invalid option: [1m-$OPTARG[22m.";				;;
-		\:)	die "Option [1m-$OPTARG[22m requires an argument.";	;;
-		*)	bad_programmer "$Option";								;;
+(($#))&& { # {{{1
+	case "$1" in
+		-Z)	apmarg=-Z;						;;
+		-z)	apmarg=-z;						;;
+		-S)	apmarg=-S;						;;
+		-h) usage;							;;
+		*)	print -u2 "$0: Bad opt: '$1'";	;;
 	esac
-done
-# remove already processed arguments
-shift $(($OPTIND - 1))
-# ready to process non '-' prefixed arguments
-# /options }}}1
+} # }}}1
+function needs { # {{{1
+	typeset badlist=""
+	for x { [[ -n "$(whence "$x")" ]] || badlist="$badlist $x"; }
+    [[ -z $badlist ]] || die "Missing needed executables:^[[1m$badlist^[[0m"
+} # }}}1
+function log { # {{{1
+	typeset logdir logfile
+	REPLY=""
+	logdir="$HOME"/log
+	[[ -d $logdir ]] || {
+		REPLY="$REPLY, $logdir is not a directory, writing to \$HOME"
+		logdir="$HOME"
+	}
+	logfile="$logdir/$1"
+	shift
+	print "$(date -u +'%Y-%m-%d %H:%M:%S Z')  " "$@" > "$logfile" || REPLY="$REPLY, problem writing to $logfile."
+	REPLY="${REPLY#, }"
+	[[ -z $REPLY ]]
+} # }}}1
 function opts+ { # {{{1
 	local i
 	for i in "$@"; do
 		opts[${#opts[*]}]="$i"
 	done
 } # }}}1
+needs apm xlock log ${LOCALBIN=${HOME:?}/.local/bin}/set-bg-per-battery.sh
+
+log timesheet xlock begin || warn $REPLY
 
 # opts: a negative number sets the maximum
 opts+	-planfont	'-*-dejavu sans-bold-r-normal-*-*-160-*-*-p-*-ascii-*'

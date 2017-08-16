@@ -1,0 +1,11 @@
+# @(#)[:v_bmIlGI)+80!lDR885g: 2017-08-16 20:50:02 Z tw@csongor]
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^G(no arguments)^g
+#:   Paste clipboard to ^SSTDOUT^s.
+
+function pbpaste {
+	xclip -selection clipboard -out
+}
+
+# Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

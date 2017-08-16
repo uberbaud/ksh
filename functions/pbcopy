@@ -1,0 +1,12 @@
+# @(#)[:TQP3%JQsAUv%F0Wbd(#Z: 2017-08-16 20:45:42 Z tw@csongor]
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^[^Ufile…^u^]
+#:   Copy ^SSTDIN^s or ^Ufile^us to clipboard
+
+function pbcopy {
+	: ${DISPLAY:?Can\'t save without X11}
+	xclip -selection clipboard -in "$@"
+}
+
+# Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

@@ -13,9 +13,10 @@ function usage {
 	PGM="$REPLY"
 	sparkle >&2 <<-\
 	===SPARKLE===
-	^F{4}Usage^f: ^T${PGM}^t ^[^Unwid^u^]
+	^F{4}Usage^f: ^T${PGM}^t ^[^T-f^t^] ^[^Unwid^u^]
 	         Connect to a wifi base station, perhaps the world.
 	           The ^Unwid^u is the name of the base station.
+	           ^T-f^t  Force. Kill the current connection, and reconnect.
 	       ^T${PGM} -h^t
 	         Show this help message.
 	===SPARKLE===
@@ -26,8 +27,10 @@ function bad_programmer {	# {{{2
 	die 'Programmer error:'	\
 		"  No getopts action defined for [1m-$1[22m."
   };	# }}}2
+warnOrDie=die
 while getopts ':h' Option; do
 	case $Option in
+		f)	warnOrDie=warn;											;;
 		h)	usage;													;;
 		\?)	die "Invalid option: [1m-$OPTARG[22m.";				;;
 		\:)	die "Option [1m-$OPTARG[22m requires an argument.";	;;
@@ -38,7 +41,16 @@ done
 shift $(($OPTIND - 1))
 # ready to process non '-' prefixed arguments
 # /options }}}1
-
+function warnOrDie { #{{{1
+	case "$warnOrDie" in
+		die)	die "$@" 'Use ^B-f^b to force a reconnect.';	;;
+		warn)	warn "$@";										;;
+		*)
+			desparkle "$warnOrDie"
+			die '^BProgrammer error^b:' "warnOrDie is ^B$REPLY^b."
+			;;
+	esac
+} # }}}1
 # LOG-INET-STATS ←→ DELETE THIS {{{1
 LOG_INET_STATS_RUNS=0
 LOG_INET_STATS_awkpgm="$(cat)" <<-\
@@ -67,14 +79,22 @@ needs doas ifconfig dhclient awk
 (($#))||	die 'scanning is not yet implemented.'
 (($#>1))&&	die 'Too many arguments. Expected at most one (1).'
 
+i-can-haz-inet&& warnOrDie "You're already connected to the Internet."
+
 LOG-INET-STATS # ← DELETE THIS
 
 set -A cfgs -- $wifi_config/[0-9][0-9],$1*
 ((${#cfgs[@]}))|| die 'Could not find a matching wifi configuration file.'
 ((${#cfgs[@]}>1))&& { set -A cfgs -- "$(omenu "${cfgs[@]}")" || exit 0; }
-nwid="${cfgs[0]#$wifi_config/[0-9][0-9],}"
+
+cfg="$(readlink -nf "${cfgs[0]}")"
+[[ -n $cfg ]]|| die 'IMPOSSIBLE THING #1'
+
+nwid="${cfg#$wifi_config/[0-9][0-9],}"
+# there's a newline character, right ... about ... there
+#     ↓
 gsub '
-' ' ' "$(sed -e '/^[[:space:]]*;/d' -e '/^[[:space:]]*$/d' "${cfgs[0]}")"
+' ' ' "$(sed -e '/^[[:space:]]*;/d' -e '/^[[:space:]]*$/d' "$cfgs")"
 eval "set -A wifiopts -- $REPLY"
 
 awkpgm="$(cat)" <<-\

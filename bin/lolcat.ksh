@@ -91,14 +91,13 @@ shift $(($OPTIND - 1))
 
 typeset -L $cpc remove=''; gsub ' ' '?' "$remove"; remove="$REPLY"
 function rainbowify-line {
-	typeset -i i=0 ndx=$2
+	typeset -i ndx=$2
 	typeset line="$1" p='' t=''
 	while ((${#line}>$cpc)); do
 		t="${line#$remove}"
 		p="${line%$t}"
 		line="$t"
-		printf "\e[$bfg;5;${colors[ndx]}m%s" "$p"
-		i=$((i+cpc))
+		print -n "\033[$bfg;5;${colors[ndx]}m$p"
 		ndx=$(( ((ndx+1)%C) ))
 	done
 	((${#line}))&&

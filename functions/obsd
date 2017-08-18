@@ -5,7 +5,7 @@
 #:   Handle mail from the OpenBSD CVS change list specially.
 
 function obsd {
-	local P="${PAGER:-less}" filter='' W=10 refold=''
+	local filter='' W=10 refold=''
 	needs show fold awk $P cat
 
 	# arbitary number after which the file list will be shown as "*"
@@ -59,15 +59,6 @@ function obsd {
 		{printf "%-${W}s%s\n",X,\$0;X="";}
 	==AWK==
 
-#printf '%s\n' "$refold"
-
-	show +inbox obsd -nocheckmime -form mhl.body	|
-		awk -v MAXFILES=$MAXFILES "$filter"			|
-		fold -s -w $((COLUMNS-W-2))					|
-		awk "$refold"
-
-	return 0
-
 	local OUTPUT linecount
 	OUTPUT="$( show +inbox obsd -nocheckmime -form mhl.body	|
 				awk -v MAXFILES=$MAXFILES "$filter"			|
@@ -76,6 +67,7 @@ function obsd {
 			)"
 	linecount=$(print "$OUTPUT"|wc -l|tr -cd '[0-9')
 
+	local P="${PAGER:-less}"
 	[[ -t 1 ]]||			P=cat
 	((linecount<LINES))&&	P=cat
 

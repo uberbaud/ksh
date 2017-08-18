@@ -116,10 +116,19 @@ NL='
 for p in f amuse; do
 	for i in $F/$p-*; { i="${i#$F/}"; alias "${i#$p-}=$i"; }
 done
+# noglobs
 for i in cowmath find math note; { alias $i="noglob $i"; }
+# askfirst all commands that use ssh
+for i in ssh scp sftp rsync;	{ alias "$i=ssh-askfirst $i"; }
+# known hosts are commands to ssh to that host
 set -A known_hosts -- $(awk -F'[ ,]' '{print $1}' $xdgcfg/ssh/known_hosts)
 for i in "${known_hosts[@]}";	{ alias "$i=ssh $i"; }
-for i in ssh scp sftp rsync;	{ alias "$i=ssh-askfirst $i"; }
+# FPATH functions are implicitly autoloaded, but the completion 
+# mechanism doesn't know about them unless we explicitly autoload them
+IFS=:
+for p in $FPATH; { for i in $F/*; { typeset -fu "${i##*/}"; } }
+IFS=" $TAB$NL"
+# clean up
 unset p i
 
 

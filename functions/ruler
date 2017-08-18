@@ -1,0 +1,33 @@
+# @(#)[:YGh$*kOt8wB5kRFg56LA: 2017-08-18 17:37:59 Z tw@csongor]
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^[^Uwidth^u^]
+#:   Prints a ruler of ^Uwidth^u to the screen, width defaults to ^S$COLUMNS^.
+
+function ruler {
+	typeset -- dots='....+....' Ruler=''
+	typeset -i count="${1:-${COLUMNS:-80}}"
+	((count<1))&& die 'syntax: ruler width-in-columns'
+
+	typeset -R 1 dial
+	typeset -i tens=$((count/10)) ones=$((count%10)) i=0
+	while ((++i<=tens)); do
+		dial=$i
+		Ruler="$Ruler$dots$dial"
+	done
+	((ones))&& {
+		typeset -L $ones dots
+		Ruler="$Ruler$dots"
+	  }
+	# add some color *only* if stdout is a terminal
+	[[ -t 1 ]]&& Ruler="\033[0;47;36m$Ruler\033[0m"
+	if [[ -t 0 ]]; then
+		print $Ruler
+	else
+		print $Ruler
+		cat
+		print $Ruler
+	fi
+}
+
+# Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

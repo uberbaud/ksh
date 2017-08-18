@@ -100,9 +100,8 @@ function rainbowify-line {
 		print -n "\033[$bfg;5;${colors[ndx]}m$p"
 		ndx=$(( ((ndx+1)%C) ))
 	done
-	((${#line}))&&
-		printf "\e[$bfg;5;${colors[ndx]}m%s" "$line"
-	printf '\e[0m\n'
+	((${#line}))&& print -n "\033[$bfg;5;${colors[ndx]}m$line"
+	print -n '\033[0m\n'
 }
 
 function rainbowify-stdin {

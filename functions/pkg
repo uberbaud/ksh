@@ -1,0 +1,74 @@
+# @(#)[:xdh)1hw*4cc>_+};sT`h: 2017-08-19 21:28:02 Z tw@csongor]
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Tcmd^t ^Uargs...^u
+#:   performs pkg_^Scmd^s, possibly using ^Tdoas^t, possibly logging the action.
+#: FUNCTION ^Tgrep^t ^Uregex^u
+#: FUNCTION ^Tquery^t ^Uregex^u
+#:   performs a ^Bperl5 regex^b search on the index file.
+#:   example: ^Tpkg query '\b(?^i:lisp)\b'^t
+#:       performs a case insenstive word bounded search for ^Slisp^s.
+#: FUNCTION ^Tinstalled^t
+#:   lists manually installed packages in a format which can be used by
+#:   ^Tpkg_add -l^t to do a best effort with flavors but not hampered by
+#:   version.
+#: FUNCTION ^Tweb^t ^Uglobs …^u
+#: FUNCTION ^Twww^t ^Uglobs …^u
+#:   Shows the html information page using ^Bw3m^b.
+
+function pkg {
+	needs doas cat die
+	(($#))|| set help
+
+	typeset osv="$(uname -r)" record=false cmd="$1"; shift
+	typeset binpath=/usr/sbin bin=$binpath/pkg_$cmd
+	typeset pkghome=$HOME/.local/pkg-info/v$osv
+	case $cmd in
+		add)		doas $bin -i "$@"; record=true;						;;
+		check)		doas $bin "$@";										;;
+		delete)		doas $bin "$@"; record=true;						;;
+		install)	die 'Did you mean ^Tadd^t or ^Tinstall^Ued^u^t?';	;;
+		installed)	$binpath/pkg_info -mz;								;;
+		web|www)
+			needs w3m
+			typeset f u h F
+			for f in "$@"; do
+				for F in $pkghome/html/$f*; { h[${#h[*]}]="$F"; }
+			done
+			for u in "${h[@]}"; { w3m "$u"; }
+			;;
+		grep|query)
+			typeset ndx="$pkghome/v$osv.ndx"
+			typeset pkgblob="$(perl -ne "print if m/$1/;" "$ndx")"
+			print -r "$pkgblob" | column -s "$TAB" -t
+			splitstr NL "$pkgblob" PKGs
+			typeset i=0 l=${#PKGs[*]}
+			while ((i<l)) { PKGs[i]="${PKGs[i]%%$TAB*}"; ((i++)); }
+			sparkle <<-\=SPARKLE=
+			        ^Gpackage names are in ^B$PKGs^b.^g
+			=SPARKLE=
+			;;
+		-h|--help|help)
+			if (($#)); then
+				help pkg
+			else
+				cmd=$1; shift
+				bin="${bin%_*}_$cmd"
+				if [[ -x $bin ]]; then
+					$bin -h
+				else
+					die "No help for ^T$cmd^t."
+				fi
+			fi
+			;;
+		*)
+			[[ -x $bin ]]|| die "Unknown command ^S$cmd^s."
+			$bin "$@"
+			;;
+	esac
+
+	$record && print $cmd "$@" >> $HOME/hold/$osv/pkg.log
+
+}
+
+# Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

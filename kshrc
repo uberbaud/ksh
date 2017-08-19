@@ -131,12 +131,14 @@ IFS=" $TAB$NL"
 # clean up
 unset p i
 
-
+alias clear='f-clear ' # expand alias of $2
 alias cls='clear colorls ${LS_OPTIONS}'
 alias doas='doas '
+alias halt='doas halt'
 alias ls='/usr/local/bin/colorls ${LS_OPTIONS}'
 alias noglob='set -f;noglob '; function noglob { "$@"; set +f; }
 alias prn="printf '  \e[35m｢\e[39m%s\e[35m｣\e[39m\n'"
+alias reboot='doas reboot'
 
 for s in $(getent shells); do
 	[[ $s == $SHELL ]]&& continue

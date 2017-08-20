@@ -38,7 +38,7 @@ function note {
 	new -nz note "$*"
 	xclip -out -selection clipboard >$seqnote
 	ln -s $PWD/$seqnote \
-		"$noterepo/$(date -u +'%Y-%m-%dz')${OLDPWD##*/}-$seqnum"
+		"$noterepo/$(date -u +'%Y-%m-%dz')-${OLDPWD##*/}-$seqnum"
 	(($#))|| v $seqnote '.'
 	cd "$OLDPWD"
 }

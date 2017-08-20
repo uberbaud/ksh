@@ -41,14 +41,16 @@ xdgcache=$XDG_CACHE_HOME
 
 # paths
 export me=$HOME/work/clients/me
-export FPATH=${KDOTDIR}/functions
-export LOCALBIN=${xdgdata}/bin
-export PERL5LIB=${xdgdata}/lib/perl
-export TEMPLATES_FOLDER=${xdgdata}/templates
-export TMPDIR=${xdgdata}/temp
-export USRBIN=${HOME}/bin/ksh
-export USRLIB=${xdgdata}/lib
-export USR_CLIB=${xdgdata}/lib/c
+export FPATH=$KDOTDIR/functions
+export LOCALBIN=$xdgdata/bin
+export PERL5LIB=$xdgdata/lib/perl
+export RAKUDO_HOME=$xdgdata/rakudobrew
+export RAKUDO_BIN=$RAKUDO_HOME/bin
+export TEMPLATES_FOLDER=$xdgdata/templates
+export TMPDIR=$xdgdata/temp
+export USRBIN=$HOME/bin/ksh
+export USRLIB=$xdgdata/lib
+export USR_CLIB=$xdgdata/lib/c
 export PERL_UNICODE=AS
 export USR_PLIB=$PERL5LIB
 
@@ -58,6 +60,7 @@ export USR_PLIB=$PERL5LIB
 [[ -d $HOME/bin ]]&& {
 [[ :$PATH: == *:$HOME/bin:*			]]|| PATH="$HOME/bin:$PATH"; }
 
+[[ :$PATH: == *:$RAKUDO_BIN:*		]]|| PATH="$RAKUDO_BIN:$PATH"
 [[ :$PATH: == *:$LOCALBIN:*			]]|| PATH="$LOCALBIN:$PATH"
 [[ :$PATH: == *:$USRBIN:*			]]|| PATH="$USRBIN:$PATH"
 [[ :$PATH: == *:/usr/games:*		]]|| PATH="$PATH:/usr/games"
@@ -132,10 +135,10 @@ IFS=" $TAB$NL"
 unset p i
 
 alias clear='f-clear ' # expand alias of $2
-alias cls='clear colorls ${LS_OPTIONS}'
+alias cls='clear colorls $LS_OPTIONS'
 alias doas='doas '
 alias halt='doas halt'
-alias ls='/usr/local/bin/colorls ${LS_OPTIONS}'
+alias ls='/usr/local/bin/colorls $LS_OPTIONS'
 alias noglob='set -f;noglob '; function noglob { "$@"; set +f; }
 alias prn="printf '  \e[35m｢\e[39m%s\e[35m｣\e[39m\n'"
 alias reboot='doas reboot'

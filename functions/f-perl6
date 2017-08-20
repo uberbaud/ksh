@@ -1,0 +1,27 @@
+# @(#)[:i@hTB6(ESoXpbIYF<27W: 2017-08-20 18:16:26 Z tw@csongor]
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^[^Iargs…^i^]
+#:   Wrapper to rlwrap ... if necessary.
+
+function f-perl6 {
+	: ${RAKUDO_BIN:?}
+	if (($#)); then
+		$RAKUDO_BIN/perl6 "$@"
+	else
+		local H=$XDG_DATA_HOME/perl6/history
+		touch $H-all
+		cat <$H-all >$H-$$
+		local lnH=$(wc -l <$H-$$|tr -cd '[0-9]')
+		date +'# %Y-%m-%d %H:%M:%S %Z' >>$H-$$
+		rlwrap -H $H-$$ perl6
+		# remove common lines from our history, plus any exit lines
+		set -A sedopts -- -E
+		((lnH))&& set -A sedopts -- "${sedopts[@]}" -e "1,${lnH}d"
+		set -A sedopts -- "${sedopts[@]}" -e '/^exit;?$/d'
+		sed "${sedopts[@]}" $H-$$ >>$H-all
+		rm $H-$$
+	fi
+}
+
+# Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

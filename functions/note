@@ -25,11 +25,11 @@ function note {
 	  }
 	# just in case everyone is trying to create a new note in the same 
 	# directory!
-	local TMPFILE="$( mktemp note-XXXXXXXXX )" tries=5
+	local TMPFILE="$(mktemp note-XXXXXXXXX)" tries=5
 	while ((tries--)); do
 		((seqnum++))
 		seqnote=$seqnum.note
-		ln $TMPFILE $seqnote && break
+		ln "$TMPFILE $seqnote" && break
 		octet="$(dd bs=1 count=1 status=none if=/dev/urandom)"
 		sleep 0.$(printf '%03d' \'$octet)
 	done

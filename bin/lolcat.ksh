@@ -95,7 +95,7 @@ function rainbowify-line {
 	typeset line="$1" p='' t=''
 	while ((${#line}>$cpc)); do
 		t="${line#$remove}"
-		p="${line%$t}"
+		p="${line%"$t"}"
 		line="$t"
 		print -n "\033[$bfg;5;${colors[ndx]}m$p"
 		ndx=$(( ((ndx+1)%C) ))

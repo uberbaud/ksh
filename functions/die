@@ -13,7 +13,8 @@ function die {
 	else
 		printf '  ^EFAILED^e: %s\n' "$ln1"
 	fi | sparkle
-	kill -QUIT $$
+	[[ -o interactive ]]&& kill -INT $$
+	exit ${errno:-1}
   } >&2
 
 # vim: ft=ksh ts=4

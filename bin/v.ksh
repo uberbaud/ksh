@@ -60,7 +60,7 @@ function warnOrDie { #{{{1
 typeset hasmsg=false rcsmsg=''
 (($#>1))&& {
 	hasmsg=true
-	typeset -A rcsmsg_a -- "$@"
+	set -A rcsmsg_a -- "$@"
 	unset rcsmsg_a[1]
 	typeset -- rcsmsg="${rcsmsg_a[*]}"
 	unset rcsmsg_a
@@ -126,7 +126,7 @@ if [[ -d RCS ]]; then
 		# without the dash at the beginning of rcsmsg, the message would 
 		# be taken from a file named in $rcsmsg
 		$hasmsg && set -A rcsopts -- -t-"$rcsmsg"
-		ci -i "${rcsopts[@]}" ./$f_name
+		ci -q -i "${rcsopts[@]}" ./$f_name
 	fi
 elif $hasmsg; then
 	warn 'No [35mRCS/[39m.'

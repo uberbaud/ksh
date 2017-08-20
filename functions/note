@@ -19,7 +19,7 @@ function note {
 	cd "$NOTES"
 	set -A Q -- *.note
 	local seqnum=0 q=$((${#Q[*]}-1))
-	[[ $q -eq 1 && ${Q[0]} == \*.note ]]|| {
+	[[ ${Q[q]} == \*.note ]]|| {
 		[[ ${Q[q]} == +([0-9]).note ]]|| die "IMPOSSIBLE THING #1."
 		seqnum=${Q[q]%.note}
 	  }

@@ -211,7 +211,7 @@ if (($#==1)); then
 	fi
 	set -- "${rgb[@]}"
 elif (($#==3)); then
-    R=$1 G=$2 B=$2
+    R=$1 G=$2 B=$3
 	[[ $R == *[!0-9]* ]]&&	bad-color-die
 	[[ $G == *[!0-9]* ]]&&	bad-color-die
 	[[ $B == *[!0-9]* ]]&&	bad-color-die

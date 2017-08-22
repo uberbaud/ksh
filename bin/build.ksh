@@ -24,7 +24,7 @@ function usage {
 } # }}}
 function header-help { # {{{1
 	sparkle <<-\
-	\SPARKLE-DOC
+	\==SPARKLE-DOC==
 
     ^BEXTENSIVE BUILD HEADER DESCRIPTION^b
 
@@ -45,16 +45,16 @@ function header-help { # {{{1
         ^T---^t
 
     The compiler/assembler/etc name is in parenthesis after the
-    term ^BBUILD-OPTS^b and more than ^BBUILD-OPTS^b declaration
+    term ^BBUILD-OPTS^b and more than one ^BBUILD-OPTS^b declaration
     is allowed, each one run in turn.
 
     The first triple dash ends the build header.
     each ^T:flag=SomeText:^t is a uname flag set, if the text matches
     ^T$(uname -^t^Uflag^u^T)^t, then the option is used.
-	SPARKLE-DOC
+	==SPARKLE-DOC==
 	exit 0
 } # }}}1
-typeset verbose=false dryrun=false TAB='	'
+typeset verbose=false dryrun=false TAB='	' WS=" $TAB"
 # process -options {{{1
 function bad_programmer {	# {{{2
 	die 'Programmer error:'	\
@@ -99,42 +99,170 @@ function parse-warn { #{{{1
 	warn "${msg[@]}"
 } # }}}1
 function __CC { #{{{1
-	typeset words sname="${XFILE:-$1}" bname="${sname%.*}"
-	set -A words -- $2
+	typeset sname="${XFILE:-$1}"
+	typeset bname="${sname%.*}"
+	typeset words; set -A words -- $2
 	typeset cc="${words[0]}"
 	unset words[0]
 	typeset cc_opts="${words[*]}"
 
-	typeset output='' cmd="${cmd##+([ $TAB])}"
-	[[ $cmd == *-[co][ $TAB] ]]|| output="-o '$bname' "
+	typeset outopt='' cmd="${cmd##+([$WS])}"
+	[[ $cmd == *-[co][$WS]* ]]|| outopt="-o '$bname' "
 
 	typeset ALL='all'
 	[[ $cc == clang ]]&& ALL='everything'
 
 	REPLY="$cc -W$ALL $outopt'$sname' $cc_opts"
 } # }}}1
-function __nasm		{ REPLY="$2 $1"; }
-function __ld		{ REPLY="$2 ${1%.*}.o"; }
-function __clang	{ __CC "$@"; }
-function __gcc		{ __CC "$@"; }
 function __ragel { #{{{1
 	typeset bname="${1%.*}" oext=c outopt='' cmd="$2"
 	if [[ $cmd == *'-o '* ]]; then
 		XFILE="${cmd#*-o }"
 		XFILE="${XFILE%% *}"
 	else
+		case "$cmd" in
+			*-C*)	oext=c;			;;
+			*-D*)	oext=d;			;;
+			*-J*)	oext=java;		;;
+			*-Z*)	oext=go;		;;
+			*-R*)	oext=rb;		;;
+		esac
+		[[ $1 == *.rh ]]&& oext=h
+		XFILE="${1%.*}"; XFILE=${XFILE##*/}.$oext
+		outopt="-o $XFILE"
 	fi
+	REPLY="$cmd $outopt $1"
 } # }}}1
+function __nasm		{ REPLY="$2 $1"; }
+function __ld		{ REPLY="$2 ${1%.*}.o"; }
+function __clang	{ __CC "$@"; }
+function __gcc		{ __CC "$@"; }
 
-rx_sets_outfile='(^|[ '"$TAB"'])-[co][[:>:]]'
+tweaklist=' CC ragel nasm ld clang gcc '
+
 bofile='build.output'
 totalerrs=0
 XFILE=''
+COLUMNS=$(tput cols)
 
-print "build $*"  >"$bofile"
-print '----'     >>"$bofile"
+print -- "build $*"  >"$bofile"
+print -- '----'     >>"$bofile"
 
+function build-one { #{{{1
+	file-exists "$1"		|| return 1
+	file-is-readable "$1"	|| return 1
 
+	desparkle "$1"
+	err_no_build="No ^BBUILD-OPTS^b in ^S$REPLY^s."
 
+	typeset SRC ln utest uflags uresp commented buildopts
+	typeset -i I=0
+	typeset headerfound=false fhead="${1%.*}"
+	typeset fbase="${fhead##*/}"
+
+	# PARSE HEADER {{{2
+	exec 4<"$1"
+	while read -ru4 ln; do
+		((I+=1))
+		[[ $ln == *([ $TAB]) ]]&& { warn "$err_no_build"; return 1; }
+		[[ $ln == *BUILD-OPTS* ]]&& { headerfound=true; break; }
+	done
+	$headerfound|| { warn "$err_no_build"; return 1; }
+	set -A buildopts -- "BUILD-OPTS${ln#*BUILD-OPTS}"
+	while read -ru4 ln; do
+		((I+=1))
+		commented=false
+		[[ $ln == *([ $TAB]) ]]&&	break
+		[[ $ln == *'---'* ]]&&		break
+		[[ $ln == *BUILD-OPTS* ]]&&	{
+			buildopts[${#buildopts[*]}]="BUILD-OPTS${ln#*BUILD-OPTS}"
+			continue
+		  }
+		[[ $ln == *'#'* ]]&& {
+			ln="${ln%%#*}"
+			commented=true
+		  }
+		[[ $ln == *:* ]]|| {
+			$commented ||
+				parse-warn 'not a directive (no ^S:^s).' "$1" $I "$ln"
+			continue
+		  }
+		ln="${ln#*:}"
+		[[ $ln == ':' ]]&& {
+			utest="${ln%%:*}"
+			ln="${ln#"$utest"}"
+			[[ $utest == *=* ]]|| {
+				parse-warn 'no ^S=^s in ^Tuname^t test.' "$1" "$I" "$ln"
+				return 1
+			  }
+			uflags="${utest%%=*}"
+			uresp="${utest#"$uflags"=}"
+			[[ $uresp == "$(uname -$uflags)" ]]|| continue
+		  }
+		buildopts[${#buildopts[*]}]="$ln"
+	done
+	exec 4>&-
+	# }}}2
+	# BUILD-OPTS to SHELL COMMANDS {{{2
+	typeset cmds cmd=''
+	set -A cmds --
+	for c in "${buildopts[@]}"; do
+		[[ $c == BUILD-OPTS* ]]&& {
+			[[ -n $cmd ]]&& cmds[${#cmds[*]}]="$cmd"
+			if [[ $c == BUILD-OPTS ]]; then
+				cmd="$CC"
+			else
+				cmd="${c##*\(}"; cmd="${cmd%\)*}"
+			fi
+			continue
+		  }
+		# strip leading and trailing whitespace
+		c="${c##+([ $TAB])}"
+		c="${c%%+([ $TAB])}"
+		[[ -n $c ]]&& cmd="$cmd $c"
+	done
+	cmds[${#cmds[*]}]="$cmd"
+	# }}}2
+	# TWEAK AND RUN COMMANDS {{{2
+	typeset -i i=0
+	typeset fn cmdwords
+	while ((i<${#cmds[*]})); do
+		set -A cmdwords -- ${cmds[i++]}
+		fn="${cmdwords[0]##*/}"
+		[[ $tweaklist ==  *" $fn "* ]]&& {
+			__$fn "$1" "${cmdwords[@]}"
+			cmd="$REPLY"
+		  }
+		$verbose && print -r "$cmd" | fold -sw $COLUMNS >&2
+		$dryrun && continue
+		# lots of workarounding to get the exit status
+		export COPID COPIDERR
+		trap 'wait $COPID; COPIDERR=$?' CHLD
+		eval "$cmd" 2>&1 |&
+		COPID=$!
+		<&p fold -sw $COLUMNS | tee -a "$bofile"
+		trap - CHLD
+		((COPIDERR))&& {
+			warn "$1 build failed"
+			return 1
+		  }
+	done
+	# }}}2
+	return 0
+} #}}}1
+
+(($#))|| die 'No source files given.'
+
+for sourcefile in "$@"; { build-one "$sourcefile"; ((totalerrs+=$?)); }
+
+typeset -i LINES=$(tput lines)
+if (( (LINES-2) <= $(wc -l <"$bofile"|tr -cd '[0-9]') )); then
+	clear
+	less $bofile
+else
+	# we have the output already
+	rm $bofile
+fi
+exit $totalerrs
 
 # Copyright (C) 2017 by Tom Davis <tom@greyshirt.net>.

@@ -6,8 +6,9 @@
 
 function note {
 	needs xclip
-	local NOTES="$PWD"/NOTES OLDPWD="$PWD"
+	local NOTES="$PWD"/NOTES OLDPWD="$PWD" setnoglob=false
 	local noterepo=${XDG_DATA_HOME:-$HOME/.local}/sysdata/notes
+	[[ $PWD == */NOTES ]]&& NOTES="$PWD"
 	[[ $NOTES == $HOME ]]&& NOTES=${XDG_DOCUMENTS_DIR:-$HOME/docs}/NOTES
 	[[ -d $noterepo ]]|| {
 		mkdir -p "$noterepo" ||
@@ -17,24 +18,23 @@ function note {
 		mkdir -p "$NOTES"/RCS || die "Could not ^Tmkdir^t ^B$NOTES^b."
 	  }
 	cd "$NOTES"
+	[[ -o noglob ]]&& { setnoglob=true; set +f; }
 	set -A Q -- *.note
 	local seqnum=0 q=$((${#Q[*]}-1))
-	[[ ${Q[q]} == \*.note ]]|| {
-		[[ ${Q[q]} == +([0-9]).note ]]|| die "IMPOSSIBLE THING #1."
-		seqnum=${Q[q]%.note}
-	  }
+	[[ ${Q[q]} == \*.note ]]|| seqnum=${Q[q]%.note}
 	# just in case everyone is trying to create a new note in the same 
 	# directory!
 	local TMPFILE="$(mktemp note-XXXXXXXXX)" tries=5
 	while ((tries--)); do
 		((seqnum++))
 		seqnote=$seqnum.note
-		ln "$TMPFILE $seqnote" && break
+		ln "$TMPFILE" "$seqnote" && break
 		octet="$(dd bs=1 count=1 status=none if=/dev/urandom)"
 		sleep 0.$(printf '%03d' \'$octet)
 	done
 	rm "$TMPFILE"
-	((tries))|| die 'Could not create ^Bnote^b.'
+	$setnoglob && set -f
+	((tries>=0))|| die 'Could not create ^Bnote^b.'
 	new -nz note "$*"
 	xclip -out -selection clipboard >$seqnote
 	ln -s $PWD/$seqnote \

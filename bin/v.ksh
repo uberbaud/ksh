@@ -34,11 +34,9 @@ function bad_programmer {	# {{{2
 		"  No getopts action defined for [1m-$1[22m."
   };	# }}}2
 typeset -- warnOrDie='die';
-typeset hasmsg=false rcsmsg=''
-while getopts ':m:fh' Option; do
+while getopts ':fh' Option; do
 	case $Option in
 		f)	warnOrDie='warn';										;;
-		m) hasmsg=true; rcsmsg="$OPTARG";							;;
 		h)	usage;													;;
 		\?)	die "Invalid option: [1m-$OPTARG[22m.";				;;
 		\:)	die "Option [1m-$OPTARG[22m requires an argument.";	;;
@@ -145,12 +143,12 @@ if [[ -d RCS ]]; then
 elif $hasmsg; then
 	warn 'No [35mRCS/[39m.'
 fi
-set +x
 
-#cd $start_wd # no need if 
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-}
+exit 0	# exit the script from within the function to prevent edits of 
+		# this file from interferring with currently open instances.
+} # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-X "$@" # run the script-as-anonymous-function
+X "$@"	# run the script-as-a-function to isolate the instructions 
+		# from edits to this file while there are other open instances.
 
 # Copyright (C) 2016 by Tom Davis <tom@greyshirt.net>.

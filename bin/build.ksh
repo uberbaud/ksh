@@ -107,7 +107,7 @@ function __CC { #{{{1
 	typeset cc_opts="${words[*]}"
 
 	typeset outopt='' cmd="${cmd##+([$WS])}"
-	[[ $cmd == *-[co][$WS]* ]]|| outopt="-o '$bname' "
+	[[ $cmd == *-[co][$WS]* ]]&& outopt="-o '$bname' "
 
 	typeset ALL='all'
 	[[ $cc == clang ]]&& ALL='everything'

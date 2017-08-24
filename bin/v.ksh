@@ -18,6 +18,10 @@ function usage { # {{{1
 	sparkle <<-\
 	==SPARKLE==
 	^F{4}Usage^f: ^T${PGM}^t  ^[^T-f^t^] ^Ufile^u ^[^Umessage^u^]
+	         Edits a file and handles RCS checkout/checkin.
+	         ^T-f^t  Force edit even if ^Ufile^u isn't text.
+	       ^T${PGM}^t  ^[^T-f^t^] ^T=^t^Ucommand^u ^[^Umessage^u^]
+	         Edits a command in ^SPATH^s or a function in ^SFPATH^s.
 	         ^T-f^t  Force edit even if ^Ufile^u isn't text.
 	       ^T${PGM} -h^t
 	         Show this help message.
@@ -54,30 +58,40 @@ function warnOrDie { #{{{1
 	esac
 } # }}}1
 
-(($#))||		die 'Missing required argument [4mfile-name[24m.'
-[[ -a $1 ]]||	die "No such file [1m${1}[22m."
-
-typeset hasmsg=false rcsmsg=''
-(($#>1))&& {
-	hasmsg=true
-	set -A rcsmsg_a -- "$@"
-	unset rcsmsg_a[1]
-	typeset -- rcsmsg="${rcsmsg_a[*]}"
-	unset rcsmsg_a
-}
-
 function X { # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-	# wrap script guts in anonymous function so edits on the file don't 
-	# affect running instances.
+	# wrap script guts in a function so edits on the file don't affect 
+	# running instances.
 
-typeset -- f_fullpath="$( readlink -fn -- $1 )"
+(($#))||		die 'Missing required argument [4mfile-name[24m.'
+typeset -- f_fullpath errmsg
+if [[ -a $1 ]]; then
+	f_fullpath="$( readlink -fn -- $1 )"
+	errmsg='Could not follow link.'
+elif [[ $1 == =* ]]; then
+	f_fullpath="$(command -v "${1#=}")"
+	if [[ -z $f_fullpath ]]; then
+		die 'No such command nor function.'
+	elif [[ $f_fullpath == /* ]]; then
+		f_fullpath="$(readlink -fn -- "$f_fullpath")"
+		errmsg='Could not follow command'\''s link.'
+	else
+		f_fullpath="$(find-function "${1#=}")"
+		errmsg='Could not find function.'
+	fi
+else
+	die "No such file [1m${1}[22m."
+fi
 
-[[ -n $f_fullpath ]]||	die 'Could not follow link.'
+[[ -n $f_fullpath ]]||	die "$errmsg"
 [[ -f $f_fullpath ]]||	die "[1m${1}[22m is [1mnot[22m a file."
 [[ $f_fullpath == *,v ]]&& warnOrDie "Seems to be an [1mRCS archive[22m file."
 typeset -- ftype="$( /usr/bin/file -b $f_fullpath )"
 [[ $ftype == *text* || $ftype == *XML* ]]||
 						warnOrDie "Does not seem to be a text file."
+shift
+
+typeset hasmsg=false rcsmsg=''
+(($#))&& { hasmsg=true; rcsmsg="$*"; }
 
 # because we've `readlink`ed the arg, it's guaranteed to have at least 
 # one (1) forward slash ('/') as (and at) the root.
@@ -119,7 +133,7 @@ if [[ -d RCS ]]; then
 	# use an array so expansion will work without weird quoting issues
 	set -A rcsopts -- -q -u
 	if $has_rcs; then
-		$hasmsg && set -A rcsopts -- "${rsopts[@]}" -m"$rcsmsg"
+		$hasmsg && set -A rcsopts -- "${rcsopts[@]}" -m"$rcsmsg"
 		rcsdiff -q ./$f_name
 		ci "${rcsopts[@]}" -j ./$f_name
 	else
@@ -131,6 +145,7 @@ if [[ -d RCS ]]; then
 elif $hasmsg; then
 	warn 'No [35mRCS/[39m.'
 fi
+set +x
 
 #cd $start_wd # no need if 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

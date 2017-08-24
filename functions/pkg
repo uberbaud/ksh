@@ -21,14 +21,14 @@ function pkg {
 	(($#))|| set help
 
 	typeset osv="$(uname -r)" record=false cmd="$1"; shift
-	typeset binpath=/usr/sbin bin=$binpath/pkg_$cmd
+	typeset bin=/usr/sbin/pkg_$cmd
 	typeset pkghome=$HOME/.local/pkg-info/v$osv
 	case $cmd in
 		add)		doas $bin -i "$@"; record=true;						;;
 		check)		doas $bin "$@";										;;
 		delete)		doas $bin "$@"; record=true;						;;
 		install)	die 'Did you mean ^Tadd^t or ^Tinstall^Ued^u^t?';	;;
-		installed)	$binpath/pkg_info -mz;								;;
+		installed)	/usr/sbin/pkg_info -mz;								;;
 		web|www)
 			needs w3m
 			typeset f u h F

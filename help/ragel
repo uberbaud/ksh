@@ -1,0 +1,362 @@
+^B^URAGEL CHEAT SHEET^u^b
+
+^BCONSTRUCTION STATE MACHINES^b
+
+    A multi-line FSM spec starts with ^T%%{^t and ends with ^T}%%^t.  
+    A single-line FSM spec starts with ^T%%^t and ends at the first 
+    ^Inewline^i.
+
+    ^T#include <string.h>^t
+    ^T#include <stdio.h>^t
+    ^T%%{^t
+        ^Tmachine foo;^t
+        ^Tmain :=^t
+            ^T( ’foo’ | ’bar’ )^t
+            ^T0 @{ res = 1; };^t
+    ^T}%%^t
+
+    ^T%% write data;^t
+
+    ^Tint main( int argc, char **argv )^t
+    ^T{^t
+        ^Tint cs, res = 0;^t
+        ^Tif ( argc > 1 ) {^t
+            ^Tchar *p = argv[1];^t
+            ^Tchar *pe = p + strlen(p) + 1;^t
+            ^T%% write init;^t
+            ^T%% write exec;^t
+        ^T}^t
+        ^Tprintf("result = %i\n", res );^t
+        ^Treturn 0;^t
+    ^T}^t
+
+    ^BMachine Definition^b
+
+        ^T<name> = <expression>;^t
+
+    ^BMachine Instantiation^b
+
+        ^T<name> := <expression>;^t
+
+^BBLOCK LEXICAL ANALYSIS^b
+
+    ^BBasic Machines^b
+
+    ^T’hello’^t         Concatenation Literal
+    ^T"hello"^t         Identical to the single quoted version
+    ^T[hello]^t         Produces a union of characters
+    ^T’’^t, ^T""^t, and ^T[]^t
+                    Zero Length Machine
+    ^T42^t              Numerical Literal
+    ^T/simple_regex/^t  Regular Expression. This notation also supports 
+                    the ^Ti^t trailing option. Use it to produce case-
+                    insensitive machines, as in ^T/GET/i^t.
+    ^T’a’ .. ’z’^t      Range
+    ^Tvarname^t         Lookup the machine definition assigned to the 
+                    variable name given and use an instance of it.
+
+    ^BBuiltin Machine^b
+
+    ^Tany^t       Any character in the alphabet.
+    ^Tascii^t     Ascii characters. ^F{4}0..127^f
+    ^Textend^t    Ascii extended characters. This is the range ^F{4}-128..127^f
+              for signed alphabets and the range ^F{4}0..255^f for unsigned 
+              alphabets.
+    ^Talpha^t     Alphabetic characters. ^F{4}[A-Za-z]^f
+    ^Tdigit^t     Digits. ^F{4}[0-9]^f
+    ^Talnum^t     Alpha numerics. ^F{4}[0-9A-Za-z]^f
+    ^Tlower^t     Lowercase characters. ^F{4}[a-z]^f
+    ^Tupper^t     Uppercase characters. ^F{4}[A-Z]^f
+    ^Txdigit^t    Hexadecimal digits. ^F{4}[0-9A-Fa-f]^f
+    ^Tcntrl^t     Control characters. ^F{4}0..31^f
+    ^Tgraph^t     Graphical characters. ^F{4}[!-~]^f
+    ^Tprint^t     Printable characters. ^F{4}[ -~]^f
+    ^Tpunct^t     Punctuation. Graphical characters that are not 
+              alphanumerics.  ^F{4}[!-/:-@[-‘{-~]^f
+    ^Tspace^t     Whitespace. ^F{4}[\t\v\f\n\r ]^f
+    ^Tzlen^t      Zero length string. ^F{4}""^f
+    ^Tempty^t     Empty set. Matches nothing. ^F{4}^^any^f
+
+^BREGULAR LANGUAGE OPERATORS^b
+
+    ^BUnion^b
+
+    ^Texpr | expr^t
+
+    The union operation produces a machine that matches any string in 
+    machine one or machine two
+
+    ^BIntersection^b
+
+    ^Texpr & expr^t
+
+    Intersection produces a machine that matches any string that is in 
+    both machine one and machine two
+
+    ^BDifference^b
+
+    ^Texpr - expr^t
+
+    The difference operation produces a machine that matches strings that 
+    are in machine one but are not in machine two.
+
+    For example: ^T(any - space)*^t
+
+    ^BStrong Difference^b
+
+    ^Texpr -- expr^t
+
+    Strong difference produces a machine that matches any string of the 
+    first machine that does not have any string of the second machine as 
+    a substring.
+
+    ^BConcatenation^b
+
+    ^Texpr . expr^t
+
+    Concatenation produces a machine that matches all the strings in 
+    machine one followed by all the strings in machine two.
+
+    ^BRepetition^b
+
+    Zero or More            ^Texpr*^t
+    One Or More Repetition  ^Texpr+^t
+    Zero or One             ^Texpr?^t
+    Exactly N copies        ^Texpr {n}^t
+    Zero to N copies        ^Texpr {,n}^t
+    N or more copies        ^Texpr {n,}^t
+    N to M copies           ^Texpr {n,m}^t
+
+    ^BNegation^b
+
+    ^T!expr^t
+
+    Negation produces a machine that matches any string not matched by the 
+    given machine. Negation is equivalent to ^T(any* - expr)^t.
+
+    ^BCharacter-Level Negation^b
+
+    ^T^^expr^t
+
+    Character-Level Negation is equivalent to ^T(any - expr)^t
+
+^BACTIONS^b
+
+    ^B^UUser Actions^u^b
+
+    ^BTwo ways of using action^b
+
+    1. ^Tmain := ( lower* >{ printf("action lower"); }) . ' ';^t
+
+    2. ^Taction A { printf("action lower"); }^t
+       ^Tmain := ( lower* >A) . ' ';^t
+
+    ^B^UTransition Actions^u^b
+
+    Entering Action         ^Texpr > action^t
+    Finishing Action        ^Texpr @ action^t
+    All Transition Action   ^Texpr $ action^t
+    Leaving Actions         ^Texpr % action^t
+
+    ^B^UState Actions^u^b
+
+    ^BThe different classes of states are:^b
+    the start state                     ^T>^t
+    any state except the start state    ^T<^t
+    all states                          ^T$^t
+    final states                        ^T%^t
+    any state except final states       ^T@^t
+    any except start and final (middle) ^T<>^t
+
+    ^BThe different kinds of embeddings are:^b
+    to-state actions (to)               ^T~^t
+    from-state actions (from)           ^T*^t
+    EOF actions (eof)                   ^T/^t
+    error actions (err)                 ^T!^t
+    local error actions (lerr)          ^T^^^t
+
+    ^B^UTo-State Actions^u^b
+    the start state                     ^T>~action   >to(name)   >to{...}^t
+    any state except the start state    ^T<~action   <to(name)   <to{...}^t
+    all states                          ^T$~action   $to(name)   $to{...}^t
+    final states                        ^T%~action   %to(name)   %to{...}^t
+    any state except final states       ^T@~action   @to(name)   @to{...}^t
+    any except start and final (middle) ^T<>~action  <>to(name)  <>to{...}^t
+
+    ^B^UFrom-State Actions^u^b
+    the start state                 ^T>*action  >from(name)  >from{...}^t
+    any state but the start state   ^T<*action  <from(name)  <from{...}^t
+    all states                      ^T$*action  $from(name)  $from{...}^t
+    final states                    ^T%*action  %from(name)  %from{...}^t
+    any state but final states      ^T@*action  @from(name)  @from{...}^t
+    any but start or final (middle) ^T<>*action <>from(name) <>from{...}^t
+
+    ^B^UEOF Actions^u^b
+    the start state                 ^T>/action   >eof(name)  >eof{...}^t
+    any state but the start state   ^T</action   <eof(name)  <eof{...}^t
+    all states                      ^T$/action   $eof(name)  $eof{...}^t
+    final states                    ^T%/action   %eof(name)  %eof{...}^t
+    any state but final states      ^T@/action   @eof(name)  @eof{...}^t
+    any but start or final (middle) ^T<>/action  <>eof(name) <>eof{...}^t
+
+    ^B^UGlobal Error Actions^u^b
+    the start state                 ^T>!action   >err(name)  >err{...}^t
+    any state but the start state   ^T<!action   <err(name)  <err{...}^t
+    all states                      ^T$!action   $err(name)  $err{...}^t
+    final states                    ^T%!action   %err(name)  %err{...}^t
+    any state but final states      ^T@!action   @err(name)  @err{...}^t
+    any but start or final (middle) ^T<>!action  <>err(name) <>err{...}^t
+
+    ^B^ULocal Error Actions^u^b
+    the start state                 ^T>^^action   >lerr(name)  >lerr{...}^t
+    any state but the start state   ^T<^^action   <lerr(name)  <lerr{...}^t
+    all states                      ^T$^^action   $lerr(name)  $lerr{...}^t
+    final states                    ^T%^^action   %lerr(name)  %lerr{...}^t
+    any state but final states      ^T@^^action   @lerr(name)  @lerr{...}^t
+    any but start or final (middle) ^T<>^^action  <>lerr(name) <>lerr{...}^t
+
+^BVALUES AND STATEMENTS AVAILABLE IN CODE BLOCKS^b
+
+    ^Tfpc^t     A pointer to the current character. This is equivalent to 
+            accessing the ^Tp^t variable
+    ^Tfc^t      The current character. This is equivalent to the 
+            expression (^T*p^t).
+    ^Tfcurs^t   An integer value representing the current state. This 
+            value should only be read from. To move to a different place 
+            in the machine from action code use the ^Tfgoto^t, ^Tfnext^t, 
+            or ^Tfcall^t statements.  Outside of the machine execution 
+            code the ^Tcs^t variable may be modified.
+    ^Tftargs^t  An integer value representing the target state. This value 
+            should only be read from. Again, ^Tfgoto^t, ^Tfnext^t, and 
+            ^Tfcall^t can be used to move to a specific entry point.
+    ^Tfentry(<label>)^t     Retrieve an integer value representing the 
+            entry point label.
+            E.g. ^Tfgoto *((ctx->done)^t
+                 ^T? fentry(html_default)^t
+                 ^T: fentry(html_special))^t
+                 ^T;^t
+    ^Tfhold^t   Do not advance over the current character
+    ^Tfexec <expr>;^t   Set the next character to process. This can be 
+                    used to backtrack to previous input or advance ahead.  
+                    Unlike ^Tfhold^t, which can be used anywhere, 
+                    ^Tfexec^t requires the user to ensure that the target 
+                    of the backtrack is in the current buffer block or is 
+                    known to be somewhere ahead of it. The machine will 
+                    continue iterating forward until ^Tpe^t is arrived at, 
+                    ^Tfbreak^t is called or the machine moves into the 
+                    error state. In actions embedded into transitions, the 
+                    ^Tfexec^t statement is equivalent to setting ^Tp^t to 
+                    one position ahead of the next character to process.  
+                    If the user also modifies ^Tpe^t, it is possible to 
+                    change the buffer block entirely.
+    ^Tfgoto <label>;^t  Jump to an entry point defined by <label>.
+    ^Tfgoto *<expr>;^t  Jump to an entry point given by <expr>. Use 
+                    together with ^Tfentry^t.
+    ^Tfnext <label>;^t  Set the next state to be the entry point defined 
+                    by label.
+    ^Tfnext *<expr>;^t  Set the next state to be the entry point given by 
+                    <expr>. Use together with ^Tfentry^t.
+    ^Tfcall <label>;^t  Push the target state and jump to the entry point 
+                    defined by <label>. The next fret will jump to the 
+                    target of the transition on which the call was made.  
+                    Use of fcall requires the declaration of a call stack.  
+                    An array of integers named stack and a single integer 
+                    named top must be declared
+    ^Tfcall *<expr>;^t  Push the current state and jump to the entry point 
+                    given by <expr>. Use together with ^Tfentry^t.
+    ^Tfret;^t           Return to the target state of the transition on 
+                    which the last fcall was made.
+    ^Tfbreak;^t         Advance ^Tp^t, save the target state to ^Tcs^t and 
+                    immediately break out of the execute loop. After an 
+                    ^Tfbreak^t statement the ^Tp^t variable will point to 
+                    the next character in the input. The current state 
+                    will be the target of the current transition. Note 
+                    that ^Tfbreak^t causes the target state’s to-state 
+                    actions to be skipped.
+
+^BCONTROLLING NON-DETERMINISM^b
+
+    ^BGuarded Operators^b
+
+    Entry-Guarded Concatenation     ^Texpr :> expr^t
+    Finish-Guarded Concatenation    ^Texpr :>> expr^t
+    Left-Guarded Concatenation      ^Texpr <: expr^t
+    Longest-Match Kleene Star       ^Texpr**^t
+            This version of kleene star puts a higher priority on staying 
+            in the machine versus wrapping around and starting over.
+
+    ^BOperator Precedence^b
+
+     Highest to lowest
+      ┌─┬──────────────────────────────┬────────────────────────────────────┐
+      │P│ Operator                     │ Comments                           │
+      ├─┼──────────────────────────────┼────────────────────────────────────┤
+      │1│ ,                            │ Join                               │
+      │2│ \| & - --                    │ Union, Intersection, Subtraction   │
+      │3│ . <: :> :>>                  │ Concatenation                      │
+      │4│ :                            │ Label                              │
+      │5│ ->                           │ Epsilon Transition                 │
+      │6│ > @ $ %                      │ Transitions Actions and Priorities │
+      │ │ >/ $/ %/ </ @/ <>/           │ EOF Actions                        │
+      │ │ >! $! %! <! @! <>!           │ Global Error Actions               │
+      │ │ >^^ $^^ %^^ <^^ @^^ <>^^           │ Local Error Actions                │
+      │ │ >~ $~ %~ <~ @~ <>~           │ To-State Actions                   │
+      │ │ >* $* %* <* @* <>*           │ From-State Action                  │
+      │7│ * ** ? + {n} {,n} {n,} {n,m} │ Repetition                         │
+      │8│ ! ^^                          │ Negation: General/Character        │
+      │9│ ( <expr> )                   │ Grouping                           │
+      └─┴──────────────────────────────┴────────────────────────────────────┘
+
+^BINTERFACE TO HOST PROGRAM^b
+
+    ^BWrite^b
+
+    ^T%%{^t
+    ^Tmachine foo;^t
+    ^Twrite data;^t
+    ^T}%%^t
+
+    ^Tvoid init(...) {^t
+        ^S...^s
+        ^T%% write init;^t
+        ^S...^s
+    ^T}^t
+
+    ^Tint parse(...) {^t
+        ^S...^s
+        ^T%% write exec;^t
+        ^S...^s
+    ^T}^t
+
+    ^BAccess Statement^b
+
+    ^Taccess fsm->;^t
+
+    The access statement specifies how the generated code should access 
+    the machine data that is persistent across processing buffer blocks. 
+    This applies to all variables except ^Tp^t, ^Tpe^t and ^Teof^t. This includes ^Tcs^t, 
+    ^Ttop^t, ^Tstack^t, ^Tts^t, ^Tte^t, and ^Tact^t. The access statement is useful if 
+    a machine is to be encapsulated inside a structure in C code.
+
+    ^BAlphtype Statement^b
+
+    ^Talphtype unsigned char;^t
+
+    The alphtype statement specifies the alphabet data type that the 
+    machine operates on. During the compilation of the machine, integer 
+    literals are expected to be in the range of possible values of the 
+    alphtype. The default is char for all languages except Go where the 
+    default is byte.
+
+    ^BCode generation^b
+       ┌─────┬─────────────────────────────────┬──────────────────────┐
+       │Flag │ Meaning                         │ Languages            │
+       ├─────┼─────────────────────────────────┼──────────────────────┤
+       │ -T0 │ binary search table-driven      │ C/D/Java/Ruby/C#/Go  │
+       │ -T1 │ binary search, expanded actions │ C/D/Ruby/C#/Go       │
+       │ -F0 │ flat table-driven               │ C/D/Ruby/C#/Go       │
+       │ -F1 │ flat table, expanded actions    │ C/D/Ruby/C#/Go       │
+       │ -G0 │ goto-driven                     │ C/D/C#/Go            │
+       │ -G1 │ goto, expanded actions          │ C/D/C#/Go            │
+       │ -G2 │ goto, in-place actions          │ C/D/Go               │
+       └─────┴─────────────────────────────────┴──────────────────────┘

@@ -84,7 +84,7 @@ i-can-haz-inet&& warnOrDie "You're already connected to the Internet."
 LOG-INET-STATS # ← DELETE THIS
 
 set -A cfgs -- $wifi_config/[0-9][0-9],$1*
-((${#cfgs[@]}))|| die 'Could not find a matching wifi configuration file.'
+[[ ${cfgs[0]} == *\* ]]&& die 'Could not find a matching wifi configuration file.'
 ((${#cfgs[@]}>1))&& { set -A cfgs -- "$(omenu "${cfgs[@]}")" || exit 0; }
 
 cfg="$(readlink -nf "${cfgs[0]}")"
@@ -94,7 +94,7 @@ nwid="${cfg#$wifi_config/[0-9][0-9],}"
 # there's a newline character, right ... about ... there
 #     ↓
 gsub '
-' ' ' "$(sed -e '/^[[:space:]]*;/d' -e '/^[[:space:]]*$/d' "$cfgs")"
+' ' ' "$(sed -e '/^[[:space:]]*;/d' -e '/^[[:space:]]*$/d' "$cfg")"
 eval "set -A wifiopts -- $REPLY"
 
 awkpgm="$(cat)" <<-\

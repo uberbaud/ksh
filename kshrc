@@ -139,7 +139,7 @@ alias cls='clear colorls $LS_OPTIONS'
 alias doas='doas '
 alias halt='doas halt'
 alias ls='/usr/local/bin/colorls $LS_OPTIONS'
-alias noglob='set -f;noglob '; function noglob { "$@"; set +f; }
+noglob() { "$@"; set +f; }; alias noglob='set -f;noglob '
 alias prn="printf '  \e[35m｢\e[39m%s\e[35m｣\e[39m\n'"
 alias reboot='doas reboot'
 

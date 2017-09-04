@@ -1,0 +1,11 @@
+# @(#)[:t`pzB%Gd{(Ei~i>LkJnC: 2017-09-04 00:33:43 Z tw@csongor]
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^G(no arguments)^g
+#:   Wrapper
+
+function f-bc {
+	/usr/bin/bc "$@" $BC_ENV_ARG
+}
+
+# Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

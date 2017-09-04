@@ -6,7 +6,7 @@
 needs date
 
 typeset -- calOpts='' daysAfter=1 daysBefore=0
-set -A justnow -- $(date +'%s %d %b %Y')
+set -A justnow -- $(date +'%s %e %b %Y')
 typeset -i TS=${justnow[0]} DOM=${justnow[1]} YEAR=${justnow[3]}
 typeset -l -L 3 MON=${justnow[2]}
 typeset -- yearOnly=false withWeek=false

@@ -42,6 +42,8 @@ xdgcache=$XDG_CACHE_HOME
 # paths
 export me=$HOME/work/clients/me
 export FPATH=$KDOTDIR/functions
+export HISTFILE=$KDOTDIR/history
+export HISTSIZE=8191
 export LOCALBIN=$xdgdata/bin
 export PERL5LIB=$xdgdata/lib/perl
 export RAKUDO_HOME=$xdgdata/rakudobrew
@@ -93,7 +95,9 @@ export VIMINIT="so $MYVIMRC"
 # default apps
 export CC=$SYSLOCAL/bin/clang
 export EDITOR=$SYSLOCAL/bin/vim
+export FCEDIT=$EDITOR
 export PAGER=/usr/bin/less
+export VISUAL=$EDITOR
 
 # misc
 export CLICOLOR=1

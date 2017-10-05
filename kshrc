@@ -42,6 +42,7 @@ xdgcache=$XDG_CACHE_HOME
 # paths
 export me=$HOME/work/clients/me
 export FPATH=$KDOTDIR/functions
+export HISTCONTROL=ignoredups:ignorespace
 export HISTFILE=$KDOTDIR/history
 export HISTSIZE=8191
 export LOCALBIN=$xdgdata/bin

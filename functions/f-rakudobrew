@@ -1,0 +1,31 @@
+# @(#)[:U{*J31WD))&t*rwj*H|*: 2017-09-10 03:11:06 Z tw@csongor]
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^G(no arguments)^g
+#:   Wrap rakudobrew
+
+function f-rakudobrew {
+	(($#))&& {
+		command rakudobrew "$@"
+		return $?
+	  }
+	for cmd in self-upgrade 'build moar'; do
+		h1 $cmd
+		command rakudobrew $cmd || die "Could not ^B$cmd^b."
+	done
+	h1 'Timing new build'
+	typeset rakudoVer='?' moarVer='?' p6ver
+	# This is Rakudo version 2017.08-103-g4de858a55
+	#    built on MoarVM version 2017.08.1-128-gde6dceda
+	# implementing Perl 6.c.
+	set -A p6ver -- $(command perl6 --version)
+	[[ ${p6ver[2]} == Rakudo ]]&& rakudoVer=${p6ver[4]}
+	[[ ${p6ver[7]} == MoarVM ]]&& moarVer=${p6ver[9]}
+	timelog=$HOME/log/perl6-times
+	printf 'Rakudo=%s,MoarVM=%s\n' $rakudoVer $moarVer >>$timelog
+	integer i=100
+	(time (while ((i--)) { command perl6 -e 'exit;'; })) 2>>$timelog
+	tail -n 4 $timelog
+}
+
+# Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

@@ -1,7 +1,7 @@
 # @(#)[:xdh)1hw*4cc>_+};sT`h: 2017-08-19 21:28:02 Z tw@csongor]
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^Tcmd^t ^Uargs...^u
+#: FUNCTION ^Tadd^t^|^Tcheck^t^|^Tdelete^t^|^Scmd^s ^Uargs...^u
 #:   performs pkg_^Scmd^s, possibly using ^Tdoas^t, possibly logging the action.
 #: FUNCTION ^Tgrep^t ^Uregex^u
 #: FUNCTION ^Tquery^t ^Uregex^u
@@ -19,7 +19,6 @@
 function pkg {
 	needs doas cat die
 	(($#))|| set help
-
 	typeset osv="$(uname -r)" record=false cmd="$1"; shift
 	typeset bin=/usr/sbin/pkg_$cmd
 	typeset pkghome=$HOME/.local/pkg-info/v$osv
@@ -50,8 +49,6 @@ function pkg {
 			;;
 		-h|--help|help)
 			if (($#)); then
-				help pkg
-			else
 				cmd=$1; shift
 				bin="${bin%_*}_$cmd"
 				if [[ -x $bin ]]; then
@@ -59,6 +56,8 @@ function pkg {
 				else
 					die "No help for ^T$cmd^t."
 				fi
+			else
+				help pkg
 			fi
 			;;
 		*)

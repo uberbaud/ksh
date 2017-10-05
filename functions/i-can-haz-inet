@@ -4,23 +4,27 @@
 #: FUNCTION ^G(no arguments)^g ^= ^SREPLY^s
 #:   Is the internet available?
 #:   Returns ^B0^b if it is,
-#:       ^B3^b if no gateway, ^B2^b if not at all, and ^B1^b if it seems
-#:       to be but there is possibly a ^Iman-in-the-middle^i issue.
-#:   And sets ^SREPLY^ with an error message, if any.
+#:       ^B3^b if no gateway,
+#:       ^B2^b if DNS lookup of ^Uuberbaud.net^u fails, and
+#:       ^B1^b if it seems to be but there is possibly a
+#:             ^Iman-in-the-middle^i issue.
+#:   And sets ^SREPLY^s to connection state.
 
 function i-can-haz-inet {
-    REPLY=''
+    REPLY='Connected'
+    needs route grep
     route -n get default 2>&1 | grep -q gateway ||
-                            { REPLY='No gateway to Internet'; return 3; }
+                            { REPLY='No gateway to Internet.';  return 3; }
 
+    needs dig
     local NAME='uberbaud.net' ADDR='208.167.249.143' digopts
     # @8.8.8.8      : google DNS
     # +short        : inet address only
     # +time=1       : 1 second to timeout instead of default 5 seconds
     # A             : section type
     local DIG="$(dig +short +time=1 $NAME A)"
-    [[ -n $DIG ]]||         { REPLY='No DNS';                 return 2; }
-    [[ $DIG == $ADDR ]]||   { REPLY='man-in-the-middle?';     return 1; }
+    [[ -n $DIG ]]||         { REPLY='DNS lookup failed.';       return 2; }
+    [[ $DIG == $ADDR ]]||   { REPLY='man-in-the-middle?';       return 1; }
 }
 
 

@@ -9,7 +9,14 @@ function splitstr {
 	[[ $1 == NL  ]]&&	IFS='
 ' # ← SINGLE QUOTE!!! ENCAPSULATING newline
 	[[ $1 == TAB  ]]&&	IFS='	' # ← ACTUAL TAB CHARACTER
+	local reset=false
+	[[ $- == *f* ]]|| {
+		reset=false
+		set -f
+	  }
 	set -A ${3:-reply} -- $2
+	$reset && set +f
+	true
 }
 
 # Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

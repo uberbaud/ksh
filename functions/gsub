@@ -1,17 +1,17 @@
 # @(#)[:z4AO*%OX13brDaGoh<?J: 2017-08-08 01:55:09 Z tw@csongor]
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^Uold^u ^Unew^u ^Utext^u ^= ^BREPLY^b
+#: FUNCTION ^Uold^u ^Unew^u ^Utext^u ^[^Uvarname^u^] ^= ^Bvarname^b or ^BREPLY^b
 #:   Replaces ^Uold^u occurences in ^Utext^u with ^Unew^u.
-#:   The result is placed in ^S$REPLY^s.
+#:   The result is placed in ^S${4:-REPLY}^s.
 
 function gsub {
-	local p='' old="$1" new="$2" text="$3"
+	local p='' old="$1" new="$2" text="$3" varname="${4:-REPLY}"
 	while [[ $text == *$old* ]]; do
 		p="$p${text%%$old*}$new"
 		text="${text#*$old}"
 	done
-	REPLY="$p$text"
+	eval "$varname=\"$p$text\""
 }
 
 # Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

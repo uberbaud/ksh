@@ -8,6 +8,7 @@ function pre-prompt {
 	# window title
 	print -nu2 "\033]0;$HOSTNAME ($PWD)\007"
 	forceline
+	[[ $- == *f* ]]&& print '\033[41;37mNOGLOB\033[0m'
 }
 
 # Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

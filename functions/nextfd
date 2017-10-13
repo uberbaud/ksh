@@ -1,0 +1,20 @@
+# @(#)[:jv5e_(`#8;f?}FCXQoZ|: 2017-10-13 01:33:17 Z tw@csongor]
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^G(no arguments)^g
+#:   Sets ^S$REPLY^s to next available fd between 3 and 9
+#:   Returns false on failure
+
+function nextfd {
+	local fd
+	REPLY=''
+	for fd in $(jot 7 3); do
+		(: >&$fd ) 2>/dev/null && continue
+		(: <&$fd ) 2>/dev/null && continue
+		REPLY=$fd
+		return 0
+	done
+	return 1
+}
+
+# Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

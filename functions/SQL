@@ -1,0 +1,42 @@
+# @(#)[:8!XiFF>f?$NWe{6u{vr{: 2017-10-13 01:47:44 Z tw@csongor]
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^[^USQL statement(s)^u^] ^= reply
+#:   Co-processicize sqlite3 and sugar the interaction.
+#:   Starts the co-process if it isn't already going.
+#:   Sets array ^S$SQLFD^s to the co-process file descriptors.
+#:   Exports ^S$SQLSEP^s as field separator, but uses user set value if
+#:     it's set before the initial call to SQL.
+
+function SQL {
+	local sql response READY='' verbose="${verbose:-false}"
+	SQLSEP="${SQLSEP:-}"
+	(($#))&& sql="$*" || sql="$(cat)"
+	set -A reply --
+	((${SQLFD[0]}))|| {
+		sqlite3 -noheader -batch -list -separator "$SQLSEP" 2>&1 |&
+		nextfd || die 'No available file descriptor.'; SQLFD[0]="$REPLY"
+		eval "exec ${SQLFD[0]}<&p"
+		nextfd || die 'No available file descriptor.'; SQLFD[1]="$REPLY"
+		eval "exec ${SQLFD[1]}>&p"
+		add-exit-action "print -u${SQLFD[1]} '.quit'"
+		# clear the SQLite3 init output
+		print -ru${SQLFD[1]} "SELECT '$READY';" ||
+			die 'Could not read from ^SSQLFD^s.'
+		while :; do
+			read -ru${SQLFD[0]} response
+			[[ $response == $READY ]]&& break
+		done
+	  }
+	$verbose && print -ru2 -- "SQL> $sql"
+	print -ru${SQLFD[1]} -- "$sql;"
+	print -ru${SQLFD[1]} -- "SELECT '$READY';"
+	while :; do
+		read -ru${SQLFD[0]} response
+		[[ $response == $READY ]]&& break
+		reply[${#reply[*]}]="$response"
+		$verbose && print -ru2 -- "$response"
+	done
+}
+
+# Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

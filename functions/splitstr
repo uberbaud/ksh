@@ -11,7 +11,7 @@ function splitstr {
 	[[ $1 == TAB  ]]&&	IFS='	' # ← ACTUAL TAB CHARACTER
 	local reset=false
 	[[ $- == *f* ]]|| {
-		reset=false
+		reset=true
 		set -f
 	  }
 	set -A ${3:-reply} -- $2

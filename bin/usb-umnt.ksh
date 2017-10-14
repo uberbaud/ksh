@@ -21,13 +21,15 @@ function usage {
 	===SPARKLE===
 	exit 0
 } # }}}
+do_all=false
 # process -options {{{1
 function bad_programmer {	# {{{2
 	die 'Programmer error:'	\
 		"  No getopts action defined for [1m-$1[22m."
   };	# }}}2
-while getopts ':h' Option; do
+while getopts ':ah' Option; do
 	case $Option in
+		a)	do_all=true;											;;
 		h)	usage;													;;
 		\?)	die "Invalid option: [1m-$OPTARG[22m.";				;;
 		\:)	die "Option [1m-$OPTARG[22m requires an argument.";	;;
@@ -50,6 +52,45 @@ function warnOrDie { #{{{1
 # wrap script guts in a function so edits to this script file don't 
 # affect running instances of the script.
 function main {
+	local awkpgm haves wants have want
+	awkpgm="$(cat)" <<-\
+	\==AWK==
+	NR==1			{next}
+	/\/dev\/sd0/	{next}
+					{sub(/^\/vol\//,"",$6);print $6}
+	==AWK==
+	set -A haves -- $(df -P|awk "$awkpgm")
+	set -A wants --
+	((${#haves[*]}+$#))|| exit 0
+
+	if $do_all; then
+		set -A wants -- "${haves[@]}"
+	elif (($#)); then	# use given
+		for want in "$@"; do
+			[[ -d $want ]]|| {
+				warn "^B$want^b is not a mount point(1)."
+				continue
+			  }
+			want="$(readlink -nf "$want")"
+			for have in "${haves[@]}"; do
+				[[ ${want#/vol/} == $have ]]|| continue 1
+				wants[${#wants[*]}]="$want"
+				continue 2
+			done
+			warn "^B$want^b is not a mount point(2)."
+		done
+	else				# do selected
+		sel-from-array -on "${haves[@]}"
+		for want in "${reply[@]}"; do
+			wants[${#wants[*]}]="${haves[want]}"
+		done
+	fi
+
+	for want in "${wants[@]}"; do
+		[[ $want == /* ]]|| want="/vol/$want"
+		notify "Unmounting ^B$want^b."
+		doas umount "$want" && doas rmdir "$want"
+	done
 
 }
 

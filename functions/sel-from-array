@@ -1,0 +1,20 @@
+# @(#)[:vNC1$yv>U}$8+0jf9E-*: 2017-10-14 22:32:07 Z tw@csongor]
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^[^T-on^t^] ^Uitem1^u ^Uitem2^u ^S...^s ^UitemN^u ^= $reply
+#:   Wrapper around ^Tdialog^t.
+#:   places selected indexes in array ^S$reply^s
+#:   ^T-on^t  Selects everything (default is to select nothing).
+#:   Use ^S$TITLE^s to set the title.
+
+function sel-from-array {
+	needs dialog
+	local args checked=off
+	set -A args -- --keep-tite --stdout --no-tags --checklist "${TITLE:-Choose}" 0 0 0
+	integer i=0
+	[[ $1 == -on ]]&& { checked=on; shift; }
+	for item { set -A args -- "${args[@]}" $((i++)) "$item" $checked; }
+	set -A reply -- $(dialog "${args[@]}")
+}
+
+# Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

@@ -5,9 +5,9 @@
 #:   If there's a ^STODO^s file, show it.
 
 function show-todos {
-	local needsep=false showit=false ln
 	[[ -f TODO ]]|| return 0
-	splitstr "$NL" "$(<TODO)" todo
+	local needsep=false showit=false ln
+	splitstr NL "$(<TODO)" todo
 	for ln in "${todo[@]}"; do
 		[[ $ln == \@* ]]&& {
 			if [[ $ln == *' DONE '* ]]; then
@@ -19,7 +19,10 @@ function show-todos {
 			needsep=true
 			continue
 		  }
-		printf '%s\n' "$ln"
+		$showit && {
+			(($#))&& { print "  ^F{12}$1^f"; set --; }
+			print "$ln"
+		  }
 	done | sparkle
 	unset todo
 }

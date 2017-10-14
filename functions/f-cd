@@ -6,12 +6,9 @@
 #:   Also shows any todo ^Bitems^b for the new directory.
 
 function f-cd {
-	(($#))|| set "$HOME"
+	(($#))|| set -- "$HOME"
 	builtin cd "$@" && {
-		[[ -f TODO ]]&& {
-			printf '  \e[1;38;5;12m== TODO ==\e[0m\n'
-			show-todos
-		  }
+		show-todos '== TODO =='
 		true # leave on a good note since `cd` did
 	  }
 }

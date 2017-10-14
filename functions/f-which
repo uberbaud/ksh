@@ -1,0 +1,11 @@
+# @(#)[:%-k{ne9ZT;hT_sK^JyE>: 2017-10-14 18:34:14 Z tw@csongor]
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^G(no arguments)^g
+#:   like ^Twhence^T^|^Tcommand -v^t but implementing ^[^T-a^t^]
+
+function f-which {
+
+}
+
+# Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

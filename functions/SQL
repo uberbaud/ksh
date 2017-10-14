@@ -2,13 +2,15 @@
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
 #: FUNCTION ^[^USQL statement(s)^u^] ^= reply
-#:   Co-processicize sqlite3 and sugar the interaction.
+#:   Co-processicize sqlite3 and sugar the interaction. If no SQL statement
+#:     is given on the command line, reads it from ^Sstdin^s.
 #:   Starts the co-process if it isn't already going.
 #:   Sets array ^S$SQLFD^s to the co-process file descriptors.
 #:   Exports ^S$SQLSEP^s as field separator, but uses user set value if
 #:     it's set before the initial call to SQL.
 
 function SQL {
+	needs sqlite3
 	local sql response READY='' verbose="${verbose:-false}"
 	SQLSEP="${SQLSEP:-}"
 	(($#))&& sql="$*" || sql="$(cat)"

@@ -4,8 +4,41 @@
 #: FUNCTION ^G(no arguments)^g
 #:   like ^Twhence^T^|^Tcommand -v^t but implementing ^[^T-a^t^]
 
-function f-which {
+function x-which-one {
+	local whence rc found=false
+	# alias
+	whence="$(alias "$1")" && { print "$whence"; found=true; }
+	eval $SATISFIED
+	# function
+	typeset -f "$1" && found=true
+	eval $SATISFIED
 
+	whence="$(unalias "$1"; unset -f "$1"; command -V "$1")"
+	case "${whence#* is }" in
+		*reserved*)	print "$1 #reserved";			found=true;		;;
+		*special*)	print "$1 #special builtin";	found=true;		;;
+		*builtin*)	print "$1 #builtin";			found=true;		;;
+	esac
+	eval $SATISFIED
+
+	command which $wopt "$1" 2>/dev/null
+}
+
+function f-which {
+	local c Option ok=true wopt='' SATISFIED='$found && return 0'
+
+	while getopts ':a' Option; do
+		case $Option in
+			a)	wopt='-a'; SATISFIED=:;								;;
+			\?)	die "Invalid options: ^B-$OPTARG^b.";				;;
+			\:)	die "Option ^B-$OPTARG^b requires an argument.";	;;
+		esac
+	done
+	shift $(($OPTIND-1))
+
+	for c { x-which-one "$c" || ok=false; }
+
+	$ok
 }
 
 # Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

@@ -202,6 +202,22 @@ else
 		[[ $ln == =* ]]&& badcfg 'Missing key name'
 		key="${ln%%=*}"
 		val="${ln#$key}"; val="${val#=}"
+		[[ $key == 'if('*'):'* ]]&& {
+			tmpvar="$key${val:+\=$val}"
+			test="${key#if\(}"; test="${test%\):*}"
+			if [[ $test == '$#' ]]; then
+				(($#))|| continue
+			elif [[ $test == '!$#' ]]; then
+				(($#))&& continue
+			else
+				desparkle "$test"
+				badcfg "Unknown test: ^Tif(^B$REPLY^b)^t"
+			fi
+			tmpvar="${tmpvar#if(*):}"
+			key="${tmpvar%%=*}"
+			val="${tmpvar#$key}"; val="${val#=}"
+		}
+
 		optcmd-$docmd "$key" "$val"
 	done
 	set -- "${prefixArgs[@]}" "$@" "${suffixArgs[@]}"
@@ -238,7 +254,8 @@ $oneInstance && {
 }
 
 # and finally, start it up!
-nohup "$appbin" "$@" > log/$$ 2>&1 &
+print "$appbin $*" > log/$$ 2>&1 &
+nohup "$appbin" "$@" >> log/$$ 2>&1 &
 mv log/$$ log/$!
 
 # Copyright (C) 2017 by Tom Davis <tom@greyshirt.net>.

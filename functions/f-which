@@ -7,7 +7,7 @@
 function x-which-one {
 	local whence rc found=false
 	# alias
-	whence="$(alias "$1")" && { print "$whence"; found=true; }
+	whence="$(alias "$1")" && { print -r -- "$whence"; found=true; }
 	eval $SATISFIED
 	# function
 	typeset -f "$1" && found=true
@@ -15,13 +15,14 @@ function x-which-one {
 
 	whence="$(unalias "$1"; unset -f "$1"; command -V "$1")"
 	case "${whence#* is }" in
-		*reserved*)	print "$1 #reserved";			found=true;		;;
-		*special*)	print "$1 #special builtin";	found=true;		;;
-		*builtin*)	print "$1 #builtin";			found=true;		;;
+		*reserved*)	print -r -- "$1 #reserved";			found=true;		;;
+		*special*)	print -r -- "$1 #special builtin";	found=true;		;;
+		*builtin*)	print -r -- "$1 #builtin";			found=true;		;;
 	esac
 	eval $SATISFIED
 
-	command which $wopt "$1" 2>/dev/null
+	command which $wopt "$1" 2>/dev/null && found=true
+	$found
 }
 
 function f-which {

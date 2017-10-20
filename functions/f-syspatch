@@ -6,7 +6,7 @@
 
 function f-syspatch {
 	doas true || doas true || doas true || die 'Want rootification.'
-	doas /usr/sbin/syspatch
+	doas /usr/sbin/syspatch "$@"
 }
 
 # Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

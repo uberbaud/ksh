@@ -7,10 +7,19 @@
 
 function gsub {
 	local p='' old="$1" new="$2" text="$3" varname="${4:-REPLY}"
-	while [[ $text == *$old* ]]; do
-		p="$p${text%%$old*}$new"
-		text="${text#*$old}"
+	while [[ $text == *"$old"* ]]; do
+		p="$p${text%%"$old"*}$new"
+		text="${text#*"$old"}"
 	done
+	# protect metachars ('\', '"', and '$') for eval
+	for old in \\ \" \$; do
+		text="$p$text"; p=''; new=\\"$old"
+		while [[ $text == *"$old"* ]]; do
+			p="$p${text%%"$old"*}$new"
+			text="${text#*"$old"}"
+		done
+	done
+
 	eval "$varname=\"$p$text\""
 }
 

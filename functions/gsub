@@ -12,7 +12,7 @@ function gsub {
 		text="${text#*"$old"}"
 	done
 	# protect metachars ('\', '"', and '$') for eval
-	for old in \\ \" \$; do
+	for old in \\ \" \$ \`; do
 		text="$p$text"; p=''; new=\\"$old"
 		while [[ $text == *"$old"* ]]; do
 			p="$p${text%%"$old"*}$new"

@@ -45,7 +45,7 @@ function warnOrDie { #{{{1
 } # }}}1
 (($#))&& die 'Unexpected arguments. Expected ^Bnone^b.'
 
-i-can-haz-inet	|| die 'No internet'
+i-can-haz-inet	|| die 'No internet' "$REPLY"
 cd ${KDOTDIR:?}	|| die 'Could not ^Tcd^t to ^S$KDOTDIR^s.'
 
 alias FAIL='{ warn "FAILED"; exit 1; }'

@@ -145,7 +145,7 @@ alias doas='doas '
 alias halt='doas halt'
 alias i-can-haz-inet='i-can-haz-inet; printf "  %s\n" "$REPLY"'
 alias ls='/usr/local/bin/colorls $LS_OPTIONS'
-noglob() { ("$@"); set +f; }; alias noglob='set -f;noglob '
+alias noglob='[[ $- == *f* ]]|| REGLOB=1;set -f; '
 alias prn="printf '  \e[35m｢\e[39m%s\e[35m｣\e[39m\n'"
 alias reboot='doas reboot'
 

@@ -23,7 +23,7 @@ function f-r {
 		done
 		[[ -n "$readme" ]]|| die 'No README found.'
 	fi
-	vim -MR "$readme"
+	nvim -MR "$readme"
 }
 
 

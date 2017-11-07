@@ -13,18 +13,25 @@
 function i-can-haz-inet {
     REPLY='Connected'
     needs route grep
-    route -n get default 2>&1 | grep -q gateway ||
-                            { REPLY='No gateway to Internet.';  return 3; }
+    route -n get default 2>&1 | grep -q gateway || {
+		REPLY='No gateway to Internet.'
+		return 3
+	  }
 
     needs dig
-    local NAME='uberbaud.net' ADDR='208.167.249.143' digopts
+    local NAME='uberbaud.net' ADDR='208.167.249.143' digopts DIG
     # @8.8.8.8      : google DNS
     # +short        : inet address only
     # +time=1       : 1 second to timeout instead of default 5 seconds
     # A             : section type
-    local DIG="$(dig +short +time=1 $NAME A)"
-    [[ -n $DIG ]]||         { REPLY='DNS lookup failed.';       return 2; }
-    [[ $DIG == $ADDR ]]||   { REPLY='man-in-the-middle?';       return 1; }
+	DIG="$(dig +short +time=1 $NAME A)" || {
+		REPLY='DNS lookup failed.'
+		return 2
+	  }
+    [[ $DIG == $ADDR ]]|| {
+		REPLY='man-in-the-middle?'
+		return 1
+	  }
 }
 
 

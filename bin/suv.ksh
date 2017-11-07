@@ -50,6 +50,8 @@ function warnOrDie { #{{{1
 (($#))|| die 'Missing required argument ^Ufile^u.'
 needs ci co ${VISUAL:-${EDITOR:?Neither VISUAL nor EDITOR variable is set}}
 
+CI_INITIAL_DESCRIPTION='OpenBSD system file'
+
 desparkle "$1"
 filenameD="$REPLY"
 filename="$(readlink -fn "$1")"; shift
@@ -86,22 +88,22 @@ function main {
 
 	[[ -f $workingfile ]]&& {
 		[[ -f RCS/$workingfile,v ]]||
-			ci -q -u -i -t'-System file.' ./"$workingfile"
+			ci -q -u -i -t"-$CI_INITIAL_DESCRIPTION" ./"$workingfile"
 		co -l ./"$workingfile" || die "^Tco^t error."
 	}
 	if [[ -f $filename ]]; then
-		SHA384="$(cksum -qa sha384b "$filename")"
 		fowner="$(stat -f'%Su' "$filename")"
 		fgroup="$(stat -f'%Sg' "$filename")"
 		fperm="$(stat -f'%#Lp' "$filename")"
 		touch ./"$workingfile"
-		if [[ -r $workingfile ]]; then
+		if [[ -r $filename ]]; then
 			cat $filename >$workingfile
-		elif [[ -s $workingfile ]]; then
+		elif [[ -s $filename ]]; then
 			doas cat $filename >$workingfile
 		else
 			echo >$workingfile
 		fi
+		SHA384="$(cksum -qa sha384b "$workingfile")"
 		[[ -f RCS/$workingfile,v ]]&& {
 			rcsdiff -q ./"$workingfile" ||
 				die "sysytem file and archived file have diverged."	\
@@ -121,7 +123,7 @@ function main {
 		rcsdiff -q ./"$workingfile" ||
 			ci -q -u -j ${1:+-m"$*"} ./"$workingfile"
 	else
-		ci -q -u -i ${1:+-t"-$*"} ./"$workingfile"
+		ci -q -u -i -t"-${*:-$CI_INITIAL_DESCRIPTION}" ./"$workingfile"
 	fi
 	[[ -n $SHA384 ]]&& {
 		[[ $SHA384 == "$(cksum -qa sha384b ./"$workfile")" ]]&& {

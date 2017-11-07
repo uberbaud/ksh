@@ -89,13 +89,12 @@ export CALENDAR_DIR=$xdgcfg/calendar
 export HGRCPATH=$xdgcfg/hg
 
 # editor
-export MYVIM=$xdgcfg/vim
-export MYVIMRC=$MYVIM/vimrc
-export VIMINIT="so $MYVIMRC"
+export MYVIM=$xdgcfg/nvim
+unset VIMINIT
 
 # default apps
 export CC=$SYSLOCAL/bin/clang
-export EDITOR=$SYSLOCAL/bin/vim
+export EDITOR=$SYSLOCAL/bin/nvim
 export FCEDIT=$EDITOR
 export PAGER=/usr/bin/less
 export VISUAL=$EDITOR
@@ -145,7 +144,7 @@ alias doas='doas '
 alias halt='doas halt'
 alias i-can-haz-inet='i-can-haz-inet; printf "  %s\n" "$REPLY"'
 alias ls='/usr/local/bin/colorls $LS_OPTIONS'
-alias noglob='[[ $- == *f* ]]|| REGLOB=1;set -f; '
+alias noglob='set -f;noglob '; function noglob { ("$@"); set +f; }
 alias prn="printf '  \e[35m｢\e[39m%s\e[35m｣\e[39m\n'"
 alias reboot='doas reboot'
 

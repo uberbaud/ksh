@@ -11,7 +11,8 @@
 
 function SQL {
 	needs sqlite3
-	local sql response READY='' verbose="${verbose:-false}"
+	local sql response READY=''
+	local verbose="${verbose:-false}" autodie="${SQL_AUTODIE:-true}"
 	SQLSEP="${SQLSEP:-}"
 	(($#))&& sql="$*" || sql="$(cat)"
 	set -A reply --
@@ -39,6 +40,10 @@ function SQL {
 		reply[${#reply[*]}]="$response"
 		$verbose && print -ru2 -- "$response"
 	done
+	$autodie && {
+		[[ ${reply[0]} == Error:* ]]&&
+			die "${reply[@]}" "$sql"
+	  }
 }
 
 # Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

@@ -80,7 +80,7 @@ function main {
 			warn "^B$want^b is not a mount point(2)."
 		done
 	else				# do selected
-		sel-from-array -on "${haves[@]}"
+		sel-from-list -on "${haves[@]}"
 		for want in "${reply[@]}"; do
 			wants[${#wants[*]}]="${haves[want]}"
 		done

@@ -1,0 +1,33 @@
+# @(#)[:)?1^OM$W+qX#K%4)etOn: 2017-11-05 21:36:42 Z tw@csongor]
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Uvarname^u …
+#:   Single quote the value of a variable, or if it is empty set it
+#:     to NULL.
+#:   Cannot ^TSQLify^t variables named ^Sn^s, ^So^s, ^Sp^s, or ^S^t^s.
+
+function SQLifyOne {
+	[[ $1 == ?(n|o|p|t) ]]&&
+		die 'Cannot ^TSQLify^t variables named ^Sn^s, ^So^s, ^Sp^s, or ^S^t^s.'
+	local n o p='' t
+	eval t="\"\$$1\""
+	[[ -z $t ]]&& { eval $1=NULL; return; }
+	while [[ $t == *\'* ]]; do
+		p="$p${t%%\'*}''"
+		t="${t#*\'}"
+	done
+	# protect metachars ('\', '"', and '$') for eval
+	for o in \\ \" \$ \`; do
+		t="$p$t"; p=''; n=\\"$o"
+		while [[ $t == *"$o"* ]]; do
+			p="$p${t%%"$o"*}$n"
+			t="${t#*"$o"}"
+		done
+	done
+
+	eval "$1=\"'$p$t'\""
+}
+
+function SQLify { while (($#)) { SQLifyOne $1; shift; }; }
+
+# Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

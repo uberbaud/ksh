@@ -7,7 +7,7 @@
 #:   ^T-on^t  Selects everything (default is to select nothing).
 #:   Use ^S$TITLE^s to set the title.
 
-function sel-from-array {
+function sel-from-list {
 	needs dialog
 	local args checked=off
 	set -A args -- --keep-tite --stdout --no-tags --checklist "${TITLE:-Choose}" 0 0 0

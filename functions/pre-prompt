@@ -8,7 +8,6 @@ pre-prompt() {
 	# window title
 	print -nu2 "\033]0;$HOSTNAME ($PWD)\007"
 	forceline
-	((REGLOB))&& set +f; unset REGLOB
 	[[ $- == *f* ]]&& print '\033[41;37mNOGLOB\033[0m'
 }
 

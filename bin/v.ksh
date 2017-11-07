@@ -123,7 +123,7 @@ typeset -- has_rcs=false
 # we could just use ./$f_name
 # BUT then the vim process would not have a command including the path, 
 # SO, let's use $f_fullpath
-vim "$f_fullpath"
+nvim "$f_fullpath"
 
 trackfile "$f_fullpath"
 

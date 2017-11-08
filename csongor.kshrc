@@ -12,7 +12,7 @@ perlbrew_rc=$PERLBREW_ROOT/etc/perlbrew.ksh
 [[ -f $perlbrew_rc ]]&& . $perlbrew_rc
 
 # default apps
-export BROWSER=$HOME/bin/surf
+export BROWSER=$HOME/bin/ksh/chrome
 
 # mail
 export EMAIL='tom@greyshirt.net'

@@ -3,7 +3,7 @@
 
 TARGET  = completions.ksh
 OBJECTS = git_1 scp ssh rcctl_2
-DEPENDS = chflags kill_1 rcctl_1
+DEPENDS = chflags kill_1 rcctl_1 xfontsel
 GIT_IGN = .gitignore
 
 .poison empty OS_VER

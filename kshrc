@@ -124,7 +124,7 @@ for p in f amuse; do
 	for i in $F/$p-*; { i="${i#$F/}"; alias "${i#$p-}=$i"; }
 done
 # noglobs
-for i in cowmath find math note; { alias $i="noglob $i"; }
+for i in cowmath math note; { alias $i="noglob $i"; }
 # askfirst all commands that use ssh
 for i in ssh scp sftp rsync;	{ alias "$i=ssh-askfirst $i"; }
 # known hosts are commands to ssh to that host
@@ -154,4 +154,5 @@ for s in $(getent shells); do
 done
 unset s
 
-. $KDOTDIR/completions
+make OS_VER="$(uname -r)" -C $KDOTDIR/completions|column
+. $KDOTDIR/completions/completions.ksh

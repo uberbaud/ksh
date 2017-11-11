@@ -1,6 +1,0 @@
-# vim: ft=ksh ts=4 nowrap
-
-set -A complete_kill_1 -- -9 -INT -HUP -KILL -STOP -CONT -INFO -USR1 -USR2
-set -A complete_ssh -- $(awk -F'[ ,]' '{print $1}' $XDG_CONFIG_HOME/ssh/known_hosts)
-set -A complete_scp -- "${complete_ssh[@]}"
-set -A complete_chflags -- nodump nonodump nosappnd noschg nouappnd nouchg sappnd schg uappnd uchg

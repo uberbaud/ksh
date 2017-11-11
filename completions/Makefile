@@ -25,9 +25,10 @@ $(TARGET): $(OBJECTS) $(DEPENDS)
 	@printf '\n'                                 >>$@
 	@rm tmp.sort tmp.tr
 .endfor
-	@echo '.*' >$(GIT_IGN)
+	@echo '.*'  >$(GIT_IGN)
+	@echo $@   >>$(GIT_IGN)
 .for f in $(OBJECTS)
-	@echo $f >>$(GIT_IGN)
+	@echo $f   >>$(GIT_IGN)
 .endfor
 
 GIT_CONFIG=/home/tw/.config/git/config

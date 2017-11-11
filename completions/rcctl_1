@@ -13,6 +13,6 @@ getdef
 order
 reload
 restart
-'set service'
+set
 start
 stop

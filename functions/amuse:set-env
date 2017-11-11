@@ -19,7 +19,7 @@ function amuse:set-env {
 	now_playing="${amuse_run}"/playing
 	paused_at="${amuse_run}"/paused-at
 	paused_song="${amuse_run}"/paused-song
-	missing_bytes="${amuse_run}"/missing-bytes
+	skipped_bytes="${amuse_run}"/skipped-bytes
 	final="${amuse_run}"/final
 	again="${amuse_run}"/again
 	fflog="${amuse_run}"/fflog

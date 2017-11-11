@@ -4,10 +4,10 @@
 #: FUNCTION ^G(no arguments)^g
 #:   Repeat the currently playing song (aMuse player)
 
-needs amuse-set-env pgrep fullstop die
+needs amuse:set-env pgrep fullstop die
 
 function amuse-again {
-	amuse-set-env; : ${again:?}
+	amuse:set-env; : ${again:?}
 	pgrep -qf $amusePlayerId ||
 		fullstop "$amusePlayerId is not playing."
 	

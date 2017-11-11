@@ -5,7 +5,7 @@
 #:   What's the aMuse player playing?
 
 function amuse-playing {
-	amuse-set-env
+	amuse:set-env
 	cat ${now_playing:?}
 }
 

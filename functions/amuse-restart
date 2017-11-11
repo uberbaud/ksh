@@ -6,7 +6,7 @@
 #:   the beginning.
 
 function amuse-restart {
-	amuse-set-env
+	amuse:set-env
 	local p="${amuse_run:?}"/paused-at
 	[[ -s $p ]]|| pause
 	echo 0.0 >"$p"

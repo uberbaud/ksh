@@ -5,8 +5,8 @@
 #:   Skip the rest of the song playing.
 
 function amuse-skip {
-	amuse-set-env
-	command pkill -SIGUSR1 -f ${amusePlayerId:?}
+	amuse:set-env
+	command pkill -s USR1 -f ${amusePlayerId:?}
 }
 
 

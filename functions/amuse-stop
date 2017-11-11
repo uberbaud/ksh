@@ -6,7 +6,7 @@
 #:   pause information.
 
 function amuse-stop {
-	amuse-set-env
+	amuse:set-env
 	: ${paused_at:?} ${paused_song:?}
 	needs pause
 	pause

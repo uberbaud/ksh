@@ -13,7 +13,7 @@ function die {
 	else
 		printf '  ^EFAILED^e: %s\n' "$ln1"
 	fi | sparkle
-	[[ -o interactive ]]&& kill -INT $$
+	[[ -o interactive ]]&& kill -s TERM $$
 	exit ${errno:-1}
   } >&2
 

@@ -55,12 +55,10 @@ function warnOrDie { #{{{1
 					'warnOrDie is [1m${warnOrDie}[22m.';		;;
 	esac
 } # }}}1
+(($#))|| exec "${VISUAL:-${EDITOR:-vi}}"
 
-function X { # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-	# wrap script guts in a function so edits on the file don't affect 
-	# running instances.
+function main {
 
-(($#))||		die 'Missing required argument [4mfile-name[24m.'
 typeset -- f_fullpath errmsg
 if [[ -a $1 ]]; then
 	f_fullpath="$( readlink -fn -- $1 )"
@@ -148,7 +146,7 @@ exit 0	# exit the script from within the function to prevent edits of
 		# this file from interferring with currently open instances.
 } # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-X "$@"	# run the script-as-a-function to isolate the instructions 
+main "$@"	# run the script-as-a-function to isolate the instructions 
 		# from edits to this file while there are other open instances.
 
 # Copyright (C) 2016 by Tom Davis <tom@greyshirt.net>.

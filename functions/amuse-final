@@ -5,7 +5,7 @@
 #   Skip the rest of the currently playing song.
 
 function amuse-final {
-	amuse-set-env
+	amuse:set-env
 	echo 'true' >"${final:?}"
 }
 

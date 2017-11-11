@@ -4,7 +4,7 @@
 #: FUNCTION ^G(no arguments)^g
 #:   Set and sanity-check common ^IaMuse^i variables.
 
-function amuse-set-env {
+function amuse:set-env {
 	: ${HOME:?} ${XDG_MUSIC_DIR:?} ${me:?}
 	amusePlayerId='aMuse player'
 	music_dir="${XDG_MUSIC_DIR:-${HOME}/media/music}"
@@ -12,10 +12,9 @@ function amuse-set-env {
 
 	amuse_home="${me}"/util/amuse
 	amuse_db="${amuse_home}"/amuse.db
-	amuse_bin="${amuse_home}"/amuse-master.zsh
 	amuse_run="${XDG_DATA_HOME}"/run/amuse
 	amuse_pid="${amuse_run}"/amuse-pid
-		export amuse_home amuse_db amuse_bin amuse_run amuse_pid
+		export amuse_home amuse_db amuse_run amuse_pid
 
 	now_playing="${amuse_run}"/playing
 	paused_at="${amuse_run}"/paused-at

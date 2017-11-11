@@ -1,0 +1,18 @@
+# @(#)[:-CXZKXv@l-Y7xTL6kJ3A: 2017-11-09 04:09:51 Z tw@csongor]
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^G(no arguments)^g
+#:   Convert milliseconds to a time format.
+
+function msecToHMMSS {
+	integer msecs=$(($1%1000)) seconds=$(($1/1000)) minutes=0 hours=0
+	((minutes=seconds/60,seconds%=60))
+	((hours=minutes/60,minutes%=60))
+	if ((hours)); then
+		printf '%d:%0.2d:%0.2d.%0.3d' $hours $minutes $seconds $msecs
+	else
+		printf '%d:%0.2d.%0.3d' $minutes $seconds $msecs
+	fi
+}
+
+# Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

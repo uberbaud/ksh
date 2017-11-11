@@ -1,0 +1,42 @@
+# @(#)[:c9)jDHF5jPmWm%5IZHdV: 2017-11-09 04:14:46 Z tw@csongor]
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
+
+#: FUNCTION ^Usong^u ^Umilliseconds^u
+#:   AMUSE FUNCTION: Play one (1) ^Usong^u starting ^Umilliseconds^u in.
+
+function a1 {
+	[[ -s $amuse_pid ]]&& fullstop 'Already playing'
+
+	local song="$1" atTime=${2:-0}
+	# clear if we're starting over
+	((atTime))|| : >$missing_bytes
+	[[ $song == /* ]]|| song="${music_dir}/$song"
+	[[ -r $song ]]|| fullstop "Can't play song: $song."
+
+	local banner="${song#$music_dir}"; banner=${banner%.*}
+	((${#banner}>COLUMNS-6))&& {
+		typeset -R$((COLUMNS-7)) cutoff="$banner"
+		banner="…$cutoff"
+	  }
+
+	print -u2 "  \033[34m>>>\033[38m $banner"
+
+	# clean up last times mess
+	: >$paused_song
+	: >$paused_at
+
+	# set up device (if possible)
+	local minf cfg ffopts auopts
+	set -A minf -- $(mediainfo --Output='Audio;%SamplingRate% %Channels%')
+	audioctl -q rate=${min[0]:-41000} play.channels=${minf[1]:-2} 2>/dev/null
+	# get actual device settings and use those
+	set -A cfg -- $(audioctl -n rate play.channels encoding)
+	set -A ffopts -- -y -loglevel error -ar ${cfg[0]} -ac ${cfg[1]} -f ${cfg[2]} -
+	set -A auopts -- -f snd/0 -r ${cfg[0]} -e ${cfg[2]} -h raw -i -
+
+	print "${song#$music_dir/}" >$now_playing
+
+
+}
+
+# Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

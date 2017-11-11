@@ -2,11 +2,11 @@
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
 #: FUNCTION ^Umsg word1^u ^[^Umsg word…N^u^]
-#:   Like die but less dramatic.
+#:   Like die but with no sparkle.
 
 function fullstop {
 	print -ru2 "  $*"
-	kill -QUIT $$
+	kill -s TERM $$
 }
 
 

@@ -1,0 +1,31 @@
+# @(#)[:N15uU=G<R|}-A~;)D7@`: 2017-11-16 01:23:31 Z tw@csongor]
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Uc file^u ^[^S…^s ^Uc fileN^u^]
+#:   List functions implemented in a file as functions declarations.
+
+function ls-cfuncs {
+	local awkpgm s
+	awkpgm="$(cat)" <<-\
+	\==AWK==
+    /^[ \t]/	{next}
+	/^[#}]/		{t="";next}
+	/^$/		{t="";next}
+	/^{/	{
+		sub(/^ +/,"",t)
+		sub(/\)[^\)]*$/,");",t)
+		gsub(/[ \t][ \t]+/," ",t)
+		print t
+		t=""
+		next
+	  }
+	# always
+				{t=t" "$0}
+	==AWK==
+
+	for s in "$@"; do
+		indent -bad -bap <"$s" | awk "$awkpgm"
+	done
+}
+
+# Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

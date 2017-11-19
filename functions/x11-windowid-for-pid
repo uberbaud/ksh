@@ -1,0 +1,25 @@
+# @(#)[:nCf33BW`h|Kt!%{uAn!@: 2017-11-16 20:46:20 Z tw@csongor]
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Upid^u ^= ^S$REPLY^s
+#:   find an X11 window id for a descendent process
+
+needs xdotool ps
+function widFromPid {
+	xdotool search --all --pid $1 --name "^$HOSTNAME \\(";
+}
+
+function x11-windowid-for-pid {
+	[[ ${1:?Missing parameter pid} == +([0-9]) ]]|| die 'Bad pid'
+	REPLY=''
+	integer pid=$1 wid=$(widFromPid $1)
+	until ((wid)); do
+		pid=$(ps -o ppid= -p $pid)
+		((pid))|| return 1
+		wid=$(widFromPid $pid)
+	done
+	REPLY=$wid
+	return 0
+}
+
+# Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

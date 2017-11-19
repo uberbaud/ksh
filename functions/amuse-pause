@@ -6,7 +6,7 @@
 
 function amuse-pause {
 	amuse:set-env
-	command pkill -s INT -f "${amusePlayerId:?}"
+	command pkill -SIGINT -f "${amusePlayerId:?}"
 	sleep 0.1
 }
 

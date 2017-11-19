@@ -2,18 +2,31 @@
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
 #: FUNCTION ^G(no arguments)^g
-#:   Wrap rakudobrew
+#:   Rebuild perl6
 
 function f-rakudobrew {
-	(($#))&& {
-		command rakudobrew "$@"
-		return $?
-	  }
-	for cmd in self-upgrade 'build moar'; do
-		h1 $cmd
-		command rakudobrew $cmd || die "Could not ^B$cmd^b."
-	done
+	: ${RAKUDO_HOME:?}
+	(($#))&& die 'Too many arguments. None expected.'
+	OLDWD="$PWD"
+	if [[ -d $RAKUDO_HOME ]]; then
+		h1 'Upgrading repository'
+		cd "$RAKUDO_HOME" || die 'Could not ^Tcd^t to ^S$RAKUDO_HOME^s.'
+		git pull|| die '^Tgit pull^t'
+	else
+		h1 'Creating repository'
+		cd "${RAKUDO_HOME%/*}" || die '^S$RAKUDO_HOME^s is not a directory.'
+		git clone https://github.com/rakudo/rakudo/ || die '^Tgit clone^t'
+		cd "$RAKUDO_HOME" || die 'Could not ^Tcd^t to ^S$RAKUDO_HOME^s.'
+	fi
+	h1 'Configuring'
+	perl Configure.pl --gen-moar --gen-nqp --backends=moar &&
+	h1 'Building'
+	make
+	h1 'Installingish'
+	make install
+	cd "$OLDWD"
 	h1 'Timing new build'
+	perl6 -e 'exit' || die "Can't run ^Tperl6^t."
 	typeset rakudoVer='?' moarVer='?' p6ver
 	# This is Rakudo version 2017.08-103-g4de858a55
 	#    built on MoarVM version 2017.08.1-128-gde6dceda

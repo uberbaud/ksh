@@ -1,0 +1,19 @@
+# @(#)[:Ls~`NsuNinc`8&>{UsjZ: 2017-11-12 19:04:55 Z tw@csongor]
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
+
+#: FUNCTION ^G(no arguments)^g
+#:   scan piped to Xdialog
+
+function xscan {
+	local rc=$XDG_CONFIG_HOME/gtk-tw/fixed-font.rc size=911x975+921+1 O
+	set -A O -- --rc-file $rc --left --no-wrap --no-buttons --textbox - $size
+	(($#))|| {
+		scanseq='¬L'
+		[[ -n "$(flist +inbox -sequence L -noshowzero)" ]]|| scanseq=all
+		set -- +inbox $scanseq
+	  }
+
+	(set -o nohup; scan "$@"| Xdialog "${O[@]}") &
+}
+
+# Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

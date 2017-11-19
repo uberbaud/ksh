@@ -23,6 +23,7 @@ function amuse:set-env {
 	final="${amuse_run}"/final
 	again="${amuse_run}"/again
 	fflog="${amuse_run}"/fflog
+		export fflog now_playing paused_at paused_song skipped_bytes
 
 	music_list="${amuse_run}"/togo.lst
 		export music_list

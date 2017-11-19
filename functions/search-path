@@ -1,0 +1,25 @@
+# @(#)[:lojkcBC9V5Z1#uaVBP!&: 2017-11-14 01:31:37 Z tw@csongor]
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Upath^u ^Ufile 1^u ^[ ^S…^s ^Ufile n^u^] ^= ^S$reply^s
+#:   Search in ^Upath^u for ^Ufile^us where ^Upath^u is a string of colon (^S:^s)
+#:   delimited paths.
+
+function search-path {
+	: ${1:?Missing required ^Upath^u parameter.}
+	: ${2:?Missing required ^Ufile^u parameter.}
+	local paths p f pf i=0
+	set -A reply --
+	splitstr ':' "$1" paths; shift 1
+	for f; do
+		pf=''
+		for p in "${paths[@]}"; do
+			[[ -f $p/$f ]]|| continue
+			pf="$p/$f"
+			break
+		done
+		reply[i++]="$pf"
+	done
+}
+
+# Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

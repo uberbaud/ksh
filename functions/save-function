@@ -1,0 +1,47 @@
+# @(#)[:p>IHsjE1fDdG|mlA9yTS: 2017-11-13 23:03:02 Z tw@csongor]
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Uname^u ^Uusage/help message^u
+#:   (re)Saves an already ^Idefined^i function given by ^Uname^u.
+#:   Saves to the last path in ^S$FPATH^s if there is no definition file
+#:     already, or overwrites the first match in ^S$FPATH^s if one exists.
+
+function save-function {
+	local fpath fname fbody fstart fend oprefix=xx i
+	: ${1:?Missing required argument function_name.}
+	: ${2:?Missing required argument help_message.}
+	: ${FPATH:?Required environment variable FPATH is not defined.}
+	[[ $1 == xx[0-9][0-9] ]]&& oprefix=XX
+	fpath="${FPATH##*:}"
+	search-path "$FPATH" "$1"
+	[[ -n "${reply[0]}" ]]&& fpath="${reply[0]%*/}"
+	fbody="$(typeset -f "$1")" || die "Function ^B$1^b is not defined."
+	[[ $fbody == "$1() " ]]&& {
+		[[ -f $fpath/$1 ]]|| die "Unknown function name: ^B$1^b."
+		. $fpath/$1
+		fbody="$(typeset -f "$1")" || die "Function ^B$1^b does not exist."
+	  }
+	cd "$(mkdir -d)" || die "Could not ^Tcd^t to temporary directory."
+	if [[ -f $fpath/$1 ]]; then
+		cp $fpath/$1 .
+	else
+		new -n -t ksh -x function "$@"
+	fi
+	fstart='/^\(function \)\{0,1\}'"$1"'\(()\)\{0,1\} {/'
+	fend='/^}/+1'
+	csplit -f $oprefix -s "$1" "$fstart" "$fend"
+	fname="$1"
+	set -- $oprefix*
+	(($#==3))|| die "^Tcsplit^t created ^B$#^b files instead of ^B3^b."
+	cat ${oprefix}00	>"$fname"
+	print "$fbody"		>>"$fname"
+	cat ${oprefix}02	>>"$fname"
+	rm $oprefix*
+	[[ -f $fpath/$fname ]]&& diff -awd $fname $fpath/$fname
+	mv -i $fname $fpath/$fname
+	rm *
+	eval "cd -; rmdir \"$PWD\""
+	unset reply
+}
+
+# Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

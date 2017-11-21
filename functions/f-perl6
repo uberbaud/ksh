@@ -7,7 +7,7 @@
 function f-perl6 {
 	: ${RAKUDO_BIN:?}
 	if (($#)); then
-		$RAKUDO_BIN/perl6 "$@"
+		command perl6 "$@"
 	else
 		local H=$XDG_DATA_HOME/perl6/history
 		touch $H-all

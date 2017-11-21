@@ -10,13 +10,16 @@ function f-rakudobrew {
 	OLDWD="$PWD"
 	if [[ -d $RAKUDO_HOME ]]; then
 		h1 'Upgrading repository'
-		cd "$RAKUDO_HOME" || die 'Could not ^Tcd^t to ^S$RAKUDO_HOME^s.'
+		builtin cd "$RAKUDO_HOME" ||
+			die 'Could not ^Tcd^t to ^S$RAKUDO_HOME^s.'
 		git pull|| die '^Tgit pull^t'
 	else
 		h1 'Creating repository'
-		cd "${RAKUDO_HOME%/*}" || die '^S$RAKUDO_HOME^s is not a directory.'
+		builtin cd "${RAKUDO_HOME%/*}" ||
+			die '^S$RAKUDO_HOME^s is not a directory.'
 		git clone https://github.com/rakudo/rakudo/ || die '^Tgit clone^t'
-		cd "$RAKUDO_HOME" || die 'Could not ^Tcd^t to ^S$RAKUDO_HOME^s.'
+		builtin cd "$RAKUDO_HOME" ||
+			die 'Could not ^Tcd^t to ^S$RAKUDO_HOME^s.'
 	fi
 	h1 'Configuring'
 	perl Configure.pl --gen-moar --gen-nqp --backends=moar &&
@@ -24,9 +27,9 @@ function f-rakudobrew {
 	make
 	h1 'Installingish'
 	make install
-	cd "$OLDWD"
+	builtin cd "$OLDWD"
 	h1 'Timing new build'
-	perl6 -e 'exit' || die "Can't run ^Tperl6^t."
+	command perl6 -e 'exit' || die "Can't run ^Tperl6^t."
 	typeset rakudoVer='?' moarVer='?' p6ver
 	# This is Rakudo version 2017.08-103-g4de858a55
 	#    built on MoarVM version 2017.08.1-128-gde6dceda

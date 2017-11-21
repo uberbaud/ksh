@@ -4,9 +4,9 @@
 
 typeset -- VIMCACHE="${HOME}/.local/vim/cache"
 
-[[ -d $VIMCACHE ]]|| die 'VIMCACHE does not exist.'
-[[ -n $LOCALBIN ]] || die '[36m$LOCALBIN[39m is not set.'
-[[ -d $LOCALBIN ]] || die '[36m$LOCALBIN[39m is not a directory.'
+[[ -d $VIMCACHE ]]||  die 'VIMCACHE does not exist.'
+[[ -n $LOCALBIN ]] || die '^S$LOCALBIN^s is not set.'
+[[ -d $LOCALBIN ]] || die '^S$LOCALBIN^s is not a directory.'
 [[ :"$PATH": == *:"$LOCALBIN":* ]]|| PATH="${PATH%:}:$LOCALBIN"
 
 [[ " ${DEBUG:-} " == *' v.zsh '* ]]&& set -x
@@ -31,15 +31,15 @@ function usage { # {{{1
 # process -options {{{1
 function bad_programmer {	# {{{2
 	die 'Programmer error:'	\
-		"  No getopts action defined for [1m-$1[22m."
+		"  No getopts action defined for ^B-$1^b."
   };	# }}}2
 typeset -- warnOrDie='die';
 while getopts ':fh' Option; do
 	case $Option in
 		f)	warnOrDie='warn';										;;
 		h)	usage;													;;
-		\?)	die "Invalid option: [1m-$OPTARG[22m.";				;;
-		\:)	die "Option [1m-$OPTARG[22m requires an argument.";	;;
+		\?)	die "Invalid option: ^B-$OPTARG^b.";				;;
+		\:)	die "Option ^B-$OPTARG^b requires an argument.";	;;
 		*)	bad_programmer "$Option";								;;
 	esac
 done
@@ -49,10 +49,10 @@ shift $(($OPTIND - 1))
 # /options }}}1
 function warnOrDie { #{{{1
 	case $warnOrDie in
-		die)  die "$@" 'Use [1m-f[22m to force an edit.';		;;
+		die)  die "$@" 'Use ^B-f^b to force an edit.';		;;
 		warn) warn "$@";											;;
-		*)    die '[1mProgrammer error[22m:' \
-					'warnOrDie is [1m${warnOrDie}[22m.';		;;
+		*)    die '^BProgrammer error^b:' \
+					'warnOrDie is ^B${warnOrDie}^b.';		;;
 	esac
 } # }}}1
 (($#))|| exec "${VISUAL:-${EDITOR:-vi}}"
@@ -75,12 +75,12 @@ elif [[ $1 == =* ]]; then
 		errmsg='Could not find function.'
 	fi
 else
-	die "No such file [1m${1}[22m."
+	die "No such file ^B${1}^b."
 fi
 
 [[ -n $f_fullpath ]]||	die "$errmsg"
-[[ -f $f_fullpath ]]||	die "[1m${1}[22m is [1mnot[22m a file."
-[[ $f_fullpath == *,v ]]&& warnOrDie "Seems to be an [1mRCS archive[22m file."
+[[ -f $f_fullpath ]]||	die "^B$1^b is ^Bnot^b a file."
+[[ $f_fullpath == *,v ]]&& warnOrDie "Seems to be an ^BRCS archive^b file."
 typeset -- ftype="$( /usr/bin/file -b $f_fullpath )"
 [[ $ftype == *text* || $ftype == *XML* ]]||
 						warnOrDie "Does not seem to be a text file."
@@ -104,7 +104,7 @@ set -A swaps -- $VIMCACHE/$swapglob.s??
 [[ ${swaps[1]} == $VIMCACHE/$swapglob'.s??' ]]&&
 	die 'Swap files exist. Vim or Crash?'
 
-cd $f_path || die "Could not [32mcd[39m to [1m${f_path}[22m."
+cd $f_path || die "Could not ^Tcd^t to ^B${f_path}^b."
 
 typeset -- has_rcs=false
 [[ -d RCS && -f RCS/$f_name,v ]] && {
@@ -112,7 +112,7 @@ typeset -- has_rcs=false
 	rcsdiff -q ./$f_name ||
 		die 'RCS and checked out versions differ.'
 	co -q -l ./$f_name ||
-		die "Could not [32mco -l[39m [1m${f_name}[22m."
+		die "Could not ^Tco -l^t ^B${f_name}^b."
   }
 
 #typeset -- stemma="$( egrep -o '@\(#\)\[:[^]]+]' "$f_name")"
@@ -139,14 +139,11 @@ if [[ -d RCS ]]; then
 		ci "${rcsopts[@]}" -i ./$f_name
 	fi
 elif $hasmsg; then
-	warn 'No [35mRCS/[39m.'
+	warn 'No ^SRCS/^s.'
 fi
 
-exit 0	# exit the script from within the function to prevent edits of 
-		# this file from interferring with currently open instances.
-} # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+}
 
-main "$@"	# run the script-as-a-function to isolate the instructions 
-		# from edits to this file while there are other open instances.
+main "$@"; exit 0
 
 # Copyright (C) 2016 by Tom Davis <tom@greyshirt.net>.

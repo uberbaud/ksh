@@ -2,9 +2,6 @@
 # @(#)[:GpEYZa*c{{hMx~)jN6Sk: 2017/08/02 18:23:45 tw@csongor.lan]
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
 
-typeset -- VIMCACHE="${HOME}/.local/vim/cache"
-
-[[ -d $VIMCACHE ]]||  die 'VIMCACHE does not exist.'
 [[ -n $LOCALBIN ]] || die '^S$LOCALBIN^s is not set.'
 [[ -d $LOCALBIN ]] || die '^S$LOCALBIN^s is not a directory.'
 [[ :"$PATH": == *:"$LOCALBIN":* ]]|| PATH="${PATH%:}:$LOCALBIN"
@@ -55,6 +52,49 @@ function warnOrDie { #{{{1
 					'warnOrDie is ^B${warnOrDie}^b.';		;;
 	esac
 } # }}}1
+function safe-to-edit-nvim { #{{{1
+	local swaps s p d w
+	set -A reply --
+	needs ls-nvim-swaps
+	gsub / % "$1"
+	splitstr NL "$(ls-nvim-swaps|fgrep "$REPLY")" swaps
+	if ((${#swaps[*]})); then
+		reply[0]="Swap files found:"
+		for s in "${swaps[@]}"; do
+			d=''
+			w=''
+			p="${s##* }"
+			s="${s% $p}"
+			desparkle "$s"; s="$REPLY"
+			if ((p)); then
+				needs x11-windowid-for-pid x11-flash-window
+				x11-windowid-for-pid $p && {
+					w=$REPLY
+					d=$(xdotool get_desktop_for_window $w); ((d++))
+					x11-flash-window -dq $w &
+				  }
+			else
+				p=''
+			fi
+			reply[${#reply[*]}]="$s p^S$p^s d^B$d^b"
+		done
+		return 1
+	else
+		return 0
+	fi
+} #}}}1
+function safe-to-edit { #{{{1
+	local call="safe-to-edit-$EDBIN"
+	[[ $(whence -v "$call") == *' function' ]]|| {
+		warnOrDie "^B$call^b is not implemented."
+		return 0
+	  }
+	"$call" "$@"
+} #}}}1
+
+ED="${VISUAL:-${EDITOR:-vi}}"
+needs $ED
+EDBIN="${ED##*/}"
 (($#))|| exec "${VISUAL:-${EDITOR:-vi}}"
 
 function main {
@@ -86,6 +126,8 @@ typeset -- ftype="$( /usr/bin/file -b $f_fullpath )"
 						warnOrDie "Does not seem to be a text file."
 shift
 
+safe-to-edit "$f_fullpath" || die "${reply[@]}"
+
 typeset hasmsg=false rcsmsg=''
 (($#))&& { hasmsg=true; rcsmsg="$*"; }
 
@@ -93,16 +135,6 @@ typeset hasmsg=false rcsmsg=''
 # one (1) forward slash ('/') as (and at) the root.
 typeset -- f_path=${f_fullpath%/*}
 typeset -- f_name=${f_fullpath##*/}
-
-typeset -- swapglob="$f_fullpath" p='' s=''
-while [[ $swapglob == */* ]]; do
-	p="${swapglob%%/*}"; s="${swapglob#*/}"; swapglob="${p}%${s}"
-done
-swapglob="$swapglob"
-set -A swaps -- $VIMCACHE/$swapglob.s??
-
-[[ ${swaps[1]} == $VIMCACHE/$swapglob'.s??' ]]&&
-	die 'Swap files exist. Vim or Crash?'
 
 cd $f_path || die "Could not ^Tcd^t to ^B${f_path}^b."
 

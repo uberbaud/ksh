@@ -4,7 +4,7 @@
 #: FUNCTION ^[^Ufile…^u^]
 #:   Copy ^SSTDIN^s or ^Ufile^us to clipboard
 
-function pbcopy {
+function xget {
 	: ${DISPLAY:?Can\'t save without X11}
 	xclip -selection clipboard -in "$@"
 }

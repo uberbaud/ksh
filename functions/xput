@@ -4,7 +4,7 @@
 #: FUNCTION ^G(no arguments)^g
 #:   Paste clipboard to ^SSTDOUT^s.
 
-function pbpaste {
+function xput {
 	xclip -selection clipboard -out
 }
 

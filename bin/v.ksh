@@ -56,8 +56,7 @@ function safe-to-edit-nvim { #{{{1
 	local swaps s p d w
 	set -A reply --
 	needs ls-nvim-swaps
-	gsub / % "$1"
-	splitstr NL "$(ls-nvim-swaps|fgrep "$REPLY")" swaps
+	splitstr NL "$(ls-nvim-swaps "$1")" swaps
 	if ((${#swaps[*]})); then
 		reply[0]="Swap files found:"
 		for s in "${swaps[@]}"; do
@@ -66,7 +65,7 @@ function safe-to-edit-nvim { #{{{1
 			p="${s##* }"
 			s="${s% $p}"
 			desparkle "$s"; s="$REPLY"
-			if ((p)); then
+			if [[ $p != - ]]; then
 				needs x11-windowid-for-pid x11-flash-window
 				x11-windowid-for-pid $p && {
 					w=$REPLY

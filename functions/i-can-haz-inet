@@ -4,19 +4,30 @@
 #: FUNCTION ^G(no arguments)^g ^= ^SREPLY^s
 #:   Is the internet available?
 #:   Returns ^B0^b if it is,
-#:       ^B3^b if no gateway,
+#:       ^B4^b if no gateway,
+#:       ^B3^b if interface is other than up and active
 #:       ^B2^b if DNS lookup of ^Uuberbaud.net^u fails, and
 #:       ^B1^b if it seems to be but there is possibly a
 #:             ^Iman-in-the-middle^i issue.
 #:   And sets ^SREPLY^s to connection state.
 
 function i-can-haz-inet {
+	local awkpgm info if status
     REPLY='Connected'
     needs route grep
-    route -n get default 2>&1 | grep -q gateway || {
+	awkpgm='/interface:/ {i=$2} /gateway:/ {g="G"$2} END {print g,i}'
+	info="$(route -n get default 2>&1|awk "$awkpgm")"
+	[[ $info == G* ]]|| {
 		REPLY='No gateway to Internet.'
-		return 3
+		return 4
 	  }
+
+	if="${info#* }"
+	status="$(ifconfig $if | awk -F': ' '/status:/ {print $2;exit}')"
+	[[ $status == active ]]|| {
+		REPLY="Interface $if status is \"$status\"."
+		return 3
+	}
 
     needs dig
     local NAME='uberbaud.net' ADDR='208.167.249.143' digopts DIG
@@ -24,7 +35,7 @@ function i-can-haz-inet {
     # +short        : inet address only
     # +time=1       : 1 second to timeout instead of default 5 seconds
     # A             : section type
-	DIG="$(dig +short +time=1 $NAME A)" || {
+	DIG="$(dig +short +time=1 $NAME A 2>/dev/null)" || {
 		REPLY='DNS lookup failed.'
 		return 2
 	  }

@@ -143,7 +143,7 @@ alias clear='f-clear ' # expand alias of $2
 alias cls='clear colorls $LS_OPTIONS'
 alias doas='doas '
 alias halt='doas halt'
-alias i-can-haz-inet='i-can-haz-inet; printf "  %s\n" "$REPLY"'
+alias i-can-haz-inet='i-can-haz-inet;E=$?;printf "  %s\n" "$REPLY";(return $E)&&:'
 alias ls='/usr/local/bin/colorls $LS_OPTIONS'
 alias noglob='set -f;noglob '; function noglob { set +f; ("$@"); }
 alias prn="printf '  \e[35m｢\e[39m%s\e[35m｣\e[39m\n'"

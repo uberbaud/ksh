@@ -2,7 +2,7 @@
 # @(#)[:i;M+GbnyPAxt0n(iRNN|: 2017-08-11 04:49:36 Z tw@csongor]
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
 
-: ${FPATH:?Run from within KSH}
+set -o nounset;: ${FPATH:?Run from within KSH}
 needs date
 
 typeset -- calOpts='' daysAfter=1 daysBefore=0

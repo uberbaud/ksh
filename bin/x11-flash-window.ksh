@@ -2,7 +2,7 @@
 # @(#)[:G4`^h#L3$+bL)DGZb#-D: 2017-11-22 01:04:13 Z tw@csongor]
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
 
-: ${FPATH:?Run from within KSH}
+set -o nounset;: ${FPATH:?Run from within KSH}
 
 # Usage {{{1
 typeset -- this_pgm="${0##*/}"

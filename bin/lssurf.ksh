@@ -2,7 +2,7 @@
 # @(#)[:JLIIde<tsIrrg)zO96>I: 2017-08-14 20:15:09 Z tw@csongor]
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
 
-: ${FPATH:?Run from within KSH}
+set -o nounset;: ${FPATH:?Run from within KSH}
 
 typeset hover=0 show=show-regular
 # Usage {{{1

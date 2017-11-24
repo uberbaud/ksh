@@ -2,7 +2,7 @@
 # @(#)[:x*SCYViRoZ!;;Xv&jEya: 2017-08-22 00:39:08 Z tw@csongor]
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
 
-: ${FPATH:?Run from within KSH} ${XDG_DATA_HOME:?}
+set -o nounset;: ${FPATH:?Run from within KSH} ${XDG_DATA_HOME:?}
 needs awk
 
 # Usage {{{1

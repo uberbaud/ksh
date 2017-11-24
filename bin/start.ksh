@@ -2,7 +2,7 @@
 # @(#)[:aXvz$y=Px4oEjA;-81a_: 2017-08-15 17:58:56 Z tw@csongor]
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
 
-: ${FPATH:?}
+set -o nounset;: ${FPATH:?}
 
 realbin="$(realbin $0)"
 shortcall="${0##*/}"; shortcall="${shortcall%.*}"

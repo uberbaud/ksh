@@ -2,7 +2,7 @@
 # @(#)[:$3#FUm4<X5^70rs&!#Il: 2017-10-09 18:53:32 Z tw@csongor]
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
 
-: ${FPATH:?Run from within KSH} ${HOST:?}
+set -o nounset;: ${FPATH:?Run from within KSH} ${HOST:?}
 
 backvol=/vol/gnar
 backroot=$backvol/backups

@@ -2,7 +2,7 @@
 # @(#)[:-Oe@t9MyEgT;AxCCl2Uy: 2017-08-11 20:32:03 Z tw@csongor]
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
 
-: ${FPATH:?Run from within KSH} ${COLUMNS:=$(tput cols)}
+set -o nounset;: ${FPATH:?Run from within KSH} ${COLUMNS:=$(tput cols)}
 
 # The $colors array was generated using the formula
 #   16 + (36*R) + (6*G) + B

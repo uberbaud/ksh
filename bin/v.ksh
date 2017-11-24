@@ -2,6 +2,8 @@
 # @(#)[:GpEYZa*c{{hMx~)jN6Sk: 2017/08/02 18:23:45 tw@csongor.lan]
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
 
+: ${FPATH:?Run from KSH}
+
 [[ -n $LOCALBIN ]] || die '^S$LOCALBIN^s is not set.'
 [[ -d $LOCALBIN ]] || die '^S$LOCALBIN^s is not a directory.'
 [[ :"$PATH": == *:"$LOCALBIN":* ]]|| PATH="${PATH%:}:$LOCALBIN"

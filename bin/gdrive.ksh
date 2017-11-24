@@ -2,7 +2,7 @@
 # @(#)[:m;xmOT~x{veGUM9@5|fU: 2017-10-06 22:10:55 Z tw@csongor]
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
 
-: ${FPATH:?Run from within KSH}
+set -o nounset;: ${FPATH:?Run from within KSH}
 
 GDRIVE=$HOME/hold/gdrive
 

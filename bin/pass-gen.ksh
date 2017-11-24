@@ -2,7 +2,7 @@
 # @(#)[:77<S9x^E&Auq4>FM~cw6: 2017-10-21 19:15:39 Z tw@csongor]
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
 
-: ${FPATH:?Run from within KSH}
+set -o nounset;: ${FPATH:?Run from within KSH}
 
 upper=ABCDEFGHIJKLMNOPQRSTUVWXYZ
 lower=abcdefghijklmnopqrstuvwxyz

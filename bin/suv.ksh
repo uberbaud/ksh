@@ -2,7 +2,7 @@
 # @(#)[:G;LweTE5#GhAdml`<%M!: 2017-10-15 21:49:54 Z tw@csongor]
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
 
-: ${FPATH:?Run from within KSH} ${VISUAL:-${EDITOR:Neither VISUAL nor EDITOR is set}}
+set -o nounset;: ${FPATH:?Run from within KSH} ${VISUAL:-${EDITOR:Neither VISUAL nor EDITOR is set}}
 set -A vopts --
 
 # Usage {{{1

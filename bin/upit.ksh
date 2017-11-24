@@ -2,7 +2,7 @@
 # @(#)[:17T;~oE%r%!)f6E%T2Qi: 2017-11-07 19:07:07 Z tw@csongor]
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
 
-: ${FPATH:?Run from within KSH}
+set -o nounset;: ${FPATH:?Run from within KSH}
 
 function @ { # {{{1
 	local NAME="$1 ($3)" DOTF="$2" EXEC="$3"; shift 3

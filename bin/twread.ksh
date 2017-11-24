@@ -2,7 +2,7 @@
 # @(#)[:VYCgD{-?KTQ|k?2m9&=p: 2017-08-08 03:00:12 Z tw@csongor]
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
 
-: ${FPATH:?Run from within KSH}
+set -o nounset;: ${FPATH:?Run from within KSH}
 
 # Usage {{{1
 typeset -- this_pgm="${0##*/}"

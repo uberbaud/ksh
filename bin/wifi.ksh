@@ -2,7 +2,7 @@
 # @(#)[:16%1M8hieME7WR^W@!x<: 2017-08-15 02:33:43 Z tw@csongor]
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
 
-: ${FPATH:?Run from within KSH}
+set -o nounset;: ${FPATH:?Run from within KSH}
 
 wifi_config=${XDG_CONFIG_HOME:?}/wifi
 

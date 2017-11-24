@@ -2,7 +2,7 @@
 # @(#)[:PR<=y0!-k6cUZ@mE5G=f: 2017-08-09 02:36:22 Z tw@csongor]
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
 
-: ${FPATH:?Run from within KSH}
+set -o nounset;: ${FPATH:?Run from within KSH}
 
 # Usage {{{1
 typeset -- this_pgm="${0##*/}"
@@ -59,7 +59,7 @@ branch="$(git rev-parse --abbrev-ref HEAD 2>/dev/null)"
 
 	# add untracked and unignored files, if any
 	set -A untracked -- $(git ls-files --exclude-standard --others)
-	((${#untracked}))&& {
+	[[ -n ${untracked[0]:-} ]]&& {
 		warn "Adding ${untracked[@]}"
 		git add "${untracked[@]}" || FAIL
 	  }

@@ -2,7 +2,7 @@
 # @(#)[:G;LweTE5#GhAdml`<%M!: 2017-10-15 21:49:54 Z tw@csongor]
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
 
-set -o nounset;: ${FPATH:?Run from within KSH} ${VISUAL:-${EDITOR:Neither VISUAL nor EDITOR is set}}
+set -o nounset;: ${FPATH:?Run from within KSH} ${VISUAL:-${EDITOR:?Neither VISUAL nor EDITOR is set}}
 set -A vopts --
 
 # Usage {{{1
@@ -88,7 +88,7 @@ function main {
 	[[ -f $workfile ]]&& {
 		[[ -f RCS/$workfile,v ]]||
 			ci -q -u -i -t"-$CI_INITIAL_DESCRIPTION" ./"$workfile"
-		co -l ./"$workfile" || die "^Tco^t error."
+		co -q -l ./"$workfile" || die "^Tco^t error."
 	}
 	PREF=''
 	if [[ -f $filename ]]; then

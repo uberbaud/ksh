@@ -2,8 +2,7 @@
 # @(#)[:G;LweTE5#GhAdml`<%M!: 2017-10-15 21:49:54 Z tw@csongor]
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
 
-: ${FPATH:?Run from within KSH}
-
+: ${FPATH:?Run from within KSH} ${VISUAL:-${EDITOR:Neither VISUAL nor EDITOR is set}}
 set -A vopts --
 
 # Usage {{{1
@@ -60,11 +59,11 @@ filename="$(readlink -fn "$1")"; shift
 	[[ -f $filename ]]|| die "^B$filenameD^b is not a file."
   }
 
+filepath="${filename%/*}"
 [[ $filepath == $HOME* ]] &&
 	die "^T$PGM^t only works outside of ^S\$HOME^s." \
 		"Instead, use ^T:W^t inside ^Tvim^t (^Tv^t or ^Tnew^t)."
 
-filepath="${filename%/*}"
 [[ -d $filepath ]]|| die "^B$filepath^b is not a directory."
 
 
@@ -78,34 +77,34 @@ function main {
 
 	cd "$workingpath" || die "Could not ^Tcd^t to ^B$workingpath^b."
 
-	workingfile="${filename##*/}"
-	[[ -a $workingfile ]]&& {
-		[[ -f $workingfile ]]||
-			die "working file (^B$workingfile^b) exits in"	\
+	workfile="${filename##*/}"
+	[[ -a $workfile ]]&& {
+		[[ -f $workfile ]]||
+			die "working file (^B$workfile^b) exits in"	\
 				"^B$workingpath^b"							\
 				"but is not a file."
 	  }
 
-	[[ -f $workingfile ]]&& {
-		[[ -f RCS/$workingfile,v ]]||
-			ci -q -u -i -t"-$CI_INITIAL_DESCRIPTION" ./"$workingfile"
-		co -l ./"$workingfile" || die "^Tco^t error."
+	[[ -f $workfile ]]&& {
+		[[ -f RCS/$workfile,v ]]||
+			ci -q -u -i -t"-$CI_INITIAL_DESCRIPTION" ./"$workfile"
+		co -l ./"$workfile" || die "^Tco^t error."
 	}
+	PREF=''
 	if [[ -f $filename ]]; then
 		fowner="$(stat -f'%Su' "$filename")"
 		fgroup="$(stat -f'%Sg' "$filename")"
 		fperm="$(stat -f'%#Lp' "$filename")"
-		touch ./"$workingfile"
-		if [[ -r $filename ]]; then
-			cat $filename >$workingfile
-		elif [[ -s $filename ]]; then
-			doas cat $filename >$workingfile
+		touch ./"$workfile"
+		[[ -r $filename ]]|| PREF=doas
+		if [[ -s $filename ]]; then
+			$PREF cat $filename >$workfile
 		else
-			echo >$workingfile
+			echo >$workfile
 		fi
-		SHA384="$(cksum -qa sha384b "$workingfile")"
-		[[ -f RCS/$workingfile,v ]]&& {
-			rcsdiff -q ./"$workingfile" ||
+		SHA384="$(cksum -qa sha384b ./"$workfile")"
+		[[ -f RCS/$workfile,v ]]&& {
+			rcsdiff -q ./"$workfile" ||
 				die "sysytem file and archived file have diverged."	\
 					"Do an RCS ^Tci^t and rerun."
 		  }
@@ -114,25 +113,25 @@ function main {
 		fowner=root
 		fgroup=wheel
 		fperm=0644
-		echo >$workingfile
+		echo >$workfile
 	fi
 
-	${VISUAL:-$EDITOR} ./"$workingfile"
-	if [[ -f RCS/$workingfile,v ]]; then
+	${VISUAL:-$EDITOR} ./"$workfile"
+	if [[ -f RCS/$workfile,v ]]; then
 		# previously checked in
-		rcsdiff -q ./"$workingfile" ||
-			ci -q -u -j ${1:+-m"$*"} ./"$workingfile"
+		rcsdiff -q ./"$workfile" ||
+			ci -q -u -j ${1:+-m"$*"} ./"$workfile"
 	else
-		ci -q -u -i -t"-${*:-$CI_INITIAL_DESCRIPTION}" ./"$workingfile"
+		ci -q -u -i -t"-${*:-$CI_INITIAL_DESCRIPTION}" ./"$workfile"
 	fi
 	[[ -n $SHA384 ]]&& {
 		[[ $SHA384 == "$(cksum -qa sha384b ./"$workfile")" ]]&& {
 			notify 'There were no changes made.' 'Exiting.'
 			exit 0
 		  }
-		[[ $SHA384 != "$(cksum -qa sha384b "$filename")" ]]&& {
-			warn "^B$filenameD^b has changed since reading."	\
-			desparkle "$workingpath/$workingfile"
+		[[ $SHA384 != "$($PREF cksum -qa sha384b "$filename")" ]]&& {
+			warn "^B$filenameD^b has changed since reading."
+			desparkle "$workingpath/$workfile"
 			yes-or-no Continue ||
 				die "You must manually copy"	\
 					"  ^B$REPLY^b"				\
@@ -141,10 +140,10 @@ function main {
 		  }
 	  }
 	if [[ -w $filename ]]; then
-		cat ./"$workingfile" >"$filename"
+		cat ./"$workfile" >"$filename"
 	else
 		set -- -p -F -o "$fowner" -g "$fgroup" -m $fperm -S
-		doas install "$@" ./"$workingfile" "$filename"
+		doas install "$@" ./"$workfile" "$filename"
 	fi
 }
 

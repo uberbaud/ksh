@@ -1,7 +1,7 @@
 #!/bin/ksh
 # vim: ft=ksh
 
-${FPATH:?No FPATH, are you running in ksh}
+: ${FPATH:?No FPATH, are you running in ksh}
 
 BKSP=''
 

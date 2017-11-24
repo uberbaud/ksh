@@ -30,8 +30,8 @@ function sparkle {
 		-e 's/\^u/[24m/g'							\
 		-e 's/\^W/[38;5;172m/g'					\
 		-e 's/\^w/[39m/g'							\
-		-e 's/\^(\[|\||\]|<|>)/[35m\1[39m/g'	\
 		-e 's/\^=/[35m⇒[39m/g'					\
+		-e 's/\^([[:punct:]])/[35m\1[39m/g'		\
 		-e 's//^/g'
 	printf '\e[0m' # failsafe: remove any unexpected attributes
 }

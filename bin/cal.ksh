@@ -59,6 +59,10 @@ function warnOrDie { #{{{1
 					'warnOrDie is [1m${warnOrDie}[22m.';		;;
 	esac
 } # }}}1
+integer LAST_EVENT=0
+function +evlist { # {{{1
+	for e { evlist[LAST_EVENT++]="$e"; }
+} # }}}1
 
 [[ $daysAfter == *[!0-9]* ]]&&	die '-A requires a number of days.'
 [[ $daysBefore == *[!0-9]* ]]&&	die '-B requires a number of days.'
@@ -140,18 +144,12 @@ gsub "$nt" ' ' "$evblob" # deformat multiline events
 splitstr NL "$REPLY" calevs
 for ln in "${calevs[@]}"; do
 	splitstr TAB "$ln" tuple
-	[[ ${tuple[0]} == $expectday ]]|| {
+	[[ ${tuple[0]:-} == $expectday ]]|| {
 		expectday="${tuple[0]}"
 		case "$expectday" in
-			"$TODAY")
-				set -A events -- "${events[@]}" '[1m   today[22m'
-				;;
-			"$TOMORROW")
-				set -A events -- "${events[@]}" '[1m   tomorrow[22m'
-				;;
-			*)
-				set -A events -- "${events[@]}" "[1m   $expectday[22m"
-				;;
+			"$TODAY")		+evlist '[1m   today[22m';		;;
+			"$TOMORROW")	+evlist '[1m   tomorrow[22m';	;;
+			*)				+evlist "[1m   $expectday[22m";	;;
 		esac
 	  }
 	# remove extraneous spaces
@@ -169,17 +167,17 @@ for ln in "${calevs[@]}"; do
 		word="${ev%% *}"
 		ev="${ev#$word}"; ev="${ev# }" # remove word and POSSIBLY space
 		((${#line}+${#word}>evsize))&& {
-			set -A events -- "${events[@]}" "$H${line# }$E"
+			+evlist "$H${line# }$E"
 			line='   '
 		  }
 		line="$line $word"
 	done
-	[[ -n ${line# } ]]&& set -A events -- "${events[@]}" "$H${line# }$E"
+	[[ -n ${line# } ]]&& +evlist "$H${line# }$E"
 done
 
 # ───────────────────────────────── VERTICALLY CENTER cal and events ───
 unset l
-integer cS=0 cE=$((${#cal[*]}-1)) eS=0 eE=$((${#events[*]}-1)) last=0 l2=0
+integer cS=0 cE=$((${#cal[*]}-1)) eS=0 eE=$((${#evlist[*]}-1)) last=0 l2=0
 if ((cE<eE)); then
 	last=eE
 	((l2=(eE-cE)/2,cS+=l2,cE+=l2))
@@ -203,7 +201,7 @@ fmt=" %-${calSize}s  %s\n"
 while ((i++<last)); do
 	cLn=''; eLn=''
 	(((cS<=i)&&(i<=cE)))&& cLn="${cal[cI++]}"
-	(((eS<=i)&&(i<=eE)))&& eLn="${events[eI++]}"
+	(((eS<=i)&&(i<=eE)))&& eLn="${evlist[eI++]}"
 	printf "$fmt" "$cLn" "$eLn"
 done | $pager
 

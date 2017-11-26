@@ -31,15 +31,14 @@ function bad_programmer {	# {{{2
 	die 'Programmer error:'	\
 		"  No getopts action defined for [1m-$1[22m."
   };	# }}}2
-set -A show --
-function show+ { local i; for i { show[${#show[*]}]="$i"; } }
+new-array show
 while getopts ':dfpsSh' Option; do
 	case $Option in
-		d)	show+ '$DIR';											;;
-		f)	show+ '$FILE';											;;
-		p)	show+ '$PID';											;;
-		s)	show+ '$SWPF';											;;
-		S)	show+ '$DIR/$SWPF';										;;
+		d)	+show '$DIR';											;;
+		f)	+show '$FILE';											;;
+		p)	+show '$PID';											;;
+		s)	+show '$SWPF';											;;
+		S)	+show '$DIR/$SWPF';										;;
 		h)	usage;													;;
 		\?)	die "Invalid option: [1m-$OPTARG[22m.";				;;
 		\:)	die "Option [1m-$OPTARG[22m requires an argument.";	;;

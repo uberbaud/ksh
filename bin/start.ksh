@@ -157,8 +157,10 @@ function optcmd-fsobject { # {{{1
 		badcfg "^B$d_1^b exists but is not a ^B$fsType^b."
 	fi
 } # }}}1
-function optcmd-prefix-args	{ prefixArgs[${#prefixArgs[*]}]="$1${2:+\=$2}"; }
-function optcmd-suffix-args	{ suffixArgs[${#suffixArgs[*]}]="$1${2:+\=$2}"; }
+NEXT_PREFIXARGS_ID=0
+function optcmd-prefix-args	{ prefixArgs[NEXT_PREFIXARGS_ID++]="$1${2:+\=$2}"; }
+NEXT_SUFFIXARGS_ID=0
+function optcmd-suffix-args	{ suffixArgs[NEXT_SUFFIXARGS_ID++]="$1${2:+\=$2}"; }
 function optcmd-directory	{ optcmd-fsobject "$1" "${2:-$1}" directory; }
 function optcmd-file		{ optcmd-fsobject "$1" "${2:-$1}" file; }
 function optcmd-environment	{ # {{{1
@@ -220,13 +222,16 @@ else
 
 		optcmd-$docmd "$key" "$val"
 	done
-	set -- "${prefixArgs[@]}" "$@" "${suffixArgs[@]}"
+	( set +u; ((${#prefixArgs[*]})) )&& set -- "${prefixArgs[@]}" "$@"
+	( set +u; ((${#suffixArgs[*]})) )&& set -- "$@" "${suffixArgs[@]}"
 fi
 
 [[ "$(readlink -nf $appbin)" == $realbin ]]&& {
-	local x='' possibles
-	set -A possibles -- $(which -a "$app")
-	local errmsg="^B$appbin^b is masked by wrapper to ^Bstart^b."
+	local x='' possibles \
+	      errmsg="^B$appbin^b is masked by wrapper to ^Bstart^b."
+	set -A possibles -- $(which -a "$app") ||
+		die "$errmsg" \
+			"Could not find a suitable executable named: ^B$d_app^b."
 	function _ {
 		for x in "${possibles[@]}"; do
 			[[ "$(readlink -nf "$x")" != $realbin ]]&& return

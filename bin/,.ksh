@@ -49,24 +49,19 @@ function log { # {{{1
 	REPLY="${REPLY#, }"
 	[[ -z $REPLY ]]
 } # }}}1
-function opts+ { # {{{1
-	local i
-	for i in "$@"; do
-		opts[${#opts[*]}]="$i"
-	done
-} # }}}1
 needs apm xlock log ${LOCALBIN=${HOME:?}/.local/bin}/set-bg-per-battery.sh
 
 log timesheet xlock begin || warn $REPLY
 
 # opts: a negative number sets the maximum
-opts+	-planfont	'-*-dejavu sans-bold-r-normal-*-*-160-*-*-p-*-ascii-*'
-opts+	-mode		clock
-opts+	-count		20
-opts+	-size		-500
-opts+	-username	' '
-opts+	-password	' '
-opts+	-info		"'I can't die but once.' -- Harriet Tubman"
+new-array opts
++opts	-planfont	'-*-dejavu sans-bold-r-normal-*-*-160-*-*-p-*-ascii-*'
++opts	-mode		clock
++opts	-count		20
++opts	-size		-500
++opts	-username	' '
++opts	-password	' '
++opts	-info		"'I can't die but once.' -- Harriet Tubman"
 
 xlock "${opts[@]}" &
 xlock_pid=$!

@@ -90,8 +90,9 @@ function posint { #{{{2
 		die "^U$1^u MUST be a positive decimal integer."
 	eval "$1=$2"
 } # }}}2
+NEXT_IDS_ID=0
 function add-id { #{{{2
-	ids[${#ids[*]}]="$1: $2"
+	ids[NEXT_IDS_ID++]="$1: $2"
 	infoIsSet=true
 } #}}}2
 function add-custom-id { #{{{2
@@ -179,13 +180,13 @@ function add-random-char { #{{{1
 	while :; do
 		random -e $1
 		n=$?
-		[[ -n ${rstr[n]} ]]&& continue
+		[[ -n ${rstr[n]:-} ]]&& continue
 		rstr[n]="$R"
 		break
 	done
 } #}}}1
 
-set -A results --
+new-array results
 integer range=$((maxLen-minLen)) thisLen=0
 while ((count--)); do
 	set -A rstr --
@@ -196,12 +197,14 @@ while ((count--)); do
 	$requireUC	&& add-random-char $thisLen "$upper"
 	$requireLC	&& add-random-char $thisLen "$lower"
 	for i in $(jot $thisLen 0); do
-		[[ -n ${rstr[i]} ]]&& continue
+		[[ -n ${rstr[i]:-} ]]&& continue
 		random-char "$allowed"
 		rstr[i]="$R"
 	done
-	results[${#results[*]}]="$(printf '%s' "${rstr[@]}")"
+	+results "$(printf '%s' "${rstr[@]}")"
 done
+
+results-not-empty || die 'Weirdly, ^S$results^b is empty.'
 
 if $quiet; then
 	printf "%s\n" "${results[@]}"

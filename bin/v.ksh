@@ -2,7 +2,7 @@
 # @(#)[:GpEYZa*c{{hMx~)jN6Sk: 2017/08/02 18:23:45 tw@csongor.lan]
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
 
-: ${FPATH:?Run from KSH}
+set -o nounset;: ${FPATH:?Run from KSH}
 
 [[ -n $LOCALBIN ]] || die '^S$LOCALBIN^s is not set.'
 [[ -d $LOCALBIN ]] || die '^S$LOCALBIN^s is not a directory.'
@@ -58,9 +58,11 @@ function safe-to-edit-nvim { #{{{1
 	local swaps s p d w
 	set -A reply --
 	needs ls-nvim-swaps
+	new-array swaps
 	splitstr NL "$(ls-nvim-swaps "$1")" swaps
-	if ((${#swaps[*]})); then
-		reply[0]="Swap files found:"
+	if swaps-not-empty; then
+		reply_next_id=0
+		reply[reply_next_id++]="Swap files found:"
 		for s in "${swaps[@]}"; do
 			d=''
 			w=''
@@ -77,7 +79,7 @@ function safe-to-edit-nvim { #{{{1
 			else
 				p=''
 			fi
-			reply[${#reply[*]}]="$s p^S$p^s d^B$d^b"
+			reply[reply_next_id]="$s p^S$p^s d^B$d^b"
 		done
 		return 1
 	else

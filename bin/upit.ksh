@@ -4,14 +4,16 @@
 
 set -o nounset;: ${FPATH:?Run from within KSH}
 
+new-array name dotf exec cmds haz
+
 function @ { # {{{1
 	local NAME="$1 ($3)" DOTF="$2" EXEC="$3"; shift 3
-	name[${#name[*]}]="$NAME"
-	dotf[${#dotf[*]}]="$DOTF"
-	exec[${#exec[*]}]="$EXEC"
-	cmds[${#cmds[*]}]="$*"
+	+name "$NAME"
+	+dotf "$DOTF"
+	+exec "$EXEC"
+	+cmds "$*"
 	/usr/bin/which "$EXEC" >/dev/null 2>&1 || return
-	haz[${#haz[*]}]="$NAME"
+	+haz "$NAME"
 } # }}}1
 #   name          dotf          exec      SUBCOMMANDS (cmds)
 @   Git           .git          git       pull
@@ -65,6 +67,7 @@ shift $(($OPTIND - 1))
 # /options }}}1
 (($#))&& die 'Too many arguments. Exepected ^Bnone^b.'
 
+name-is-empty && die 'Impossibly, ^S$name^s is empty.'
 found=false
 integer i=${#name[*]}
 while ((i--)); do

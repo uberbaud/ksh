@@ -112,12 +112,14 @@ mark +inbox all -sequence oldhat 2>/dev/null
 notify 'Incorporating new mail'
 inc -nochangecur >/dev/null
 
+new-array groups
+
 function group {
 	mark +inbox -sequence x -delete all
 	x="$(pick +inbox -sequence x -sequence "$@")"; x="${x:-0}"; x="${x% *}"
 	mark +inbox -sequence x -delete oldhat
 	y="$(pick +inbox x -nolist)"; y="${y:-0}"; y="${y% *}"
-	set -A groups -- "${groups[@]}" "$1:" "new $y, total $x"
+	+groups "$1:" "new $y, total $x"
 	mark +inbox -sequence L -add "$1"
 } 2>/dev/null
 
@@ -128,6 +130,7 @@ group drgfly    --list-id 'users\.dragonflybsd\.org'
 scanseq='¬L'
 [[ -n "$(flist +inbox -sequence L -noshowzero)" ]]|| scanseq='all'
 scan +inbox $scanseq
-printf '                      %-9s %s\n' "${groups[@]}"
+groups-not-empty &&
+	printf '                      %-9s %s\n' "${groups[@]}"
 
 # Copyright (C) 2017 by Tom Davis <tom@greyshirt.net>.

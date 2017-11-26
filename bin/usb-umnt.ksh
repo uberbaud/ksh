@@ -53,18 +53,23 @@ function warnOrDie { #{{{1
 # affect running instances of the script.
 function main {
 	local awkpgm haves wants have want
+	new-array haves wants
+
 	awkpgm="$(cat)" <<-\
 	\==AWK==
 	NR==1			{next}
 	/\/dev\/sd0/	{next}
 					{sub(/^\/vol\//,"",$6);print $6}
 	==AWK==
-	set -A haves -- $(df -P|awk "$awkpgm")
-	set -A wants --
-	((${#haves[*]}+$#))|| exit 0
+	+haves $(df -P|awk "$awkpgm")
+	if haves-is-empty; then
+		(($#==1)) && die 'No such drive mounted.'
+		(($#)) && die 'No such drives mounted.'
+		exit 0
+	fi
 
 	if $do_all; then
-		set -A wants -- "${haves[@]}"
+		+wants "${haves[@]}"
 	elif (($#)); then	# use given
 		for want in "$@"; do
 			[[ -d $want ]]|| {
@@ -74,17 +79,20 @@ function main {
 			want="$(readlink -nf "$want")"
 			for have in "${haves[@]}"; do
 				[[ ${want#/vol/} == $have ]]|| continue 1
-				wants[${#wants[*]}]="$want"
+				+wants "$want"
 				continue 2
 			done
 			warn "^B$want^b is not a mount point(2)."
 		done
 	else				# do selected
 		sel-from-list -on "${haves[@]}"
-		for want in "${reply[@]}"; do
-			wants[${#wants[*]}]="${haves[want]}"
+		( set +u; ((${#reply[*]})); )|| die 'Nothing selected.'
+		integer want_id
+		for want_id in "${reply[@]}"; do
+			+wants "${haves[want_id]}"
 		done
 	fi
+	want-is-empty && return 1
 
 	for want in "${wants[@]}"; do
 		[[ $want == /* ]]|| want="/vol/$want"

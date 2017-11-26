@@ -42,24 +42,24 @@ needs curl display xrandr awk
 integer edgeOffset=20
 graph_url='http://forecast.weather.gov/meteograms/Plotter.php'
 
-function opts+ { for o; do opts[${#opts[*]}]="$o"; done; }
-opts+ lat='35.39'
-opts+ lon='-80.71'
-opts+ wfo='GSP'
-opts+ zcode='NCZ072'
-opts+ gset='18'
-opts+ gdiff='3'
-opts+ unit='0'
-opts+ tinfo='EY5'
-opts+ ahour='0'
-opts+ pcmd='11000111101110000000000000000000000000000000000000000000000'
-opts+ lg='en'
-opts+ indu='1!1!1!'
-opts+ dd=''
-opts+ bw=''
-opts+ hrspan='48'
-opts+ pqpfhr='6'
-opts+ psnwhr='6'
+new-array opts
++opts lat='35.39'
++opts lon='-80.71'
++opts wfo='GSP'
++opts zcode='NCZ072'
++opts gset='18'
++opts gdiff='3'
++opts unit='0'
++opts tinfo='EY5'
++opts ahour='0'
++opts pcmd='11000111101110000000000000000000000000000000000000000000000'
++opts lg='en'
++opts indu='1!1!1!'
++opts dd=''
++opts bw=''
++opts hrspan='48'
++opts pqpfhr='6'
++opts psnwhr='6'
 
 runPath=${XDG_DATA_HOME:?}/run/weather
 [[ -d $runPath ]]||

@@ -66,6 +66,10 @@ filepath="${filename%/*}"
 
 [[ -d $filepath ]]|| die "^B$filepath^b is not a directory."
 
+function as-root {
+	doas true || doas true || doas true || return 255
+	doas "$@"
+}
 
 function main {
 	holdbase="$HOME/hold/$(uname -r)/sys-files"
@@ -96,7 +100,7 @@ function main {
 		fgroup="$(stat -f'%Sg' "$filename")"
 		fperm="$(stat -f'%#Lp' "$filename")"
 		touch ./"$workfile"
-		[[ -r $filename ]]|| PREF=doas
+		[[ -r $filename ]]|| PREF=as-root
 		if [[ -s $filename ]]; then
 			$PREF cat $filename >$workfile
 		else
@@ -143,7 +147,7 @@ function main {
 		cat ./"$workfile" >"$filename"
 	else
 		set -- -p -F -o "$fowner" -g "$fgroup" -m $fperm -S
-		doas install "$@" ./"$workfile" "$filename"
+		as-root install "$@" ./"$workfile" "$filename"
 	fi
 }
 

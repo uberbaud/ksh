@@ -45,6 +45,7 @@ export FPATH=$KDOTDIR/functions
 export HISTCONTROL=ignoredups:ignorespace
 export HISTFILE=$KDOTDIR/history
 export HISTSIZE=8191
+export LD_LIBRARY_PATH=$xdgdata/c/lib
 export LOCALBIN=$xdgdata/bin
 export PERL5LIB=$xdgdata/perl5/twlib
 export RAKUDO_HOME=$xdgdata/rakudo

@@ -48,6 +48,8 @@ function warnOrDie { #{{{1
 i-can-haz-inet	|| die 'No internet' "$REPLY"
 cd ${KDOTDIR:?}	|| die 'Could not ^Tcd^t to ^S$KDOTDIR^s.'
 
+bin/update-help-completions.ksh
+
 alias FAIL='{ warn "FAILED"; exit 1; }'
 
 branch="$(git rev-parse --abbrev-ref HEAD 2>/dev/null)"

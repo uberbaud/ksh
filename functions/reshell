@@ -7,7 +7,7 @@
 function reshell {
 	needs getent readlink /usr/bin/env
 	local k keepvars s setenvs v x
-	set -A keepvars	FCEDIT HOME TERM			\
+	set -A keepvars	FCEDIT HOME TERM USER		\
 					DISPLAY WINDOWID WINDOWPATH	\
 					SSH_AGENT_PID SSH_AUTH_SOCK
 	s=$(getent shells $(which "$1"))

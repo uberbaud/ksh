@@ -1,12 +1,16 @@
 # @(#)[:uvS>DT2{l?2;*(+$y0)-: 2017-11-11 18:02:13 Z tw@csongor]
 # vim: ft=make nowrap
 
-TARGET  = completions.ksh
-OBJECTS = git_1 scp ssh rcctl_2
-DEPENDS = chflags kill_1 rcctl_1 xfontsel
-GIT_IGN = .gitignore
+TARGET      = completions.ksh
+# things make builds (don't git)
+OBJECTS     = git_1 help scp ssh rcctl_2
+# things hand crafted (git them)
+DEPENDS     = chflags kill_1 rcctl_1 xfontsel
+GIT_IGN     = .gitignore
 
 .poison empty OS_VER
+.poison empty KDOTDIR
+.poison empty XDG_CONFIG_HOME
 
 all: $(TARGET)
 
@@ -16,7 +20,7 @@ clean:
 
 $(TARGET): $(OBJECTS) $(DEPENDS)
 	@echo $@
-	@printf '# vim: ft=ksh ts=4 nowrap\n\n'   >$@
+	@printf '# vim: ft=ksh ts=4 nowrap\n\n'      >$@
 .for f in $(OBJECTS) $(DEPENDS)
 	@printf 'set -A complete_$f -- '             >>$@
 	@sort <$f >tmp.sort
@@ -38,6 +42,10 @@ git_1: $(GIT_CONFIG)
 	@: >$@
 	@git --help |awk '/^   [a-z]/ {print $$1}'>>$@
 	@awk $(GIT_ALIAS_PGM) $(GIT_CONFIG) >>$@
+
+HELP_UPBIN=$(KDOTDIR)/bin/update-help-completions.ksh
+help:
+	$(HELP_UPBIN)
 
 SSH_HOSTS=$(XDG_CONFIG_HOME)/ssh/known_hosts
 ssh: $(SSH_HOSTS)

@@ -360,3 +360,33 @@
        │ -G1 │ goto, expanded actions          │ C/D/C#/Go            │
        │ -G2 │ goto, in-place actions          │ C/D/Go               │
        └─────┴─────────────────────────────────┴──────────────────────┘
+
+^BVARIABLES RAGEL EXPECTS THE USER TO DECLARE^b
+
+    ^BAlways Used^b
+
+    ^Tcs^t      int: current state.
+    ^Tp^t       pointer to buffer to parse.
+    ^Tpe^t      pointer to char one past data in buffer to parse (p+strlen(p)).
+    ^Teof^t     pointer to ^SNULL^s (more blocks to process after this one),
+                or ^Spe^s (this is the last block to parse).
+
+    ^BSometimes Used^b
+
+    ^Tstack[]^t array of integers to hold states (use Pre-push (§5.6) and
+                Post-Pop (§5.7) statements to grow and shrink the array 
+                dynamically.
+    ^Ttop^t     int index into the ^Sstack^s.
+    ^Tact^t     int with data on most recent match.
+    ^Tts^t      pointer used with scanners^G†^g.
+    ^Tte^t      pointer used with scanners^G†^g.
+                  ^G†^g See §6.3 of the ^IRagel User Guide^i
+
+    ^BLanguages Without Pointers^b
+
+    For languages like ^IJava^i, ^IRuby^i, and ^IGo^i, an additional variable:
+
+    ^Tdata[]^t  buffer to be parsed
+
+    must be declared, and all pointers listed above are instead integer
+    indices into the buffer.

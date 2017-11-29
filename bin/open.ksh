@@ -89,7 +89,7 @@ function open-one-file { # {{{1
 		[[ -f $file ]]|| { warn "^B$REPLY^b: Not a file.";   return 1; }
 	fi
 
-	typeset -l F
+	typeset -l F="$file"
 	if $is_remote; then
 		REPLY='remote/web'
 	elif [[ $F == readme.m@(d|arkdown) ]]; then
@@ -104,14 +104,14 @@ function open-one-file { # {{{1
 		get-filetype-from-ext "${F%%*.}"
 	fi
 
-	if [[ -n $REPLY ]]; then
+	if [[ -n ${REPLY:-} ]]; then
 		filetype="$REPLY"
 	else
 		filetype="$(file -bi "$file")"
 	fi
 
 	get-handler-for-filetype "$filetype"
-	if [[ -n $REPLY ]]; then
+	if [[ -n ${REPLY:-} ]]; then
 		filehandler="$REPLY"
 	else
 		warn "No handler for ^B$filetype^b."

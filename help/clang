@@ -1,0 +1,18 @@
+^BClang cheatsheet^b
+
+^BPRAGMAS^b
+
+    ^BIgnore Particular Warnings^b
+    ^S#pragma clang diagnostic push^s
+    ^S#pragma clang diagnostic ignored "-W^Uunreachable-code^u"^s
+    …
+    ^S#pragma clang diagnostic pop^s
+
+    ^BIgnore warnings for particular variables^b
+    ^S#pragma unused (^Uvar1^u,...,^UvarN^u)^s
+
+    ^BFrom the command line^b
+    ^T-Q^Uwarning-name^u^t  ^G# excluding the -W bit^g
+
+
+

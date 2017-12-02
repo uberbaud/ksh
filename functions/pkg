@@ -17,15 +17,15 @@
 #:   Shows the html information page using ^Bw3m^b.
 
 function pkg {
-	needs doas cat die
+	needs cat die
 	(($#))|| set help
 	typeset osv="$(uname -r)" record=false cmd="$1"; shift
 	typeset bin=/usr/sbin/pkg_$cmd
 	typeset pkghome=$HOME/.local/pkg-info/v$osv
 	case $cmd in
-		add)		doas $bin -i "$@"; record=true;						;;
-		check)		doas $bin "$@";										;;
-		delete)		doas $bin "$@"; record=true;						;;
+		add)		as-root $bin -i "$@"; record=true;					;;
+		check)		as-root $bin "$@";									;;
+		delete)		as-root $bin "$@"; record=true;						;;
 		install)	die 'Did you mean ^Tadd^t or ^Tinstall^Ued^u^t?';	;;
 		installed)	/usr/sbin/pkg_info -mz;								;;
 		web|www)

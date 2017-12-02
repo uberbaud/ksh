@@ -1,0 +1,13 @@
+# @(#)[:*@@Y3kZ|~7FKqL4~}9pw: 2017-12-01 23:53:59 Z tw@csongor]
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Ucmd^u ^Uarg1^u ^S…^s ^UargN^u
+#:   Run doas, but more forgivingly
+
+needs doas
+function as-root {
+	doas true || doas true || doas true || die 'Bad credentials'
+	doas "$@"
+}
+
+# Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

@@ -54,8 +54,7 @@ export RAKUDO_BIN=$RAKUDO_HOME/install/bin
 export TEMPLATES_FOLDER=$xdgdata/templates
 export TMPDIR=$xdgdata/temp
 export USRBIN=$HOME/bin/ksh
-export USRLIB=$xdgdata/lib
-export USR_CLIB=$xdgdata/lib/c
+export USR_CLIB=$xdgdata/c/lib
 export PERL_UNICODE=AS
 export USR_PLIB=$PERL5LIB
 

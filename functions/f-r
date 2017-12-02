@@ -8,13 +8,6 @@
 function f-r {
 	typeset readme=''
 	if (($#)); then
-		[[ $1 == '-h' ]]&& {
-			sparkle <<----
-				   ^F{4}Usage^f: ^Tr^t ^[^T-h^t^|^Ufile^u^] 
-				       Reads ^Ufile^ or a readme in the current directory.
-				---
-			return 0
-		  }
 		readme="$1"
 	else
 		set -- [Rr][Ee][Aa][Dd]+([Mm][Ee]){.[Mm]{[Dd],arkdown},}*
@@ -23,8 +16,7 @@ function f-r {
 		done
 		[[ -n "$readme" ]]|| die 'No README found.'
 	fi
-	nvim -MR "$readme"
+	nvim -MR +'set nolist norelativenumber nonumber colorcolumn=' "$readme"
 }
-
 
 # Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

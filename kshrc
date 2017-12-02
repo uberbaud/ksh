@@ -155,5 +155,10 @@ for s in $(getent shells); do
 done
 unset s
 
-make OS_VER="$(uname -r)" -C $KDOTDIR/completions|column
+KCOMPLETE=$KDOTDIR/completions
+make OS_VER="$(uname -r)" -C $KCOMPLETE >$KCOMPLETE/make.out
+[[ -s $KCOMPLETE/make.out ]]|| {
+	notify 'Recompiled completion modules:'
+	column -c $((COLUMNS-8)) $KCOMPLETE/make.out|expand|sed -e 's/^/    /'
+  }
 . $KDOTDIR/completions/completions.ksh

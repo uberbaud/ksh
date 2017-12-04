@@ -34,16 +34,39 @@ if [[ -d ${XDG_CONFIG_HOME:-~/.config} ]]; then
 		F=$K/functions
 		B=$K/bin
 	fi
+else
+	XDG_CONFIG_HOME=$HOME/.config
+	XDG_DATA_HOME=$HOME/.local
+	XDG_CACHE_HOME=$HOME/.local/cache
+
+	mkdir -p $XDG_CONFIG_HOME	>/dev/null 2>&1
+	mkdir -p $XDG_DATA_HOME		>/dev/null 2>&1
+	mkdir -p $XDG_CACHE_HOME	>/dev/null 2>&1
 fi
 xdgdata=$XDG_DATA_HOME
 xdgcfg=$XDG_CONFIG_HOME
 xdgcache=$XDG_CACHE_HOME
 
+# special history file stuff
+KHIST=$KDOTDIR/history
+histcache=$xdgcache/history
+[[ -d $histcache ]]|| mkdir -p $histcache
+fhist=$(mktemp $histcache/ksh-hist.XXXXXXXXXXXX)
+if (($?)); then
+	print '  \033[38;5;172mwarning\033[0m: Using common history.'
+	fhist=$KHIST
+else
+	histmark="# OLDHISTORY $(date -u +'%Y-%m-%d %H:%M:%S Z')"
+	trap "awk '/^$histmark\$/{p=1;next}p' $fhist>>$KHIST && rm $fhist" EXIT
+	tail -n 127 $KHIST>$fhist
+	print "$histmark" >>$fhist
+fi
+
 # paths
 export me=$HOME/work/clients/me
 export FPATH=$KDOTDIR/functions
 export HISTCONTROL=ignoredups:ignorespace
-export HISTFILE=$KDOTDIR/history
+export HISTFILE=$fhist
 export HISTSIZE=8191
 export LD_LIBRARY_PATH=$xdgdata/c/lib
 export LOCALBIN=$xdgdata/bin

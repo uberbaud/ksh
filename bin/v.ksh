@@ -139,7 +139,7 @@ typeset hasmsg=false rcsmsg=''
 typeset -- f_path=${f_fullpath%/*}
 typeset -- f_name=${f_fullpath##*/}
 
-cd $f_path || die "Could not ^Tcd^t to ^B${f_path}^b."
+cd "$f_path" || die "Could not ^Tcd^t to ^B${f_path}^b."
 
 typeset -- has_rcs=false
 [[ -d RCS && -f RCS/$f_name,v ]] && {

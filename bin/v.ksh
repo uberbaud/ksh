@@ -104,7 +104,7 @@ function main {
 
 typeset -- f_fullpath errmsg
 if [[ -a $1 ]]; then
-	f_fullpath="$( readlink -fn -- $1 )"
+	f_fullpath="$( readlink -fn -- "$1")"
 	errmsg='Could not follow link.'
 elif [[ $1 == =* ]]; then
 	f_fullpath="$(command -v "${1#=}")"

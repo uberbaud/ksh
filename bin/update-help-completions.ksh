@@ -54,7 +54,10 @@ printf "%s\n" $KDOTDIR/help/* $KDOTDIR/functions/*	\
 	| uniq											\
 	> $TEMPF
 
-cmp -s $HELPF $TEMPF || cat $TEMPF >$HELPF
+cmp -s $HELPF $TEMPF || { 
+	cat $TEMPF >$HELPF
+	print help # for Makefile output
+  }
 
 rm $TEMPF
 

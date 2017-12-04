@@ -19,7 +19,6 @@ clean:
 	rm -f $(OBJECTS)
 
 $(TARGET): $(OBJECTS) $(DEPENDS)
-	@echo $@
 	@printf '# vim: ft=ksh ts=4 nowrap\n\n'      >$@
 .for f in $(OBJECTS) $(DEPENDS)
 	@printf 'set -A complete_$f -- '             >>$@

@@ -5,7 +5,11 @@
 #:   Place a Mark in the history
 
 function mark {
-
+	integer i
+	LASTHISTMARK="# MARK $(now) $*"
+	print -s "$LASTMARK"
+	i=$(set +u; print ${#HISTMARKS[*]})
+	HISTMARKS[i]="$LASTHISTMARK"
 }
 
 # Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

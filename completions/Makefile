@@ -29,8 +29,9 @@ $(TARGET): $(OBJECTS) $(DEPENDS)
 	@printf '\n'                                 >>$@
 	@rm tmp.sort tmp.tr
 .endfor
-	@echo '.*'  >$(GIT_IGN)
-	@echo $@   >>$(GIT_IGN)
+	@echo '.*'       >$(GIT_IGN)
+	@echo $@        >>$(GIT_IGN)
+	@echo make.out  >>$(GIT_IGN)
 .for f in $(OBJECTS)
 	@echo $f   >>$(GIT_IGN)
 .endfor
@@ -45,6 +46,7 @@ git_1: $(GIT_CONFIG)
 
 HELP_UPBIN=$(KDOTDIR)/bin/update-help-completions.ksh
 help:
+	@echo $@
 	$(HELP_UPBIN)
 
 SSH_HOSTS=$(XDG_CONFIG_HOME)/ssh/known_hosts

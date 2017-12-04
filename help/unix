@@ -1,0 +1,63 @@
+^BUNIX standard utilties^b
+
+    ^Bexpand^b
+        Converts tabs to spaces.
+
+    ^Bunexpand^b
+        Converts spaces to tabs.
+
+    ^Bcol -b^b
+        Filters out backspaces keeping last character in a space. (deman)
+
+    ^Bcomm^b
+        Determines unique to, and common lines in two files.
+
+    ^Bfuser^b
+        Identify processes holding particular file(s) open.
+
+    ^Bgetconf^b
+        Get system limits (^T-L^t and ^T-l^t to list availble keys).
+
+
+
+fold
+fmt
+indent
+apply
+colrm
+csplit
+getent
+join
+jot
+lam
+lndir
+logger
+logname
+look
+merge
+nl
+od
+pagesize
+paste
+prove
+rdist
+rev
+rs
+sdiff
+shar
+signify
+split
+tsort
+ul
+units
+unvis
+vis
+
+binutils, ar, nm, ranlib
+rpcgen,rpcinfo
+usbhidaction,usbhidctl
+
+cpio
+expr
+pax
+

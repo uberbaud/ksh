@@ -44,6 +44,8 @@ work=${XDG_CACHE_HOME:?}/mail
 cd "$work" || die "Could not ^Tcd^t to ^S$work^s."
 printf 'In \e[35m$XDG_CACHE_HOME/mail\e[39m\n'
 
+new-array parts
+
 touch mark-$$
 mhstore "$@"
 for f in *; do
@@ -57,10 +59,10 @@ for f in *; do
 		H="${f%.*}.html"
 		mv "$f" "$H" && f="$H"
 	fi
-	set -A new -- "${new[@]}" "$f"
+	+parts "$f"
 done
 rm mark-$$
 
-open "${new[@]}"
+open "${parts[@]}"
 
 # Copyright (C) 2017 by Tom Davis <tom@greyshirt.net>.

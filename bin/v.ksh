@@ -159,18 +159,19 @@ typeset -- has_rcs=false
 nvim "$f_fullpath"
 
 trackfile "$f_fullpath"
+new-array rcsopts
 
 if [[ -d RCS ]]; then
 	# use an array so expansion will work without weird quoting issues
-	set -A rcsopts -- -q -u
+	+rcsopts -q -u
 	if $has_rcs; then
-		$hasmsg && set -A rcsopts -- "${rcsopts[@]}" -m"$rcsmsg"
+		$hasmsg && +rcsopts -m"$rcsmsg"
 		rcsdiff -q ./$f_name
 		ci "${rcsopts[@]}" -j ./$f_name
 	else
 		# without the dash at the beginning of rcsmsg, the message would 
 		# be taken from a file named in $rcsmsg
-		$hasmsg && set -A rcsopts -- "${rcsopts[@]}" -t-"$rcsmsg"
+		$hasmsg && +rcsopts -t-"$rcsmsg"
 		ci "${rcsopts[@]}" -i ./$f_name
 	fi
 elif $hasmsg; then

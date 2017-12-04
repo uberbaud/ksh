@@ -7,7 +7,7 @@
 function p {
 	cd ~/play
 	(($#))|| return 0 # no directory given so we're done
-	((1<$#))&& {
+	(($#>1))&& {
 		sparkle >&2 <<-\
 		==SPARKLE==
 		  ^F{4}usage^f ^F{2}p^f ^Udir^u
@@ -20,19 +20,25 @@ function p {
 
 	local choice='-'
 	if ((${#possibles[*]}>1)); then
+		local inthere=false
+		for p in "${possibles[@]}"; do
+			[[ $p == $1 ]]|| continue
+			inthere=true
+			break
+		done
+		$inthere || set -A possibles -- "<$1>" "${possibles[@]}"
 		choice="$( umenu "${possibles[@]}" )"
 	elif [[ $possibles == "*$1*" ]]; then
 		choice="$(umenu "<$1>" *)"
-		[[ $choice == "<$1>" ]]&&
-			choice="$1"
 	else
 		choice="${possibles[0]}"
 	fi
+	[[ $choice == "<$1>" ]]&& choice="$1"
 
 	[[ -n $choice ]]|| return
 	[[ -d $choice ]]|| mkdir -p "$choice"
 
-	cd $choice
+	cd "$choice"
 }
 
 

@@ -156,9 +156,11 @@ done
 unset s
 
 KCOMPLETE=$KDOTDIR/completions
+makeout=$KCOMPLETE/make.out
 make OS_VER="$(uname -r)" -C $KCOMPLETE >$KCOMPLETE/make.out
-[[ -s $KCOMPLETE/make.out ]]|| {
+[[ -s $makeout ]]&& {
 	notify 'Recompiled completion modules:'
-	column -c $((COLUMNS-8)) $KCOMPLETE/make.out|expand|sed -e 's/^/    /'
+	column -c $((COLUMNS-8)) $makeout|expand|sed -e 's/^/    /'
   }
+rm $makeout
 . $KDOTDIR/completions/completions.ksh

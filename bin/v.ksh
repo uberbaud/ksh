@@ -124,7 +124,7 @@ fi
 [[ -n $f_fullpath ]]||	die "$errmsg"
 [[ -f $f_fullpath ]]||	die "^B$1^b is ^Bnot^b a file."
 [[ $f_fullpath == *,v ]]&& warnOrDie "Seems to be an ^BRCS archive^b file."
-typeset -- ftype="$( /usr/bin/file -b $f_fullpath )"
+typeset -- ftype="$( /usr/bin/file -b "$f_fullpath")"
 [[ $ftype == *text* || $ftype == *XML* ]]||
 						warnOrDie "Does not seem to be a text file."
 shift
@@ -136,17 +136,17 @@ typeset hasmsg=false rcsmsg=''
 
 # because we've `readlink`ed the arg, it's guaranteed to have at least 
 # one (1) forward slash ('/') as (and at) the root.
-typeset -- f_path=${f_fullpath%/*}
-typeset -- f_name=${f_fullpath##*/}
+typeset -- f_path="${f_fullpath%/*}"
+typeset -- f_name="${f_fullpath##*/}"
 
 cd "$f_path" || die "Could not ^Tcd^t to ^B${f_path}^b."
 
 typeset -- has_rcs=false
-[[ -d RCS && -f RCS/$f_name,v ]] && {
+[[ -d RCS && -f RCS/"$f_name,v" ]] && {
 	has_rcs=true
-	rcsdiff -q ./$f_name ||
+	rcsdiff -q ./"$f_name" ||
 		die 'RCS and checked out versions differ.'
-	co -q -l ./$f_name ||
+	co -q -l ./"$f_name" ||
 		die "Could not ^Tco -l^t ^B${f_name}^b."
   }
 
@@ -166,13 +166,13 @@ if [[ -d RCS ]]; then
 	+rcsopts -q -u
 	if $has_rcs; then
 		$hasmsg && +rcsopts -m"$rcsmsg"
-		rcsdiff -q ./$f_name
-		ci "${rcsopts[@]}" -j ./$f_name
+		rcsdiff -q ./"$f_name"
+		ci "${rcsopts[@]}" -j ./"$f_name"
 	else
 		# without the dash at the beginning of rcsmsg, the message would 
 		# be taken from a file named in $rcsmsg
 		$hasmsg && +rcsopts -t-"$rcsmsg"
-		ci "${rcsopts[@]}" -i ./$f_name
+		ci "${rcsopts[@]}" -i ./"$f_name"
 	fi
 elif $hasmsg; then
 	warn 'No ^SRCS/^s.'

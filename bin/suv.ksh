@@ -45,6 +45,11 @@ function warnOrDie { #{{{1
 					'warnOrDie is [1m${warnOrDie}[22m.';		;;
 	esac
 } # }}}1
+function as-root { # {{{1
+	doas true || doas true || doas true || return 255
+	doas "$@"
+} # }}}1
+
 
 (($#))|| die 'Missing required argument ^Ufile^u.'
 needs ci co ${VISUAL:-${EDITOR:?Neither VISUAL nor EDITOR variable is set}}
@@ -53,23 +58,24 @@ CI_INITIAL_DESCRIPTION='OpenBSD system file'
 
 desparkle "$1"
 filenameD="$REPLY"
-filename="$(readlink -fn "$1")"; shift
-[[ -n $filename ]]|| die "Invalid file name ^B$filenameD^b."
-[[ -a $filename ]]&& {
-	[[ -f $filename ]]|| die "^B$filenameD^b is not a file."
+file_or_error="$(readlink -fn "$1" 2>&1)"
+[[ $file_or_error == 'readlink: '*': Permission denied' ]]&& {
+	: here is where we do **doas $K/suvX.ksh**
+  }
+[[ $file_or_error == readlink:* ]]&& {
+	errmsg="${file_or_error##readlink: *: }"
+	die "$errmsg: ^B$filenameD^b."
+  }
+[[ -a $file_or_error ]]&& {
+	[[ -f $file_or_error ]]|| die "^B$filenameD^b is not a file."
   }
 
+shift
+filename="$file_or_error"
 filepath="${filename%/*}"
 [[ $filepath == $HOME* ]] &&
 	die "^T$PGM^t only works outside of ^S\$HOME^s." \
 		"Instead, use ^T:W^t inside ^Tvim^t (^Tv^t or ^Tnew^t)."
-
-[[ -d $filepath ]]|| die "^B$filepath^b is not a directory."
-
-function as-root {
-	doas true || doas true || doas true || return 255
-	doas "$@"
-}
 
 function main {
 	holdbase="$HOME/hold/$(uname -r)/sys-files"

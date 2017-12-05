@@ -13,7 +13,7 @@ function xscan {
 		set -- +inbox $scanseq
 	  }
 
-	(set -o nohup; scan "$@"| Xdialog "${O[@]}") &
+	(set -o nohup; scan "$@"| Xdialog "${O[@]}" &)
 }
 
 # Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

@@ -2,9 +2,11 @@
 # @(#)[:TpT~W!fOPp~o^JMNTd&8: 2017-08-08 19:26:18 Z tw@csongor]
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
 
+set -A RHOSTS -- uberbaud.net yt.lan
+
+
 set -o nounset;: ${FPATH:?Run from within KSH}
 : ${KDOTDIR:?}
-
 # Usage {{{1
 typeset -- this_pgm="${0##*/}"
 function usage {
@@ -37,12 +39,22 @@ shift $(($OPTIND - 1))
 # ready to process non '-' prefixed arguments
 # /options }}}1
 
-notify "Updating ^SDOCSTORE^s"
-$KDOTDIR/bin/savetracks.ksh
+KB=$KDOTDIR/bin/
+docstore=$HOME/hold/DOCSTORE
+[[ -a $docstore ]]|| die "^B$docstore^b does not exist."
+[[ -d $docstore ]]|| die "^B$docstore^b is not a directory."
+cd "$docstore" || die "Could not ^Tcd^t to ^B$docstore^b."
 
-notify "Syncing with ^Buberbaud.net^b."
-cd "$docstore"
-$KDOTDIR/bin/synrdir.ksh uberbaud.net:"$PWD" "$PWD"
+function main {
+	notify "Updating ^SDOCSTORE^s"
+	$KB/savetracks.ksh
 
+	for H in "${RHOSTS[@]}"; do
+		notify "Syncing with ^B$H^b."
+		$KB/synrdir.ksh $H:"$PWD" "$PWD"
+	done
+}
+
+main "$@"; exit
 
 # Copyright (C) 2017 by Tom Davis <tom@greyshirt.net>.

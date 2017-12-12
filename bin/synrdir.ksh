@@ -8,14 +8,21 @@ set -o nounset; : ${KSH_VERSION:?Run from with KSH}
 full_pgm_path="$(readlink -nf "$0")"
 : ${full_pgm_path:?}
 this_pgm="${0##*/}"
+LOGLEVELS='^Bnone^b, ^Bnormal^b, or ^Ball^b.'
 function usage {
 	desparkle "$this_pgm"
 	PGM="$REPLY"
-	sparkle <<-\
+	sparkle >&2 <<-\
 	===SPARKLE===
-	^F{4}Usage^f: ^T${PGM}^t ^[^Uuser^u^T@^t^]^Uhost^u^T:^t^Uremote dir^u ^Ulocal dir^u
+	^F{4}Usage^f: ^T${PGM}^t ^[-L ^Uloglevel^u^] ^[^Uuser^u^T@^t^]^Uhost^u^T:^t^Uremote dir^u ^Ulocal dir^u
 	         Sync two directories over ssh
 	           ^Ulocal dir^u defaults to \$PWD
+	         ^T-L^t ^Uloglevel^u
+	             Where loglevel is one of
+	               ^Bnone^b (no output),
+	               ^Bnormal^b (show ^Igetting^i and ^Iputting^i files, or
+	               ^Ball^b (show pretty much the whole convo).
+	             The default is ^Inormal^i
 	       ^T${PGM} -R^t ^Uotherhost^u
 	         Start as the remote
 	           ^BNever call this directly.^b The local version does this.
@@ -31,18 +38,35 @@ function bad_programmer {	# {{{2
   };	# }}}2
 i_am_the_local=true
 i_am_the_remote=false
-while getopts ':hR:' Option; do
+integer LOGNONE=-1 LOGNORM=0 LOGDBUG=1
+VERBOSITY_LEVEL=$LOGNORM
+while getopts ':hR:L:' Option; do
 	case $Option in
 		R)	LOGFILE="$HOME/log/synrdir-$OPTARG"
 			i_am_the_local=false
 			i_am_the_remote=true
 			;;
-		h)	usage;													;;
+		L)
+			case $OPTARG in
+				none)	VERBOSITY_LEVEL=$LOGNONE;	;;
+				normal)	VERBOSITY_LEVEL=$LOGNORM;	;;
+				all)	VERBOSITY_LEVEL=$LOGDBUG;	;;
+				*)	die "Bad ^Ulog level^u, expected one of $LOGLEVELS"; ;;
+			esac
+			;;
+		h)	usage;												;;
 		\?)	die "Invalid option: ^B-$OPTARG^b.";				;;
 		\:)	die "Option ^B-$OPTARG^b requires an argument.";	;;
-		*)	bad_programmer "$Option";								;;
+		*)	bad_programmer "$Option";							;;
 	esac
 done
+case $VERBOSITY_LEVEL in
+	$LOGNONE) LOG_PRINTER=:;				;;
+	$LOGNORM) LOG_PRINTER=l-log-normal;		;;
+	$LOGDBUG) LOG_PRINTER=l-log-all;		;;
+	*)	die "Unexpectedly impossible VERBOSITY_LEVEL: $VERBOSITY_LEVEL"
+		;;
+esac
 # remove already processed arguments
 shift $(($OPTIND - 1))
 # ready to process non '-' prefixed arguments
@@ -53,26 +77,37 @@ CKSUM="$(cksum -qa sha384b "$MYNAME")"
 DIR_IS_SET=false
 
 tmfmt='%Y-%m-%dT%H:%M:%S%z'
-statfmt='%m %Op %z'
+statfmt='%m %Op %z %Df'
+statvars='modtm perm size flags'
 
-alias fail='{ r-reply fail; return 1; }'
-alias okay='{ r-reply okay; return 0; }'
+alias r-fail='{ r-reply fail; return 1; }'
+alias r-okay='{ r-reply okay; return 0; }'
 alias require_dir_be_set='$DIR_IS_SET || { r-reply dirunset; return 1; }'
-alias l-log='notify'
+alias l-log="$LOG_PRINTER"
+
+function l-log-normal { # {{{1
+	(($1>$VERBOSITY_LEVEL))&& return
+	shift
+	print "  $*"
+} # }}}1
+function l-log-all { # {{{1
+	shift
+	notify "$@"
+} # }}}1
 function r-log { # {{{1
 	typeset -L12 REQ="$1"
 	print -u3 "$REQ: $2"
 } # }}}1
 function l-request { #{{{1
-	l-log "request: ^[$*^]"
+	l-log $LOGDBUG "request: ^[$*^]"
 	print -pr -- "$@"
 } # }}}1
 function l-reply-is { # {{{1
 	local expected="$1"; shift
 	[[ ${1:-} == WITH-VARS ]]&& shift
 	read -pr status "$@"
-	l-log "got: $status, expected: $expected"
-	[[ $status == $expected ]]
+	l-log $LOGDBUG "got: $status, expected: $expected"
+	[[ $expected == ANY || $status == $expected ]]
 } # }}}1
 function r-reply { # {{{1
 	r-log reply "$*"
@@ -83,60 +118,76 @@ function r-request-is { # {{{1
 	[[ ${1:-} == WITH-VARS ]]&& shift
 	read -r request "$@"
 	r-log request "got: $request, expected: $expected"
-	[[ $request == $expected ]]
+	[[ $expected == ANY || $request == $expected ]]
 } # }}}1
+function fflags-to-flagstr {
+	((0xffff0000&$1))&& warn 'system flags not settable.'
+	((0x0000fff0&$1))&& warn 'unsettable or unknown flags.'
+	case $((0x000f&$1)) in
+		0)	flagstr='';					;;
+		1)	flagstr=nodump;				;;
+		2)	flagstr=uchg;				;;
+		3)	flagstr=nodump,uchg;		;;
+		4)	flagstr=uappnd;				;;
+		5)	flagstr=nodump,uappnd;		;;
+		6)	flagstr=uchg,uappnd;		;;
+		7)	flagstr=nodump,uchg,uappnd;	;;
+	esac
+}
 function l-getfile { # {{{1
 	l-request i-wantfile "$1"
-	local status modtm perm size
-	l-reply-is sending WITH-VARS modtm perm size && {
+	local status $statvars flagstr
+	l-reply-is sending WITH-VARS $statvars && {
 		dd of="$1" count=$size bs=1 status=none <&p
 		touch -md "$(date -ur $modtm +'%Y-%m-%dT%H:%M:%SZ')" "./$1" 
 		chmod ${perm#??} "./$1"
-		chflags uchg "./$1"
+		fflags-to-flagstr $flags
+		chflags $flagstr "./$1"
 		l-reply-is okay || return 1
 		return 0
 	}
 } # }}}1
 function r-pushfile { # {{{1
 	require_dir_be_set
-	set -A statfo $(stat -qf "$statfmt" -- "$1") || fail
+	set -A statfo $(stat -qf "$statfmt" -- "$1") || r-fail
 	r-reply sending "${statfo[@]}"
 	dd if="$1" count="${statfo[2]}" bs=1 status=none
-	okay
+	r-okay
 } # }}}1
 function r-setdir { # {{{1
-	cd "$1" || fail
+	cd "$1" || r-fail
 	DIR_IS_SET=true
-	okay
+	r-okay
 } # }}}1
 function l-putfile { # {{{1
-	print -p u-wantfile "$1"
-	l-reply-is okay || quit
-	set -A statfo $(stat -qf "$statfmt" -- "$1") || quit
-	print -p sending "${statfo[@]}"
-	l-reply-is go || quit
+	l-request u-wantfile "$1"
+	l-reply-is okay || l-quit
+	set -A statfo $(stat -qf "$statfmt" -- "$1") || l-quit
+	l-request sending "${statfo[@]}"
+	l-reply-is go || l-quit
 	dd if="$1" count="${statfo[2]}" bs=1 status=none >&p
-	print -p done
-	read -pr status
+	l-request done
+	l-reply-is okay
 } #}}}1
 function r-pullfile { # {{{1
 	require_dir_be_set
 	r-reply okay
-	local status modtm perm size
-	r-request-is sending WITH-VARS modtm perm size && {
+	local status $statvars
+	r-request-is sending WITH-VARS $statvars && {
 		r-reply go
 		dd of="$1" count=$size bs=1 status=none
 		touch -md "$(date -ur $modtm +'%Y-%m-%dT%H:%M:%SZ')" "./$1"
 		chmod ${perm#??} "./$1"
-		chflags uchg "./$1"
-		r-request-is done || fail
-		okay
+		fflags-to-flagstr $flags
+		chflags $flagstr "./$1"
+		r-request-is done || r-fail
+		r-okay
 	  }
-	fail
+	r-fail
 } # }}}1
 function r-listfiles { # {{{1
 	require_dir_be_set
-	local i=0 filelist
+	local i=0 filelist F
 	for f in *; do
 		[[ $f == r.log ]]&& continue
 		[[ -h $f ]]&& continue
@@ -146,8 +197,8 @@ function r-listfiles { # {{{1
 	done
 	((i))|| { r-reply 'empty'; return 0; }
 	r-reply listing $i files
-	printf '%s\n' "${filelist[@]}"
-	okay
+	for F in "${filelist[@]}"; { print "$F"; }
+	r-okay
 } # }}}1
 function l-quit { # {{{1
 	(($?))&& notify "remote status: $status"
@@ -165,11 +216,11 @@ function l-cleanup { # {{{1
 function fileagent { # {{{1
 	ssh-add -l >/dev/null || {
 		# hide cursor, plus
-		printf '\e[s ==> Gather passphrase\n'
+		print '\033[s ==> Gather passphrase'
 		# force an x-window
 		ssh-add < /dev/null
 		# restore cursor and blank intermediate
-		printf '\e[u\e[K\e[0J'
+		print -n '\033[u\033[K\033[0J'
 	  }
 	ssh-add -l >/dev/null || die 'Bad passphrase or such.'
 	ssh "$1" "bin/$this_pgm -R '$HOSTNAME'" |&
@@ -180,7 +231,7 @@ $i_am_the_remote && { # {{{1
 	r-request-is hello || exit 1
 	r-reply ready
 
-	r-request-is cksum || fail
+	r-request-is cksum || r-fail
 	r-reply cksum "$CKSUM"
 
 	while read -r cmd arglist; do
@@ -241,13 +292,14 @@ $i_am_the_local && { # {{{1
 	l-reply-is okay || l-quit
 
 	l-request listfiles
-	if l-reply-is empty WITH-VARS filecount files; then
+	l-reply-is ANY WITH-VARS filecount files
+	if [[ $status == empty ]]; then
 		: >"$rlst"
 	else
 		[[ $status == listing && $files == files ]]|| l-quit
 		while ((filecount--)); do
-			read -pr filename
-			print "$filename"
+			read -pr -- filename
+			print -- "$filename"
 		done | sort >$rlst
 		l-reply-is okay || l-quit
 	fi
@@ -257,14 +309,14 @@ $i_am_the_local && { # {{{1
 		[[ -h $f ]]&& continue
 		[[ -f $f ]]|| continue
 		[[ -s $f ]]|| continue
-		printf '%s\n' "$f"
+		print -- "$f"
 	done | sort >$llst
 
 	# get files on remote but missing on local
 	splitstr NL "$(comm -13 "$llst" "$rlst")" filequeue
 	if (set +u; ((${#filequeue[*]}))); then
 		for rf in "${filequeue[@]}"; do
-			print getting "<$rf>"
+			l-log $LOGNORM "getting <$rf>"
 			l-getfile "$rf" || l-quit
 		done
 	fi
@@ -273,7 +325,7 @@ $i_am_the_local && { # {{{1
 	splitstr NL "$(comm -23 "$llst" "$rlst")" filequeue
 	if (set +u; ((${#filequeue[*]}))); then
 		for lf in "${filequeue[@]}"; do
-			print putting "<$lf>"
+			l-log $LOGNORM "putting <$lf>"
 			l-putfile "$lf" || l-quit
 		done
 	fi

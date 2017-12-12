@@ -45,13 +45,15 @@ docstore=$HOME/hold/DOCSTORE
 [[ -d $docstore ]]|| die "^B$docstore^b is not a directory."
 cd "$docstore" || die "Could not ^Tcd^t to ^B$docstore^b."
 
+synropt="${LOGLEVEL:+"-L $LOGLEVEL"}"
+
 function main {
 	notify "Updating ^SDOCSTORE^s"
 	$KB/savetracks.ksh
 
 	for H in "${RHOSTS[@]}"; do
 		notify "Syncing with ^B$H^b."
-		$KB/synrdir.ksh $H:"$PWD" "$PWD"
+		$KB/synrdir.ksh $synropt $H:"$PWD" "$PWD"
 	done
 }
 

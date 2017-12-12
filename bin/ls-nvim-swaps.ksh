@@ -58,11 +58,11 @@ function warnOrDie { #{{{1
 	esac
 } # }}}1
 function show-prev { #{{{1
-	if [[ -z $FILE ]]; then
+	if [[ -z ${FILE:-} ]]; then
 		return 0
 	elif $showAll; then
 		eval "print -- ${show[*]}"
-	elif [[ $FILE == $file ]]; then
+	elif [[ ${FILE:-} == $file ]]; then
 		eval "print -- ${show[*]}"
 	fi
 
@@ -71,7 +71,7 @@ function show-prev { #{{{1
 } #}}}1
 
 (($#>1))&&	die 'Unexpected parameters. Expected ^Uflags^u and ^Ufilename^u.'
-((${#show[*]}))|| set -A show -- '"$DIR/$SWPF"' '"$PID"'
+(set +u; ((${#show[*]})))|| set -A show -- '"$DIR/$SWPF"' '"$PID"'
 needs nvim
 
 showAll=true; file=''

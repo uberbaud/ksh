@@ -18,6 +18,9 @@ function usage {
 	         Update hold/DOCSTORE and sync with uberbaud.net.
 	       ^T${PGM} -h^t
 	         Show this help message.
+	    ^GNote^g
+	       Exporting ^S\$LOGLEVEL^s will set ^Tsynrdir^t to that log level.
+	       Use ^Tsynrdir -h^t for allowable values.
 	===SPARKLE===
 	exit 0
 } # }}}

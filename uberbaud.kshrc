@@ -2,6 +2,9 @@
 # ksh local profile
 # vim: ts=4 ft=ksh
 
+export MYVIM=$HOME/.config/vim
+export MYVIMRC=$MYVIM/vimrc
+export VIMINIT="so $MYVIMRC"
 export EDITOR=/usr/local/bin/vim
 export VISUAL=$EDITOR
 

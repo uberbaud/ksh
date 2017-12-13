@@ -106,7 +106,7 @@ while getopts ':a:c:n:x:e:u:O:s:qh' Option; do
 		a)  set-alphabet "$OPTARG";									;;
 		c)  posint count "$OPTARG";									;;
 		n)  posint minLen "$OPTARG";								;;
-		n)  posint maxLen "$OPTARG";								;;
+		x)  posint maxLen "$OPTARG";								;;
 		e)  add-id 'eml' "$OPTARG";									;;
 		u)  add-id 'usr' "$OPTARG";									;;
 		O)  add-custom-id "$OPTARG";								;;

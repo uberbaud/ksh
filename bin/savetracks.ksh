@@ -66,8 +66,7 @@ for t in *; do
 	if [[ -f ../$SHA384 ]]; then
 		warn "sha384b already exists for ^B$t^b."
 	else
-		echo "$original" >../"$SHA384"
-		cat "$original" >>../"$SHA384"
+		{ echo "$original"; cat "$original"; } | gzip -qfno ../"$SHA384"
 		chflags uchg ../"$SHA384"
 	fi
 	echo "$SHA384" >"$t"

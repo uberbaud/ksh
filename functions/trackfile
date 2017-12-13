@@ -23,9 +23,9 @@ function trackfile {
 	# Since we want the encoding to be decodeable, we need to escape 
 	# percent signs (%), which means we also need to escape whatever we 
 	# use to escape. We'll just use the common backslash for that.
-	while [[ "$t" == *\\* ]] { p="$p${t%%\\*}\\\\"; t="${t#*\\}"; }
-	while [[ "$t" == *%* ]] { p="$p${t%%%*}\\%"; t="${t#*%}"; }
-	while [[ "$t" == */* ]] { p="$p${t%%/*}%"; t="${t#*/}"; }
+	while [[ "$t" == *\\* ]]	{ p="$p${t%%\\*}\\\\"; t="${t#*\\}"; }
+	while [[ "$t" == *%* ]]		{ p="$p${t%%%*}\\%"; t="${t#*%}"; }
+	while [[ "$t" == */* ]]		{ p="$p${t%%/*}%"; t="${t#*/}"; }
 	: >"$trackdir/$p$t"
 }
 

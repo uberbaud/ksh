@@ -150,19 +150,15 @@ typeset -- has_rcs=false
 		die "Could not ^Tco -l^t ^B${f_name}^b."
   }
 
-#typeset -- stemma="$( egrep -o '@\(#\)\[:[^]]+]' "$f_name")"
-#stemma="${stemma#*:}"; stemma="${stemma%%:*}"
-
 # we could just use ./$f_name
 # BUT then the vim process would not have a command including the path, 
-# SO, let's use $f_fullpath
+# which we can use for finding the X11 window, SO, let's use $f_fullpath
 nvim "$f_fullpath"
 
 trackfile "$f_fullpath"
-new-array rcsopts
 
 if [[ -d RCS ]]; then
-	# use an array so expansion will work without weird quoting issues
+	new-array rcsopts
 	+rcsopts -q -u
 	if $has_rcs; then
 		$hasmsg && +rcsopts -m"$rcsmsg"

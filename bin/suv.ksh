@@ -2,7 +2,8 @@
 # @(#)[:G;LweTE5#GhAdml`<%M!: 2017-10-15 21:49:54 Z tw@csongor]
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
 
-set -o nounset;: ${FPATH:?Run from within KSH} ${VISUAL:-${EDITOR:?Neither VISUAL nor EDITOR is set}}
+set -o nounset;: ${FPATH:?Run from within KSH}
+ED=${VISUAL:-${EDITOR:?Neither VISUAL nor EDITOR is set}}
 set -A vopts --
 
 # Usage {{{1
@@ -52,7 +53,7 @@ function as-root { # {{{1
 
 
 (($#))|| die 'Missing required argument ^Ufile^u.'
-needs ci co ${VISUAL:-${EDITOR:?Neither VISUAL nor EDITOR variable is set}}
+needs ci co $ED
 
 CI_INITIAL_DESCRIPTION='OpenBSD system file'
 
@@ -126,7 +127,7 @@ function main {
 		echo >$workfile
 	fi
 
-	${VISUAL:-$EDITOR} ./"$workfile"
+	$ED ./"$workfile"
 	if [[ -f RCS/$workfile,v ]]; then
 		# previously checked in
 		rcsdiff -q ./"$workfile" ||

@@ -3,6 +3,7 @@
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
 
 set -o nounset;: ${FPATH:?Run from KSH}
+ED="${VISUAL:-${EDITOR:?Neither VISUAL nor EDITOR is set.}}"
 
 [[ -n $LOCALBIN ]] || die '^S$LOCALBIN^s is not set.'
 [[ -d $LOCALBIN ]] || die '^S$LOCALBIN^s is not a directory.'
@@ -54,6 +55,11 @@ function warnOrDie { #{{{1
 					'warnOrDie is ^B${warnOrDie}^b.';		;;
 	esac
 } # }}}1
+function safe-to-edit-vim {
+	local F="$1"
+	[[ $F == $HOME/* ]]&& F="~$USER/${F#$HOME/}"
+	! (vim -r|egrep "$F")
+}
 function safe-to-edit-nvim { #{{{1
 	local swaps s p d w
 	set -A reply --
@@ -95,10 +101,9 @@ function safe-to-edit { #{{{1
 	"$call" "$@"
 } #}}}1
 
-ED="${VISUAL:-${EDITOR:-vi}}"
 needs $ED
 EDBIN="${ED##*/}"
-(($#))|| exec "${VISUAL:-${EDITOR:-vi}}"
+(($#))|| exec "$ED"
 
 function main {
 
@@ -153,7 +158,7 @@ typeset -- has_rcs=false
 # we could just use ./$f_name
 # BUT then the vim process would not have a command including the path, 
 # which we can use for finding the X11 window, SO, let's use $f_fullpath
-nvim "$f_fullpath"
+$ED "$f_fullpath"
 
 trackfile "$f_fullpath"
 

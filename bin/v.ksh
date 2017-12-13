@@ -55,11 +55,11 @@ function warnOrDie { #{{{1
 					'warnOrDie is ^B${warnOrDie}^b.';		;;
 	esac
 } # }}}1
-function safe-to-edit-vim {
+function safe-to-edit-vim { # {{{1
 	local F="$1"
 	[[ $F == $HOME/* ]]&& F="~$USER/${F#$HOME/}"
-	! (vim -r|egrep "$F")
-}
+	! (vim -r 2>&1|egrep "$F")
+} # }}}1
 function safe-to-edit-nvim { #{{{1
 	local swaps s p d w
 	set -A reply --

@@ -57,6 +57,8 @@ function warnOrDie { #{{{1
 } # }}}1
 function safe-to-edit-vim { # {{{1
 	local F="$1"
+	# we set this, but it isn't used unless we return false
+	set -A reply -- 'Swap files found.'
 	[[ $F == $HOME/* ]]&& F="~$USER/${F#$HOME/}"
 	! (vim -r 2>&1|egrep "$F")
 } # }}}1

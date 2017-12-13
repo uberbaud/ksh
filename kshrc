@@ -82,7 +82,12 @@ export PERL_UNICODE=AS
 export USR_PLIB=$PERL5LIB
 
 ####### IMPORT LOCAL BITS
-[[ -f $KDOTDIR/$HOST.kshrc ]]&& . $KDOTDIR/$HOST.kshrc
+if [[ -f $KDOTDIR/$HOST.kshrc ]]; then
+	print "  > Importing \$K/$HOST.kshrc"
+	. $KDOTDIR/$HOST.kshrc
+else
+	print '\033[31mNo $KDOTDIR/$HOST.kshrc\033[0m'
+fi
 
 [[ -d $HOME/bin ]]&& {
 [[ :$PATH: == *:$HOME/bin:*			]]|| PATH="$HOME/bin:$PATH"; }

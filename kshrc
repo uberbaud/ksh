@@ -113,8 +113,21 @@ export CALENDAR_DIR=$xdgcfg/calendar
 export HGRCPATH=$xdgcfg/hg
 
 # default apps
-export CC=$SYSLOCAL/bin/clang
+if   [[ -f /usr/local/bin/nvim ]]; then
+	export MYVIM=$HOME/.config/nvim
+	export EDITOR=/usr/local/bin/nvim
+elif [[ -f /usr/local/bin/vim ]]; then
+	export MYVIM=$HOME/.config/vim
+	export MYVIMRC=$MYVIM/vimrc
+	export VIMINIT="so $MYVIMRC"
+	export EDITOR=/usr/local/bin/vim
+else
+	export EDITOR=/usr/bin/vi
+fi
+export VISUAL=$EDITOR
 export FCEDIT=$EDITOR
+
+export CC=$SYSLOCAL/bin/clang
 export PAGER=/usr/bin/less
 
 # misc

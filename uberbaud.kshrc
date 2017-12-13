@@ -2,8 +2,6 @@
 # ksh local profile
 # vim: ts=4 ft=ksh
 
-echo 'Importing uberbaud.kshrc'
-
 export MYVIM=$HOME/.config/vim
 export MYVIMRC=$MYVIM/vimrc
 export VIMINIT="so $MYVIMRC"

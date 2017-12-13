@@ -82,12 +82,7 @@ export PERL_UNICODE=AS
 export USR_PLIB=$PERL5LIB
 
 ####### IMPORT LOCAL BITS
-if [[ -f $KDOTDIR/$HOST.kshrc ]]; then
-	print "  > Importing \$K/$HOST.kshrc"
-	. $KDOTDIR/$HOST.kshrc
-else
-	print '\033[31mNo $KDOTDIR/$HOST.kshrc\033[0m'
-fi
+[[ -f $KDOTDIR/$HOST.kshrc ]]&& . $KDOTDIR/$HOST.kshrc
 
 [[ -d $HOME/bin ]]&& {
 [[ :$PATH: == *:$HOME/bin:*			]]|| PATH="$HOME/bin:$PATH"; }
@@ -116,10 +111,6 @@ export BC_ENV_ARG=$xdgcfg/etc/bc.rc
 export BZR_HOME=$xdgcfg/bzr
 export CALENDAR_DIR=$xdgcfg/calendar
 export HGRCPATH=$xdgcfg/hg
-
-# editor
-export MYVIM=$xdgcfg/nvim
-unset VIMINIT
 
 # default apps
 export CC=$SYSLOCAL/bin/clang

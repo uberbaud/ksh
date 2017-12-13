@@ -118,10 +118,8 @@ unset VIMINIT
 
 # default apps
 export CC=$SYSLOCAL/bin/clang
-export EDITOR=$SYSLOCAL/bin/nvim
 export FCEDIT=$EDITOR
 export PAGER=/usr/bin/less
-export VISUAL=$EDITOR
 
 # misc
 export CLICOLOR=1

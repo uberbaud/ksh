@@ -2,6 +2,9 @@
 # ksh local profile
 # vim: ts=4 ft=ksh
 
+export EDITOR=/usr/local/bin/vim
+export VISUAL=$EDITOR
+
 osrev=$(uname -r)
 osarc=$(uname -m)
 PKG_PATH=ftp://ftp4.usa.openbsd.org/pub/OpenBSD/$osrev/packages/$osarc

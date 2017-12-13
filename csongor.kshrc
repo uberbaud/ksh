@@ -13,6 +13,8 @@ perlbrew_rc=$PERLBREW_ROOT/etc/perlbrew.ksh
 
 # default apps
 export BROWSER=$HOME/bin/ksh/chrome
+export EDITOR=/usr/local/bin/nvim
+export VISUAL=$EDITOR
 
 # mail
 export EMAIL='tom@greyshirt.net'

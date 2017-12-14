@@ -1,0 +1,30 @@
+# @(#)[:Y`ut8gj8OZ+Ab|5Bq+m2: 2017-12-14 16:51:02 Z tw@csongor]
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Usource file^u ^[^Uexecute file^u ^Uargs…^u^]
+#:   Watch a single file and run ^Tmake^t when it changes.
+#:   Executes ^S${^s^F{12}source^f^G%^g^S^F{12}.*^f^S}^s or ^S$2^s if given
+
+needs watch-file
+function make-on-filechange {
+	local src exe
+	(($#))|| die 'Expected at least a ^Usource file^u parameter.'
+
+	src="$1"; shift
+	exe="${1:-"${src%.*}"}"
+
+	[[ -a $src ]]|| die "^B$src^b does not exist."
+	[[ -f $src ]]|| die "^B$src^b is not a file."
+	[[ -a $exe ]]|| die "^B$exe^b does not exist."
+	[[ -f $exe ]]|| die "^B$exe^b is not a file."
+	[[ -x $exe ]]|| die "^B$exe^b is not executable."
+
+	while watch-file "$1"; do
+		clear
+		h1 make;	make || continue
+		h1 "$exe";	"$@" || warn 'Exited with ^F{1}$?^f.'
+		h1 '^BCtrl-C^b to quit'
+	done
+}
+
+# Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

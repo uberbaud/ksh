@@ -10,8 +10,9 @@ function make-on-filechange {
 	local src exe i=0
 	(($#))|| die 'Expected at least a ^Usource file^u parameter.'
 
-	src="$1"; shift
-	exe="${1:-"${src%.*}"}"
+	src="$1"
+	exe="${2:-"${src%.*}"}"
+	[[ $exe == /* ]]|| exe=./"$exe"
 
 	[[ -a $src ]]|| die "^B$src^b does not exist."
 	[[ -f $src ]]|| die "^B$src^b is not a file."
@@ -19,10 +20,14 @@ function make-on-filechange {
 	[[ -f $exe ]]|| die "^B$exe^b is not a file."
 	[[ -x $exe ]]|| die "^B$exe^b is not executable."
 
+	# reset ARGV to use later
+	shift 2 2>/dev/null
+	set -- "$exe" "$@"
+
 	while watch-file "$src"; do
 		clear
 		h1 make $((i++));	make || continue
-		h1 "$exe";			"$@" || warn 'Exited with ^F{1}$?^f.'
+		h1 "$exe";			"$@" || warn "Exited with ^F{1}$?^f."
 		notify '^N^BCtrl-C^b to quit.^n'
 	done
 }

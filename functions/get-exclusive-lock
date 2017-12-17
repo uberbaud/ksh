@@ -1,0 +1,31 @@
+# @(#)[:gS_Y`4kbOSgr}&jXug0J: 2017-12-17 01:36:03 Z tw@csongor]
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
+
+#: FUNCTION ^Ulock name^u
+#:   Attempts to create a lock with ^Ulock name^u
+#:   The locking is handled by
+#:     1) Creating a unique temporary file (^Sunique name^s) using ^Tmktemp^t,
+#:     2) trying in a loop to link the unique file to a file named ^Ulock name^u,
+#:         and when it succeeds,
+#:     3) delete (unlink) the ^Sunique name^s, and finally
+#:     4) return.
+#:   The return value
+
+needs watch-file
+function get-exclusive-lock {
+	local T="${TMPDIR:-/tmp}" U L P=excl-lock
+	L="$T/$P-${1:?Missing exclusive lock name}"
+
+	[[ -d $T ]]|| {
+		warn '^S$TMPDIR^s does not point to a directory.'; return 1
+	  }
+
+	U="$(mktemp $T/$P.XXXXXXXXXXX)" || {
+		warn 'Could not create a temporary file.'; return 1
+	  }
+	while ! ln "$U" "$L" 2>/dev/null; do watch-file "$L"; done
+	rm "$U"
+	return 0
+}
+
+# Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

@@ -188,11 +188,12 @@ unset s
 
 KCOMPLETE=$KDOTDIR/completions
 makeout=$KCOMPLETE/make.out
-while [[ -f $makeout ]] { sleep 0.1; }
+get-exclusive-lock completion-make
 make OS_VER="$(uname -r)" -C $KCOMPLETE >$KCOMPLETE/make.out
 [[ -s $makeout ]]&& {
 	notify 'Recompiled completion modules:'
 	column -c $((COLUMNS-8)) $makeout|expand|sed -e 's/^/    /'
   }
 rm $makeout
+release-exclusive-lock completion-make
 . $KDOTDIR/completions/completions.ksh

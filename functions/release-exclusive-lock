@@ -1,0 +1,22 @@
+# @(#)[:idYb!j6CSbf)f`5g~{O^: 2017-12-17 02:21:08 Z tw@csongor]
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Ulock name^u
+#:   Releases lock created by ^Tget-exclusive-lock^t
+#:   ^WNOTE^w It is an error to release a non-existing lock.
+
+function release-exclusive-lock {
+	local T=${TMPDIR:-/tmp} L P=excl-lock rc
+	L="$T/$P-${1:?Missing exclusive lock name}"
+	if [[ -f $L ]]; then
+		rm "$L"
+		rc=0
+	else
+		desparkle "$L"
+		warn "No such lock: ^B$REPLY^b."
+		rc=1
+	fi
+	return $rc
+}
+
+# Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

@@ -207,10 +207,10 @@ function l-quit { # {{{1
 	exit 0
 } # }}}1
 function l-cleanup { # {{{1
-	[[ -n $temppath ]]&& {
+	[[ -n $tmppath ]]&& {
 		[[ -f $rlst ]]&& rm "$rlst"
 		[[ -f $llst ]]&& rm "$llst"
-		rmdir "$temppath"
+		rmdir "$tmppath"
 	}
 } # }}}1
 function fileagent { # {{{1
@@ -248,7 +248,7 @@ $i_am_the_remote && { # {{{1
 	exit 0
 } # }}}1
 
-temppath=''; rlst=''; llst='';
+tmppath=''; rlst=''; llst='';
 $i_am_the_local && { # {{{1
 
 	: ${FPATH:?Run from within KSH}

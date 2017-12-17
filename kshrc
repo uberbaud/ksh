@@ -84,8 +84,9 @@ export USR_PLIB=$PERL5LIB
 ####### IMPORT LOCAL BITS
 [[ -f $KDOTDIR/$HOST.kshrc ]]&& . $KDOTDIR/$HOST.kshrc
 
-[[ -d $HOME/bin ]]&& {
-[[ :$PATH: == *:$HOME/bin:*			]]|| PATH="$HOME/bin:$PATH"; }
+####### SET PATH
+[[ -d $HOME/bin ]]&&
+	[[ :$PATH: == *:$HOME/bin:*		]]|| PATH="$HOME/bin:$PATH";
 
 [[ :$PATH: == *:$RAKUDO_BIN:*		]]|| PATH="$RAKUDO_BIN:$PATH"
 [[ :$PATH: == *:$LOCALBIN:*			]]|| PATH="$LOCALBIN:$PATH"
@@ -187,6 +188,7 @@ unset s
 
 KCOMPLETE=$KDOTDIR/completions
 makeout=$KCOMPLETE/make.out
+while [[ -f $makeout ]] { sleep 0.1; }
 make OS_VER="$(uname -r)" -C $KCOMPLETE >$KCOMPLETE/make.out
 [[ -s $makeout ]]&& {
 	notify 'Recompiled completion modules:'

@@ -13,9 +13,11 @@ function usage {
 	PGM="$REPLY"
 	sparkle >&2 <<-\
 	===SPARKLE===
-	^F{4}Usage^f: ^T$PGM^t ^Ufile^u ^[^Ucheckin message^u^]
+	^F{4}Usage^f: ^T$PGM^t ^[^T-f^t^] ^Ufile^u ^[^Ucheckin message^u^]
 	         Edit a copy of a file in ^B~/hold^b, then overwrite the original
 	         with the copy. (More secure that ^Tdoas vim ^Ufile^u^t).
+	         ^T-f^t    Force an edit, even if ^Isystem^i and ^Iarchive^i
+	               files differ.
 	       ^T$PGM -h^t
 	         Show this help message.
 	===SPARKLE===
@@ -26,8 +28,10 @@ function bad_programmer {	# {{{2
 	die 'Programmer error:'	\
 		"  No getopts action defined for [1m-$1[22m."
   };	# }}}2
-while getopts ':h' Option; do
+warnOrDie=die
+while getopts ':fh' Option; do
 	case $Option in
+		f)	warnOrDie=warn;											;;
 		h)	usage;													;;
 		\?)	die "Invalid option: [1m-$OPTARG[22m.";				;;
 		\:)	die "Option [1m-$OPTARG[22m requires an argument.";	;;
@@ -40,10 +44,10 @@ shift $(($OPTIND - 1))
 # /options }}}1
 function warnOrDie { #{{{1
 	case $warnOrDie in
-		die)  die "$@" 'Use [1m-f22m to force an edit.';		;;
+		die)  die "$@" 'Use ^B-f^b to force an edit.';		;;
 		warn) warn "$@";											;;
-		*)    die '[1mProgrammer error[22m:' \
-					'warnOrDie is [1m${warnOrDie}[22m.';		;;
+		*)    die '^BProgrammer error^b:' \
+					"warnOrDie is ^S${warnOrDie}^s.";		;;
 	esac
 } # }}}1
 function as-root { # {{{1
@@ -115,9 +119,11 @@ function main {
 		fi
 		SHA384="$(cksum -qa sha384b ./"$workfile")"
 		[[ -f RCS/$workfile,v ]]&& {
-			rcsdiff -q ./"$workfile" ||
-				die "sysytem file and archived file have diverged."	\
-					"Do an RCS ^Tci^t and rerun."
+			set -A errMsg "System file and archived file have diverged."
+			[[ $warnOrDie == die ]]&&
+				errMsg[1]="Do an RCS ^Tci^t and rerun, or"
+			rcsdiff -q ./"$workfile" || warnOrDie "${errMsg[@]}"
+			unset errMsg
 		  }
 	else
 		SHA384=''

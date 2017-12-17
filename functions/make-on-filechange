@@ -7,7 +7,7 @@
 
 needs watch-file
 function make-on-filechange {
-	local src exe
+	local src exe i=0
 	(($#))|| die 'Expected at least a ^Usource file^u parameter.'
 
 	src="$1"; shift
@@ -19,11 +19,11 @@ function make-on-filechange {
 	[[ -f $exe ]]|| die "^B$exe^b is not a file."
 	[[ -x $exe ]]|| die "^B$exe^b is not executable."
 
-	while watch-file "$1"; do
+	while watch-file "$src"; do
 		clear
-		h1 make;	make || continue
-		h1 "$exe";	"$@" || warn 'Exited with ^F{1}$?^f.'
-		h1 '^BCtrl-C^b to quit'
+		h1 make $((i++));	make || continue
+		h1 "$exe";			"$@" || warn 'Exited with ^F{1}$?^f.'
+		notify '^N^BCtrl-C^b to quit.^n'
 	done
 }
 

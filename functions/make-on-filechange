@@ -28,7 +28,7 @@ function make-on-filechange {
 		clear
 		h1 make $((i++));	make || continue
 		h1 "$exe";			"$@"; rc=$?
-		print '\033[38;5;136────────────────────────────────\033[0m'
+		print '\033[38;5;136m────────────────────────────────\033[0m'
 		((rc))&& warn "Exited with ^F{1}$rc^f."
 		notify '^N^BCtrl-C^b to quit.^n'
 	done

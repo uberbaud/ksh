@@ -7,7 +7,7 @@
 
 needs watch-file
 function make-on-filechange {
-	local src exe i=0
+	local src exe; integer i=0 rc
 	(($#))|| die 'Expected at least a ^Usource file^u parameter.'
 
 	src="$1"
@@ -27,7 +27,9 @@ function make-on-filechange {
 	while watch-file "$src"; do
 		clear
 		h1 make $((i++));	make || continue
-		h1 "$exe";			"$@" || warn "Exited with ^F{1}$?^f."
+		h1 "$exe";			"$@"; rc=$?
+		print '\033[38;5;136────────────────────────────────\033[0m'
+		((rc))&& warn "Exited with ^F{1}$rc^f."
 		notify '^N^BCtrl-C^b to quit.^n'
 	done
 }

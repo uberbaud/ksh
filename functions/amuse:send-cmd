@@ -17,7 +17,7 @@
   # At this time we won't because we can't know what AMUSE_DATA_HOME was
   # set to in some other environment, so we'll look in that same order.
 
-function amuse-send-cmd {
+function amuse:send-cmd {
 	local pexp wrkpath fifo='amuse-if' atitle='^Iamuse player^i'
 
 	pgrep -qf '^amuse: player$' ||

@@ -7,11 +7,10 @@
 
 function amuse-stop {
 	amuse:set-env
-	: ${paused_at:?} ${paused_song:?}
+	: ${paused_at:?}
 	needs pause
 	pause
 	: >$paused_at
-	: >$paused_song
 }
 
 

@@ -83,6 +83,6 @@ wait $xlock_pid
 $LOCALBIN/set-bg-per-battery.sh >>$HOME/log/battery-monitor
 
 log timesheet xlock end || -warn $REPLY
-
+doas ifconfig iwm0 up # just in case, because you know, sometimes
 
 # Copyright (C) 2017 by Tom Davis <tom@greyshirt.net>.

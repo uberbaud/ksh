@@ -1,0 +1,16 @@
+# @(#)[:c&vS94aam3Nj@Tw}&sG0: 2017-12-27 00:24:53 Z tw@csongor]
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^G(no arguments)^g
+#:   Wrapper with autochange on clone
+
+function f-git {
+	local newdir want_cd=false gitresult
+	[[ $# -eq 2 && $1 == clone && $2 == http*.git ]] && want_cd=true
+	command git "$@"; gitresult=$?
+	$want_cd || return $gitresult
+	newdir="${2%.git}"; newdir="${newdir##http*/}"
+	cd $newdir
+}
+
+# Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

@@ -128,7 +128,7 @@ fi
 export VISUAL=$EDITOR
 export FCEDIT=$EDITOR
 
-export CC=$SYSLOCAL/bin/clang
+export CC="$(command -v clang)"
 export PAGER=/usr/bin/less
 
 # misc

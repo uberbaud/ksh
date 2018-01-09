@@ -52,7 +52,7 @@ function warnOrDie { #{{{1
 } # }}}1
 (($#))||	die 'Missing required argument ^Uwindowid^u.'
 (($#>1))&&	die 'Too many arguments. Expected only one.'
-[[ $1 == +([0-9]) ]]||
+[[ $1 == ?(0x)+([0-9]) ]]||
 			die 'Parameter is not a ^Uwindowid^u.'
 
 needs xdotool xwd convert display

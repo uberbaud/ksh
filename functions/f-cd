@@ -5,8 +5,11 @@
 #:   Wraps the builtin to provide a default ^Unew-path^u of ^S$HOME^s
 #:   Also shows any todo ^Bitems^b for the new directory.
 
+# NOTE: this works with alias cd='_u="$-"; set -u; f-cd'
 function f-cd {
 	(($#))|| set -- "$HOME"
+	# undo the alias nounset bit
+	[[ -n ${_u:-} && $_u != *u* && $- == *u* ]]&& set +u
 	builtin cd "$@" && {
 		show-todos '== TODO =='
 		true # leave on a good note since `cd` did

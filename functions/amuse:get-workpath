@@ -1,0 +1,39 @@
+# @(#)[:;oCl3#GNx=+#kQXb6I0?: 2018-01-09 19:58:56 Z tw@csongor]
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
+
+#: FUNCTION ^G(no arguments)^g ^= ^S$REPLY^s
+#:   Assigns the ^Iamuse player^i working directory to ^S$REPLY^s
+
+  # The amuse player gets the path in this order
+  #  1) $AMUSE_DATA_HOME
+  #  2) $XDG_DATA_HOME/amuse
+  #  3) $HOME/.local/amuse
+  #  4) $HOME/.amuse
+  #  5) FAIL
+
+function amuse:get-workpath {
+	local pexp wrkpath
+
+	if [[ -n ${AMUSE_DATA_HOME:-} ]]; then		# 1) $AMUSE_DATA_HOME
+		pexp='^S$AMUSE_DATA_HOME^s'
+		wrkpath="$AMUSE_DATA_HOME"
+	elif [[ -n ${XDG_DATA_HOME:-} ]]; then		# 2) $XDG_DATA_HOME/amuse
+		pexp='^S$XDG_DATA_HOME^s/amuse'
+		wrkpath=$XDG_DATA_HOME/amuse
+	elif [[ -z ${HOME:-} ]]; then				# 5) FAIL
+		die 'Neither ^SAMUSE_DATA_HOME^s, ^SXDG_DATA_HOME^s, nor ^SHOME^s is set.'
+	elif [[ -d $HOME/.local ]]; then			# 3) $HOME/.local/amuse
+		pexp='^S$HOME^s/.local/amuse'
+		wrkpath=$HOME/.local/amuse
+	else										# 4) $HOME/.amuse
+		pexp='^S$HOME^s/.amuse'
+		wrkpath=$HOME/.amuse
+	fi
+
+	[[ -d $wrkpath ]]||
+		die "Using ^U$pexp^u, the ^Bamuse^b directory does not exist."
+
+	REPLY="$wrkpath"
+}
+
+# Copyright © 2018 by Tom Davis <tom@greyshirt.net>.

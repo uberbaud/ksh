@@ -10,8 +10,8 @@
 #:       ^B+^S$varname^s^b to add items to an array;
 #:       ^B^S$varname^s-is-empty^b, and
 #:       ^B^S$varname^s-not-empty^b to test arrays;
-#;       ^B^S$varname^s-reset^b to empty array, and set
-#;            ^BNEXT_^S$varname^s_ID^b to ^B0^b
+#:       ^B^S$varname^s-reset^b to empty array, and set
+#:            ^BNEXT_^S$varname^s_ID^b to ^B0^b
 
 function new-array {
 	typeset -u N

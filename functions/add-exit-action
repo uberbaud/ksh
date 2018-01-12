@@ -5,9 +5,9 @@
 #:   Wrapper around trap with some memory.
 
 function add-exit-action {
-	set -A TRAPEXIT -- "${TRAPEXIT[@]}" "$@"
+	set -A TRAPEXIT -- "${TRAPEXIT[@]:-}" "$@"
 	local IFS=';'
-	trap "${TRAPEXIT[*]}" EXIT
+	trap "${TRAPEXIT[*]:-}" EXIT
 }
 
 # Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

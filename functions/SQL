@@ -8,15 +8,25 @@
 #:   Sets array ^S$SQLFD^s to the co-process file descriptors.
 #:   Exports ^S$SQLSEP^s as field separator, but uses user set value if
 #:     it's set before the initial call to SQL.
+#:   Uses ^S$SQL_AUTODIE^s (^Itrue^i, ^Iwarn^i, or ^Ifalse^i)
 
 function SQL {
 	needs sqlite3
-	local sql response READY=''
-	local verbose="${verbose:-false}" autodie="${SQL_AUTODIE:-true}"
-	SQLSEP="${SQLSEP:-}"
+	local sql response READY='\007\007\007' # three bells
+
+	local verbose="${verbose:-false}"
+	local autodie="${SQL_AUTODIE:-true}" autowarn=false
+	[[ $autodie == ?(true|false|warn) ]]|| {
+		warn '^BSQL_AUTODIE^b is set incorrectly (^S$autodie^s).' \
+			 'Resetting ^BAUTODIE^b to ^Btrue^b.'
+		autodie=true
+	  }
+	[[ $autodie == warn ]]&& { autodie=false; autowarn=true; }
+
+	SQLSEP="${SQLSEP:-\034}" # ^\ -> field separator
 	(($#))&& sql="$*" || sql="$(cat)"
 	set -A reply --
-	((${SQLFD[0]}))|| {
+	((${SQLFD[0]:-}))|| {
 		sqlite3 -noheader -batch -list -separator "$SQLSEP" 2>&1 |&
 		nextfd || die 'No available file descriptor.'; SQLFD[0]="$REPLY"
 		eval "exec ${SQLFD[0]}<&p"
@@ -34,16 +44,21 @@ function SQL {
 	$verbose && print -ru2 -- "SQL> $sql"
 	print -ru${SQLFD[1]} -- "$sql;"
 	print -ru${SQLFD[1]} -- "SELECT '$READY';"
+	integer i=0
 	while :; do
 		read -ru${SQLFD[0]} response
 		[[ $response == $READY ]]&& break
-		reply[${#reply[*]}]="$response"
+		reply[i++]="$response"
 		$verbose && print -ru2 -- "$response"
 	done
-	$autodie && {
-		[[ ${reply[0]} == Error:* ]]&&
-			die "${reply[@]}" "$sql"
+
+	[[ ${reply[0]:-} == Error:* ]]&& {
+		reply[i]="$sql"
+		$autodie && die "${reply[@]}"
+		$autowarn && warn "${reply[@]}"
+		return 1
 	  }
+	return 0
 }
 
 # Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

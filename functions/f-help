@@ -25,6 +25,13 @@ function _show_function_help {
 }
 
 function f-help {
+	local helpdir=${KDOTDIR:?}/help
+	(($#))|| {(
+		cd $helpdir || die "No help directory ^B$helpdir^b."
+		print 'Help is available for functions in \033[34m$FPATH\033[39m as well as:'
+		printf '    %s\n' * |column
+	); return; }
+
 	: ${FPATH:?}
 	splitstr ':' "$FPATH" fpath
 	local p funcfile
@@ -33,7 +40,6 @@ function f-help {
 		[[ -f $p/f-$1 ]]&&		{ funcfile="$p/f-$1";		break; }
 		[[ -f $p/amuse-$1 ]]&&	{ funcfile="$p/amuse-$1";	break; }
 	done
-	local helpdir=${KDOTDIR:?}/help
 	if [[ -n $funcfile ]]; then
 		_show_function_help "$funcfile" "$1"
 	elif   [[ -f $helpdir/$1 ]]; then

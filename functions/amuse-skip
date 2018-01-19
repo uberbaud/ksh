@@ -6,7 +6,7 @@
 
 function amuse-skip {
 	amuse:set-env
-	command pkill -s USR1 -f ${amusePlayerId:?}
+	command pkill -SIGUSR1 -f ${amusePlayerId:?}
 }
 
 

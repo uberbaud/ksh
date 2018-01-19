@@ -23,7 +23,7 @@ function SQL {
 	  }
 	[[ $autodie == warn ]]&& { autodie=false; autowarn=true; }
 
-	SQLSEP="${SQLSEP:-\034}" # ^\ -> field separator
+	SQLSEP="${SQLSEP:-"$(print '\034')"}" # ^\ -> field separator
 	(($#))&& sql="$*" || sql="$(cat)"
 	set -A reply --
 	((${SQLFD[0]:-}))|| {

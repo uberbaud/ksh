@@ -36,9 +36,19 @@ function i-can-haz-inet {
     # +time=1       : 1 second to timeout instead of default 5 seconds
     # A             : section type
 	DIG="$(dig +short +time=1 $NAME A 2>/dev/null)" || {
-		REPLY='DNS lookup failed.'
+		REPLY='local DNS lookup failed.'
 		return 2
 	  }
+	[[ -n $DIG ]]|| {
+		DIG="$(dig @8.8.8.8 +short +time=1 $NAME A 2>/dev/null)" || {
+			REPLY='local and google DNS lookups failed.'
+			return 2
+		  }
+		[[ -n $DIG ]]|| {
+			REPLY='DNS returned no result.'
+			return 2
+		  }
+	}
     [[ $DIG == $ADDR ]]|| {
 		REPLY='man-in-the-middle?'
 		return 1

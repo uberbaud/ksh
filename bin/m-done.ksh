@@ -83,6 +83,7 @@ function X { # {{{1
   X -from  'root@csongor\.lan'            root@csongor  '@csongor'
   X -to    'bgumm102@gmail\.com'          notes         'Notes to Self'
   X -to    'source-changes@openbsd\.org'  obsd-cvs      'OpenBSD CVS'
+  X -from  '@stackoverflow\.'             stackover     'Stack Overflow'
 
 if Done; then
     print -u2 ' [34m>>>[0m No messages to [1remove[0m.'

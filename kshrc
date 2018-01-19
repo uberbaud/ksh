@@ -157,6 +157,7 @@ for p in f amuse; do
 done
 # noglobs
 for i in cowmath math note; { alias $i="noglob $i"; }
+alias mathcow="noglob cowmath"
 # askfirst all commands that use ssh
 for i in ssh scp sftp rsync;	{ alias "$i=ssh-askfirst $i"; }
 # known hosts are commands to ssh to that host

@@ -1,5 +1,5 @@
 #!/bin/ksh
-# @(#)[:lVwc|Iba@n^kl!T`!&gj: 2017-11-25 18:42:31 Z tw@csongor]
+# @(#)[csongor.greyshirt.net,2017-11-25:18.42.31/tw/95b23a]
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
 
 set -o nounset;: ${FPATH:?Run from within KSH}
@@ -47,20 +47,22 @@ function warnOrDie { #{{{1
 (($#))&& die 'Too many arguments. Expected none.'
 
 
-needs date id printf random uname
+needs date id random uname
 
 # Use the pid, but prefix it with 1–2 digits, and suffix it with 1
 # digit, making the result unpredictable while maintaining uniqueness.
 random -e 100;	A=$?
 random -e 10;	B=$?
 typeset -i16 X=$A$$$B
+H="$(uname -n)"; H="${H%.*}"
+DTs="$(date -u +'%Y-%m-%d:%H.%M.%Sz')"
+D="${DTs%:*}"
+T="${DTs#*:}"
+I="$(id -un)"
+U="${URI_AUTHORITY-${EMAIL#*@}}"
+: ${U-Neither URI_AUTHORITY nor EMAIL is set.}
 
-#	'@' = \x40, '(' = \x28, '#' = \x23, ')' = \x29
-printf '\x40\x28\x23\x29[tag:%s.%s,%s/%s/%s]'	\
-	"$(uname -n)"								\
-	"${URI_AUTHORITY?}"							\
-	"$(date -u +'%Y-%m-%d:%H.%M.%S')"			\
-	"$(id -un)"									\
-	"${X#?(-)16#}"
+#	'@' = \0100, '(' = \050, '#' = \043, ')' = \051
+print -n '\0100\050\043\051['"tag:$H.$U,$D:$I/$T/${X#?(-)16#}]"
 
 # Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

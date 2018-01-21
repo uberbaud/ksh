@@ -47,11 +47,20 @@ function warnOrDie { #{{{1
 (($#))&& die 'Too many arguments. Expected none.'
 
 
-needs uuid85 date id uname
-printf '\x40\x28\x23\x29[:%s: %s %s@%s]'	\
-	"$(uuid85)"								\
-	"$(date -u +'%Y/%m/%d %H:%M:%S')"		\
-	"$(id -un)"								\
-	"$(uname -n)"
+needs date id printf random uname
+
+# Use the pid, but prefix it with 1–2 digits, and suffix it with 1
+# digit, making the result unpredictable while maintaining uniqueness.
+random -e 100;	A=$?
+random -e 10;	B=$?
+typeset -i16 X=$A$$$B
+
+#	'@' = \x40, '(' = \x28, '#' = \x23, ')' = \x29
+printf '\x40\x28\x23\x29[tag:%s.%s,%s/%s/%s]'	\
+	"$(uname -n)"								\
+	"${URI_AUTHORITY?}"							\
+	"$(date -u +'%Y-%m-%d:%H.%M.%S')"			\
+	"$(id -un)"									\
+	"${X#?(-)16#}"
 
 # Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

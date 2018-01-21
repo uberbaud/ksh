@@ -19,6 +19,7 @@ export TERM
 
 export SYSLOCAL=/usr/local
 export ISO_DATE='%Y-%m-%d %H:%M:%S %z'
+export URI_AUTHORITY='greyshirt.net'
 
 # XDG paths
 if [[ -d ${XDG_CONFIG_HOME:-~/.config} ]]; then

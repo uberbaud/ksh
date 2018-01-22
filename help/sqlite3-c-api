@@ -1,0 +1,79 @@
+^BSQLite3 Overview^b
+
+    ^U^TOpen^t^u
+        ^Iint^i ^Bsqlite3_open^b( ^Iconst char *^i^Nutf8_filename^n^*, ^Isqlite3 **^i^i^Ndb_handle^n );
+        ^Iint^i ^Bsqlite3_open16^b( ^Iconst char *^i^Nutf16_filename^n^*, ^Isqlite3 **^i^i^Ndb_handle^n );
+
+        ^Iint^i
+        ^Bsqlite3_open_v2^b(
+            ^Iconst char *^i^Nutf8_filename^n^*,
+            ^Isqlite3 **^i^i^Ndb_handle^n,
+            ^Iint^i ^Nflags^n,
+            ^Iconst char *^i^NzVfs^n ^G# VFS module to use, NULL uses default^g
+          );
+
+        ^* The filename may be ^B:memory^b or if empty (^"^") creates a temporary
+          on-disk database.
+
+        ^Bflags^b
+            ^UOne of:^u
+            ^ISQLITE_OPEN_READONLY^i
+            ^ISQLITE_OPEN_READWRITE^i
+            ^ISQLITE_OPEN_READWRITE^i^|^ISQLITE_OPEN_CREATE^i
+
+            ^UOptionally with one of:^u
+            ^ISQLITE_OPEN_SHAREDCACHE^i
+            ^ISQLITE_OPEN_PRIVATECACHE^i
+
+            ^UOptionally with any of:^u
+            ^ISQLITE_OPEN_URI^i ^G# URIs may contain parameters in the query bit.^g
+            ^ISQLITE_OPEN_FULLMUTEX^i
+
+    ^U^TPrepare a statement^t^u
+        ^Iint^i
+        ^Bsqlite3_prepare_v2^b(
+            ^Isqlite3 *^i^Ndb^n,
+            ^Iconst char *^i^Nzutf8Statement^n,
+            ^Iint^i ^Nmaxlen_statement_buf^n,
+            ^Isqlite3_stmt **^i^Nstmt_handle^n,         ^G# OUT^g
+            ^Iconst car **^i^Nunused_zutf8Statment^n    ^G# OUT^g
+          );
+
+        ^Iint^i
+        ^Bsqlite3_prepare_v3^b(
+            ^Isqlite3 *^i^Ndb^n,
+            ^Iconst char *^i^Nzutf8Statement^n,
+            ^Iint^i ^Nmaxlen_statement_buf^n^S¹^s,
+            ^Iunsigned int^i ^NprepFlags^n^S²^s,
+            ^Isqlite3_stmt **^i^Nstmt_handle^n,         ^G# OUT^g
+            ^Iconst car **^i^NpzTail^n^S³^s                 ^G# OUT^g
+          );
+
+        ^S¹^s If ^Nmaxlen_statment_buf^n is negative, reads to ^S\0^s.
+        ^S²^s May be ^ISQLITE_PREPARE_PERSISTENT^i as a hint for the engine
+          to keep (not discard) as it will be used for a long time.
+        ^S³^s If ^NpzTail^n is not NULL, it will be set to the next beginning
+          of the ^Inext^i SQL statment (sqlite3 only processes one at a time).
+
+        ^Iint^i ^Bsqlite3_prepare^b( ^S…^s );
+        ^Iint^i ^Bsqlite3_prepare16^b( ^S…^s ); ^G# UTF16^g
+        ^Iint^i ^Bsqlite3_prepare16_v2^b( ^S…^s ); ^G# UTF16^g
+        ^Iint^i ^Bsqlite3_prepare16_v3^b( ^S…(v3)^s ); ^G# UTF16^g
+
+    ^U^TStep^t^u
+        ^Bsqlite3_step^b(^Isqlite3_stmt *^i^Nstmt_handle^n);
+
+        Returns ^ISQLITE_BUSY^i, ^ISQLITE_DONE^i, ^ISQLITE_ROW^i, ^ISQLITE_ERROR^i,
+        ^ISQLITE_MISUSE^i, or if ^B_v^b^IX^i, any other error code.
+
+        Call ^Bsqlite3_reset()^b for re-executions.
+
+    ^U^TExtract Data Values^t^u
+        ^Iconst void *^i ^Bsqlite3_column_blob^b(^Isqlite3_stmt *^i, ^Iint^i ^Ncol^n );
+
+    ^U^TFinalize^t^u
+        ^Bsqlite3_open^b()
+
+    ^U^TClose^t^u
+        ^Bsqlite3_open^b()
+

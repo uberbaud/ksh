@@ -175,13 +175,13 @@ unset p i
 alias clear='f-clear ' # expand alias of $2
 alias cls='clear colorls $LS_OPTIONS'
 alias doas='doas '
-alias halt='doas halt'
+alias halt='doas /sbin/halt -p'
 alias i-can-haz-inet='i-can-haz-inet;E=$?;printf "  %s\n" "$REPLY";(return $E)&&:'
 alias ls='/usr/local/bin/colorls $LS_OPTIONS'
 alias noglob='set -f;noglob '; function noglob { set +f; ("$@"); }
 alias cd='_u="$-"; set -u; f-cd'
 alias prn="printf '  \e[35m｢\e[39m%s\e[35m｣\e[39m\n'"
-alias reboot='doas reboot'
+alias reboot='doas /sbin/reboot'
 
 for s in $(getent shells); do
 	[[ $s == $SHELL ]]&& continue

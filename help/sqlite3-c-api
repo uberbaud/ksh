@@ -35,8 +35,8 @@
             ^Isqlite3 *^i^Ndb^n,
             ^Iconst char *^i^Nzutf8Statement^n,
             ^Iint^i ^Nmaxlen_statement_buf^n,
-            ^Isqlite3_stmt **^i^Nstmt_handle^n,         ^G# OUT^g
-            ^Iconst car **^i^Nunused_zutf8Statment^n    ^G# OUT^g
+            ^Isqlite3_stmt **^i^Nstmt_h^n,             ^G# OUT^g
+            ^Iconst car **^i^Nunused_zutf8Statment^n   ^G# OUT^g
           );
 
         ^Iint^i
@@ -45,8 +45,8 @@
             ^Iconst char *^i^Nzutf8Statement^n,
             ^Iint^i ^Nmaxlen_statement_buf^n^S¹^s,
             ^Iunsigned int^i ^NprepFlags^n^S²^s,
-            ^Isqlite3_stmt **^i^Nstmt_handle^n,         ^G# OUT^g
-            ^Iconst car **^i^NpzTail^n^S³^s                 ^G# OUT^g
+            ^Isqlite3_stmt **^i^Nstmt_h^n,             ^G# OUT^g
+            ^Iconst car **^i^NpzTail^n^S³^s                ^G# OUT^g
           );
 
         ^S¹^s If ^Nmaxlen_statment_buf^n is negative, reads to ^S\0^s.
@@ -60,8 +60,53 @@
         ^Iint^i ^Bsqlite3_prepare16_v2^b( ^S…^s ); ^G# UTF16^g
         ^Iint^i ^Bsqlite3_prepare16_v3^b( ^S…(v3)^s ); ^G# UTF16^g
 
+    ^U^TBinding values^t^u
+        All sqlite3_bind functions return an error code, have the name prefix
+        ^Bsqlite3_bind_^b^ITYPE^i, and the first two (2) arguments are
+        ^Isqlite3_stmt *^i^Nstmt_h^n and ^Iint^i ^Nbindno^n where columns are
+        counted from one (1). For instance
+
+        ^Iint^i ^Bsqlite3_bind_null^b(^Isqlite3_stmt *^i^Nstmt_h^n, ^Iint^i ^Nbindno^n);
+
+        The third (3rd) parameter is always the value to bind.
+        ^B…double^b(^S…^s, ^Idouble^i);
+        ^B…int^b(^S…^s, ^Iint^i);
+        ^B…int64^b(^S…^s, ^Isqlite3_int64^i);
+        ^B…value^b(^S…^s, ^Iconst sqlite3_value*^i);
+
+        zeroblobs have a value of ^S\0^s of size arg3 bytes.
+        ^B…zeroblob^b(^S…^s, ^Iint^i ^Nn^n);
+        ^B…zeroblob64^b(^S…^s, ^Isqlite3_uint64^i);
+
+        Any fourth (4th) parameter is the size of the value (3rd param), in
+        which case there is also a fifth (5th) parameter which is a destructor
+        function for the value. The size is where a NUL byte WOULD be, whether
+        or not there is one. For _text functions with ^S\0^s terminators, the
+        number may be negative, in which case 
+
+        ^B…blob^b(^S…^s, ^Iconst void*^i, ^Iint^i ^Nn^n, ^Nfn_destroy^n);
+        ^B…blob64^b(^S…^s, ^Iconst void*^i, ^Isqlite3_uint64^i, ^Nfn_destroy^n);
+        ^B…text^b(^S…^s, ^Iconst char*^i,^Iint^i,^Nfn_destroy^n);
+        ^B…text16^b(^S…^s, ^Iconst void*^i, ^Iint^i, ^Nfn_destroy^n);
+
+        A sixth (6th) parameter contains an encoding flag.
+        ^B…text64^b(^S…^s, ^Iconst char*^i, ^Isqlite3_uint64^i, ^Nfn_destroy^n, ^Iunsigned char^i ^Nencoding^n);
+
+        To be used when passing pointers to extensions
+        ^B…pointer^b(^S…^s, ^Ivoid*^i, const char*,^Nfn_destroy^n);
+
+        In SQL statements, values to be bound may take any one of the
+        following forms:
+        ^S?^s, ^S?NNN^s, ^S:VVV^s, ^S@VVV^s, or ^S$VVV^s, where
+
+        ^BNNN^b represents an integer literal which will be the bindno, and
+        ^BVVV^b is an alphanumeric identifier whose bindno is incremented in
+        order for any non-repeated identifiers.
+        ^Bsqlite3_bind_parameter_index(^b^Nstmt_h^n^b,^S"VVV"^s^B)^b can be used to find the
+        bindno value.
+
     ^U^TStep^t^u
-        ^Bsqlite3_step^b(^Isqlite3_stmt *^i^Nstmt_handle^n);
+        ^Bsqlite3_step^b(^Isqlite3_stmt *^i^Nstmt_h^n);
 
         Returns ^ISQLITE_BUSY^i, ^ISQLITE_DONE^i, ^ISQLITE_ROW^i, ^ISQLITE_ERROR^i,
         ^ISQLITE_MISUSE^i, or if ^B_v^b^IX^i, any other error code.
@@ -69,11 +114,47 @@
         Call ^Bsqlite3_reset()^b for re-executions.
 
     ^U^TExtract Data Values^t^u
-        ^Iconst void *^i ^Bsqlite3_column_blob^b(^Isqlite3_stmt *^i, ^Iint^i ^Ncol^n );
+        ^UGet data values^u
+        ^Iconst void *^i          ^Bsqlite3_column_blob^b(^Isqlite3_stmt *^i, ^Iint^i ^Ncol^n);
+        ^Idouble^i                ^Bsqlite3_column_double^b(^Isqlite3_stmt *^i, ^Iint^i ^Ncol^n);
+        ^Iint^i                   ^Bsqlite3_column_int^b(^Isqlite3_stmt *^i, ^Iint^i ^Ncol^n);
+        ^Isqlite3_int64^i         ^Bsqlite3_column_int64^b(^Isqlite3_stmt *^i, ^Iint^i ^Ncol^n);
+        ^Iconst unsigned char *^i ^Bsqlite3_column_text^b(^Isqlite3_stmt *^i, ^Iint^i ^Ncol^n);
+        ^Iconst void *^i          ^Bsqlite3_column_text16^b(^Isqlite3_stmt *^i, ^Iint^i ^Ncol^n);
+
+        ^UGet unprotected data type^u
+        ^Isqlite3_value *^i       ^Bsqlite3_column_value^b(^Isqlite3_stmt *^i, ^Iint^i ^Ncol^n);
+
+        ^UGet information^u
+        ^Iint^i ^Bsqlite3_column_bytes^b(^Isqlite3_stmt *^i, ^Iint^i ^Ncol^n); ^G# size of blob^g
+        ^Iint^i ^Bsqlite3_column_bytes16^b(^Isqlite3_stmt *^i, ^Iint^i ^Ncol^n); ^G# size of UTF16^g
+        ^Iint^i ^Bsqlite3_column_type^b(^Isqlite3_stmt *^i, ^Iint^i ^Ncol^n); ^G# DEFALUT data type^g
 
     ^U^TFinalize^t^u
-        ^Bsqlite3_open^b()
+        ^Bsqlite3_finalize^b(^Isqlite3_stmt *^i^Nstmt_h^n);
+
+        Releases associated resources to avoid memory leaks, etc.
 
     ^U^TClose^t^u
-        ^Bsqlite3_open^b()
+        ^Bsqlite3_close^b(^Isqlite3 *^I);
+        ^Bsqlite3_close_v2^b(^Isqlite3 *^I);
 
+    ^U^TExec Wrapper^t^u
+        ^Bsqlite3_exec^b(
+            ^Isqlite3 *^i^Ndb^n,
+            ^Iconst char *^i^Nsql^n,
+            ^Iint (*callback)(void*,int,char**,char**)^i^Nfn_callback^n,
+            ^Ivoid *^i^Nuserdata^n,
+            ^Ichar **^i^Nerrmsg^n
+          );
+
+        The callback function (if not NULL) is called for each row returned.
+        The callback is of form
+        int ^Bon_row^b(
+            ^Ivoid *^i^Nuserdata^n,
+            ^Iint^i ^Ncolumns^n,
+            ^Ichar **^i^Ncol_as_text_array^n,
+            ^Ichar **^i^Ncol_name_array^n
+          );
+
+        ^Bsqlite3_free^b should be called on any returned errmsg.

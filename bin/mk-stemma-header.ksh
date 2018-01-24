@@ -85,8 +85,8 @@ function warnOrDie { #{{{1
 bins[0]='date'
 bins[1]='random'
 # we only need to find what we don't already have
-[[ -n ${M:-} ]] bins[${#bins[*]}]='id'
-[[ -n ${U:-} ]] bins[${#bins[*]}]='uname'
+[[ -n ${M:-} ]]|| bins[${#bins[*]}]='id'
+[[ -n ${U:-} ]]|| bins[${#bins[*]}]='uname'
 needs "${bins[@]}"
 
 if $DATEGIVEN && $TIMEGIVEN; then

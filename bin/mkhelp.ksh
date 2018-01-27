@@ -1,4 +1,5 @@
 #!/bin/ksh
+# <@(#)tag:csongor.greyshirt.net,2018-01-27:tw/19.16.37z/443d6f7>
 # vim: ft=ksh
 
 set -o nounset;: ${FPATH:?No FPATH, are you running in ksh}

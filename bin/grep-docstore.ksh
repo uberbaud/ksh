@@ -1,5 +1,5 @@
 #!/bin/ksh
-# <@(#)tag:csongor.greyshirt.net,2017-11-20:tw/19.26.21z/8485b8>
+# <@(#)tag:csongor.greyshirt.net,2018-01-27:tw/19.38.04z/32d5e9a>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
 
 set -o nounset;: ${FPATH:?Run from within KSH}
@@ -11,8 +11,8 @@ function usage {
 	PGM="$REPLY"
 	sparkle >&2 <<-\
 	===SPARKLE===
-	^F{4}Usage^f: ^T$PGM^t
-	         List all notes for a directory.
+	^F{4}Usage^f: ^T$PGM^t ^Upattern^u
+	         List files matching awk style ^Upattern^u
 	       ^T$PGM -h^t
 	         Show this help message.
 	===SPARKLE===
@@ -44,26 +44,40 @@ function warnOrDie { #{{{1
 	esac
 } # }}}1
 
-needs awk less sparkle
+needs awk zcat
 
-[[ -d NOTES ]]|| exit 0		#empty
-cd NOTES || die 'Could not ^Tcd^t into ^BNOTES^b.'
-
-set -A notes -- $(/bin/ls *.note 2>/dev/null|sort -n)
-((${#notes[*]}))|| exit 0	#empty
+(($#))||	die 'Missing required argument ^Upattern^u'
+(($#==1))||	die 'Too many arguments, expected one (1): ^Upattern^u.'
+cd ~/hold/DOCSTORE || die 'Could not ^Tcd^t to ^BDOCSTORE^b.'
 
 AWKPGM="$(cat)" <<-\
-	\===AWK===
-		/<@\(#\)tag:/ {next}
-		FNR == 2 && /^[0-9][0-9][0-9][0-9]-[01][0-9]-[0-3][0-9].* Z/ {
-				if (FNR != NR) { print "" }
-				print "^B"$0"^b"
-				next
-			}
-		# always
-			{print}
-	===AWK===
+	===AWKPGM===
+	NR == 1	{ f=\$0; next }
+	/$1/	{ print f }
+	===AWKPGM===
 
-awk "$AWKPGM" "${notes[@]}"|sparkle|less -iMSx4 -FXc; exit
+desparkle "$AWKPGM"
+splitstr NL "$REPLY" dAWKPGM
 
-# Copyright (C) 2017 by Tom Davis <tom@greyshirt.net>.
+#   ↓ newline
+NL='
+' # ↑ newline
+function only-files {(
+	IFS="$NL"
+	while read -r F; do
+		[[ -f $F ]]|| continue
+		print -r -- "$F"
+	done
+)}
+
+function zgrep-docstore {
+	for f in *; do
+		[[ -f $f ]]|| continue
+		zcat "$f" | awk "$AWKPGM" ||
+			die '^Bzcat^b or ^Bawk^b' "${dAWKPGM[@]}"
+	done
+}
+
+zgrep-docstore | only-files | sort | uniq; exit
+
+# Copyright (C) 2018 by Tom Davis <tom@greyshirt.net>.

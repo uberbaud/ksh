@@ -1,5 +1,5 @@
 #!/bin/ksh
-# @(#)[:i;M+GbnyPAxt0n(iRNN|: 2017-08-11 04:49:36 Z tw@csongor]
+# <@(#)tag:csongor.greyshirt.net,2017-08-11:tw/04.49.36z/23cefa>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
 
 set -o nounset;: ${FPATH:?Run from within KSH}

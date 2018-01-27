@@ -1,4 +1,4 @@
-# @(#)[:SR4?YKx^=i2MU(j$#uH?: 2017/08/01 02:52:13 tw@csongor.lan]
+# <@(#)tag:csongor.greyshirt.net,2017-04-20:tw/19.11.47z/4e02e72>
 # ksh profile
 # vim: ts=4 ft=ksh
 

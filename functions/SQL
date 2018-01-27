@@ -1,5 +1,5 @@
-# @(#)[:8!XiFF>f?$NWe{6u{vr{: 2017-10-13 01:47:44 Z tw@csongor]
-# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+# <@(#)tag:csongor.greyshirt.net,2017-10-13:tw/01.47.44z/8c58de>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
 
 #: FUNCTION ^[^USQL statement(s)^u^] ^= reply
 #:   Co-processicize sqlite3 and sugar the interaction. If no SQL statement
@@ -8,13 +8,13 @@
 #:   Sets array ^S$SQLFD^s to the co-process file descriptors.
 #:   Exports ^S$SQLSEP^s as field separator, but uses user set value if
 #:     it's set before the initial call to SQL.
-#:   Uses ^S$SQL_AUTODIE^s (^Itrue^i, ^Iwarn^i, or ^Ifalse^i)
+#:   Uses ^S$SQL_AUTODIE^s (^Itrue^i, ^Iwarn^i, or ^Ifalse^i). Defaults to ^Itrue^i.
+#:   Uses ^S$SQL_VERBOSE^s (^Itrue^i or ^Ifalse^i). Defaults to ^S${verbose:-^s^Nfalse^n^S}^s.
 
 function SQL {
 	needs sqlite3
 	local sql response READY='\007\007\007' # three bells
-
-	local verbose="${verbose:-false}"
+	local verbose="${SQL_VERBOSE:-${verbose:-false}}"
 	local autodie="${SQL_AUTODIE:-true}" autowarn=false
 	[[ $autodie == ?(true|false|warn) ]]|| {
 		warn '^BSQL_AUTODIE^b is set incorrectly (^S$autodie^s).' \

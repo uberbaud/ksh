@@ -1,5 +1,7 @@
 ^BSQLite3 Overview^b
 
+    ^S#include <^s^Nsqlite3.h^n^S>^s
+
     ^U^TOpen^t^u
         ^Iint^i ^Bsqlite3_open^b( ^Iconst char *^i^Nutf8_filename^n^*, ^Isqlite3 **^i^i^Ndb_handle^n );
         ^Iint^i ^Bsqlite3_open16^b( ^Iconst char *^i^Nutf16_filename^n^*, ^Isqlite3 **^i^i^Ndb_handle^n );
@@ -114,6 +116,8 @@
         Call ^Bsqlite3_reset()^b for re-executions.
 
     ^U^TExtract Data Values^t^u
+        Columns are numbered from zero (0).
+
         ^UGet data values^u
         ^Iconst void *^i          ^Bsqlite3_column_blob^b(^Isqlite3_stmt *^i, ^Iint^i ^Ncol^n);
         ^Idouble^i                ^Bsqlite3_column_double^b(^Isqlite3_stmt *^i, ^Iint^i ^Ncol^n);

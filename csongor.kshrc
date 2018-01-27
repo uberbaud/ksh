@@ -1,4 +1,4 @@
-# @(#)[:KQ&%s2TwrVsrO`?xkIo&: 2017-08-11 03:12:38 tw@csongor.lan]
+# <@(#)tag:csongor.greyshirt.net,2017-08-11:tw/03.12.38z/32b357f>
 # ksh local profile
 # vim: ts=4 ft=ksh
 

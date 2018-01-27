@@ -1,5 +1,5 @@
 #!/bin/ksh
-# <@(#)tag:csongor.greyshirt.net,2017-11-20:tw/19.26.21z/8485b8>
+# <@(#)tag:csongor.greyshirt.net,2018-01-27:tw/05.14.51z/295ebcc>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
 
 set -o nounset;: ${FPATH:?Run from within KSH}
@@ -11,8 +11,9 @@ function usage {
 	PGM="$REPLY"
 	sparkle >&2 <<-\
 	===SPARKLE===
-	^F{4}Usage^f: ^T$PGM^t
-	         List all notes for a directory.
+	^F{4}Usage^f: ^T$PGM^t ^[^Upattern^u^]
+	         List performers, albums, songs filtered by given parameters.
+	         If no pattern is given, a random letter is used.
 	       ^T$PGM -h^t
 	         Show this help message.
 	===SPARKLE===
@@ -44,26 +45,37 @@ function warnOrDie { #{{{1
 	esac
 } # }}}1
 
-needs awk less sparkle
+needs amuse:get-workpath SQL
 
-[[ -d NOTES ]]|| exit 0		#empty
-cd NOTES || die 'Could not ^Tcd^t into ^BNOTES^b.'
+if (($#)); then
+	for P; do
+		[[ $P == +([A-Za-z0-9]) ]]|| { warn "Bad filter ^U$P^u."; continue; }
+		where="${where:-} OR value LIKE '$P%'"
+	done
+	where="${where# OR }"
+else
+	random -e 27
+	R="$(printf "\x$(printf %x $((64+$?)))")"
+	if [[ $R == '`' ]]; then
+		where="value < 'A'"
+	else
+		where="value LIKE '$R%'"
+	fi
+fi
 
-set -A notes -- $(/bin/ls *.note 2>/dev/null|sort -n)
-((${#notes[*]}))|| exit 0	#empty
+SQL_AUTODIE=true
+SQL_VERBOSE=false
+amuse:get-workpath
+SQL "ATTACH '$REPLY/amuse.db3' AS amuse;"
+SQL <<-\
+	==SQL==
+	SELECT DISTINCT value
+	  FROM amuse.vtags
+	 WHERE label = 'albumartist'
+	   AND ( $where )
+	 ;
+	==SQL==
 
-AWKPGM="$(cat)" <<-\
-	\===AWK===
-		/@\(#\)\[/ {next}
-		FNR == 2 && /^[0-9][0-9][0-9][0-9]-[01][0-9]-[0-3][0-9].* Z/ {
-				if (FNR != NR) { print "" }
-				print "^B"$0"^b"
-				next
-			}
-		# always
-			{print}
-	===AWK===
+for r in "${reply[@]}"; { print -- "$r"; } | column
 
-awk "$AWKPGM" "${notes[@]}"|sparkle|less -iMSx4 -FXc; exit
-
-# Copyright (C) 2017 by Tom Davis <tom@greyshirt.net>.
+# Copyright (C) 2018 by Tom Davis <tom@greyshirt.net>.

@@ -53,7 +53,7 @@ cd ~/hold/DOCSTORE || die 'Could not ^Tcd^t to ^BDOCSTORE^b.'
 AWKPGM="$(cat)" <<-\
 	===AWKPGM===
 	NR == 1	{ f=\$0; next }
-	/$1/	{ print f }
+	/$1/	{ print f; nextfile }
 	===AWKPGM===
 
 desparkle "$AWKPGM"

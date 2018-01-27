@@ -11,8 +11,12 @@ function usage {
 	PGM="$REPLY"
 	sparkle >&2 <<-\
 	===SPARKLE===
-	^F{4}Usage^f: ^T$PGM^t ^Upattern^u
-	         List files matching awk style ^Upattern^u
+	^F{4}Usage^f: ^T$PGM^t ^[^T-o^t^|^T-a^t^] ^Upattern^u
+	         List ^BDOCSTORE^b archived filenames whose content matches the
+	         awk style ^Upattern^u. By default, only list files currently in
+	         the filesystem.
+	           ^T-o^t  List filenames not in the file system.
+	           ^T-a^t  List all filenames (in or not in the file system).
 	       ^T$PGM -h^t
 	         Show this help message.
 	===SPARKLE===
@@ -23,8 +27,11 @@ function bad_programmer {	# {{{2
 	die 'Programmer error:'	\
 		"  No getopts action defined for [1m-$1[22m."
   };	# }}}2
-while getopts ':h' Option; do
+ins=true; outs=false
+while getopts ':aoh' Option; do
 	case $Option in
+		a)	ins=true; outs=true;									;;
+		o)	ins=false; outs=true;									;;
 		h)	usage;													;;
 		\?)	die "Invalid option: [1m-$OPTARG[22m.";				;;
 		\:)	die "Option [1m-$OPTARG[22m requires an argument.";	;;
@@ -62,13 +69,31 @@ splitstr NL "$REPLY" dAWKPGM
 #   ↓ newline
 NL='
 ' # ↑ newline
-function only-files {(
+
+function only-in-files {( # {{{1
 	IFS="$NL"
 	while read -r F; do
 		[[ -f $F ]]|| continue
 		print -r -- "$F"
 	done
-)}
+)} # }}}1
+function only-out-files {( # {{{1
+	IFS="$NL"
+	while read -r F; do
+		[[ -f $F ]]&& continue
+		print -r -- "$F"
+	done
+)} # }}}1
+
+if $ins && $outs; then
+	alias only-files=cat
+elif $ins; then
+	alias only-files=only-in-files
+elif $outs; then
+	alias only-files=only-out-files
+else
+	die 'Bad programmer:' '^S$ins^s and ^S$outs^s are both ^Ifalse^i.'
+fi
 
 function zgrep-docstore {
 	for f in *; do

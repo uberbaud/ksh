@@ -15,7 +15,7 @@ function p {
 		return 0
 	  }
 
-	local possibles t="${1%/}" p s
+	local P possibles t="${1%/}" p s
 	while [[ $t == *[\'/]* ]]; do
 		p="${t%%[\'/]*}"
 		s="${t#"$p"}"
@@ -29,10 +29,18 @@ function p {
 		t="${s#[\'/]}"
 	done
 	t="$p$t"
-	eval "set -A possibles -- *'$t'*"
+	eval "set -A P -- *'$t'*"
+
+	integer i=0
+	for p in "${P[@]}"; do
+		[[ $p == $1 || -d $p ]]&& possibles[i++]="$p";
+	done
 
 	local choice='-'
-	if ((${#possibles[*]}>1)); then
+
+	if ((i==0)); then
+		choice="$(umenu "<$1>" *)"
+	elif ((${#possibles[*]}>1)); then
 		local inthere=false
 		for p in "${possibles[@]}"; do
 			[[ $p == $1 ]]|| continue
@@ -41,8 +49,6 @@ function p {
 		done
 		$inthere || set -A possibles -- "<$1>" "${possibles[@]}"
 		choice="$( umenu "${possibles[@]}" )"
-	elif [[ $possibles == "*$1*" ]]; then
-		choice="$(umenu "<$1>" *)"
 	else
 		choice="${possibles[0]}"
 	fi

@@ -71,10 +71,12 @@ SQL <<-\
 	==SQL==
 	SELECT DISTINCT value
 	  FROM amuse.vtags
-	 WHERE label = 'albumartist'
+	 WHERE label = 'performer'
 	   AND ( $where )
 	 ;
 	==SQL==
+
+(( $(set +u; print ${#reply[*]}) ))|| die "No results WHERE $where;"
 
 for r in "${reply[@]}"; { print -- "$r"; } | column
 

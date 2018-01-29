@@ -42,7 +42,8 @@ function SQL {
 		done
 	  }
 	$verbose && print -ru2 -- "SQL> $sql"
-	print -ru${SQLFD[1]} -- "$sql;"
+	print -ru${SQLFD[1]} -- "$sql"
+	print -ru${SQLFD[1]} -- ";"
 	print -ru${SQLFD[1]} -- "SELECT '$READY';"
 	integer i=0
 	while :; do

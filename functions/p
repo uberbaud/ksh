@@ -15,8 +15,21 @@ function p {
 		return 0
 	  }
 
-	local possibles
-	set -A possibles -- *"$1"*
+	local possibles t="${1%/}" p s
+	while [[ $t == *[\'/]* ]]; do
+		p="${t%%[\'/]*}"
+		s="${t#"$p"}"
+		if [[ $s == \'* ]]; then
+			p="$p'\''"
+		elif [[ $s == /* ]]; then
+			p="$p'*/*'"
+		else
+			die "Bad Programmer: matched ^[$s^]."
+		fi
+		t="${s#[\'/]}"
+	done
+	t="$p$t"
+	eval "set -A possibles -- *'$t'*"
 
 	local choice='-'
 	if ((${#possibles[*]}>1)); then

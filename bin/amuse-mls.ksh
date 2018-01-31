@@ -49,7 +49,7 @@ needs amuse:get-workpath SQL
 
 if (($#)); then
 	for P; do
-		[[ $P == +([A-Za-z0-9]) ]]|| { warn "Bad filter ^U$P^u."; continue; }
+		[[ $P == +([A-Za-z0-9 ]) ]]|| { warn "Bad filter ^U$P^u."; continue; }
 		where="${where:-} OR value LIKE '$P%'"
 	done
 	where="${where# OR }"

@@ -102,6 +102,19 @@ function safe-to-edit { #{{{1
 	  }
 	"$call" "$@"
 } #}}}1
+function check-flags-for-writability { # {{{1
+	local UCHG=16#2 UAPPND=16#4 SCHG=16#20000 SAPPND=16#40000
+	local NOWRITES=$((UCHG|UAPPND|SCHG|SAPPND))
+	local flags=$(stat -f %f "$1")
+	((flags&NOWRITES))|| return 0
+
+	flagstr=''
+	((flags&UCHG))&&	flagstr="$flagstr,uchg"
+	((flags&UAPPND))&&	flagstr="$flagstr,uappnd"
+	((flags&SCHG))&&	flagstr="$flagstr,schg"
+	((flags&SAPPND))&&	flagstr="$flagstr,sappnd"
+	die "File is flagged ^B${flagstr#,}^b. It is not writable."
+} # }}}1
 
 needs $ED
 EDBIN="${ED##*/}"
@@ -130,6 +143,7 @@ fi
 
 [[ -n $f_fullpath ]]||	die "$errmsg"
 [[ -f $f_fullpath ]]||	die "^B$1^b is ^Bnot^b a file."
+check-flags-for-writability "$f_fullpath"
 [[ $f_fullpath == *,v ]]&& warnOrDie "Seems to be an ^BRCS archive^b file."
 typeset -- ftype="$( /usr/bin/file -b "$f_fullpath")"
 [[ $ftype == *text* || $ftype == *XML* ]]||
@@ -153,6 +167,8 @@ typeset -- has_rcs=false
 	has_rcs=true
 	rcsdiff -q ./"$f_name" ||
 		die 'RCS and checked out versions differ.'
+	# avoid "writable ./f_name exists; remove it? [ny](n):"
+	[[ -w ./"$f_name" ]]&& chmod a-w ./"$f_name"
 	co -q -l ./"$f_name" ||
 		die "Could not ^Tco -l^t ^B${f_name}^b."
   }

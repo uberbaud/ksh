@@ -74,7 +74,7 @@ if (($#==1)) && [[ $1 == [0-9][0-9][0-9][0-9] ]]; then
 	shift
 elif (($#)); then
 	typeset -l o
-	for o in "$@"; do
+	for o; do
 		case $o in
 			[0-9][0-9][0-9][0-9])
 				YEAR=$o
@@ -82,7 +82,7 @@ elif (($#)); then
 			[0-9][0-9]|[0-9])
 				DOM=$o
 				;;
-			jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)
+			@(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)*)
 				MON=$o
 				;;
 			*)

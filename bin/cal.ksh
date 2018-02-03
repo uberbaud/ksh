@@ -24,7 +24,7 @@ function usage {
 	         ^T-y^t      Display whole year (no ^Tcalendar^t output).
 	         ^T-A^t ^Unum^u  Show events for ^Udays^u after.
 	         ^T-B^t ^Unum^u  Show events for ^Udays^u before.
-	         The date bits can be in any order. Any bits not will use today's bits.
+	         Date bits can be in any order. Unspecified bits will use today's bits.
 	       ^T${PGM} -h^t
 	         Show this help message.
 	===SPARKLE===

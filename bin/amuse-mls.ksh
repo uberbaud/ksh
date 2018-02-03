@@ -54,10 +54,14 @@ if (($#)); then
 	done
 	where="${where# OR }"
 else
-	random -e 27
-	R="$(printf "\x$(printf %x $((64+$?)))")"
-	if [[ $R == '`' ]]; then
+	random -e 28
+	R="$(printf "\x$(printf %x $((63+$?)))")"
+	if [[ $R == '@' ]]; then
 		where="value < 'A'"
+	elif [[ $R == '?' ]]; then
+		where="lower(value) BETWEEN 'sm' AND 't'"
+	elif [[ $R == 'S' ]]; then
+		where="lower(value) BETWEEN 's' AND 'sm'"
 	else
 		where="value LIKE '$R%'"
 	fi
@@ -73,6 +77,7 @@ SQL <<-\
 	  FROM amuse.vtags
 	 WHERE label = 'performer'
 	   AND ( $where )
+	   ORDER BY lower(value)
 	 ;
 	==SQL==
 

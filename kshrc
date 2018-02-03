@@ -34,6 +34,7 @@ if [[ -d ${XDG_CONFIG_HOME:-~/.config} ]]; then
 		K=$KDOTDIR
 		F=$K/functions
 		B=$K/bin
+		H=$K/help
 	fi
 else
 	XDG_CONFIG_HOME=$HOME/.config

@@ -5,12 +5,22 @@
 #:   Wrapper with autochange on clone
 
 function f-git {
-	local newdir want_cd=false gitresult
-	[[ $# -eq 2 && $1 == clone && $2 == http*.git ]] && want_cd=true
+	local newdir cmd_is_clone=false gitresult
+	[[ $1 == clone ]]&& cmd_is_clone=true
+
 	command git "$@"; gitresult=$?
-	$want_cd || return $gitresult
-	newdir="${2%.git}"; newdir="${newdir##http*/}"
-	cd $newdir
+
+	# return whatever if it wasn't a clone
+	$cmd_is_clone || return $gitresult
+	# return error if it was a clone and there was an error
+	((gitresult))|| return $gitresult
+
+	eval "newdir=\"\$$#\"" # get the last parameter
+	[[ $newdir == @(http|https|git):*.git ]]&& {
+		newdir="${newdir%.git}"
+		newdir="${newdir##*/}"
+	  }
+	cd "$newdir"
 }
 
 # Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

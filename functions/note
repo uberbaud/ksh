@@ -22,8 +22,13 @@ function note {
 	cd "$NOTES"
 	[[ -o noglob ]]&& { setnoglob=true; set +f; }
 	set -A Q -- *.note
-	local seqnum=0 q=$((${#Q[*]}-1))
-	[[ ${Q[q]} == \*.note ]]|| seqnum=${Q[q]%.note}
+	local seqnum=0
+	integer c
+	[[ ${Q[0]} == \*.note ]]|| # returning *.note means no matches
+		for q in "${Q[@]}"; do
+			c=${q%.note}
+			((seqnum<c))&& seqnum="$c"
+		done
 	# just in case everyone is trying to create a new note in the same 
 	# directory!
 	local TMPFILE="$(mktemp note-XXXXXXXXX)" tries=5
@@ -38,7 +43,11 @@ function note {
 	$setnoglob && set -f
 	((tries>=0))|| die 'Could not create ^Bnote^b.'
 	new -nz note "$*"
+	local CLIP="$(mktemp clip-XXXXXXXXX)"
+	xclip -out -selection clipboard >"${CLIP}"
 	xclip -out -selection clipboard >$seqnote
+	xclip -in -selection clipboard <"${CLIP}"
+	rm "${CLIP}"
 	ln -s $PWD/$seqnote \
 		"$noterepo/$(date -u +'%Y-%m-%dz')-${OLDPWD##*/}-$seqnum"
 	(($#))|| v $seqnote '.'

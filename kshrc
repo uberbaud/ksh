@@ -165,6 +165,8 @@ for i in ssh scp sftp rsync;	{ alias "$i=ssh-askfirst $i"; }
 # known hosts are commands to ssh to that host
 set -A known_hosts -- $(awk -F'[ ,]' '{print $1}' $xdgcfg/ssh/known_hosts)
 for i in "${known_hosts[@]}"; do
+	# skip unqualified names and dot-quads
+	[[ $i == *.* ]]|| continue
 	[[ $i == +([0-9]).+([0-9]).+([0-9]).+([0-9]) ]]&& continue
 	alias "$i=ssh $i"
 done

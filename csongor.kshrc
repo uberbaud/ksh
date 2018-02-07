@@ -53,6 +53,7 @@ LOGPS1='\n'\
 
 typeset -fu pre-prompt
 export PS1=\
+'\[\e[0m'\
 '$(pre-prompt)'\
 '\[\e[33m\]['\
 '\[\e[31m\]KSH '\

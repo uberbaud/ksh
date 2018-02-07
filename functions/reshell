@@ -1,18 +1,27 @@
 # <@(#)tag:csongor.greyshirt.net,2017-08-15:tw/04.06.15z/13ea47f>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^G(no arguments)^g
+#: FUNCTION ^[^T-f^t^] ^U/path/shell^u
 #:   Give a clean shell experience.
 
+needs getent readlink /usr/bin/env
 function reshell {
-	needs getent readlink /usr/bin/env
-	local k keepvars s setenvs v x
+	local k keepvars s setenvs v x force=false
 	set -A keepvars	FCEDIT HOME TERM USER		\
 					DISPLAY WINDOWID WINDOWPATH	\
 					SSH_AGENT_PID SSH_AUTH_SOCK
-	s=$(getent shells $(which "$1"))
-	desparkle "$1"
-	[[ -n $s ]]|| die "^B$REPLY^b is not a recognized shell."
+	[[ $1 == -f ]]&& { force=true; shift; }
+	(($#))|| die 'Missing required argument ^Bshell^b'
+	desparkle "$1"; sD="$REPLY"
+	if $force; then
+		s="$(readlink -fn "$1")"
+		[[ -n $s ]]|| die "^B$sD^b does not exist."
+		[[ -f $s ]]|| die "^B$sD^b is not a file."
+		[[ -x $s ]]|| die "^B$sD^b is not executable."
+	else
+		s=$(getent shells $(which "$1"))
+		[[ -n $s ]]|| die "^B$sD^b is not a recognized shell."
+	fi
 	shift
 	REPLY=''
 

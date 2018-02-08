@@ -1,16 +1,30 @@
 # <@(#)tag:csongor.greyshirt.net,2017-08-15:tw/04.06.15z/13ea47f>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^[^T-f^t^] ^U/path/shell^u
+#: FUNCTION ^[^T-fn^t^] ^[^T-e^t ^Uenvfile^u^] ^U/path/shell^u
 #:   Give a clean shell experience.
+#:     ^T-e^t  Use ^Uenvfile^u instead of .config/^Ushell^u.
+#:     ^T-f^t  Force even if it's not recognized shell.
+#:     ^T-n^t  Don't set or export ^SENV^s.
 
 needs getent readlink /usr/bin/env
 function reshell {
-	local k keepvars s setenvs v x force=false
+	local k keepvars s setenvs v x force=false doenv=true useenv ENV
 	set -A keepvars	FCEDIT HOME TERM USER		\
 					DISPLAY WINDOWID WINDOWPATH	\
 					SSH_AGENT_PID SSH_AUTH_SOCK
-	[[ $1 == -f ]]&& { force=true; shift; }
+	while getopts ':e:fn' Opt; do
+		case $Opt in
+			e)	useenv="$OPTARG";									;;
+			f)	force=true;											;;
+			n)	doenv=false;										;;
+			\?)	die "Invalid option: ^B-$OPTARG^b.";				;;
+			\:)	die "Option ^B-$OPTARG^b requires an argument.";	;;
+			*)	die "Bad programmer.";								;;
+		esac
+	done
+	shift $((OPTIND-1))
+
 	(($#))|| die 'Missing required argument ^Bshell^b'
 	desparkle "$1"; sD="$REPLY"
 	if $force; then
@@ -25,15 +39,18 @@ function reshell {
 	shift
 	REPLY=''
 
-	local ENV=${XDG_CONFIG_HOME:-$HOME/.config}/${s##*/}/env
-	[[ -f $ENV ]]&& {
-		ENV=$(readlink -fn $ENV)
-		if [[ -f $ENV ]]; then
-			keepvars[${#keepvars[*]}]=ENV
-		else
-			warn '^Benv^b exists but links to a non-existent file.'
-		fi
+	$doenv && {
+		ENV="${useenv:-"${XDG_CONFIG_HOME:-$HOME/.config}/${s##*/}/env"}"
+		[[ -f $ENV ]]&& {
+			ENV=$(readlink -fn $ENV)
+			if [[ -f $ENV ]]; then
+				keepvars[${#keepvars[*]}]=ENV
+			else
+				warn '^Benv^b exists but links to a non-existent file.'
+			fi
+		  }
 	  }
+
 	set -A setenvs -- SHELL="$s"
 	for k in "${keepvars[@]}"; do
 		eval 'v="$'"$k"'"'

@@ -135,7 +135,7 @@ showvar() {
 	{
 		print -n -- "  ^B$1^b is "
 		if [[ $3 == *\] ]]; then
-			print "an ^Barray^b of $2, with ^B$#^b slots."
+			print "an ^Barray^b of $2, with ^B$(($#-2))^b slots."
 		else
 			if [[ $2 == [aeiou]* ]]; then
 				print -n "an "

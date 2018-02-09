@@ -1,0 +1,35 @@
+# <@(#)tag:csongor.greyshirt.net,2018-02-09:tw/22.18.48z/333759>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Ustring^u
+#:   Sparkle single quoted string with controls specialized.
+
+function qvis {
+	local NL TAB='	' p s out='' c
+NL='
+'
+	desparkle "$1"
+	gsub \' \'\\\'\' "$REPLY"
+	text="$REPLY"
+	while [[ $text == *[[:cntrl:]]* ]]; do
+		s="${text#*[[:cntrl:]]}"	# end without CTRL
+		p="${text%"$s"}"			# beginning WITH CNTRL
+		# for some reason, parameter substitutions eat NL and TAB
+		case "$p" in
+			*"$NL")	 c="^S^^J^s";	;;
+			*"$TAB") c="^S^^I^s";	;;
+			*)	c="${p#"${p%?}"}"	# remove all CNTRL (last char)
+				c="^S^$(print -r "$c"|vis -b)^s"	# convert visible
+				;;
+		esac
+		out="$out${p%?}$c"
+		text="$s"
+	done
+	out="'$out$text'"		# enclose in quotes
+	out="${out#\'\'}"		# remove empty quote at beginning
+	out="${out%\'\'}"		# remove empty quote at end
+	[[ -z $out ]]&& out="^Gempty^g"
+	print -r -- "$out" |sparkle
+}
+
+# Copyright © 2018 by Tom Davis <tom@greyshirt.net>.

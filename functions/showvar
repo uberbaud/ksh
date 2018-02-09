@@ -1,84 +1,164 @@
-# <@(#)tag:csongor.greyshirt.net,2017-07-17:tw/04.31.09z/474468e>
+# <@(#)tag:csongor.greyshirt.net,2018-02-08:tw/20.12.04z/1b4f09d>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-# FUNCTION ^Uvarname^u
-#:  Shows information about a variable.
+#: FUNCTION ^Uvarname^u
+#:   Shows information about ^Uvarname^u.
 
-# Because the variable is accessed by name and any variable assignment 
-# inside the function would potentially overwrite the information we 
-# would need to access later, all variable handling is done with 
-# positional variables/parameters of the function.
-#
-# Consequently, this is more complex and obfuscated than it could have 
-# otherwise been.
-
-function showvar {
-	(($#==1))|| die 'usage: showvar var'
-	[[ "${1:-x}" == @(_|\!|\$|\-|IFS) ]] && {
-		printf '  \e[1m%s\e[22m is a \e[1mksh special\e[22m with a value of:\n' $1
-		case $1 in
-			\_)		printf "  '%s'\n" $_;							;;
-			\!)		printf "  '%s'\n" $!;							;;
-			\$)		printf "  '%s'\n" $$;							;;
-			\-)		printf "  '%s'\n" $-;							;;
-			IFS)	printf "  '%s'\n" "$(echo -n "$IFS"|cat -te)";	;;
-			*)  printf '  \e[31mBad Programmer!\e[0m\n';			;;
-		esac
-		return 0
-	}
-	(eval ": \${$1?}" 2>/dev/null) ||
-		die 'showvar: variable is null or not set.'
-	[[ $1 == @(\@|\*|\#|\?|LINENO) ]]&& die 'showvar: special variable, not available.'
-	[[ $1 == +([0-9]) ]]&& die 'showvar: positional variable, not available.'
-	[[ $1 == *(0) ]]&& die 'showvar: variable not available.'
-
-	printf '  \e[1m%s\e[22m is ' "$1"
-
-	set -- "$(typeset|egrep '[[:<:]]'"$1"'$')" $(typeset +|egrep "^$1"'(\[[0-9]+\])?$')
-
-	if (($#==1)); then
-		printf 'an \e[1mempty array\e[0m.'
-	elif (($#>2)); then
-		shift
-		printf 'an \e[1marray\e[0m with \e[1m%d\e[0m slots.\n' $#
-		while (($#)); do
-			set -- "${1#*\[}" "$@"
-			set -- "${1%\]}" "$@"
-			eval set -- "\"\${$3}\"" "$@"
-			printf "%4d: '%s'\n" $2 "$1"
-			shift 4
-		done
-	elif [[ "$2" == *'[0]' ]]; then
-		printf 'an \e[1marray\e[0m with \e[1m1\e[0m slot.\n'
-		eval set -- "\"\${$2}\""
-		printf "%4d: '%s'\n" 1 "$1"
-	else
-		set -- $1
-		shift
-		if [[ " $* " == *' -i '* ]]; then
-			printf 'an \e[1minteger'
-		elif [[ " $* " == *' -U '* ]]; then
-			printf 'an \e[1munsigned'
-		else
-			printf 'a \e[1mscalar'
-		fi
-
-		while (($#>1)); do
+showvar() {
+	set -- "$@" "$?" "$-" "$_" # save special variables
+	(($#!=4))&& die 'Expected exactly one (1) variable name.'
+	( # use a subshell so we can alter variables (REPLY)
+	case "$1" in
+		\@|\*|\#|[1-9])
+			die 'Cannot access parent argument list.';	;;
+		\_)
+			sparkle <<-==SPARKLE==
+			  ^B$1^b is a ^Bspecial^b variable whose value is
+			    1. the last word of previous command,
+			    2. the path of the executed command, or
+			    3. the name of the file in ^SMAILPATH^s that changed.
+			==SPARKLE==
+			return
+			;;
+		@(\?|-|!|$|0))
 			case $1 in
-				-L*)	printf '-left(%d)' ${1#-L};			;;
-				-l)		printf '-lowercase';				;;
-				-R*)	printf '-right(%d)' ${1#-R};		;;
-				-r)		printf '-readonly';					;;
-				-r)		printf '-tag';						;;
-				-u)		printf '-uppercase';				;;
-				-x)		printf '-export';					;;
-				-Z*)	printf '-zerofill(%d)' ${1#-Z};		;;
+				\?)	set -- "$1" "$2";					;;
+				-)	set -- "$1" "$3";					;;
+				!)	set -- "$1" "$!";					;;
+				$)	set -- "$1" "$$";					;;
+				0)	set -- "$1" "$0";					;;
+				_)	set -- "$1" "$4";					;;
+				*) die 'Bad programmer (2nd case).';	;;
 			esac
-			shift
-		done
-		printf '\e[0m with a value of:\n'
-		eval set -- "\"\${$1}\""
-		printf "  '%s'\n" "$1"
-	fi
-}
+			sparkle <<-==SPARKLE==
+			  ^B$1^b is a ^Bspecial^b variable with a value of:
+			  ^B$2^b
+			==SPARKLE==
+			return
+			;;
+		PWD)
+			sparkle <<-==SPARKLE==
+			  ^BPWD^b is a ^Bspecial^b variable whose value is set to
+			    the working directory by the shell.
+			    currently ^S$PWD^s
+			==SPARKLE==
+			return
+			;;
+		RANDOM)
+			sparkle <<-==SPARKLE==
+			  ^BRANDOM^b is a ^Bspecial^b variable whose value is
+			    randomly generated (e.g. ^S$RANDOM^s).
+			==SPARKLE==
+			return
+			;;
+		REPLY)
+			local x attr="scalar" j=right
+			x="$(typeset|egrep " $1\$")"
+			[[ -n $x ]]|| die 'Variable is not set'
+			[[ $x == *'-i'* ]]&& attr="integer"
+			[[ $x == *'-U'* ]]&& attr="unsigned integer"
+			[[ $x == *'-L'* ]]&& {
+				x="${x#*-L}"; x="${x%% *}"
+				attr="left justified to $x bytes $attr"
+				j=left
+			  }
+			[[ $x == *'-R'* ]]&& {
+				x="${x#*-R}"; x="${x%% *}"
+				attr="right justified to $x bytes $attr"
+			  }
+			[[ $x == *'-Z'* ]]&& {
+				x="${x#*-R}"; x="${x%% *}"
+				attr="zero filled $j justified to $x bytes $attr"
+			  }
+			[[ $x == *'-l'* ]]&& attr="lowercase $attr"
+			[[ $x == *'-u'* ]]&& attr="uppercase $attr"
+			[[ $x == *'-r'* ]]&& attr="readonly $attr"
+			[[ $x == *'-x'* ]]&& attr="exported $attr"
+			set -- $(typeset +|egrep "^$1(\[[0-9]+\])?$")
+			{
+				print -n -- "  ^BREPLY^b is "
+				if [[ $3 == *\] ]]; then
+					print "an ^Barray^b of $attr, with ^B$#^b slots."
+				else
+					if [[ $attr == [aeiou]* ]]; then
+						print -n "an "
+					else
+						print -n "a "
+					fi
+					print "$attr with a value of:"
+				fi
+			}| sparkle
+			for x; do
+				if [[ $x == *\] ]]; then
+					set -- "$x"
+					x="${x#*\[}"
+					x="${x%\]}"
+					printf "%4s: " "$x"
+					x="$1"
+				else
+					print -n '    '
+				fi
+				eval "x=\"\${$x}\""
+				qvis "$x"
+			done
+			return 0
+			;;
+	esac
+	[[ $1 == [A-Za-z_]*([A-Za-z0-9_]) ]]|| {
+		desparkle "$1"
+		die "^B$REPLY^b does not look like a variable name."
+	  }
+	# get info about the variable first!
+	set -- "$1" scalar right
+	REPLY="$(typeset|egrep " $1\$")"
+	# if it doesn't exist, we can exit
+	[[ -n $REPLY ]]|| die 'Variable is not set'
+	[[ $REPLY == *'-i'* ]]&& set -- "$1" "integer" "$3"
+	[[ $REPLY == *'-U'* ]]&& set -- "$1" "unsigned integer" "$3"
+	[[ $REPLY == *'-L'* ]]&& {
+		REPLY="${REPLY#*-L}"; REPLY="${REPLY%% *}"
+		set -- "$1" "left justified to $REPLY bytes $2" "left"
+	  }
+	[[ $REPLY == *'-R'* ]]&& {
+		REPLY="${REPLY#*-R}"; REPLY="${REPLY%% *}"
+		set -- "$1" "right justified to $REPLY bytes $2" "$3"
+	  }
+	[[ $REPLY == *'-Z'* ]]&& {
+		REPLY="${REPLY#*-R}"; REPLY="${REPLY%% *}"
+		set -- "$1" "zero filled $3 justified to $REPLY bytes $2" "$3"
+	  }
+	[[ $REPLY == *'-l'* ]]&& set -- "$1" "lowercase $2"
+	[[ $REPLY == *'-u'* ]]&& set -- "$1" "uppercase $2"
+	[[ $REPLY == *'-r'* ]]&& set -- "$1" "readonly $2"
+	[[ $REPLY == *'-x'* ]]&& set -- "$1" "exported $2"
+	set -- "$1" "$2" $(typeset +|egrep "^$1(\[[0-9]+\])?$")
+	{
+		print -n -- "  ^B$1^b is "
+		if [[ $3 == *\] ]]; then
+			print "an ^Barray^b of $2, with ^B$#^b slots."
+		else
+			if [[ $2 == [aeiou]* ]]; then
+				print -n "an "
+			else
+				print -n "a "
+			fi
+			print "$2 with a value of:"
+		fi
+	}| sparkle
+	shift 2
+	for REPLY; do
+		if [[ $REPLY == *\] ]]; then
+			set -- "$REPLY"
+			REPLY="${REPLY#*\[}"
+			REPLY="${REPLY%\]}"
+			printf "%4s: " "$REPLY"
+			REPLY="$1"
+		else
+			print -n '    '
+		fi
+		eval "REPLY=\"\${$REPLY}\""
+		qvis "$REPLY"
+	done
+)}
 
-# vim: ft=zsh ts=4 nowrap
+# Copyright © 2018 by Tom Davis <tom@greyshirt.net>.

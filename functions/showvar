@@ -52,111 +52,135 @@ showvar() {
 			==SPARKLE==
 			return
 			;;
-		REPLY)
-			local x attr="scalar"
-			x="$(typeset|egrep " $1\$")"
-			[[ -n $x ]]|| die 'Variable is not set'
-			[[ $x == *'-i'* ]]&& attr="integer"
-			[[ $x == *'-U'* ]]&& attr="unsigned integer"
-			[[ $x == *'-L'* ]]&& {
-				x="${x#*-L}"; x="${x%% *}"
-				attr="left justified to $x bytes $attr"
-			  }
-			[[ $x == *'-R'* ]]&& {
-				x="${x#*-R}"; x="${x%% *}"
-				attr="right justified to $x bytes $attr"
-			  }
-			[[ $x == *'-Z'* ]]&& attr="zero filled $attr"
-			[[ $x == *'-l'* ]]&& attr="lowercase $attr"
-			[[ $x == *'-u'* ]]&& attr="uppercase $attr"
-			[[ $x == *'-r'* ]]&& attr="readonly $attr"
-			[[ $x == *'-x'* ]]&& attr="exported $attr"
-			set -- $(typeset +|egrep "^$1(\[[0-9]+\])?$")
-			print -n -- "  \033[1mREPLY\033[22m is "
-			if [[ $1 == *\] ]]; then
-				print "an \033[1marray\033[22m of $attr, with \033[1m$#\033[22m slots."
-			else
-				if [[ $attr == [aeiou]* ]]; then
-					print -n "an "
-				else
-					print -n "a "
-				fi
-				print "$attr with a value of:"
-			fi
-			for x; do
-				if [[ $x == *\] ]]; then
-					set -- "$x"
-					x="${x#*\[}"
-					x="${x%\]}"
-					printf "%4s: " "$x"
-					x="$1"
-				else
-					print -n '    '
-				fi
-				eval "x=\"\${$x}\""
-				qvis "$x"
+	##############################################################
+	# the v & e cases are so we can use those in the general case
+	# without overwriting the variable we are inspecting
+	##############################################################
+		v)
+			local V e
+			set -- # clear parameter array
+			for V in $(typeset +|egrep '^v(\[[0-9]+\])?$'); do
+				eval "e=\"\${$V}\""
+				set -- "$@" "$V" "$e"
 			done
-			return 0
+			(($#))|| die "Variable is not set."
+			set -- "$(typeset|egrep ' v$')" "$@"
+			;;
+		e)
+			local v E
+			set -- # clear parameter array
+			for v in $(typeset +|egrep '^e(\[[0-9]+\])?$'); do
+				eval "E=\"\${$v}\""
+				set -- "$@" "$v" "$E"
+			done
+			(($#))|| die "Variable is not set."
+			set -- "$(typeset|egrep ' e$')" "$@"
+			;;
+		*)
+			[[ $1 == [A-Za-z_]*([A-Za-z0-9_]) ]]|| {
+				desparkle "$1"
+				die "^B$REPLY^b does not look like a variable name."
+			  }
+			local v e
+			set -- "$1" # clear but save variable name for later
+			for v in $(typeset +|egrep "^$1(\[[0-9]+\])?\$"); do
+				eval "e=\"\${$v}\""
+				set -- "$@" "$v" "$e"
+			done
+			(($#==1))&& # 1, not 0, becaue we saved the variable name
+				die "Variable is not set."
+			v="$(typeset|egrep " $1\$")"
+			shift # remove variable name
+			set -- "$v" "$@"
 			;;
 	esac
-	[[ $1 == [A-Za-z_]*([A-Za-z0-9_]) ]]|| {
-		desparkle "$1"
-		die "^B$REPLY^b does not look like a variable name."
-	  }
-	# get info about the variable first!
-	set -- "$1" scalar
-	REPLY="$(typeset|egrep " $1\$")"
-	# if it doesn't exist, we can exit
-	[[ -n $REPLY ]]|| die 'Variable is not set'
-	[[ $REPLY == *'-i'* ]]&& set -- "$1" "integer"
-	[[ $REPLY == *'-U'* ]]&& set -- "$1" "unsigned integer"
-	[[ $REPLY == *'-L'* ]]&& {
-		set -- "$1" "$2" "$REPLY"
-		REPLY="${REPLY#*-L}"; REPLY="${REPLY%% *}"
-		set -- "$1" "left justified to $REPLY bytes $2" "$3"
-		REPLY="$3"
-	  }
-	[[ $REPLY == *'-R'* ]]&& {
-		set -- "$1" "$2" "$REPLY"
-		REPLY="${REPLY#*-R}"; REPLY="${REPLY%% *}"
-		set -- "$1" "right justified to $REPLY bytes $2" "$3"
-		REPLY="$3"
-	  }
-	[[ $REPLY == *'-Z'* ]]&& set -- "$1" "zero filled $2"
-	[[ $REPLY == *'-l'* ]]&& set -- "$1" "lowercase $2"
-	[[ $REPLY == *'-u'* ]]&& set -- "$1" "uppercase $2"
-	[[ $REPLY == *'-r'* ]]&& set -- "$1" "readonly $2"
-	[[ $REPLY == *'-x'* ]]&& set -- "$1" "exported $2"
-	set -- "$1" "$2" $(typeset +|egrep "^$1(\[[0-9]+\])?$")
-	print -n -- "  \033[1m$1\033[22m is " # 6 chars + len(varname)
-	if [[ $3 == *\] ]]; then
-		print "an \033[1marray\033[22m of $2, with \033[1m$(($#-2))\033[22m slots."
+	varname="${1##* }"
+	integer ndx=-1 scrcol=1 noun=0
+	function @decl { #{{{1
+		local decl num type=scalar tlen=6
+		decl="${1% *}"			# remove name
+		decl="${decl#typeset}"	#remove keyword (which might be all that's left
+		decl="${decl# }"		#remove leading space if it exists
+
+		[[ $decl == *'-i'* ]]&& { type="integer"; tlen=7; }
+		[[ $decl == *'-U'* ]]&& { type="unsigned integer"; tlen=16; }
+
+		[[ $decl == *'-r'* ]]&& { attr[++ndx]="readonly";   atlen[ndx]=8; }
+		[[ $decl == *'-x'* ]]&& { attr[++ndx]="exported";   atlen[ndx]=8; }
+		[[ $decl == *'-t'* ]]&& { attr[++ndx]="tagged";     atlen[ndx]=8; }
+		[[ $decl == *'-l'* ]]&& { attr[++ndx]="lowercase";  atlen[ndx]=9; }
+		[[ $decl == *'-u'* ]]&& { attr[++ndx]="uppercase";  atlen[ndx]=9; }
+		[[ $decl == *'-Z'* ]]&& { attr[++ndx]="zero padded";atlen[ndx]=11;}
+		noun=$((++ndx))
+		attr[noun]="$type"
+		atlen[noun]="$tlen"
+		[[ $decl == *'-L'* ]]&& {
+			num="${decl#*-L}"; num="${num%% *}"
+			attr[++ndx]="left justified to $num bytes"
+			atlen[ndx]=$((24+${#num}))
+		  }
+		[[ $decl == *'-R'* ]]&& {
+			num="${decl#*-R}"; num="${num%% *}"
+			attr[++ndx]="right justified to $num bytes"
+			atlen[ndx]=$((25+${#num}))
+		  }
+	} #}}}1
+	function @newline { #{{{1
+		local pad="${1:-}"
+		print -n -- "\n$pad"
+		scrcol=$((${#pad}+1)) # we moved one (1) past the padding
+	} #}}}1
+	function @prnstr { #{{{1
+		integer len=$1
+		if ((scrcol+len+1>COLUMNS)); then
+			@newline '    '
+		elif ${3:-true}; then
+			print -n ' '
+			((scrcol++))
+		fi
+		print -n -- "$2"
+		((scrcol+=len))
+	} #}}}1
+	function @prnattr { #{{{1
+		integer i=0
+		while ((i<=ndx)); do
+			@prnstr ${atlen[i]} "${attr[i]}"
+			((i++))
+		done
+	} #}}}1
+	@decl "$1"; shift
+	@prnstr $((5+${#varname})) "  \033[1m$varname\033[22m is" false
+
+	if [[ $1 == *\] ]]; then
+		attr[noun]="${attr[noun]}s"
+		((atlen[0]++))
+		@prnstr 11 'an \033[1marray\033[22m of'
+		@prnattr
+		s='s'; S=14
+		slots=$(($#/2))
+		((slots==1))&& { s=''; S=13; }
+		@prnstr 1 ',' false
+		@prnstr $((12+${#slots})) "with \033[1m$slots\033[22m slot$s."
 	else
-		if [[ $2 == [aeiou]* ]]; then
-			print -n "an "
-		else
-			print -n "a "
-		fi
-		(((${#1}+3+${#2}+17)>COLUMNS))&& print -n '\n    '
-		if (((4+${#2}+17)>COLUMNS)); then
-			print -- "$2\n    with a value of:"
-		else
-			print -- "$2 with a value of:"
-		fi
+		@prnstr 1 a
+		[[ $1 == [aeiou]* ]]&& @prnstr 1 n false
+		@prnattr
+		@prnstr 16 "with a value of:"
 	fi
-	shift 2
-	for REPLY; do
-		if [[ $REPLY == *\] ]]; then
-			set -- "$REPLY"
-			REPLY="${REPLY#*\[}"
-			REPLY="${REPLY%\]}"
-			printf "%4s: " "$REPLY"
-			REPLY="$1"
+	@newline
+	typeset -R4 -i K=0
+	while (($#)); do
+		k="$1" v="$2"
+		if [[ $k == *\] ]]; then
+			k="${k#*\[}"
+			K="${k%\]}"
+			print -n "$K) "
 		else
 			print -n '    '
 		fi
-		eval "REPLY=\"\${$REPLY}\""
-		qvis "$REPLY"
+		eval "v=\"\${$1}\""
+		qvis "$v"
+		shift 2
 	done
 )}
 

@@ -32,15 +32,16 @@ showvar() {
 			esac
 			sparkle <<-==SPARKLE==
 			  ^B$1^b is a ^Bspecial^b variable with a value of:
-			  ^B$2^b
+			    $2
 			==SPARKLE==
 			return
 			;;
 		PWD)
+			desparkle "$PWD"
 			sparkle <<-==SPARKLE==
 			  ^BPWD^b is a ^Bspecial^b variable whose value is set to
-			    the working directory by the shell.
-			    currently ^S$PWD^s
+			    the working directory by the shell. Current value is
+			      $REPLY
 			==SPARKLE==
 			return
 			;;

@@ -5,7 +5,8 @@
 #:   Wrapper for bible-mark.ksh. use ^T-h^t for help.
 
 function f-b {
-	${XDG_DATA_HOME:?}/bible/bible-mark.ksh "$@"
+	${XDG_DATA_HOME:?}/bible/bible-mark.ksh "$@"|
+		less -iMSx4 -FXc
 }
 
 # Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

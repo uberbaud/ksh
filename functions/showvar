@@ -75,19 +75,17 @@ showvar() {
 			[[ $x == *'-r'* ]]&& attr="readonly $attr"
 			[[ $x == *'-x'* ]]&& attr="exported $attr"
 			set -- $(typeset +|egrep "^$1(\[[0-9]+\])?$")
-			{
-				print -n -- "  ^BREPLY^b is "
-				if [[ $3 == *\] ]]; then
-					print "an ^Barray^b of $attr, with ^B$#^b slots."
+			print -n -- "  \033[1mREPLY\033[22m is "
+			if [[ $1 == *\] ]]; then
+				print "an \033[1marray\033[22m of $attr, with \033[1m$#\033[22m slots."
+			else
+				if [[ $attr == [aeiou]* ]]; then
+					print -n "an "
 				else
-					if [[ $attr == [aeiou]* ]]; then
-						print -n "an "
-					else
-						print -n "a "
-					fi
-					print "$attr with a value of:"
+					print -n "a "
 				fi
-			}| sparkle
+				print "$attr with a value of:"
+			fi
 			for x; do
 				if [[ $x == *\] ]]; then
 					set -- "$x"
@@ -124,7 +122,7 @@ showvar() {
 		set -- "$1" "right justified to $REPLY bytes $2" "$3"
 	  }
 	[[ $REPLY == *'-Z'* ]]&& {
-		REPLY="${REPLY#*-R}"; REPLY="${REPLY%% *}"
+
 		set -- "$1" "zero filled $3 justified to $REPLY bytes $2" "$3"
 	  }
 	[[ $REPLY == *'-l'* ]]&& set -- "$1" "lowercase $2"
@@ -132,19 +130,17 @@ showvar() {
 	[[ $REPLY == *'-r'* ]]&& set -- "$1" "readonly $2"
 	[[ $REPLY == *'-x'* ]]&& set -- "$1" "exported $2"
 	set -- "$1" "$2" $(typeset +|egrep "^$1(\[[0-9]+\])?$")
-	{
-		print -n -- "  ^B$1^b is "
-		if [[ $3 == *\] ]]; then
-			print "an ^Barray^b of $2, with ^B$(($#-2))^b slots."
+	print -n -- "  \033[1m$1\033[22m is "
+	if [[ $3 == *\] ]]; then
+		print "an \033[1marray\033[22m of $2, with \033[1m$(($#-2))\033[22m slots."
+	else
+		if [[ $2 == [aeiou]* ]]; then
+			print -n "an "
 		else
-			if [[ $2 == [aeiou]* ]]; then
-				print -n "an "
-			else
-				print -n "a "
-			fi
-			print "$2 with a value of:"
+			print -n "a "
 		fi
-	}| sparkle
+		print "$2 with a value of:"
+	fi
 	shift 2
 	for REPLY; do
 		if [[ $REPLY == *\] ]]; then

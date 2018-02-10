@@ -53,11 +53,7 @@ function warnOrDie { #{{{1
 	esac
 } # }}}1
 
-i-can-haz-inet || case $? in
-		1) die 'man in the middle';			;;
-		2) die 'no internet';				;;
-		*) die 'Unknown [1mi-can-haz-inet[0m result [1m'$?'[0m'; ;;
-	esac
+i-can-haz-inet || die "$REPLY"
 
 accToFetch=${XDG_CONFIG_HOME:?}/fetchmail/accTofetch.ksh
 needs $accToFetch inc pick scan mark fetchmail
@@ -124,7 +120,10 @@ function group {
 } 2>/dev/null
 
 group obsd      --list-id 'source-changes\.openbsd\.org'
-group zshwork   --list-id 'zsh-workers\.zsh\.org'
+group otech     --list-id 'tech\.openbsd\.org'
+group obugs     --list-id 'bugs\.openbsd\.org'
+group omisc     --list-id 'misc\.openbsd\.org'
+#group zshwork   --list-id 'zsh-workers\.zsh\.org'
 group drgfly    --list-id 'users\.dragonflybsd\.org'
 
 scanseq='¬L'

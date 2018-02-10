@@ -8,18 +8,51 @@ function qvis {
 	local NL TAB='	' p s out='' c
 NL='
 '
-	desparkle "$1"
-	gsub \' \'\\\'\' "$REPLY"
+	gsub \' \'\\\'\' "$1"
+	gsub '\' '\\' "$REPLY"
 	text="$REPLY"
 	while [[ $text == *[[:cntrl:]]* ]]; do
 		s="${text#*[[:cntrl:]]}"	# end without CTRL
 		p="${text%"$s"}"			# beginning WITH CNTRL
 		# for some reason, parameter substitutions eat NL and TAB
 		case "$p" in
-			*"$NL")	 c="^S^^J^s";	;;
-			*"$TAB") c="^S^^I^s";	;;
-			*)	c="${p#"${p%?}"}"	# remove all CNTRL (last char)
-				c="^S^$(print -r "$c"|vis -b)^s"	# convert visible
+			*"$NL")	 c="\033[35m^J\033[39m";	;;
+			*"$TAB") c="\033[35m^I\033[39m";	;;
+			*) # p - all but the last character = last char
+				case "${p#"${p%?}"}" in
+					'') c="^A";	;; #   1
+					'') c="^B";	;; #   2
+					'') c="^C";	;; #   3
+					'') c="^D";	;; #   4
+					'') c="^E";	;; #   5
+					'') c="^F";	;; #   6
+					'') c="^G";	;; #   7
+					'') c="^H";	;; #   8
+					'') c="^K";	;; #  11
+					'') c="^L";	;; #  12
+					'') c="^M";	;; #  13
+					'') c="^N";	;; #  14
+					'') c="^O";	;; #  15
+					'') c="^P";	;; #  16
+					'') c="^Q";	;; #  17
+					'') c="^R";	;; #  18
+					'') c="^S";	;; #  19
+					'') c="^T";	;; #  20
+					'') c="^U";	;; #  21
+					'') c="^V";	;; #  22
+					'') c="^W";	;; #  23
+					'') c="^X";	;; #  24
+					'') c="^Y";	;; #  25
+					'') c="^Z";	;; #  26
+					'') c="^[";	;; #  27
+					'') c='^\';	;; #  28
+					'') c="^]";	;; #  29
+					'') c="^^";	;; #  30
+					'') c="^_";	;; #  31
+					'') c="^?";	;; # 128
+					*)	  c='??';	;; # shouldn't happen
+				esac
+				c="\033[35m$c\033[39m"
 				;;
 		esac
 		out="$out${p%?}$c"
@@ -28,8 +61,8 @@ NL='
 	out="'$out$text'"		# enclose in quotes
 	out="${out#\'\'}"		# remove empty quote at beginning
 	out="${out%\'\'}"		# remove empty quote at end
-	[[ -z $out ]]&& out="^Gempty^g"
-	print -r -- "$out" |sparkle
+	[[ -z $out ]]&& out="\033[38;5;248mempty\033[39m"
+	print -- "$out"
 }
 
 # Copyright © 2018 by Tom Davis <tom@greyshirt.net>.

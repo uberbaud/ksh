@@ -62,6 +62,7 @@ NL='
 	out="${out#\'\'}"		# remove empty quote at beginning
 	out="${out%\'\'}"		# remove empty quote at end
 	[[ -z $out ]]&& out="\033[38;5;248mempty\033[39m"
+	[[ $out == \'+([0-9])\' ]]&& { out="${out%\'}"; out="${out#\'}"; }
 	print -- "$out"
 }
 

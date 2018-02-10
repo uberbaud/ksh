@@ -1,5 +1,5 @@
 # <@(#)tag:csongor.greyshirt.net,2018-02-08:tw/20.12.04z/1b4f09d>
-# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
 
 #: FUNCTION ^Uvarname^u
 #:   Shows information about ^Uvarname^u.
@@ -52,7 +52,7 @@ showvar() {
 			return
 			;;
 		REPLY)
-			local x attr="scalar" j=right
+			local x attr="scalar"
 			x="$(typeset|egrep " $1\$")"
 			[[ -n $x ]]|| die 'Variable is not set'
 			[[ $x == *'-i'* ]]&& attr="integer"
@@ -60,16 +60,12 @@ showvar() {
 			[[ $x == *'-L'* ]]&& {
 				x="${x#*-L}"; x="${x%% *}"
 				attr="left justified to $x bytes $attr"
-				j=left
 			  }
 			[[ $x == *'-R'* ]]&& {
 				x="${x#*-R}"; x="${x%% *}"
 				attr="right justified to $x bytes $attr"
 			  }
-			[[ $x == *'-Z'* ]]&& {
-				x="${x#*-R}"; x="${x%% *}"
-				attr="zero filled $j justified to $x bytes $attr"
-			  }
+			[[ $x == *'-Z'* ]]&& attr="zero filled $attr"
 			[[ $x == *'-l'* ]]&& attr="lowercase $attr"
 			[[ $x == *'-u'* ]]&& attr="uppercase $attr"
 			[[ $x == *'-r'* ]]&& attr="readonly $attr"
@@ -107,30 +103,31 @@ showvar() {
 		die "^B$REPLY^b does not look like a variable name."
 	  }
 	# get info about the variable first!
-	set -- "$1" scalar right
+	set -- "$1" scalar
 	REPLY="$(typeset|egrep " $1\$")"
 	# if it doesn't exist, we can exit
 	[[ -n $REPLY ]]|| die 'Variable is not set'
-	[[ $REPLY == *'-i'* ]]&& set -- "$1" "integer" "$3"
-	[[ $REPLY == *'-U'* ]]&& set -- "$1" "unsigned integer" "$3"
+	[[ $REPLY == *'-i'* ]]&& set -- "$1" "integer"
+	[[ $REPLY == *'-U'* ]]&& set -- "$1" "unsigned integer"
 	[[ $REPLY == *'-L'* ]]&& {
+		set -- "$1" "$2" "$REPLY"
 		REPLY="${REPLY#*-L}"; REPLY="${REPLY%% *}"
-		set -- "$1" "left justified to $REPLY bytes $2" "left"
+		set -- "$1" "left justified to $REPLY bytes $2" "$3"
+		REPLY="$3"
 	  }
 	[[ $REPLY == *'-R'* ]]&& {
+		set -- "$1" "$2" "$REPLY"
 		REPLY="${REPLY#*-R}"; REPLY="${REPLY%% *}"
 		set -- "$1" "right justified to $REPLY bytes $2" "$3"
+		REPLY="$3"
 	  }
-	[[ $REPLY == *'-Z'* ]]&& {
-
-		set -- "$1" "zero filled $3 justified to $REPLY bytes $2" "$3"
-	  }
+	[[ $REPLY == *'-Z'* ]]&& set -- "$1" "zero filled $2"
 	[[ $REPLY == *'-l'* ]]&& set -- "$1" "lowercase $2"
 	[[ $REPLY == *'-u'* ]]&& set -- "$1" "uppercase $2"
 	[[ $REPLY == *'-r'* ]]&& set -- "$1" "readonly $2"
 	[[ $REPLY == *'-x'* ]]&& set -- "$1" "exported $2"
 	set -- "$1" "$2" $(typeset +|egrep "^$1(\[[0-9]+\])?$")
-	print -n -- "  \033[1m$1\033[22m is "
+	print -n -- "  \033[1m$1\033[22m is " # 6 chars + len(varname)
 	if [[ $3 == *\] ]]; then
 		print "an \033[1marray\033[22m of $2, with \033[1m$(($#-2))\033[22m slots."
 	else
@@ -139,7 +136,12 @@ showvar() {
 		else
 			print -n "a "
 		fi
-		print "$2 with a value of:"
+		(((${#1}+3+${#2}+17)>COLUMNS))&& print -n '\n    '
+		if (((4+${#2}+17)>COLUMNS)); then
+			print -- "$2\n    with a value of:"
+		else
+			print -- "$2 with a value of:"
+		fi
 	fi
 	shift 2
 	for REPLY; do

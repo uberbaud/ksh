@@ -22,17 +22,62 @@ showvar() {
 			;;
 		@(\?|-|!|$|0))
 			case $1 in
-				\?)	set -- "$1" "$2";					;;
-				-)	set -- "$1" "$3";					;;
-				!)	set -- "$1" "$!";					;;
-				$)	set -- "$1" "$$";					;;
-				0)	set -- "$1" "$0";					;;
-				_)	set -- "$1" "$4";					;;
+				\?)	set -- "$1" "$2" "most recent error code";			;;
+				-)	set -- "$1" "$3" "set single letter options state";	;;
+				!)	set -- "$1" "$!" "PID of last bg process started";	;;
+				$)	set -- "$1" "$$" "shell PID (parent of subshell)";	;;
+				0)	set -- "$1" "$0" "name of shell or function";		;;
 				*) die 'Bad programmer (2nd case).';	;;
 			esac
 			sparkle <<-==SPARKLE==
-			  ^B$1^b is a ^Bspecial^b variable with a value of:
+			  ^B$1^b is a ^Bspecial^b variable indicating the $3
+			  with a value of:
 			    $2
+			==SPARKLE==
+			return
+			;;
+		COLUMNS)
+			desparkle "$COLUMNS"
+			sparkle <<-==SPARKLE==
+			  ^BCOLUMNS^b is a ^Bspecial^b scalar whose value is set to
+			    the terminal columns. Current value is
+			      $REPLY
+			==SPARKLE==
+			return
+			;;
+		LINENO)
+			desparkle "$LINENO"
+			sparkle <<-==SPARKLE==
+			  ^BLINENO^b is a ^Bspecial^b variable whose value is set to
+			    the line of the script or function. The current value is
+			      $REPLY
+			==SPARKLE==
+			return
+			;;
+		LINES)
+			desparkle "$LINES"
+			sparkle <<-==SPARKLE==
+			  ^BLINES^b is a ^Bspecial^b variable whose value is set to
+			    the line of the script or function. The current value is
+			      $REPLY
+			==SPARKLE==
+			return
+			;;
+		OLDPWD)
+			desparkle "$OLDPWD"
+			sparkle <<-==SPARKLE==
+			  ^BOLDPWD^b is a ^Bspecial^b variable whose value is set to
+			    the previous working directory. Current value is
+			      $REPLY
+			==SPARKLE==
+			return
+			;;
+		PPID)
+			desparkle "$PPID"
+			sparkle <<-==SPARKLE==
+			  ^BPPID^b is a readonly ^Bspecial^b variable whose value is
+			    set to the parent PID of the shell. Current value is
+			      $REPLY
 			==SPARKLE==
 			return
 			;;
@@ -52,29 +97,31 @@ showvar() {
 			==SPARKLE==
 			return
 			;;
-	##############################################################
-	# the v & e cases are so we can use those in the general case
-	# without overwriting the variable we are inspecting
-	##############################################################
-		v)
-			local V e
-			set -- # clear parameter array
-			for V in $(typeset +|egrep '^v(\[[0-9]+\])?$'); do
-				eval "e=\"\${$V}\""
-				set -- "$@" "$V" "$e"
-			done
-			(($#))|| die "Variable is not set."
-			set -- "$(typeset|egrep ' v$')" "$@"
+		SECONDS)
+			desparkle "$SECONDS"
+			sparkle <<-==SPARKLE==
+			  ^BSECONDS^b is a ^Bspecial^b integer whose value is set to the
+			    number of seconds since the shell started. Current value is
+			      $REPLY
+			==SPARKLE==
+			return
 			;;
-		e)
-			local v E
-			set -- # clear parameter array
-			for v in $(typeset +|egrep '^e(\[[0-9]+\])?$'); do
-				eval "E=\"\${$v}\""
-				set -- "$@" "$v" "$E"
+	####################################################################
+	# The v & e cases are so we can use those variables in the general #
+	# case without overwriting the variable we are inspecting.         #
+	####################################################################
+		v|e)
+			local V E
+			set -- "$1" # clear but save variable name for later
+			for V in $(typeset +|egrep "^$1(\[[0-9]+\])?\$"); do
+				eval "E=\"\${$V}\""
+				set -- "$@" "$V" "$E"
 			done
-			(($#))|| die "Variable is not set."
-			set -- "$(typeset|egrep ' e$')" "$@"
+			(($#==1))&& # 1, not 0, becaue we saved the variable name
+				die "Variable is not set."
+			V="$(typeset|egrep " $1\$")"
+			shift # remove variable name
+			set -- "$V" "$@"
 			;;
 		*)
 			[[ $1 == [A-Za-z_]*([A-Za-z0-9_]) ]]|| {

@@ -1,0 +1,20 @@
+# <@(#)tag:csongor.greyshirt.net,2018-02-11:tw/03.58.00z/18c8403>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Uutf8 string^u ^[^Uchars^u^]
+#:   Remove ^Uchars^u from the end of the ^Uutf8 string^u.
+#:   ^Uchars^u defaults to one (1).
+
+function chomp {
+	[[ -z ${1:-} ]]&& { REPLY=""; return; }
+	integer i=${2:-1}
+	ustart="${ustart:-"$(print '\0302-\0364')"}"
+	ucont="${ucont:-"$(print '\0200-\0277')"}"
+	REPLY="$1"
+	while ((i--)); do
+		REPLY="${REPLY%%@([$ustart]+([$ucont])|?)}"
+		[[ -z $REPLY ]]&& return;
+	done
+}
+
+# Copyright © 2018 by Tom Davis <tom@greyshirt.net>.

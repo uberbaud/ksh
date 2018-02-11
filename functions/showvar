@@ -169,6 +169,8 @@ showvar() {
 	fi
 	@newline
 	typeset -R4 -i K=0
+	integer COLUMNS="${COLUMNS:-9999}" c
+	((c=COLUMNS-6))
 	while (($#)); do
 		k="$1" v="$2"
 		if [[ $k == *\] ]]; then
@@ -177,9 +179,10 @@ showvar() {
 			print -n "$K) "
 		else
 			print -n '    '
+			((c=COLUMNS-4))
 		fi
 		eval "v=\"\${$1}\""
-		qvis "$v"
+		qvis "$v" $c
 		shift 2
 	done
 )}

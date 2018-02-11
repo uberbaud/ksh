@@ -6,6 +6,7 @@
 
 function qvis {
 	local NL TAB='	' p s out='' c
+	integer maxlen="${2:-${COLUMNS:-80}}" len=0 chop=2
 NL='
 '
 	# if it's blank, we're done
@@ -22,9 +23,18 @@ NL='
 	REPLY="'$REPLY'"			# quote whole string
 	REPLY="${REPLY#\'\'}"		# remove empty quote at beginning
 	REPLY="${REPLY%\'\'}"		# remove empty quote at end
+	text="$REPLY"
+	utf8codes "$REPLY" $maxlen
+	len="$REPLEN"
+	[[ "$REPLY" == "$text" ]]|| {
+		chomp "$REPLY"; chop=1; ((maxlen--));
+	  }
 	gsub '\' '\\' "$REPLY"		# escape existing escapes for print
 	text="$REPLY"
 	while [[ $text == *[[:cntrl:]]* ]]; do
+		((++len>maxlen))&& {
+			chomp "$text" $chop; text="$REPLY"; chop=1; ((maxlen--));
+		  }
 		s="${text#*[[:cntrl:]]}"	# end without CTRL
 		p="${text%"$s"}"			# beginning WITH CNTRL
 		# for some reason, parameter substitutions eat NL and TAB
@@ -71,7 +81,9 @@ NL='
 		out="$out${p%?}$c"
 		text="$s"
 	done
-	print -- "$out$text"
+	out="$out$text"
+	((chop==1))&& out="$out\033[35m→\033[0m"
+	print -- "$out"
 }
 
 # Copyright © 2018 by Tom Davis <tom@greyshirt.net>.

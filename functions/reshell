@@ -12,7 +12,11 @@ function reshell {
 	local k keepvars s setenvs v x force=false doenv=true useenv ENV
 	set -A keepvars	FCEDIT HOME TERM USER		\
 					DISPLAY WINDOWID WINDOWPATH	\
-					SSH_AGENT_PID SSH_AUTH_SOCK
+					SSH_AGENT_PID SSH_AUTH_SOCK	\
+					LC_ALL LC_COLLATE LC_CTYPE	\
+					LC_MESSAGES LC_MONETARY		\
+					LC_NUMERIC LC_TIME LANG		\
+					NLSPATH
 	while getopts ':e:fn' Opt; do
 		case $Opt in
 			e)	useenv="$OPTARG";									;;

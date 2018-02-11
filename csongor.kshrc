@@ -32,6 +32,7 @@ export dskWIDGIT=7
 export dskXAPP=6
 export CSONGOR_XTERM_WINDOW_BG='#FFFFFF' CSONGOR_XTERM_WINDOW_FG='#000000'
 export CVSROOT='anoncvs@anoncvs4.usa.openbsd.org:/cvs'
+export LESSKEY=$xdgcfg/less/lesskey.compiled
 export PRINTER=poco
 
 osrev=$(uname -r)

@@ -1,20 +1,21 @@
 ^BUTF-8 Notes^b
 
-    ^Bascii^b
-        octal   ^S000^s-^S177^s
-        hex      ^S00^s-^S7f^s
-        decimal   ^S0^s-^S177^s
-    ^Bstart bytes^b
-        octal   ^S302^s-^S364^s         ^WNot all of the codes given will^w
-        hex      ^Sc2^s-^Sf4^s          ^Wnecessarily form valid codepoints.^w
-        decimal ^S194^s-^S244^s
-    ^Bcontinuation bytes^b
-        octal   ^S200^s-^S277^s
-        hex      ^S80^s-^Sbf^s
-        decimal ^S128^s-^S191^s
+    ^Bascii^b                  ^Bstart bytes^b           ^Bcontinuation bytes^b     
+      octal   ^S000^s-^S177^s        octal   ^S302^s-^S364^s       octal   ^S200^s-^S277^s
+      hex      ^S00^s-^S7f^s         hex      ^Sc2^s-^Sf4^s        hex      ^S80^s-^Sbf^s 
+      decimal   ^S0^s-^S177^s        decimal ^S194^s-^S244^s       decimal ^S128^s-^S191^s
+
+    ^WNot all of the codes given will necessarily form valid codepoints.^w
 
     ^Bksh pattern^b
         ^Tustart=$(print '\0302-\0364')"^t
         ^Tucont=$(print '\0200-\0277')"^t
         ^T[[ $str == *[$ustart]+([$ucont])* ]]^t
       ^GNote: a longest match (^g^#^#^G) must be used in prefix deletion substitutions.^g
+      one-liner by Ted Unangst <tedu@openbsd.org>
+
+    ^BC Continuation Character Test^b
+        ^Tisu8cont(unsigned char c)^t
+        ^T{ return MB_CUR_MAX > 1 && (c & (0x80 | 0x40)) == 0x80; }^t
+      ^GNote: MB_CUR_MAX is set by setlocale(3)^g
+

@@ -44,7 +44,7 @@ function f-help {
 		_show_function_help "$funcfile" "$1"
 	elif   [[ -f $helpdir/$1 ]]; then
 		local pager=${PAGER:-less}
-		(($(wc -l $helpdir/$1|tr -cd [0-9])<LINES))&& pager=cat
+		(($(wc -l<$helpdir/$1)<LINES))&& pager=cat
 		sparkle < $helpdir/$1 | $pager
 	else
 		die "No help for [1m$1[22m"

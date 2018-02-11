@@ -17,4 +17,4 @@
         ^Tustart=$(print '\0302-\0364')"^t
         ^Tucont=$(print '\0200-\0277')"^t
         ^T[[ $str == *[$ustart]+([$ucont])* ]]^t
-      ^GNote: a longest match (^g^#^#^G or ^g^%^%^G) must be used in pattern substitutions.^g
+      ^GNote: a longest match (^g^#^#^G) must be used in prefix deletion substitutions.^g

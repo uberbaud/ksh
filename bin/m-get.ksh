@@ -115,7 +115,8 @@ function group {
 	x="$(pick +inbox -sequence x -sequence "$@")"; x="${x:-0}"; x="${x% *}"
 	mark +inbox -sequence x -delete oldhat
 	y="$(pick +inbox x -nolist)"; y="${y:-0}"; y="${y% *}"
-	+groups "$1:" "new $y, total $x"
+	(($y+$x))&&
+		+groups "$1:" "new $y, total $x"
 	mark +inbox -sequence L -add "$1"
 } 2>/dev/null
 

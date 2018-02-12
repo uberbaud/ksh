@@ -104,6 +104,7 @@ $accToFetch
 msgCount=$(from|wc -l)
 ((msgCount))|| { notify "Nothing more to do, quitting."; return 0; }
 
+/usr/bin/clear # clear, but keep the buffer
 mark +inbox all -sequence oldhat 2>/dev/null
 notify 'Incorporating new mail'
 inc -nochangecur >/dev/null

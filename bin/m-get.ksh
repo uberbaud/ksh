@@ -132,7 +132,10 @@ group drgfly    --list-id 'users\.dragonflybsd\.org'
 scanseq='¬L'
 [[ -n "$(flist +inbox -sequence L -noshowzero)" ]]|| scanseq='all'
 scan +inbox $scanseq
-groups-not-empty &&
+: >"$NMH/groupmail" # truncate, we'll append if we have any groups
+groups-not-empty && {
 	printf '                      %-9s %s\n' "${groups[@]}"
+	print -r -- "${groups[*]}" >"$NMH/groupmail"
+  }
 
 # Copyright (C) 2017 by Tom Davis <tom@greyshirt.net>.

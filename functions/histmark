@@ -4,12 +4,14 @@
 #: FUNCTION ^G(no arguments)^g
 #:   Place a Mark in the history
 
-function mark {
+function histmark {
+	local want_unset=false
 	integer i
 	LASTHISTMARK="# MARK $(now) $*"
-	print -s "$LASTMARK"
-	i=$(set +u; print ${#HISTMARKS[*]})
-	HISTMARKS[i]="$LASTHISTMARK"
+	print -s "$LASTHISTMARK"
+	[[ $- == *u* ]]&& { want_unset=true; set +u; }
+	set -A histmarks -- "${histmarks[@]}" "$LASTHISTMARK"
+	$want_unset && set -u
 }
 
 # Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

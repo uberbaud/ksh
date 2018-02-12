@@ -1,0 +1,23 @@
+# <@(#)tag:csongor.greyshirt.net,2018-02-12:tw/20.37.00z/f1bece>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^G(no arguments)^g
+#:   Review mail groups
+
+needs h1 yes-or-no show
+: ${NMH:?}
+function m-groups {
+	local G
+	set -- $(<"${NMH:?}"/groupmail)
+	for G; do
+		h1 "$G"
+		yes-or-no "View $G"|| continue
+		if [[ $(whence $G) == $G ]]; then
+			$G
+		else
+			mhshow +inbox $G -textonly -form mhl.group
+		fi
+	done
+}
+
+# Copyright © 2018 by Tom Davis <tom@greyshirt.net>.

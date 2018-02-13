@@ -46,6 +46,9 @@ function warnOrDie { #{{{1
 
 needs flist mark folder pick refile yes-or-no
 
+# clean out groupmail list
+: >"$NMH"/groupmail
+
 function Done {
 	[[ -z "$(flist +inbox -sequence marked -fast -noshowzero)" ]]
 }

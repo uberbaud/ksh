@@ -71,7 +71,12 @@ ps4a="$E[44;37m"
 ps4b="$E[44;33m"
 ps4c="$E[0m"
 PS4W=14
-ps4p='              '
-export PS4="$ps4a$ps4p$R\$0$ps4b $E[\$((PS4W-\${#LINENO}))G \$LINENO $ps4c "
+#    |....+....0....|
+ps4p='              ' # the width of PS4W
+export PS4=\
+"$ps4a$ps4p$R"\
+'${0##*/}'\
+"$ps4b $E[\$(($PS4W-\${#LINENO}))G \$LINENO "\
+"$ps4c "
 
 true

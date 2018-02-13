@@ -55,11 +55,14 @@ function as-root { # {{{1
 	doas "$@"
 } # }}}1
 
-
 (($#))|| die 'Missing required argument ^Ufile^u.'
 needs ci co $ED
 
 CI_INITIAL_DESCRIPTION='OpenBSD system file'
+LOCKBASE="${XDG_DATA_HOME:?}"/run/suv/locks
+[[ -d $LOCKBASE ]]|| {
+	mkdir -p "$LOCKBASE" || die 'Could not ^Tmkdir^t ^S$LOCKBASE^s.'
+  }
 
 desparkle "$1"
 filenameD="$REPLY"
@@ -75,13 +78,21 @@ file_or_error="$(readlink -fn "$1" 2>&1)"
 	[[ -f $file_or_error ]]|| die "^B$filenameD^b is not a file."
   }
 
-shift
 filename="$file_or_error"
 filepath="${filename%/*}"
 [[ $filepath == $HOME* ]] &&
 	die "^T$PGM^t only works outside of ^S\$HOME^s." \
 		"Instead, use ^T:W^t inside ^Tvim^t (^Tv^t or ^Tnew^t)."
 
+# GET AN EXCLUSIVE LOCK ON THE FILE
+gsub '/' '%' "$file_or_error"
+lockfile="$REPLY"
+get-exclusive-lock-or-exit "$lockfile" "$LOCKBASE" ||
+	die "PID $(<$LOCKBASE/$lockfile) has locked ^U$1^u."
+print $$>"$LOCKBASE/$lockfile"
+# WE HAVE A LOCK
+
+shift
 function main {
 	holdbase="$HOME/hold/$(uname -r)/sys-files"
 
@@ -164,6 +175,6 @@ function main {
 	fi
 }
 
-main "$@"; exit
+(main "$@"); release-exclusive-lock "$lockfile" "$LOCKBASE"; exit
 
 # Copyright (C) 2017 by Tom Davis <tom@greyshirt.net>.

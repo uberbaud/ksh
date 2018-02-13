@@ -1,0 +1,29 @@
+# <@(#)tag:csongor.greyshirt.net,2017-12-17:tw/01.36.03z/2058dc2>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
+
+#: FUNCTION ^Ulock name^u ^[^Ulock path^u^]
+#:   Attempts to create a lock with ^Ulock name^u in the ^Ulock path^u,
+#:   which defaults to $TMPDIR or if that's unset, to /tmp.
+#:   Exits with 0 on success and >0 on failure.
+
+function get-exclusive-lock-or-exit {
+	local T="${2:-${TMPDIR:-/tmp}}" U L P=excl-lock
+	L="$T/$P-${1:?Missing exclusive lock name}"
+
+	[[ -d $T ]]|| {
+		warn '^S$TMPDIR^s does not point to a directory.'; return 1
+	  }
+
+	U="$(mktemp $T/$P.XXXXXXXXXXX)" || {
+		warn 'Could not create a temporary file.'; return 1
+	  }
+
+	ln "$U" "$L" 2>/dev/null;
+	integer lnRC=$?
+
+	rm "$U"
+
+	return $lnRC
+}
+
+# Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

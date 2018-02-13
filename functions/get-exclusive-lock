@@ -13,8 +13,9 @@
 
 needs watch-file
 function get-exclusive-lock {
-	local T="${2:-${TMPDIR:-/tmp}}" U L P=excl-lock
-	L="$T/$P-${1:?Missing exclusive lock name}"
+	local T="${2:-${TMPDIR:-/tmp}}" U L P=excl-lock-
+	[[ -n ${2:-} ]]&& P=''
+	L="$T/$P${1:?Missing exclusive lock name}"
 
 	[[ -d $T ]]|| {
 		warn '^S$TMPDIR^s does not point to a directory.'; return 1

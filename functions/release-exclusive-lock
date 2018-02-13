@@ -7,8 +7,9 @@
 #:   The ^Ulock path^u MUST be the same as in the ^Tget-exclusive-lock^t^S*^s call.
 
 function release-exclusive-lock {
-	local T="${2:-${TMPDIR:-/tmp}}" L P=excl-lock rc
-	L="$T/$P-${1:?Missing exclusive lock name}"
+	local T="${2:-${TMPDIR:-/tmp}}" L P=excl-lock- rc
+	[[ -n ${2:-} ]]&& P=''
+	L="$T/$P${1:?Missing exclusive lock name}"
 	if [[ -f $L ]]; then
 		rm "$L"
 		rc=0

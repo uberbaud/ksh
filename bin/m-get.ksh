@@ -124,12 +124,11 @@ function group {
 	  }
 } 2>/dev/null
 
-group obsd      --list-id 'source-changes\.openbsd\.org'
+group drgfly    --list-id 'users\.dragonflybsd\.org'
 group otech     --list-id 'tech\.openbsd\.org'
 group obugs     --list-id 'bugs\.openbsd\.org'
 group omisc     --list-id 'misc\.openbsd\.org'
-#group zshwork   --list-id 'zsh-workers\.zsh\.org'
-group drgfly    --list-id 'users\.dragonflybsd\.org'
+group obsd      --list-id 'source-changes\.openbsd\.org'
 
 scanseq='¬L'
 [[ -n "$(flist +inbox -sequence L -noshowzero)" ]]|| scanseq='all'

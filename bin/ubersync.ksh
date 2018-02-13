@@ -4,7 +4,6 @@
 
 set -A RHOSTS -- uberbaud.net yt.lan
 
-
 set -o nounset;: ${FPATH:?Run from within KSH}
 : ${KDOTDIR:?}
 # Usage {{{1
@@ -43,6 +42,7 @@ shift $(($OPTIND - 1))
 # /options }}}1
 
 KB=$KDOTDIR/bin/
+needs $KB/synrdir.ksh
 docstore=$HOME/hold/DOCSTORE
 [[ -a $docstore ]]|| die "^B$docstore^b does not exist."
 [[ -d $docstore ]]|| die "^B$docstore^b is not a directory."

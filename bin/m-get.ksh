@@ -109,6 +109,7 @@ mark +inbox all -sequence oldhat 2>/dev/null
 notify 'Incorporating new mail'
 inc -nochangecur >/dev/null
 
+new-array scanout
 new-array groups
 
 function group {
@@ -117,7 +118,8 @@ function group {
 	mark +inbox -sequence x -delete oldhat
 	y="$(pick +inbox x -nolist)"; y="${y:-0}"; y="${y% *}"
 	(($y+$x))&& {
-		+groups "$1:" "new $y, total $x"
+		+scanout "$1:" "new $y, total $x"
+		+groups "$1"
 		mark +inbox -sequence L -add "$1"
 	  }
 } 2>/dev/null
@@ -134,7 +136,7 @@ scanseq='¬L'
 scan +inbox $scanseq
 : >"$NMH/groupmail" # truncate, we'll append if we have any groups
 groups-not-empty && {
-	printf '                      %-9s %s\n' "${groups[@]}"
+	printf '                      %-9s %s\n' "${scanout[@]}"
 	print -r -- "${groups[*]}" >"$NMH/groupmail"
   }
 

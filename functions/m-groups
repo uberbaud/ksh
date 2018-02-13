@@ -10,8 +10,7 @@ function m-groups {
 	local G
 	set -- $(<"${NMH:?}"/groupmail)
 	for G; do
-		h1 "$G"
-		yes-or-no "View $G"|| continue
+		notify "$G"
 		if [[ $(whence $G) == $G ]]; then
 			$G
 		else

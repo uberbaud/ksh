@@ -116,6 +116,9 @@ function check-flags-for-writability { # {{{1
 	die "File is flagged ^B${flagstr#,}^b. It is not writable."
 } # }}}1
 
+# TODO: test 'checked-out'ness with something like	
+#       [[ -n $(rlog -L -l genvoya.rem) ]]			
+
 needs $ED
 EDBIN="${ED##*/}"
 (($#))|| exec "$ED"

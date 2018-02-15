@@ -101,7 +101,7 @@ for ln in "${swapinfo[@]}"; do
 	  }
 	[[ $ln == +( )'file name: '* ]]&& {
 		ln="${ln#+( )file name: }"
-		eval FILE="$ln"
+		eval FILE="'$ln'"
 		continue
 	  }
 	[[ $ln == +( )'process ID: '+([0-9])' (still running)' ]]&& {

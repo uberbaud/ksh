@@ -6,6 +6,12 @@
 #:   the description text if none is given. Uses ^S./TODO^s.
 
 function todo {
+	[[ $PWD == ${HOME?} ]]&& {
+		local C="${XDG_DATA_HOME?}/conky/conky.1"
+		(($#))&& print -r -- "$*" >>"$C"
+		v "$C"
+		return 0
+	  }
 	local now="$(date -u +'%Y-%m-%d %H:%M:%S Z')"
 	local H="@ $now" TODO="$*"
 	[[ -n $TODO ]]|| TODO="$(vtmp TODO)"

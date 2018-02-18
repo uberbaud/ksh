@@ -189,6 +189,13 @@ alias cd='_u="$-"; set -u; f-cd'
 alias prn="printf '  \e[35m｢\e[39m%s\e[35m｣\e[39m\n'"
 alias reboot='doas /sbin/reboot'
 
+alias ff='find0 -type f'
+alias fd='find0 -type d'
+alias fn='find0 -name'
+alias ffn='find0 -type f -name'
+alias fdn='find0 -type d -name'
+alias x0='xargs -0'
+
 for s in $(getent shells); do
 	[[ $s == $SHELL ]]&& continue
 	alias ${s##*/}="reshell $s"

@@ -1,0 +1,13 @@
+# <@(#)tag:csongor.greyshirt.net,2018-02-18:tw/15.50.01z/3c31842>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Udirectory^u ^[^U…^u^]
+#:   ^Tfind "^t^S$@^s^T" -print0^t
+
+function find0 {
+	local P="${1:-}"
+	[[ -d $P ]]&& shift || P=.
+	/usr/bin/find "$P" "$@" -print0
+}
+
+# Copyright © 2018 by Tom Davis <tom@greyshirt.net>.

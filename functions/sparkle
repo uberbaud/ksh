@@ -1,8 +1,17 @@
-# @(#)[:Djzg&|Mr5(J2*iD=w3zd: 2017/08/07 15:39:52 tw@csongor.lan]
+# <@(#)tag:csongor.greyshirt.net,2017-08-07:tw/15.39.52z/33f0086>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
 #: FUNCTION ^G(no arguments)^g
 #:   Transform marked ^SSTDIN^s to colorized ^SSTDOUT^s.
+#:     ^B^^B bold^b           ^E^^E error^e             ^G^^G grey^g
+#:     ^I^^I italic^i         ^N^^N notice^n            ^S^^S special^s
+#:     ^T^^T tty^t            ^U^^U underline^u         ^W^^W warning^w
+#:     ^T^^F{^t^U0-255^u^T}^t ^Gforeground^g      ^T^^=^t ^=
+#:     ^T^^K{^t^U0-255^u^T}^t ^Gbackground^g      ^^[:punct:] ^= ^T^^S^t^Upunct^u^T^^s^t
+#:    Other than ^Ucaret+punctuation^u, a capital letter is the start code
+#:    and ^Ucaret+lowercase^u is end code.
+#:     ^B^^^^^b ^= ^B^^^b ^G(a doubled caret becomes a single caret)^g
+
 
 function sparkle {
 	# start by changing ^^ to GROUP SEPARATOR \x1e

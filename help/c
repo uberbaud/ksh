@@ -1,5 +1,7 @@
-^BStandard C Stuff^b
+^BC Stuff^b
 
     ^BINT_MAX^b
         ^T#include <sys/limits.h>^t
 
+    ^BPass a ^Ufile descriptor^u via ^Usocket^u^b
+        Example code in ^BCMSG_DATA(3)^b

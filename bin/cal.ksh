@@ -1,5 +1,5 @@
 #!/bin/ksh
-# @(#)[:i;M+GbnyPAxt0n(iRNN|: 2017-08-11 04:49:36 Z tw@csongor]
+# <@(#)tag:csongor.greyshirt.net,2017-08-11:tw/04.49.36z/23cefa>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
 
 set -o nounset;: ${FPATH:?Run from within KSH}
@@ -24,7 +24,7 @@ function usage {
 	         ^T-y^t      Display whole year (no ^Tcalendar^t output).
 	         ^T-A^t ^Unum^u  Show events for ^Udays^u after.
 	         ^T-B^t ^Unum^u  Show events for ^Udays^u before.
-	         The date bits can be in any order. Any bits not will use today's bits.
+	         Date bits can be in any order. Unspecified bits will use today's bits.
 	       ^T${PGM} -h^t
 	         Show this help message.
 	===SPARKLE===
@@ -74,7 +74,7 @@ if (($#==1)) && [[ $1 == [0-9][0-9][0-9][0-9] ]]; then
 	shift
 elif (($#)); then
 	typeset -l o
-	for o in "$@"; do
+	for o; do
 		case $o in
 			[0-9][0-9][0-9][0-9])
 				YEAR=$o
@@ -82,7 +82,7 @@ elif (($#)); then
 			[0-9][0-9]|[0-9])
 				DOM=$o
 				;;
-			jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)
+			@(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)*)
 				MON=$o
 				;;
 			*)

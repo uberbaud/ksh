@@ -1,0 +1,17 @@
+# <@(#)tag:csongor.greyshirt.net,2017-12-04:tw/03.35.55z/3b1369c>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^G(no arguments)^g
+#:   Place a Mark in the history
+
+function histmark {
+	local want_unset=false
+	integer i
+	LASTHISTMARK="# MARK $(now) $*"
+	print -s "$LASTHISTMARK"
+	[[ $- == *u* ]]&& { want_unset=true; set +u; }
+	set -A histmarks -- "${histmarks[@]}" "$LASTHISTMARK"
+	$want_unset && set -u
+}
+
+# Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

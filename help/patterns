@@ -1,0 +1,39 @@
+^BKSH Patterns^b
+
+     ^B*^b^(^Upattern^u^|…^|^Upattern^u^)
+        zero or more
+
+     ^B+^b^(^Upattern^u^|…^|^Upattern^u^)
+        one or more
+
+     ^B?^b^(^Upattern^u^|…^|^Upattern^u^)
+        none or one
+
+     ^B@^b^(^Upattern^u^|…^|^Upattern^u^)
+        one
+
+     ^B!^b^(^Upattern^u^|…^|^Upattern^u^)
+       does not any match one
+
+     ^B[…]^b
+        To represent itself in a list,
+            ^- must be ^Bquoted^b or ^Bfirst^b, or ^Blast^b,
+            ^] must be ^Bquoted^b or ^Bfirst^b,
+            ^!  must be ^Bquoted^b or ^Bnot first^b.
+
+        recognized character classes, enclosed in ^S[:^s and ^S:]^s, include
+
+           ^Balnum^b   ^Bcntrl^b   ^Blower^b   ^Bspace^b
+           ^Balpha^b   ^Bdigit^b   ^Bprint^b   ^Bupper^b
+           ^Bblank^b   ^Bgraph^b   ^Bpunct^b   ^Bxdigit^b
+
+
+     Unlike most shells, ksh never matches ^. or ^.^.
+
+     None of the pattern elements match a period at the start of
+     a file name or a slash, even if they are explicitly used in
+     a ^S[…]^s sequence; also, the names ^. and ^.^. are never matched,
+     even by the pattern ^T.*^t.
+
+     ^B[!..]^b
+        Like ^S[…]^s, but negated.

@@ -1,4 +1,4 @@
-# @(#)[:L>;)e;b((ePib;UkIowI: 2017-08-06 03:08:17 Z tw@csongor]
+# <@(#)tag:csongor.greyshirt.net,2017-08-06:tw/03.08.17z/1bd9e24>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
 #: FUNCTION ^[^Uplay path fragment^u^|^Unew play directory^u^]
@@ -15,11 +15,30 @@ function p {
 		return 0
 	  }
 
-	local possibles
-	set -A possibles -- *"$1"*
+	local P possibles t="${1%/}" p s n=''
+	while [[ $t == *[\'/]* ]]; do
+		p="${t%%[\'/]*}"
+		s="${t#"$p"}"
+		if [[ $s == \'* ]]; then
+			n="$n$p'\''"
+		elif [[ $s == /* ]]; then
+			n="$n$p'*/*'"
+		else
+			die "Bad Programmer: matched ^[$s^]."
+		fi
+		t="${s#[\'/]}"
+	done
+	n="$n$t"
+	eval "set -A P -- *'$n'*"
+
+	integer i=0
+	for p in "${P[@]}"; { [[ -d $p ]]&& possibles[i++]="$p"; }
 
 	local choice='-'
-	if ((${#possibles[*]}>1)); then
+
+	if ((i==0)); then
+		choice="$(umenu "<$1>" *)"
+	elif ((${#possibles[*]}>1)); then
 		local inthere=false
 		for p in "${possibles[@]}"; do
 			[[ $p == $1 ]]|| continue
@@ -28,8 +47,6 @@ function p {
 		done
 		$inthere || set -A possibles -- "<$1>" "${possibles[@]}"
 		choice="$( umenu "${possibles[@]}" )"
-	elif [[ $possibles == "*$1*" ]]; then
-		choice="$(umenu "<$1>" *)"
 	else
 		choice="${possibles[0]}"
 	fi

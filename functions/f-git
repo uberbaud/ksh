@@ -1,0 +1,26 @@
+# <@(#)tag:csongor.greyshirt.net,2017-12-27:tw/00.24.53z/40460ee>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^G(no arguments)^g
+#:   Wrapper with autochange on clone
+
+function f-git {
+	local newdir cmd_is_clone=false gitresult
+	[[ $1 == clone ]]&& cmd_is_clone=true
+
+	command git "$@"; gitresult=$?
+
+	# return whatever if it wasn't a clone
+	$cmd_is_clone || return $gitresult
+	# return error if it was a clone and there was an error
+	((gitresult))&& return $gitresult
+
+	eval "newdir=\"\$$#\"" # get the last parameter
+	[[ $newdir == @(http|https|git):*.git ]]&& {
+		newdir="${newdir%.git}"
+		newdir="${newdir##*/}"
+	  }
+	cd "$newdir"
+}
+
+# Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

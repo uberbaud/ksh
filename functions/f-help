@@ -1,4 +1,4 @@
-# @(#)[:v}?-gKt3hIPbHz!)JRm): 2017-08-04 19:39:13 Z tw@csongor]
+# <@(#)tag:csongor.greyshirt.net,2017-08-04:tw/19.39.13z/12a7e33>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
 #: FUNCTION ^Utopic^u
@@ -25,6 +25,13 @@ function _show_function_help {
 }
 
 function f-help {
+	local helpdir=${KDOTDIR:?}/help
+	(($#))|| {(
+		cd $helpdir || die "No help directory ^B$helpdir^b."
+		print 'Help is available for functions in \033[34m$FPATH\033[39m as well as:'
+		printf '    %s\n' * |column
+	); return; }
+
 	: ${FPATH:?}
 	splitstr ':' "$FPATH" fpath
 	local p funcfile
@@ -33,12 +40,11 @@ function f-help {
 		[[ -f $p/f-$1 ]]&&		{ funcfile="$p/f-$1";		break; }
 		[[ -f $p/amuse-$1 ]]&&	{ funcfile="$p/amuse-$1";	break; }
 	done
-	local helpdir=${KDOTDIR:?}/help
 	if [[ -n $funcfile ]]; then
 		_show_function_help "$funcfile" "$1"
 	elif   [[ -f $helpdir/$1 ]]; then
 		local pager=${PAGER:-less}
-		(($(wc -l $helpdir/$1|tr -cd [0-9])<LINES))&& pager=cat
+		(($(wc -l<$helpdir/$1)<LINES))&& pager=cat
 		sparkle < $helpdir/$1 | $pager
 	else
 		die "No help for [1m$1[22m"

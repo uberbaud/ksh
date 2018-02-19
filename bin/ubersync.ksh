@@ -1,10 +1,11 @@
 #!/bin/ksh
-# @(#)[:TpT~W!fOPp~o^JMNTd&8: 2017-08-08 19:26:18 Z tw@csongor]
+# <@(#)tag:csongor.greyshirt.net,2017-08-08:tw/19.26.18z/1101710>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
+
+set -A RHOSTS -- uberbaud.net yt.lan
 
 set -o nounset;: ${FPATH:?Run from within KSH}
 : ${KDOTDIR:?}
-
 # Usage {{{1
 typeset -- this_pgm="${0##*/}"
 function usage {
@@ -16,6 +17,9 @@ function usage {
 	         Update hold/DOCSTORE and sync with uberbaud.net.
 	       ^T${PGM} -h^t
 	         Show this help message.
+	    ^GNote^g
+	       Exporting ^S\$LOGLEVEL^s will set ^Tsynrdir^t to that log level.
+	       Use ^Tsynrdir -h^t for allowable values.
 	===SPARKLE===
 	exit 0
 } # }}}
@@ -37,12 +41,25 @@ shift $(($OPTIND - 1))
 # ready to process non '-' prefixed arguments
 # /options }}}1
 
-notify "Updating ^SDOCSTORE^s"
-$KDOTDIR/bin/savetracks.ksh
+KB=$KDOTDIR/bin/
+needs $KB/synrdir.ksh
+docstore=$HOME/hold/DOCSTORE
+[[ -a $docstore ]]|| die "^B$docstore^b does not exist."
+[[ -d $docstore ]]|| die "^B$docstore^b is not a directory."
+cd "$docstore" || die "Could not ^Tcd^t to ^B$docstore^b."
 
-notify "Syncing with ^Buberbaud.net^b."
-cd "$docstore"
-$KDOTDIR/bin/synrdir.ksh uberbaud.net:"$PWD" "$PWD"
+synropt="${LOGLEVEL:+"-L $LOGLEVEL"}"
 
+function main {
+	notify "Updating ^SDOCSTORE^s"
+	$KB/savetracks.ksh
+
+	for H in "${RHOSTS[@]}"; do
+		notify "Syncing with ^B$H^b."
+		$KB/synrdir.ksh $synropt $H:"$PWD" "$PWD"
+	done
+}
+
+main "$@"; exit
 
 # Copyright (C) 2017 by Tom Davis <tom@greyshirt.net>.

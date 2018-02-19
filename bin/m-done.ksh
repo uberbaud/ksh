@@ -1,5 +1,5 @@
 #!/bin/ksh
-# @(#)[:Yj29By3V}7CmUsoI0Tf3: 2017-08-08 00:26:18 Z tw@csongor]
+# <@(#)tag:csongor.greyshirt.net,2017-08-08:tw/00.26.18z/127495>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
 
 set -o nounset;: ${FPATH:?Run from within KSH}
@@ -46,6 +46,9 @@ function warnOrDie { #{{{1
 
 needs flist mark folder pick refile yes-or-no
 
+# clean out groupmail list
+: >"$NMH"/groupmail
+
 function Done {
 	[[ -z "$(flist +inbox -sequence marked -fast -noshowzero)" ]]
 }
@@ -83,6 +86,7 @@ function X { # {{{1
   X -from  'root@csongor\.lan'            root@csongor  '@csongor'
   X -to    'bgumm102@gmail\.com'          notes         'Notes to Self'
   X -to    'source-changes@openbsd\.org'  obsd-cvs      'OpenBSD CVS'
+  X -from  '@stackoverflow\.'             stackover     'Stack Overflow'
 
 if Done; then
     print -u2 ' [34m>>>[0m No messages to [1remove[0m.'

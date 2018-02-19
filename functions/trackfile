@@ -1,4 +1,4 @@
-# @(#)[:F_-`rfuuGd$u~GO2EGi+: 2017/07/31 18:04:18 tw@csongor.lan]
+# <@(#)tag:csongor.greyshirt.net,2017-07-31:tw/18.04.18z/2c0784e>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
 #: FUNCTION ^Ufile name^u
@@ -23,9 +23,9 @@ function trackfile {
 	# Since we want the encoding to be decodeable, we need to escape 
 	# percent signs (%), which means we also need to escape whatever we 
 	# use to escape. We'll just use the common backslash for that.
-	while [[ "$t" == *\\* ]] { p="$p${t%%\\*}\\\\"; t="${t#*\\}"; }
-	while [[ "$t" == *%* ]] { p="$p${t%%%*}\\%"; t="${t#*%}"; }
-	while [[ "$t" == */* ]] { p="$p${t%%/*}%"; t="${t#*/}"; }
+	while [[ "$t" == *\\* ]]	{ p="$p${t%%\\*}\\\\"; t="${t#*\\}"; }
+	while [[ "$t" == *%* ]]		{ p="$p${t%%%*}\\%"; t="${t#*%}"; }
+	while [[ "$t" == */* ]]		{ p="$p${t%%/*}%"; t="${t#*/}"; }
 	: >"$trackdir/$p$t"
 }
 

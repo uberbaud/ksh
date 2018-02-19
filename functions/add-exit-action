@@ -1,13 +1,14 @@
-# @(#)[:Y2(fFSNNtM=@x)ivcw2t: 2017-10-13 01:41:49 Z tw@csongor]
+# <@(#)tag:csongor.greyshirt.net,2017-10-13:tw/01.41.49z/6f9b8f>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^G(no arguments)^g
+#: FUNCTION ^Utrap action^u
 #:   Wrapper around trap with some memory.
+#:   Uses ^S$TRAPEXIT^s array.
 
 function add-exit-action {
-	set -A TRAPEXIT -- "${TRAPEXIT[@]}" "$@"
+	set -A TRAPEXIT -- "${TRAPEXIT[@]:-}" "$@"
 	local IFS=';'
-	trap "${TRAPEXIT[*]}" EXIT
+	trap "${TRAPEXIT[*]:-}" EXIT
 }
 
 # Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

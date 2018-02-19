@@ -1,5 +1,5 @@
 #!/bin/ksh
-# @(#)[:F1*!*sUq!cL=Uf=CDEzk: 2017-08-15 20:20:19 Z tw@csongor]
+# <@(#)tag:csongor.greyshirt.net,2017-08-15:tw/20.20.19z/549db7>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
 
 set -o nounset;: ${FPATH:?Run from within KSH}

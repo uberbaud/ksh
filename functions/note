@@ -1,26 +1,17 @@
-# @(#)[:J-9XbW76RCnxhGB9=KRC: 2017-08-15 07:58:21 Z tw@csongor]
+# <@(#)tag:csongor.greyshirt.net,2017-08-15:tw/07.58.21z/2951f07>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
 #: FUNCTION ^[^Unote text^u^]
 #:   Jot a quick note.
-#: FUNCTION ^T-l^t
-#:   List a formatted version of existing notes.
+#:   Stores notes to ^B^S$PWD^s/NOTES^b and links in ^B^S$XDG_DATA_HOME^s/sysdata/notes^b.
+#:   ^GList notes with^g ^Tls-notes^t.
 
+needs xclip
 function note {
-	needs xclip
 	local NOTES="$PWD"/NOTES OLDPWD="$PWD" setnoglob=false
 	local noterepo=${XDG_DATA_HOME:-$HOME/.local}/sysdata/notes
 	[[ $PWD == */NOTES ]]&& NOTES="$PWD"
 	[[ $NOTES == $HOME ]]&& NOTES=${XDG_DOCUMENTS_DIR:-$HOME/docs}/NOTES
-	[[ ${1:-} == -l ]]&& {
-		[[ -d $noterepo ]]|| die 'No notes yet.'
-		for n in $NOTES/*.note; do
-			print "=== ${n##*/} ==="
-			sed -e '/^@''(#)/d' "$n"
-			print
-		done | less
-		return 0;
-	  }
 	[[ -d $noterepo ]]|| {
 		mkdir -p "$noterepo" ||
 			die "Could not ^Tmkdir^t ^B$noterepo^b."
@@ -31,8 +22,13 @@ function note {
 	cd "$NOTES"
 	[[ -o noglob ]]&& { setnoglob=true; set +f; }
 	set -A Q -- *.note
-	local seqnum=0 q=$((${#Q[*]}-1))
-	[[ ${Q[q]} == \*.note ]]|| seqnum=${Q[q]%.note}
+	local seqnum=0
+	integer c
+	[[ ${Q[0]} == \*.note ]]|| # returning *.note means no matches
+		for q in "${Q[@]}"; do
+			c=${q%.note}
+			((seqnum<c))&& seqnum="$c"
+		done
 	# just in case everyone is trying to create a new note in the same 
 	# directory!
 	local TMPFILE="$(mktemp note-XXXXXXXXX)" tries=5
@@ -47,7 +43,11 @@ function note {
 	$setnoglob && set -f
 	((tries>=0))|| die 'Could not create ^Bnote^b.'
 	new -nz note "$*"
+	local CLIP="$(mktemp clip-XXXXXXXXX)"
+	xclip -out -selection clipboard >"${CLIP}"
 	xclip -out -selection clipboard >$seqnote
+	xclip -in -selection clipboard <"${CLIP}"
+	rm "${CLIP}"
 	ln -s $PWD/$seqnote \
 		"$noterepo/$(date -u +'%Y-%m-%dz')-${OLDPWD##*/}-$seqnum"
 	(($#))|| v $seqnote '.'

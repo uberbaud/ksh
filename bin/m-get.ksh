@@ -1,5 +1,5 @@
 #!/bin/ksh
-# @(#)[:!`5CRbQ%@Q{KLd>IavxF: 2017-08-07 18:13:42 Z tw@csongor]
+# <@(#)tag:csongor.greyshirt.net,2017-08-07:tw/18.13.42z/3c5a944>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
 
 set -o nounset;: ${FPATH:?Run from within KSH}
@@ -53,11 +53,7 @@ function warnOrDie { #{{{1
 	esac
 } # }}}1
 
-i-can-haz-inet || case $? in
-		1) die 'man in the middle';			;;
-		2) die 'no internet';				;;
-		*) die 'Unknown [1mi-can-haz-inet[0m result [1m'$?'[0m'; ;;
-	esac
+i-can-haz-inet || die "$REPLY"
 
 accToFetch=${XDG_CONFIG_HOME:?}/fetchmail/accTofetch.ksh
 needs $accToFetch inc pick scan mark fetchmail
@@ -108,10 +104,12 @@ $accToFetch
 msgCount=$(from|wc -l)
 ((msgCount))|| { notify "Nothing more to do, quitting."; return 0; }
 
+/usr/bin/clear # clear, but keep the buffer
 mark +inbox all -sequence oldhat 2>/dev/null
 notify 'Incorporating new mail'
 inc -nochangecur >/dev/null
 
+new-array scanout
 new-array groups
 
 function group {
@@ -119,18 +117,26 @@ function group {
 	x="$(pick +inbox -sequence x -sequence "$@")"; x="${x:-0}"; x="${x% *}"
 	mark +inbox -sequence x -delete oldhat
 	y="$(pick +inbox x -nolist)"; y="${y:-0}"; y="${y% *}"
-	+groups "$1:" "new $y, total $x"
-	mark +inbox -sequence L -add "$1"
+	(($y+$x))&& {
+		+scanout "$1:" "new $y, total $x"
+		+groups "$1"
+		mark +inbox -sequence L -add "$1"
+	  }
 } 2>/dev/null
 
-group obsd      --list-id 'source-changes\.openbsd\.org'
-group zshwork   --list-id 'zsh-workers\.zsh\.org'
 group drgfly    --list-id 'users\.dragonflybsd\.org'
+group otech     --list-id 'tech\.openbsd\.org'
+group obugs     --list-id 'bugs\.openbsd\.org'
+group omisc     --list-id 'misc\.openbsd\.org'
+group obsd      --list-id 'source-changes\.openbsd\.org'
 
 scanseq='¬L'
 [[ -n "$(flist +inbox -sequence L -noshowzero)" ]]|| scanseq='all'
 scan +inbox $scanseq
-groups-not-empty &&
-	printf '                      %-9s %s\n' "${groups[@]}"
+: >"$NMH/groupmail" # truncate, we'll append if we have any groups
+groups-not-empty && {
+	printf '                      %-9s %s\n' "${scanout[@]}"
+	print -r -- "${groups[*]}" >"$NMH/groupmail"
+  }
 
 # Copyright (C) 2017 by Tom Davis <tom@greyshirt.net>.

@@ -1,4 +1,4 @@
-# @(#)[:KQ&%s2TwrVsrO`?xkIo&: 2017-08-11 03:12:38 tw@csongor.lan]
+# <@(#)tag:csongor.greyshirt.net,2017-08-11:tw/03.12.38z/32b357f>
 # ksh local profile
 # vim: ts=4 ft=ksh
 
@@ -32,6 +32,7 @@ export dskWIDGIT=7
 export dskXAPP=6
 export CSONGOR_XTERM_WINDOW_BG='#FFFFFF' CSONGOR_XTERM_WINDOW_FG='#000000'
 export CVSROOT='anoncvs@anoncvs4.usa.openbsd.org:/cvs'
+export LESSKEY=$xdgcfg/less/lesskey.compiled
 export PRINTER=poco
 
 osrev=$(uname -r)
@@ -53,6 +54,7 @@ LOGPS1='\n'\
 
 typeset -fu pre-prompt
 export PS1=\
+'\[\e[0m'\
 '$(pre-prompt)'\
 '\[\e[33m\]['\
 '\[\e[31m\]KSH '\
@@ -64,3 +66,17 @@ export PS1=\
 '\[\e[48;5;224;31m\]$( local E=$?; ((E))&& printf "[%d]" $E )'\
 '\[\e[0m\]\$ '
 
+E=''; R=''
+ps4a="$E[44;37m"
+ps4b="$E[44;33m"
+ps4c="$E[0m"
+PS4W=14
+#    |....+....0....|
+ps4p='              ' # the width of PS4W
+export PS4=\
+"$ps4a$ps4p$R"\
+'${0##*/}'\
+"$ps4b $E[\$(($PS4W-\${#LINENO}))G \$LINENO "\
+"$ps4c "
+
+true

@@ -1,4 +1,4 @@
-# @(#)[:SR4?YKx^=i2MU(j$#uH?: 2017/08/01 02:52:13 tw@csongor.lan]
+# <@(#)tag:csongor.greyshirt.net,2017-04-20:tw/19.11.47z/4e02e72>
 # ksh profile
 # vim: ts=4 ft=ksh
 
@@ -19,6 +19,7 @@ export TERM
 
 export SYSLOCAL=/usr/local
 export ISO_DATE='%Y-%m-%d %H:%M:%S %z'
+export URI_AUTHORITY='greyshirt.net'
 
 # XDG paths
 if [[ -d ${XDG_CONFIG_HOME:-~/.config} ]]; then
@@ -33,6 +34,7 @@ if [[ -d ${XDG_CONFIG_HOME:-~/.config} ]]; then
 		K=$KDOTDIR
 		F=$K/functions
 		B=$K/bin
+		H=$K/help
 	fi
 else
 	XDG_CONFIG_HOME=$HOME/.config
@@ -84,8 +86,9 @@ export USR_PLIB=$PERL5LIB
 ####### IMPORT LOCAL BITS
 [[ -f $KDOTDIR/$HOST.kshrc ]]&& . $KDOTDIR/$HOST.kshrc
 
-[[ -d $HOME/bin ]]&& {
-[[ :$PATH: == *:$HOME/bin:*			]]|| PATH="$HOME/bin:$PATH"; }
+####### SET PATH
+[[ -d $HOME/bin ]]&&
+	[[ :$PATH: == *:$HOME/bin:*		]]|| PATH="$HOME/bin:$PATH";
 
 [[ :$PATH: == *:$RAKUDO_BIN:*		]]|| PATH="$RAKUDO_BIN:$PATH"
 [[ :$PATH: == *:$LOCALBIN:*			]]|| PATH="$LOCALBIN:$PATH"
@@ -112,16 +115,23 @@ export BZR_HOME=$xdgcfg/bzr
 export CALENDAR_DIR=$xdgcfg/calendar
 export HGRCPATH=$xdgcfg/hg
 
-# editor
-export MYVIM=$xdgcfg/nvim
-unset VIMINIT
-
 # default apps
-export CC=$SYSLOCAL/bin/clang
-export EDITOR=$SYSLOCAL/bin/nvim
-export FCEDIT=$EDITOR
-export PAGER=/usr/bin/less
+if   [[ -f /usr/local/bin/nvim ]]; then
+	export MYVIM=$HOME/.config/nvim
+	export EDITOR=/usr/local/bin/nvim
+elif [[ -f /usr/local/bin/vim ]]; then
+	export MYVIM=$HOME/.config/vim
+	export MYVIMRC=$MYVIM/vimrc
+	export VIMINIT="so $MYVIMRC"
+	export EDITOR=/usr/local/bin/vim
+else
+	export EDITOR=/usr/bin/vi
+fi
 export VISUAL=$EDITOR
+export FCEDIT=$EDITOR
+
+export CC="$(command -v clang)"
+export PAGER=/usr/bin/less
 
 # misc
 export CLICOLOR=1
@@ -149,11 +159,17 @@ for p in f amuse; do
 done
 # noglobs
 for i in cowmath math note; { alias $i="noglob $i"; }
+alias mathcow="noglob cowmath"
 # askfirst all commands that use ssh
 for i in ssh scp sftp rsync;	{ alias "$i=ssh-askfirst $i"; }
 # known hosts are commands to ssh to that host
 set -A known_hosts -- $(awk -F'[ ,]' '{print $1}' $xdgcfg/ssh/known_hosts)
-for i in "${known_hosts[@]}";	{ alias "$i=ssh $i"; }
+for i in "${known_hosts[@]}"; do
+	# skip unqualified names and dot-quads
+	[[ $i == *.* ]]|| continue
+	[[ $i == +([0-9]).+([0-9]).+([0-9]).+([0-9]) ]]&& continue
+	alias "$i=ssh $i"
+done
 # FPATH functions are implicitly autoloaded, but the completion 
 # mechanism doesn't know about them unless we explicitly autoload them
 IFS=:
@@ -165,12 +181,20 @@ unset p i
 alias clear='f-clear ' # expand alias of $2
 alias cls='clear colorls $LS_OPTIONS'
 alias doas='doas '
-alias halt='doas halt'
+alias halt='doas /sbin/halt -p'
 alias i-can-haz-inet='i-can-haz-inet;E=$?;printf "  %s\n" "$REPLY";(return $E)&&:'
 alias ls='/usr/local/bin/colorls $LS_OPTIONS'
 alias noglob='set -f;noglob '; function noglob { set +f; ("$@"); }
+alias cd='_u="$-"; set -u; f-cd'
 alias prn="printf '  \e[35m｢\e[39m%s\e[35m｣\e[39m\n'"
-alias reboot='doas reboot'
+alias reboot='doas /sbin/reboot'
+
+alias ff='find0 -type f'
+alias fd='find0 -type d'
+alias fn='find0 -name'
+alias ffn='find0 -type f -name'
+alias fdn='find0 -type d -name'
+alias x0='xargs -0'
 
 for s in $(getent shells); do
 	[[ $s == $SHELL ]]&& continue
@@ -180,10 +204,12 @@ unset s
 
 KCOMPLETE=$KDOTDIR/completions
 makeout=$KCOMPLETE/make.out
+get-exclusive-lock completion-make
 make OS_VER="$(uname -r)" -C $KCOMPLETE >$KCOMPLETE/make.out
 [[ -s $makeout ]]&& {
 	notify 'Recompiled completion modules:'
 	column -c $((COLUMNS-8)) $makeout|expand|sed -e 's/^/    /'
   }
 rm $makeout
+release-exclusive-lock completion-make
 . $KDOTDIR/completions/completions.ksh

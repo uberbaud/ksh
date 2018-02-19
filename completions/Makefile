@@ -1,4 +1,4 @@
-# @(#)[:uvS>DT2{l?2;*(+$y0)-: 2017-11-11 18:02:13 Z tw@csongor]
+# <@(#)tag:csongor.greyshirt.net,2017-11-11:tw/18.02.13z/29dd912>
 # vim: ft=make nowrap
 
 TARGET      = completions.ksh

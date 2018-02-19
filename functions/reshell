@@ -1,30 +1,60 @@
-# @(#)[:k7)~|=Hdg5w)uWrfh3Gr: 2017-08-15 04:06:15 Z tw@csongor]
+# <@(#)tag:csongor.greyshirt.net,2017-08-15:tw/04.06.15z/13ea47f>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^G(no arguments)^g
+#: FUNCTION ^[^T-fn^t^] ^[^T-e^t ^Uenvfile^u^] ^U/path/shell^u
 #:   Give a clean shell experience.
+#:     ^T-e^t  Use ^Uenvfile^u instead of .config/^Ushell^u.
+#:     ^T-f^t  Force even if it's not recognized shell.
+#:     ^T-n^t  Don't set or export ^SENV^s.
 
+needs getent readlink /usr/bin/env
 function reshell {
-	needs getent readlink /usr/bin/env
-	local k keepvars s setenvs v x
+	local k keepvars s setenvs v x force=false doenv=true useenv ENV
 	set -A keepvars	FCEDIT HOME TERM USER		\
 					DISPLAY WINDOWID WINDOWPATH	\
-					SSH_AGENT_PID SSH_AUTH_SOCK
-	s=$(getent shells $(which "$1"))
-	desparkle "$1"
-	[[ -n $s ]]|| die "^B$REPLY^b is not a recognized shell."
+					SSH_AGENT_PID SSH_AUTH_SOCK	\
+					LC_ALL LC_COLLATE LC_CTYPE	\
+					LC_MESSAGES LC_MONETARY		\
+					LC_NUMERIC LC_TIME LANG		\
+					NLSPATH
+	while getopts ':e:fn' Opt; do
+		case $Opt in
+			e)	useenv="$OPTARG";									;;
+			f)	force=true;											;;
+			n)	doenv=false;										;;
+			\?)	die "Invalid option: ^B-$OPTARG^b.";				;;
+			\:)	die "Option ^B-$OPTARG^b requires an argument.";	;;
+			*)	die "Bad programmer.";								;;
+		esac
+	done
+	shift $((OPTIND-1))
+
+	(($#))|| die 'Missing required argument ^Bshell^b'
+	desparkle "$1"; sD="$REPLY"
+	if $force; then
+		s="$(readlink -fn "$1")"
+		[[ -n $s ]]|| die "^B$sD^b does not exist."
+		[[ -f $s ]]|| die "^B$sD^b is not a file."
+		[[ -x $s ]]|| die "^B$sD^b is not executable."
+	else
+		s=$(getent shells $(which "$1"))
+		[[ -n $s ]]|| die "^B$sD^b is not a recognized shell."
+	fi
 	shift
 	REPLY=''
 
-	local ENV=${XDG_CONFIG_HOME:-$HOME/.config}/${s##*/}/env
-	[[ -f $ENV ]]&& {
-		ENV=$(readlink -fn $ENV)
-		if [[ -f $ENV ]]; then
-			keepvars[${#keepvars[*]}]=ENV
-		else
-			warn '^Benv^b exists but links to a non-existent file.'
-		fi
+	$doenv && {
+		ENV="${useenv:-"${XDG_CONFIG_HOME:-$HOME/.config}/${s##*/}/env"}"
+		[[ -f $ENV ]]&& {
+			ENV=$(readlink -fn $ENV)
+			if [[ -f $ENV ]]; then
+				keepvars[${#keepvars[*]}]=ENV
+			else
+				warn '^Benv^b exists but links to a non-existent file.'
+			fi
+		  }
 	  }
+
 	set -A setenvs -- SHELL="$s"
 	for k in "${keepvars[@]}"; do
 		eval 'v="$'"$k"'"'

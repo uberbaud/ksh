@@ -1,5 +1,5 @@
 #!/bin/ksh
-# @(#)[:TpT~W!fOPp~o^JMNTd&8: 2017-08-08 19:26:18 Z tw@csongor]
+# <@(#)tag:csongor.greyshirt.net,2017-08-08:tw/19.26.18z/1101710>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
 
 set -o nounset;: ${FPATH:?Run from within KSH}
@@ -66,8 +66,7 @@ for t in *; do
 	if [[ -f ../$SHA384 ]]; then
 		warn "sha384b already exists for ^B$t^b."
 	else
-		echo "$original" >../"$SHA384"
-		cat "$original" >>../"$SHA384"
+		{ echo "$original"; cat "$original"; } | gzip -qfno ../"$SHA384"
 		chflags uchg ../"$SHA384"
 	fi
 	echo "$SHA384" >"$t"

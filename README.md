@@ -56,4 +56,4 @@ Copyright
 
 Copyright (C) 2016 by Tom Davis <tom@greyshirt.net>.
 
-` @(#)[:b}*eRMU;rjq%nv^<5PdR: 2017-08-09 02:57:09 Z tw@csongor] `
+` <@(#)tag:csongor.greyshirt.net,2017-08-09:tw/02.57.09z/83fa5a> `

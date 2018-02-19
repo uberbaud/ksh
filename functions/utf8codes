@@ -1,0 +1,61 @@
+# <@(#)tag:csongor.greyshirt.net,2018-02-10:tw/20.55.41z/2c1d996>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
+
+#: FUNCTION ^Uutf8 string^u ^[^Umaxlen^u^] ^= ^S$REPLEN^s, ^[^S$REPLY^s^]
+#:   Sets ^S$REPLEN^s to number of unicode code points in the ^Uutf8 string^u.
+#:   If ^Umaxlen^u is given and is greater than zero (0), ^S$REPLY^s is set to the
+#:     string chopped to that length.
+#: ^G^BNote^b: Some codepoints are double wide, but they are still one codepoint,^g
+#:       ^GAdditionally, combining characters count as codepoints.^g
+#:       ^GAnd finally,^g FUNCTION ^Gdoes not handle malformed characters.^g
+
+function utf8codes {
+	(($#))||	die 'Missing arguments. Expected one (1) or two (2).'
+	(($#>2))&&	die 'Too many arguments. Expected one (1) or two (2).'
+	local str="$1" ucont p c s short
+	integer len=0 max="${2:-0}" L=0
+	if ((max>0)); then
+		REPLY=''
+		function addpart { #{{{1
+			local L=${2:-${#1}} rc=0
+			# if this str puts us past the max, then chop it and add it
+			if ((max>len+L)); then
+				((len+=L))
+				REPLY="$REPLY$1"
+			elif ((max==len+L)); then
+				((len+=L))
+				REPLY="$REPLY$1"
+				rc=1
+			elif ((max>len)); then
+				((L=max-len))
+				typeset -L$L short="$1"
+				((len+=L))
+				REPLY="$REPLY$short"
+				rc=1
+			else
+				rc=1
+			fi
+			return $rc
+		} #}}}1
+	else
+		function addpart { #{{{1
+			local L=${2:-${#1}}
+			((len+=L))
+			true
+		} #}}}1
+	fi
+	ustart="$(print '\0302-\0364')"
+	ucont="$(print '\0200-\0277')"
+	while [[ $str == *[$ustart]+([$ucont])* ]]; do
+		p="${str%%[$ustart]+([$ucont])*}"
+		s="${str##"$p"[$ustart]+([$ucont])}"
+		c="${str%"$s"}"; c="${c#"$p"}"
+		addpart "$p" || break
+		addpart "$c" 1 || break
+		str="$s"
+	done
+	addpart "$str"
+	REPLEN=$len
+}
+
+# Copyright © 2018 by Tom Davis <tom@greyshirt.net>.

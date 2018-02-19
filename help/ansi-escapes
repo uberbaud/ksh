@@ -1,0 +1,31 @@
+^BANSI Escape Sequences^b
+
+    ^T\e[^t^Sn^s^TA^t    Cursor up ^Sn^s cells
+    ^T\e[^t^Sn^s^TB^t    Cursor down ^Sn^s cells
+    ^T\e[^t^Sn^s^TC^t    Cursor forward ^Sn^s cells
+    ^T\e[^t^Sn^s^TD^t    Cursor backward ^Sn^s cells
+    ^T\e[^t^Sn^s^TE^t    Cursor to beginning of line ^Sn^s lines down
+    ^T\e[^t^Sn^s^TF^t    Cursor to beginning of line ^Sn^s lines up
+    ^T\e[^t^Sn^s^TG^t    Cursor to column ^Sn^s of this line
+    ^T\e[^t^Sr^s^T;^t^Sc^s^TH^t  Cursor to line ^Sr^s and column ^Sc^s
+    ^T\e[^t^Sr^s^T;^t^Sc^s^Tf^t  ''
+
+        When ^Sn^s is not specified, it defaults to one (1).
+
+    ^T\e[J^t     Clear from cursor to end of the screen
+    ^T\e[0J^t    ''
+    ^T\e[1J^t    Clear from cursor to beginning of the screen
+    ^T\e[2J^t    Clear from cursor the entire screen
+
+    ^T\e[K^t     Clear from cursor to the end of the line
+    ^T\e[0K^t    ''
+    ^T\e[1K^t    Clear from cursor to the beginning of the line
+    ^T\e[2K^t    Clear the entire line
+
+    ^T\e[^t^Sn^s^TS^t    Scroll screen up by ^Sn^s lines
+    ^T\e[^t^Sn^s^TT^t    Scroll screen down by ^Sn^s lines
+
+    ^T\e[6n^t    Report cursor position as ^B\e[^b^Sr^s^B;^b^Sc^s^BR^b
+
+    ^T\e[s^t     Save the cursor position
+    ^T\e[u^t     Return the cursor to the saved position

@@ -1,8 +1,9 @@
 #!/bin/ksh
-# @(#)[:G;LweTE5#GhAdml`<%M!: 2017-10-15 21:49:54 Z tw@csongor]
+# <@(#)tag:csongor.greyshirt.net,2017-10-15:tw/21.49.54z/9b7653>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
 
-set -o nounset;: ${FPATH:?Run from within KSH} ${VISUAL:-${EDITOR:?Neither VISUAL nor EDITOR is set}}
+set -o nounset;: ${FPATH:?Run from within KSH}
+ED=${VISUAL:-${EDITOR:?Neither VISUAL nor EDITOR is set}}
 set -A vopts --
 
 # Usage {{{1
@@ -12,9 +13,11 @@ function usage {
 	PGM="$REPLY"
 	sparkle >&2 <<-\
 	===SPARKLE===
-	^F{4}Usage^f: ^T$PGM^t ^Ufile^u ^[^Ucheckin message^u^]
+	^F{4}Usage^f: ^T$PGM^t ^[^T-f^t^] ^Ufile^u ^[^Ucheckin message^u^]
 	         Edit a copy of a file in ^B~/hold^b, then overwrite the original
 	         with the copy. (More secure that ^Tdoas vim ^Ufile^u^t).
+	         ^T-f^t    Force an edit, even if ^Isystem^i and ^Iarchive^i
+	               files differ.
 	       ^T$PGM -h^t
 	         Show this help message.
 	===SPARKLE===
@@ -25,8 +28,10 @@ function bad_programmer {	# {{{2
 	die 'Programmer error:'	\
 		"  No getopts action defined for [1m-$1[22m."
   };	# }}}2
-while getopts ':h' Option; do
+warnOrDie=die
+while getopts ':fh' Option; do
 	case $Option in
+		f)	warnOrDie=warn;											;;
 		h)	usage;													;;
 		\?)	die "Invalid option: [1m-$OPTARG[22m.";				;;
 		\:)	die "Option [1m-$OPTARG[22m requires an argument.";	;;
@@ -39,10 +44,10 @@ shift $(($OPTIND - 1))
 # /options }}}1
 function warnOrDie { #{{{1
 	case $warnOrDie in
-		die)  die "$@" 'Use [1m-f22m to force an edit.';		;;
+		die)  die "$@" 'Use ^B-f^b to force an edit.';		;;
 		warn) warn "$@";											;;
-		*)    die '[1mProgrammer error[22m:' \
-					'warnOrDie is [1m${warnOrDie}[22m.';		;;
+		*)    die '^BProgrammer error^b:' \
+					"warnOrDie is ^S${warnOrDie}^s.";		;;
 	esac
 } # }}}1
 function as-root { # {{{1
@@ -50,11 +55,14 @@ function as-root { # {{{1
 	doas "$@"
 } # }}}1
 
-
 (($#))|| die 'Missing required argument ^Ufile^u.'
-needs ci co ${VISUAL:-${EDITOR:?Neither VISUAL nor EDITOR variable is set}}
+needs ci co $ED
 
 CI_INITIAL_DESCRIPTION='OpenBSD system file'
+LOCKBASE="${XDG_DATA_HOME:?}"/run/suv/locks
+[[ -d $LOCKBASE ]]|| {
+	mkdir -p "$LOCKBASE" || die 'Could not ^Tmkdir^t ^S$LOCKBASE^s.'
+  }
 
 desparkle "$1"
 filenameD="$REPLY"
@@ -70,13 +78,21 @@ file_or_error="$(readlink -fn "$1" 2>&1)"
 	[[ -f $file_or_error ]]|| die "^B$filenameD^b is not a file."
   }
 
-shift
 filename="$file_or_error"
 filepath="${filename%/*}"
 [[ $filepath == $HOME* ]] &&
 	die "^T$PGM^t only works outside of ^S\$HOME^s." \
 		"Instead, use ^T:W^t inside ^Tvim^t (^Tv^t or ^Tnew^t)."
 
+# GET AN EXCLUSIVE LOCK ON THE FILE
+gsub '/' '%' "$file_or_error"
+lockfile="$REPLY"
+get-exclusive-lock-or-exit "$lockfile" "$LOCKBASE" ||
+	die "PID $(<$LOCKBASE/$lockfile) has locked ^U$1^u."
+print $$>"$LOCKBASE/$lockfile"
+# WE HAVE A LOCK
+
+shift
 function main {
 	holdbase="$HOME/hold/$(uname -r)/sys-files"
 
@@ -114,9 +130,11 @@ function main {
 		fi
 		SHA384="$(cksum -qa sha384b ./"$workfile")"
 		[[ -f RCS/$workfile,v ]]&& {
-			rcsdiff -q ./"$workfile" ||
-				die "sysytem file and archived file have diverged."	\
-					"Do an RCS ^Tci^t and rerun."
+			set -A errMsg "System file and archived file have diverged."
+			[[ $warnOrDie == die ]]&&
+				errMsg[1]="Do an RCS ^Tci^t and rerun, or"
+			rcsdiff -q ./"$workfile" || warnOrDie "${errMsg[@]}"
+			unset errMsg
 		  }
 	else
 		SHA384=''
@@ -126,7 +144,7 @@ function main {
 		echo >$workfile
 	fi
 
-	${VISUAL:-$EDITOR} ./"$workfile"
+	$ED ./"$workfile"
 	if [[ -f RCS/$workfile,v ]]; then
 		# previously checked in
 		rcsdiff -q ./"$workfile" ||
@@ -157,6 +175,6 @@ function main {
 	fi
 }
 
-main "$@"; exit
+(main "$@"); release-exclusive-lock "$lockfile" "$LOCKBASE"; exit
 
 # Copyright (C) 2017 by Tom Davis <tom@greyshirt.net>.

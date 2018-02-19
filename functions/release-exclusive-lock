@@ -1,0 +1,24 @@
+# <@(#)tag:csongor.greyshirt.net,2017-12-17:tw/02.21.08z/752d2d>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Ulock name^u ^[^Ulock path^u^]
+#:   Releases lock created by ^Tget-exclusive-lock^t
+#:   ^WNOTE^w It is an error to release a non-existing lock.
+#:   The ^Ulock path^u MUST be the same as in the ^Tget-exclusive-lock^t^S*^s call.
+
+function release-exclusive-lock {
+	local T="${2:-${TMPDIR:-/tmp}}" L P=excl-lock- rc
+	[[ -n ${2:-} ]]&& P=''
+	L="$T/$P${1:?Missing exclusive lock name}"
+	if [[ -f $L ]]; then
+		rm "$L"
+		rc=0
+	else
+		desparkle "$L"
+		warn "No such lock: ^B$REPLY^b."
+		rc=1
+	fi
+	return $rc
+}
+
+# Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

@@ -1,12 +1,15 @@
-# @(#)[:uq11iLeXaz4K_#oH-b)}: 2017-08-04 16:59:46 Z tw@csongor]
+# <@(#)tag:csongor.greyshirt.net,2017-08-04:tw/16.59.46z/1efa620>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
 #: FUNCTION ^[^Unew-path^u^]
 #:   Wraps the builtin to provide a default ^Unew-path^u of ^S$HOME^s
 #:   Also shows any todo ^Bitems^b for the new directory.
 
+# NOTE: this works with alias cd='_u="$-"; set -u; f-cd'
 function f-cd {
 	(($#))|| set -- "$HOME"
+	# undo the alias nounset bit
+	[[ -n ${_u:-} && $_u != *u* && $- == *u* ]]&& set +u
 	builtin cd "$@" && {
 		show-todos '== TODO =='
 		true # leave on a good note since `cd` did

@@ -1,8 +1,10 @@
 #!/bin/ksh
-# @(#)[:YOZB9_2>K`*GnZkFMldR: 2017-11-20 19:26:21 Z tw@csongor]
+# <@(#)tag:csongor.greyshirt.net,2017-11-20:tw/19.26.21z/8485b8>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
 
 set -o nounset;: ${FPATH:?Run from within KSH}
+REPO="NOTES"
+SUFFIX=".note"
 
 # Usage {{{1
 typeset -- this_pgm="${0##*/}"
@@ -23,8 +25,9 @@ function bad_programmer {	# {{{2
 	die 'Programmer error:'	\
 		"  No getopts action defined for [1m-$1[22m."
   };	# }}}2
-while getopts ':h' Option; do
+while getopts ':ah' Option; do
 	case $Option in
+		a)	REPO="$XDG_DATA_HOME/sysdata/notes"; SUFFIX="";			;;
 		h)	usage;													;;
 		\?)	die "Invalid option: [1m-$OPTARG[22m.";				;;
 		\:)	die "Option [1m-$OPTARG[22m requires an argument.";	;;
@@ -46,24 +49,38 @@ function warnOrDie { #{{{1
 
 needs awk less sparkle
 
-[[ -d NOTES ]]|| exit 0		#empty
-cd NOTES || die 'Could not ^Tcd^t into ^BNOTES^b.'
+[[ -d $REPO ]]|| exit 0		#empty
+cd $REPO || die 'Could not ^Tcd^t into ^B$REPO^b.'
 
-set -A notes -- $(/bin/ls *.note 2>/dev/null|sort -n)
-((${#notes[*]}))|| exit 0	#empty
+set -- $(/bin/ls *"$SUFFIX" 2>/dev/null|sort -n)
+(($#))|| exit 0	#empty
+
+integer i=0 x=0
+for H; do
+	if [[ -a $H ]]; then
+		notes[i++]="$H"
+	else
+		badlinks[x++]="$H"
+	fi
+done
 
 AWKPGM="$(cat)" <<-\
 	\===AWK===
-		/@\(#\)\[/ {next}
+		/<@\(#\)tag:/ {next}
 		FNR == 2 && /^[0-9][0-9][0-9][0-9]-[01][0-9]-[0-3][0-9].* Z/ {
 				if (FNR != NR) { print "" }
 				print "^B"$0"^b"
 				next
 			}
-		# always
+		# otherwise
 			{print}
 	===AWK===
 
-awk "$AWKPGM" "${notes[@]}"|sparkle|less -iMSx4 -FXc; exit
+function main {
+	awk "$AWKPGM" "${notes[@]}"|sparkle|less -iMSx4 -FXc
+	((x))&& warn "Bad links:" "${badlinks[@]}"
+}
+main; exit 0
+
 
 # Copyright (C) 2017 by Tom Davis <tom@greyshirt.net>.

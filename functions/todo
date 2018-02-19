@@ -1,4 +1,4 @@
-# @(#)[:xT;m3F%!VoaSgSW>IBIA: 2017-08-06 14:22:04 Z tw@csongor]
+# <@(#)tag:csongor.greyshirt.net,2017-08-06:tw/14.22.04z/42efb0e>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
 #: FUNCTION ^[^Udescription text^u^]
@@ -6,13 +6,23 @@
 #:   the description text if none is given. Uses ^S./TODO^s.
 
 function todo {
+	[[ $PWD == ${HOME?} ]]&& {
+		local C="${XDG_DATA_HOME?}/conky/conky.1"
+		(($#))&& print -r -- "$*" >>"$C"
+		v "$C"
+		return 0
+	  }
 	local now="$(date -u +'%Y-%m-%d %H:%M:%S Z')"
 	local H="@ $now" TODO="$*"
 	[[ -n $TODO ]]|| TODO="$(vtmp TODO)"
 	splitstr NL "$TODO" todo
 	[[ -f RCS/TODO,v ]]&& co -q -l TODO
 	{ printf '%s\n' "$H"; printf '    %s\n' "${todo[@]}"; } >>TODO
-	[[ -f RCS/TODO,v ]]&& ci -q -m'add' -u TODO
+	if [[ -f RCS/TODO,v ]]; then
+		ci -q -j -m'add' -u TODO
+	elif [[ -d RCS ]]; then
+		ci -q -i -t-'Stuff that needs doing.' -u TODO
+	fi
 	true # leave on a good note, even if there is no RCS
 }
 

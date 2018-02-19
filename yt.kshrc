@@ -1,4 +1,4 @@
-# @(#)[:KQ&%s2TwrVsrO`?xkIo&: 2017/12/05 08:12:23 tw@yt.lan]
+# <@(#)tag:csongor.greyshirt.net,2017-08-11:tw/03.12.38z/32b357f>
 # ksh local profile
 # vim: ts=4 ft=ksh
 
@@ -9,15 +9,6 @@ osarc=$(uname -m)
 PKG_PATH=ftp://ftp4.usa.openbsd.org/pub/OpenBSD/$osrev/packages/$osarc
 export PKG_PATH
 export TZ=EST5EDT
-
-LOGPS1='\n'\
-'%:KSH:% \D{%Y.%m.%d.%H.%M.%S.%z} \w\n'\
-'\[\e[33m\]['\
-'\[\e[32m\]$( local E=$?; ((E))|| printf "ok" )'\
-'\[\e[48;5;224;31m\]$( local E=$?; ((E))&& printf " %d " $E )'\
-'\[\e[0;33m\]]'\
-'\[\\e[0;34m\]\$'\
-'\[\e[0m\] '
 
 typeset -fu pre-prompt
 export PS1=\
@@ -31,4 +22,3 @@ export PS1=\
 '\[\e[33m\]]'\
 '\[\e[48;5;224;31m\]$( local E=$?; ((E))&& printf "[%d]" $E )'\
 '\[\e[0m\]\$ '
-

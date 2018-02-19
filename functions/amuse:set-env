@@ -1,4 +1,4 @@
-# @(#)[:mOX>6AIT8nEWh)#!wN8A: 2017-08-06 17:18:50 Z tw@csongor]
+# <@(#)tag:csongor.greyshirt.net,2017-08-06:tw/17.18.50z/387ebd0>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
 #: FUNCTION ^G(no arguments)^g
@@ -18,12 +18,11 @@ function amuse:set-env {
 
 	now_playing="${amuse_run}"/playing
 	paused_at="${amuse_run}"/paused-at
-	paused_song="${amuse_run}"/paused-song
 	skipped_bytes="${amuse_run}"/skipped-bytes
 	final="${amuse_run}"/final
 	again="${amuse_run}"/again
 	fflog="${amuse_run}"/fflog
-		export fflog now_playing paused_at paused_song skipped_bytes
+		export fflog now_playing paused_at skipped_bytes
 
 	music_list="${amuse_run}"/togo.lst
 		export music_list

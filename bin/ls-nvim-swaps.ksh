@@ -1,5 +1,5 @@
 #!/bin/ksh
-# @(#)[:yr4icdoH>bPrsUEV&7B-: 2017-11-22 04:40:03 Z tw@csongor]
+# <@(#)tag:csongor.greyshirt.net,2017-11-22:tw/04.40.03z/183d07>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
 
 set -o nounset;: ${FPATH:?Run from within KSH}
@@ -58,11 +58,11 @@ function warnOrDie { #{{{1
 	esac
 } # }}}1
 function show-prev { #{{{1
-	if [[ -z $FILE ]]; then
+	if [[ -z ${FILE:-} ]]; then
 		return 0
 	elif $showAll; then
 		eval "print -- ${show[*]}"
-	elif [[ $FILE == $file ]]; then
+	elif [[ ${FILE:-} == $file ]]; then
 		eval "print -- ${show[*]}"
 	fi
 
@@ -71,7 +71,7 @@ function show-prev { #{{{1
 } #}}}1
 
 (($#>1))&&	die 'Unexpected parameters. Expected ^Uflags^u and ^Ufilename^u.'
-((${#show[*]}))|| set -A show -- '"$DIR/$SWPF"' '"$PID"'
+(set +u; ((${#show[*]})))|| set -A show -- '"$DIR/$SWPF"' '"$PID"'
 needs nvim
 
 showAll=true; file=''
@@ -101,7 +101,7 @@ for ln in "${swapinfo[@]}"; do
 	  }
 	[[ $ln == +( )'file name: '* ]]&& {
 		ln="${ln#+( )file name: }"
-		eval FILE="$ln"
+		eval FILE="'$ln'"
 		continue
 	  }
 	[[ $ln == +( )'process ID: '+([0-9])' (still running)' ]]&& {

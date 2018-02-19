@@ -1,0 +1,45 @@
+# <@(#)tag:csongor.greyshirt.net,2018-01-09:tw/19.58.56z/79bdfd>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
+
+#: FUNCTION ^T^Ucommand^u^t ^[^Uparameters^u^]
+#:   Sends a command to the amuse player if it is running.
+
+  # The amuse player gets the path in this order
+  #  1) $AMUSE_DATA_HOME
+  #  2) $XDG_DATA_HOME/amuse
+  #  3) $HOME/.local/amuse
+  #  4) $HOME/.amuse
+  #  5) FAIL
+  # We are looking for the command fifo it created, BUT it might have
+  # different information than we had, so SHOULD we look for the actual
+  # command file?
+  #
+  # At this time we won't because we can't know what AMUSE_DATA_HOME was
+  # set to in some other environment, so we'll look in that same order.
+
+function amuse:send-cmd {(
+	local pexp wrkpath fifo='amuse-if' atitle='^Iamuse player^i'
+
+	pgrep -qf '^amuse: player$' ||
+		die "The $atitle is not running."
+
+	amuse:get-workpath
+	wrkpath="$REPLY"
+
+	cd "$wrkpath" ||
+		die "Could not ^Tcd^t to ^U$pexp^u."
+
+	[[ -p $fifo ]]||
+		die "Could not find the $atitle command pipe."
+
+	if [[ $1 == 'copy' && -n $2 ]]; then
+		cat $2 >$fifo
+	elif [[ $1 == 'copy' && -z $2 ]]; then
+		[[ -t 0 ]]&& die 'Nothing attached to ^Sstdin^s.'
+		cat >$fifo
+	else
+		print -r -- "$*" >$fifo
+	fi
+)}
+
+# Copyright © 2018 by Tom Davis <tom@greyshirt.net>.

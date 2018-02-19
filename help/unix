@@ -1,5 +1,6 @@
-^BUNIX standard utilties^b
+^BUNIX STANDARD UTILTIES^b
 
+^BText^b
     ^Bexpand^b
         Converts tabs to spaces.
 
@@ -7,10 +8,98 @@
         Converts spaces to tabs.
 
     ^Bcol -b^b
-        Filters out backspaces keeping last character in a space. (deman)
+        Filters out backspaces keeping last character in a space. (de-man)
 
     ^Bcomm^b
         Determines unique to, and common lines in two files.
+
+    ^Bfold^b
+        fold long lines for finite width output device
+
+    ^Bfmt^b
+        simple text formatter
+
+    ^Bindent^b
+        indent and format C program source
+
+    ^Bcolrm^b
+        remove columns from a file
+
+    ^Bcsplit^b
+        split files based on context
+
+    ^Bjoin^b
+        relational database operator
+
+    ^Blam^b
+        laminate files
+
+    ^Blook^b
+        display lines beginning with a given string
+
+    ^Bnl^b
+        line numbering filter
+
+    ^Bod^b
+        octal, decimal, hex, ascii dump
+
+    ^Bpaste^b
+        merge corresponding or subsequent lines of files
+
+    ^Brev^b
+        reverse lines of a file
+
+    ^Brs^b
+        reshape a data array
+
+    ^Bsplit^b
+        split a file into pieces
+
+    ^Bul^b
+        do underlining
+
+    ^Bunvis^b
+        revert a visual representation of data back to original form
+
+    ^Bvis^b
+        display non-printable characters in a visual format
+
+
+^BObject file manipulation^b
+    ^Bar^b
+        create, modify, and extract from archives
+
+    ^Bnm^b
+        display name list (symbol table)
+
+    ^Branlib^b
+        generate index to archive.
+
+
+^Bother^b
+    ^Brpcgen^b
+        RPC protocol compiler
+
+    ^Brpcinfo^b
+        report RPC information
+
+    ^Busbhidaction^b
+        perform actions according to USB HID controls
+
+    ^Busbhidctl^b
+        manipulate USB HID devices
+
+    ^Bcpio^b
+        copy file archives in and out
+
+    ^Bbsdcpio^b
+        copy files to and from archives
+
+    ^Bexpr^b
+        evaluate expression
+
+    ^Bpax^b
+        read and write file archives and copy directory hierarchies
 
     ^Bfuser^b
         Identify processes holding particular file(s) open.
@@ -18,46 +107,51 @@
     ^Bgetconf^b
         Get system limits (^T-L^t and ^T-l^t to list availble keys).
 
+    ^Bgetent^b
+        get entries from administrative database
 
+    ^Blndir^b
+        create a shadow directory of symbolic links to another directory tree
 
-fold
-fmt
-indent
-apply
-colrm
-csplit
-getent
-join
-jot
-lam
-lndir
-logger
-logname
-look
-merge
-nl
-od
-pagesize
-paste
-prove
-rdist
-rev
-rs
-sdiff
-shar
-signify
-split
-tsort
-ul
-units
-unvis
-vis
+    ^Blogger^b
+        make entries in the system log
 
-binutils, ar, nm, ranlib
-rpcgen,rpcinfo
-usbhidaction,usbhidctl
+    ^Blogname^b
+        display user's login name
 
-cpio
-expr
-pax
+    ^Bpagesize^b
+        print system page size
+
+    ^Bprove^b
+        Run tests through a TAP harness.
+
+    ^Brdist^b
+        remote file distribution client program
+
+    ^Bsdiff^b
+        side-by-side diff
+
+    ^Bgsdiff, sdiff^b
+        side-by-side merge of file differences
+
+    ^Bshar^b
+        create a shell archive of files
+
+    ^Bsignify^b
+        cryptographically sign and verify files
+
+    ^Bunits^b
+        conversion program
+
+    ^Bjot^b
+        print sequential or random data
+
+    ^Bapply^b
+        apply a command to a set of arguments
+
+    ^Bmerge^b
+        3-way file merge
+
+    ^Btsort^b
+        topological sort of a directed graph
 

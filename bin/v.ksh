@@ -1,8 +1,9 @@
 #!/bin/ksh
-# @(#)[:GpEYZa*c{{hMx~)jN6Sk: 2017/08/02 18:23:45 tw@csongor.lan]
+# <@(#)tag:csongor.greyshirt.net,2017-07-31:tw/19.16.21z/4b16eb0>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
 
 set -o nounset;: ${FPATH:?Run from KSH}
+ED="${VISUAL:-${EDITOR:?Neither VISUAL nor EDITOR is set.}}"
 
 [[ -n $LOCALBIN ]] || die '^S$LOCALBIN^s is not set.'
 [[ -d $LOCALBIN ]] || die '^S$LOCALBIN^s is not a directory.'
@@ -54,6 +55,13 @@ function warnOrDie { #{{{1
 					'warnOrDie is ^B${warnOrDie}^b.';		;;
 	esac
 } # }}}1
+function safe-to-edit-vim { # {{{1
+	local F="$1"
+	# we set this, but it isn't used unless we return false
+	set -A reply -- 'Swap files found.'
+	[[ $F == $HOME/* ]]&& F="~$USER/${F#$HOME/}"
+	! (vim -r 2>&1|egrep "$F")
+} # }}}1
 function safe-to-edit-nvim { #{{{1
 	local swaps s p d w
 	set -A reply --
@@ -94,11 +102,26 @@ function safe-to-edit { #{{{1
 	  }
 	"$call" "$@"
 } #}}}1
+function check-flags-for-writability { # {{{1
+	local UCHG=16#2 UAPPND=16#4 SCHG=16#20000 SAPPND=16#40000
+	local NOWRITES=$((UCHG|UAPPND|SCHG|SAPPND))
+	local flags=$(stat -f %f "$1")
+	((flags&NOWRITES))|| return 0
 
-ED="${VISUAL:-${EDITOR:-vi}}"
+	flagstr=''
+	((flags&UCHG))&&	flagstr="$flagstr,uchg"
+	((flags&UAPPND))&&	flagstr="$flagstr,uappnd"
+	((flags&SCHG))&&	flagstr="$flagstr,schg"
+	((flags&SAPPND))&&	flagstr="$flagstr,sappnd"
+	die "File is flagged ^B${flagstr#,}^b. It is not writable."
+} # }}}1
+
+# TODO: test 'checked-out'ness with something like	
+#       [[ -n $(rlog -L -l genvoya.rem) ]]			
+
 needs $ED
 EDBIN="${ED##*/}"
-(($#))|| exec "${VISUAL:-${EDITOR:-vi}}"
+(($#))|| exec "$ED"
 
 function main {
 
@@ -123,6 +146,7 @@ fi
 
 [[ -n $f_fullpath ]]||	die "$errmsg"
 [[ -f $f_fullpath ]]||	die "^B$1^b is ^Bnot^b a file."
+check-flags-for-writability "$f_fullpath"
 [[ $f_fullpath == *,v ]]&& warnOrDie "Seems to be an ^BRCS archive^b file."
 typeset -- ftype="$( /usr/bin/file -b "$f_fullpath")"
 [[ $ftype == *text* || $ftype == *XML* ]]||
@@ -146,23 +170,28 @@ typeset -- has_rcs=false
 	has_rcs=true
 	rcsdiff -q ./"$f_name" ||
 		die 'RCS and checked out versions differ.'
+	# avoid "writable ./f_name exists; remove it? [ny](n):"
+	[[ -w ./"$f_name" ]]&& chmod a-w ./"$f_name"
 	co -q -l ./"$f_name" ||
 		die "Could not ^Tco -l^t ^B${f_name}^b."
   }
 
-#typeset -- stemma="$( egrep -o '@\(#\)\[:[^]]+]' "$f_name")"
-#stemma="${stemma#*:}"; stemma="${stemma%%:*}"
-
 # we could just use ./$f_name
 # BUT then the vim process would not have a command including the path, 
-# SO, let's use $f_fullpath
-nvim "$f_fullpath"
+# which we can use for finding the X11 window, SO, let's use $f_fullpath
 
-trackfile "$f_fullpath"
-new-array rcsopts
+# SHA1 is the fastest on my system (amd64) of any of the cksum
+# algorithms, more than twice as fast as sha224 or sha256, and nearly
+# twice as fast as the 64 bit SHAs (384, 512/256, 512). But it's even
+# faster than md5, or the traditional cksum algorithm.
+CKSUM_BEFORE="$(cksum -qa sha1b "$f_fullpath")"
+$ED "$f_fullpath"
+CKSUM_AFTER="$(cksum -qa sha1b "$f_fullpath")"
+[[ $CKSUM_BEFORE != $CKSUM_AFTER ]]&&
+	trackfile "$f_fullpath"
 
 if [[ -d RCS ]]; then
-	# use an array so expansion will work without weird quoting issues
+	new-array rcsopts
 	+rcsopts -q -u
 	if $has_rcs; then
 		$hasmsg && +rcsopts -m"$rcsmsg"

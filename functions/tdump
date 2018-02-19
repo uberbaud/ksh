@@ -1,0 +1,14 @@
+# <@(#)tag:csongor.greyshirt.net,2018-01-27:tw/18.46.37z/1fc5d25>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Ufile^u
+#:   ^Thexdump -C^t ^Ufile^u ^T| less^t (like Borland's Turbo Dump)
+
+needs hexdump
+function tdump {
+	(($#==1))|| die "Expected one argument: the ^Ufile^u name."
+	[[ -f $1 ]]|| die "^B$1^b is not a file."
+	hexdump -C -- "$1" | less
+}
+
+# Copyright © 2018 by Tom Davis <tom@greyshirt.net>.

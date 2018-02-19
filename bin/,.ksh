@@ -1,5 +1,5 @@
 #!/bin/ksh
-# @(#)[:2nY0@+6ypedP@#VB~2}J: 2017-08-15 05:12:04 Z tw@csongor]
+# <@(#)tag:csongor.greyshirt.net,2017-08-15:tw/05.12.04z/5b15fe0>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
 
 apmarg=''
@@ -83,6 +83,6 @@ wait $xlock_pid
 $LOCALBIN/set-bg-per-battery.sh >>$HOME/log/battery-monitor
 
 log timesheet xlock end || -warn $REPLY
-
+doas ifconfig iwm0 up # just in case, because you know, sometimes
 
 # Copyright (C) 2017 by Tom Davis <tom@greyshirt.net>.

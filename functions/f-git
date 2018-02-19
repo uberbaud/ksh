@@ -13,7 +13,7 @@ function f-git {
 	# return whatever if it wasn't a clone
 	$cmd_is_clone || return $gitresult
 	# return error if it was a clone and there was an error
-	((gitresult))|| return $gitresult
+	((gitresult))&& return $gitresult
 
 	eval "newdir=\"\$$#\"" # get the last parameter
 	[[ $newdir == @(http|https|git):*.git ]]&& {

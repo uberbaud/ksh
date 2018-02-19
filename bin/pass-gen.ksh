@@ -190,7 +190,7 @@ new-array results
 integer range=$((maxLen-minLen)) thisLen=0
 while ((count--)); do
 	set -A rstr --
-	random -e $range
+	((!range))|| random -e $range
 	thisLen=$((minLen+$?))
 	$requireSYM	&& add-random-char $thisLen "$punct"
 	$requireDIG	&& add-random-char $thisLen "$digit"

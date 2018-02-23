@@ -31,7 +31,7 @@ function note {
 		done
 	# just in case everyone is trying to create a new note in the same 
 	# directory!
-	local TMPFILE="$(mktemp note-XXXXXXXXX)" tries=5
+	local TMPFILE="$(mktemp note-XXXXXXXXX)" tries=5 repolink SHA384
 	while ((tries--)); do
 		((seqnum++))
 		seqnote=$seqnum.note
@@ -43,14 +43,20 @@ function note {
 	$setnoglob && set -f
 	((tries>=0))|| die 'Could not create ^Bnote^b.'
 	new -nz note "$*"
-	local CLIP="$(mktemp clip-XXXXXXXXX)"
-	xclip -out -selection clipboard >"${CLIP}"
 	xclip -out -selection clipboard >$seqnote
-	xclip -in -selection clipboard <"${CLIP}"
-	rm "${CLIP}"
-	ln -s $PWD/$seqnote \
-		"$noterepo/$(date -u +'%Y-%m-%dz')-${OLDPWD##*/}-$seqnum"
+	repolink="$noterepo/$(date -u +'%Y-%m-%dz')-${OLDPWD##*/}-$seqnum"
+	tries=0
+	while ! ln -s $PWD/$seqnote "$repolink" 2>/dev/null; do
+		[[ "$(readlink "$repolink")" == $PWD/$seqnote ]]&& break
+		repolink="${repolink%%,+([0-9])},$((tries++))"
+	done
+	SHA384="$(cksum -qa sha384b "$seqnote")"
 	(($#))|| v $seqnote '.'
+	[[ $SHA384 == "$(cksum -qa sha384b "$seqnote")" ]]&& {
+		# no changes, so delete everything.
+		warn "Discarding empty note."
+		rm -f "$seqnote" "RCS/$seqnote,v" "$repolink"
+	  }
 	cd "$OLDPWD"
 }
 

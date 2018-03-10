@@ -7,7 +7,7 @@
 #:   ^GList notes with^g ^Tls-notes^t.
 
 needs xclip
-function note {
+function note {(
 	local NOTES="$PWD"/NOTES OLDPWD="$PWD" setnoglob=false
 	local noterepo=${XDG_DATA_HOME:-$HOME/.local}/sysdata/notes
 	[[ $PWD == */NOTES ]]&& NOTES="$PWD"
@@ -50,14 +50,15 @@ function note {
 		[[ "$(readlink "$repolink")" == $PWD/$seqnote ]]&& break
 		repolink="${repolink%%,+([0-9])},$((tries++))"
 	done
-	SHA384="$(cksum -qa sha384b "$seqnote")"
-	(($#))|| v $seqnote '.'
-	[[ $SHA384 == "$(cksum -qa sha384b "$seqnote")" ]]&& {
-		# no changes, so delete everything.
-		warn "Discarding empty note."
-		rm -f "$seqnote" "RCS/$seqnote,v" "$repolink"
+	(($#))|| {
+		SHA384="$(cksum -qa sha384b "$seqnote")"
+		v $seqnote '.'
+		[[ $SHA384 == "$(cksum -qa sha384b "$seqnote")" ]]&& {
+			# no changes, so delete everything.
+			warn "Discarding empty note."
+			rm -f "$seqnote" "RCS/$seqnote,v" "$repolink"
+		  }
 	  }
-	cd "$OLDPWD"
-}
+)}
 
 # Copyright © 2017 by Tom Davis,,, <tom@greyshirt.net>.

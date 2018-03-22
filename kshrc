@@ -202,6 +202,8 @@ for s in $(getent shells); do
 done
 unset s
 
+[[ -x /usr/local/bin/vis ]]&& alias vised='/usr/local/bin/vis'
+
 KCOMPLETE=$KDOTDIR/completions
 makeout=$KCOMPLETE/make.out
 get-exclusive-lock completion-make

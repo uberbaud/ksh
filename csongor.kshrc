@@ -42,6 +42,7 @@ export PKG_PATH
 export TZ=EST5EDT
 
 alias s=show
+alias lua=lua53
 
 LOGPS1='\n'\
 '%:KSH:% \D{%Y.%m.%d.%H.%M.%S.%z} \w\n'\

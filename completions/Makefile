@@ -5,7 +5,7 @@ TARGET      = completions.ksh
 # things make builds (don't git)
 OBJECTS     = git_1 help scp ssh rcctl_2
 # things hand crafted (git them)
-DEPENDS     = chflags kill_1 rcctl_1 xfontsel
+DEPENDS     = chflags kill_1 poco rcctl_1 xfontsel
 GIT_IGN     = .gitignore
 
 .poison empty OS_VER

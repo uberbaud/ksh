@@ -69,6 +69,7 @@ xlock_pid=$!
 [[ -x /usr/bin/sudo ]]&&	/usr/bin/sudo -K	# revoke sudo persistance
 [[ -x /usr/bin/ssh-add ]]&&	/usr/bin/ssh-add -D	# clear ssh keys
 pkill -SIGINT -f '^zsh: aMuse player'			# stop the music
+sync	# if the battery runs out while we're hibernating, ¿maybe?
 
 # suspend returns immediately, but suspension is in the future
 [[ -n $apmarg ]]&& {

@@ -1,0 +1,13 @@
+# <@(#)tag:csongor.greyshirt.net,2018-02-12:tw/20.37.00z/f1bece>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Umsgs^u
+#:   Save file to ^Bsaves^b folder
+
+needs notify refile
+function m-groups {
+	notify "refile $* +saves"
+	refile "$@" +saves
+}
+
+# Copyright © 2018 by Tom Davis <tom@greyshirt.net>.

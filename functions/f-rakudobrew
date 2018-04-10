@@ -12,12 +12,13 @@ function f-rakudobrew {
 		h1 'Upgrading repository'
 		builtin cd "$RAKUDO_HOME" ||
 			die 'Could not ^Tcd^t to ^S$RAKUDO_HOME^s.'
-		git pull|| die '^Tgit pull^t'
+		command git pull|| die '^Tgit pull^t'
 	else
 		h1 'Creating repository'
 		builtin cd "${RAKUDO_HOME%/*}" ||
 			die '^S$RAKUDO_HOME^s is not a directory.'
-		git clone https://github.com/rakudo/rakudo/ || die '^Tgit clone^t'
+		command git clone https://github.com/rakudo/rakudo/ ||
+			die '^Tgit clone^t'
 		builtin cd "$RAKUDO_HOME" ||
 			die 'Could not ^Tcd^t to ^S$RAKUDO_HOME^s.'
 	fi

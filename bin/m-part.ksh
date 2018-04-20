@@ -46,10 +46,12 @@ printf 'In \e[35m$XDG_CACHE_HOME/mail\e[39m\n'
 
 new-array parts
 
-touch mark-$$
+mark="$(mktemp mark-XXXXXXXXX)"
+
 mhstore "$@"
 for f in *; do
-	[[ $f -nt mark-$$ ]]&& continue # skip old files
+	[[ $f == $mark ]]&& continue	# skip mark
+	[[ $f -ot $mark ]]&& continue	# skip old files
 	if [[ $f == *.txt && "$( file -bi "$f" )" == text/html ]]; then
 		H="${f%.*}.html"
 		mv "$f" "$H" && f="$H"
@@ -61,7 +63,7 @@ for f in *; do
 	fi
 	+parts "$f"
 done
-rm mark-$$
+rm $mark
 
 open "${parts[@]}"
 

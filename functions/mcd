@@ -1,11 +1,17 @@
 # <@(#)tag:csongor.greyshirt.net,2017-08-11:tw/19.05.36z/4b3dca2>
 
-#: FUNCTION ^Unew path^u
+#: FUNCTION ^[^T-R-t^] ^Unew directory^u
 #:   ^Tmkdir -p^t ^Unew path^u, and then ^Tcd^t there.
 
 function mcd {
+	local wantRCS=false
+	[[ ${1:?Missing required parameter NEW DIRECTORY} == -R ]]&& {
+		wantRCS=true
+		shift
+	  }
+	(($#==1))|| die 'Too many arguments.'
 	mkdir -p "$1"
-	cd "$1"
+	cd "$1" && $wantRCS && mkdir RCS
   }
 
 # vim: ft=ksh ts=4

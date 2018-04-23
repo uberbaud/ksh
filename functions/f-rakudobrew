@@ -23,11 +23,12 @@ function f-rakudobrew {
 			die 'Could not ^Tcd^t to ^S$RAKUDO_HOME^s.'
 	fi
 	h1 'Configuring'
-	perl Configure.pl --gen-moar --gen-nqp --backends=moar &&
+	perl Configure.pl --gen-moar --gen-nqp --backends=moar ||
+		die 'Did not configure rakudo.'
 	h1 'Building'
-	make
+	make || die 'Did not build.'
 	h1 'Installingish'
-	make install
+	make install || die 'Did not install'
 	builtin cd "$OLDWD"
 	h1 'Timing new build'
 	command perl6 -e 'exit' || die "Can't run ^Tperl6^t."

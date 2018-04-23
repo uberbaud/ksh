@@ -99,7 +99,7 @@ set -A files2delete ${XDG_CACHE_HOME:?}/mail/*
 if [[ $files2delete != *\* ]]; then
     print -u2 ' [34m>>>[0;1m Cleaning[0m mail workshop.'
     yes-or-no 'Delete the mail parts which maybe you'\''re using' &&
-        rm $files2delete
+        rm "${files2delete[@]}"
 fi
 
 exec 3>&-

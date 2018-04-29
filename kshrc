@@ -72,6 +72,9 @@ export HISTFILE=$fhist
 export HISTSIZE=8191
 export LD_LIBRARY_PATH=$xdgdata/c/lib
 export LOCALBIN=$xdgdata/bin
+# LUA wants SEMICOLON separated PATTERNS, empty item is default
+export LUA_PATH_5_3="$xdgdata/lua/5.3/?.lua;$xdgdata/lua/5.3/?/init.lua;;"
+export LUA_CPATH_5_3="$xdgdata/lua/5.3/?.so;;"
 export PERL5LIB=$xdgdata/perl5/twlib
 export RAKUDO_HOME=$xdgdata/rakudo
 export RAKUDO_BIN=$RAKUDO_HOME/install/bin

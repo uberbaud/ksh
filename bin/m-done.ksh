@@ -88,10 +88,14 @@ function X { # {{{1
   X -to    'source-changes@openbsd\.org'  obsd-cvs      'OpenBSD CVS'
   X -from  '@stackoverflow\.'             stackover     'Stack Overflow'
 
+print -u2 ' [34m>>>[0m [1mDeleting[0m old trash.'
+pick -before -30 +deleted -seq expired
+rmm -unlink expired
+
 if Done; then
     print -u2 ' [34m>>>[0m No messages to [1remove[0m.'
 else
-    print -u2 ' [34m>>>[0m [1mRemoving[0m everything else.'
+    print -u2 ' [34m>>>[0m [1mTrashing[0m everything else.'
     refile marked -unlink -src +inbox +deleted
 fi
 

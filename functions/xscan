@@ -5,15 +5,21 @@
 #:   scan piped to Xdialog
 
 function xscan {
-	local rc=$XDG_CONFIG_HOME/gtk-tw/fixed-font.rc size=911x975+921+1 O
-	set -A O -- --rc-file $rc --left --no-wrap --no-buttons --textbox - $size
+	local rc=$XDG_CONFIG_HOME/gtk-tw/fixed-font.rc size=927x1080
+	new-array opts
+	+opts --rc-file $rc
+	+opts --wmclass xscan
+	+opts --left
+	+opts --no-wrap
+	+opts --no-buttons
+	+opts --textbox - $size
 	(($#))|| {
 		scanseq='¬L'
 		[[ -n "$(flist +inbox -sequence L -noshowzero)" ]]|| scanseq=all
 		set -- +inbox $scanseq
 	  }
 
-	(set -o nohup; scan "$@"| Xdialog "${O[@]}" &)
+	(set -o nohup; scan "$@"| Xdialog "${opts[@]}" &)
 }
 
 # Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

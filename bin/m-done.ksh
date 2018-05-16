@@ -43,15 +43,20 @@ function warnOrDie { #{{{1
 					'warnOrDie is [1m${warnOrDie}[22m.';		;;
 	esac
 } # }}}1
+function expire { # {{{1
+	pick -before -30 +deleted -seq expired &&
+		rmm -unlink expired
+	forceline
+} # }}}1
+function Done { # {{{1
+	[[ -z "$(flist +inbox -sequence marked -fast -noshowzero)" ]]
+} # }}}1
 
-needs flist mark folder pick refile yes-or-no
+needs flist folder forceline mark pick refile rmm yes-or-no
 
 # clean out groupmail list
 : >"$NMH"/groupmail
 
-function Done {
-	[[ -z "$(flist +inbox -sequence marked -fast -noshowzero)" ]]
-}
 (($#))|| set all
 mark "$@" +inbox -sequence marked 2>/dev/null
 folder +inbox
@@ -88,9 +93,8 @@ function X { # {{{1
   X -to    'source-changes@openbsd\.org'  obsd-cvs      'OpenBSD CVS'
   X -from  '@stackoverflow\.'             stackover     'Stack Overflow'
 
-print -u2 ' [34m>>>[0m [1mDeleting[0m old trash.'
-pick -before -30 +deleted -seq expired
-rmm -unlink expired
+print -nu2 ' [34m>>>[0m [1mDeleting[0m old trash. ... '
+expire 2>/dev/null
 
 if Done; then
     print -u2 ' [34m>>>[0m No messages to [1remove[0m.'

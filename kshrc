@@ -20,6 +20,7 @@ export TERM
 export SYSLOCAL=/usr/local
 export ISO_DATE='%Y-%m-%d %H:%M:%S %z'
 export URI_AUTHORITY='greyshirt.net'
+export XDIALOG_NO_GMSGS=1	# Xdialog Gdk/GLib/Gtk will not g_log()
 
 # XDG paths
 if [[ -d ${XDG_CONFIG_HOME:-~/.config} ]]; then

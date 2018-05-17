@@ -93,7 +93,7 @@ function X { # {{{1
   X -to    'source-changes@openbsd\.org'  obsd-cvs      'OpenBSD CVS'
   X -from  '@stackoverflow\.'             stackover     'Stack Overflow'
 
-print -nu2 ' [34m>>>[0m [1mDeleting[0m old trash. ... '
+print -nu2 ' [34m>>>[0m [1mDeleting[0m old trash ... '
 expire 2>/dev/null
 
 if Done; then

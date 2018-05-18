@@ -6,6 +6,10 @@ set -o nounset;: ${FPATH:?Run from within KSH}
 
 new-array name dotf exec cmds haz
 
+GITUP=$KDOTDIR/bin/gitup.ksh
+[[ -x $GITUP ]]||
+	die 'No ^S$B^s^T/gitup.ksh^t so using git pull.'
+
 function @ { # {{{1
 	local NAME="$1 ($3)" DOTF="$2" EXEC="$3"; shift 3
 	+name "$NAME"
@@ -16,8 +20,8 @@ function @ { # {{{1
 	+haz "$NAME"
 } # }}}1
 #   name          dotf          exec      SUBCOMMANDS (cmds)
-@   Git           .git          git       pull
-@   Git+Modules   .gitmodules   git       pull submodule update --remote
+@   Git           .git          $GITUP    simple
+@   Git+Modules   .gitmodules   $GITUP    modules
 @   Fossil        .fslckout     fossil    pull co --latest
 @   Subversion    .svn          svn       update
 @   Mercurial     .hg           hg        pull update
@@ -39,22 +43,25 @@ function usage {
 	supported="^B$REPLY^b"
 	sparkle >&2 <<-\
 	===SPARKLE===
-	^F{4}Usage^f: ^T$PGM^t
+	^F{4}Usage^f: ^T$PGM^t ^[^T-v^t^]
 	         Calls the appropriate ^BVersion Control Software^b (vcs).
 	         Supported and installed ^Ivcs^i systems:
 	             $supported
+	         ^T-v^t  Verbose.
 	       ^T$PGM -h^t
 	         Show this help message.
 	===SPARKLE===
 	exit 0
 } # }}}
 # process -options {{{1
+VERBOSE=false
 function bad_programmer {	# {{{2
 	die 'Programmer error:'	\
 		"  No getopts action defined for [1m-$1[22m."
   };	# }}}2
-while getopts ':h' Option; do
+while getopts ':vh' Option; do
 	case $Option in
+		v)	VERBOSE=true;											;;
 		h)	usage;													;;
 		\?)	die "Invalid option: [1m-$OPTARG[22m.";				;;
 		\:)	die "Option [1m-$OPTARG[22m requires an argument.";	;;
@@ -71,6 +78,7 @@ name-is-empty && die 'Impossibly, ^S$name^s is empty.'
 found=false
 integer i=${#name[*]}
 while ((i--)); do
+	$VERBOSE && notify "Looking for ^B${dotf[i]}^b."
 	[[ -a ${dotf[i]} ]]|| continue
 	found=true
 
@@ -80,6 +88,7 @@ while ((i--)); do
 		continue
 	  }
 
+	$VERBOSE && notify "Runing ^T${exec[i]} ${cmds[i]}^t."
 	"$EXEC" ${cmds[i]}
 	break
 done

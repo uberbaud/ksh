@@ -11,9 +11,10 @@ function usage {
 	PGM="$REPLY"
 	sparkle >&2 <<-\
 	===SPARKLE===
-	^F{4}Usage^f: ^T${PGM}^t
+	^F{4}Usage^f: ^T${PGM}^t ^Uupdate type^u
+	         Where ^Uupdate type^u is one of ^Bsimple^b or ^Bmodules^b.
 	         1. ^Tgit checkout master^t if not on master,
-	         2. ^Tgit pull^t,
+	         2. ^Tgit pull^t or ^Tgit submodule update --remote^t,
 	         3. ^Tgit checkout^t ^Uprevious^u if needed, and finally
 	         4. ^Tgit merge master^t.
 	       ^T${PGM} -h^t
@@ -38,22 +39,25 @@ done
 shift $(($OPTIND - 1))
 # ready to process non '-' prefixed arguments
 # /options }}}1
-(($#))&& die 'Unexpected arguments. Expected ^Bnone^b.'
+function GIT { notify "git $*"; command git "$@"; }
 
 i-can-haz-inet	|| die 'No internet' "$REPLY"
 
-branch="$(git rev-parse --abbrev-ref HEAD 2>/dev/null)"
-[[ $branch == master ]]|| git checkout master
-before="$(git describe --always --dirty)"
-git pull || die "Couldn't ^Tpull^t."
-after="$(git describe --always --dirty)"
+branch="$(command git rev-parse --abbrev-ref HEAD 2>/dev/null)"
+[[ $branch == master ]]|| GIT checkout master
+
+before="$(command git describe --always --dirty)"
+[[ -f .gitmodules ]]&& GIT submodule update --remote
+GIT pull || die "Couldn't ^Tpull^t."
+after="$(command git describe --always --dirty)"
+
 [[ $branch == master ]]|| {
-	git checkout $branch
+	GIT checkout $branch
 	[[ $before == "$after" ]]&& {
-		warn 'Unchanged.' 'Quitting.'
+		warn 'Unchanged, quitting.'
 		exit 1
 	  }
-	git merge master
+	GIT merge master
   }
 
 # Copyright (C) 2017 by Tom Davis <tom@greyshirt.net>.

@@ -23,9 +23,12 @@ function usage {
 } # }}}
 (($#))&& { # {{{1
 	case "$1" in
-		-Z)	apmarg=-Z;						;;
-		-z)	apmarg=-z;						;;
-		-S)	apmarg=-S;						;;
+		##### STATE in RAM  #####
+		?(-)S)	apmarg=-S;					;; # stand-by (light sleep)
+		?(-)z)	apmarg=-z;					;; # suspend (deep sleep)
+		##### STATE in SWAP #####
+		?(-)Z)	apmarg=-Z;					;; # hibernate
+		#########################
 		-h) usage;							;;
 		*)	print -u2 "$0: Bad opt: '$1'";	;;
 	esac

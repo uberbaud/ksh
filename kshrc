@@ -177,7 +177,7 @@ done
 # FPATH functions are implicitly autoloaded, but the completion 
 # mechanism doesn't know about them unless we explicitly autoload them
 IFS=:
-for p in $FPATH; { for i in $F/*; { typeset -fu "${i##*/}"; } }
+for p in $FPATH; { for i in $p/*; { typeset -fu "${i##*/}"; } }
 IFS=" $TAB$NL"
 # clean up
 unset p i

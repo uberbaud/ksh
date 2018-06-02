@@ -30,12 +30,7 @@ function ruler {
 	else
 		print $Ruler
 		cat
-		set -A CURSOR_AT -- $($HOME/larn/nix/tui/curpos)
-		print -- ---
-		$HOME/larn/nix/tui/curpos
-		print "${CURSOR_AT[0]}"
-		print "${CURSOR_AT[1]}"
-		print -- ---
+		forceline
 		print $Ruler
 	fi
 }

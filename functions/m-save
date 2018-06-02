@@ -5,9 +5,9 @@
 #:   Save file to ^Bsaves^b folder
 
 needs notify refile
-function m-groups {
-	notify "refile $* +saves"
-	refile "$@" +saves
+function m-save {
+	notify "refile -src +inbox $* +saves"
+	refile -src +inbox "$@" +saves
 }
 
 # Copyright © 2018 by Tom Davis <tom@greyshirt.net>.

@@ -6,7 +6,7 @@
 #:   Useful mostly in prompts.
 
 function forceline {
-	set -A pos $($HOME/.local/bin/get-row-col)
+	set -A pos $($HOME/.local/bin/get-row-col ${TTY:?})
 	((pos[1]==1))|| printf '\e[7m%%\e[0m\n'
   } >&2
 

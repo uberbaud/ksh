@@ -92,6 +92,8 @@ function X { # {{{1
   X -to    'bgumm102@gmail\.com'          notes         'Notes to Self'
   X -to    'source-changes@openbsd\.org'  obsd-cvs      'OpenBSD CVS'
   X -from  '@stackoverflow\.'             stackover     'Stack Overflow'
+CIP='alexepstein@industrialprogress.net'
+  X -from  "$CIP"                         energy        'CIP'
 
 print -nu2 ' [34m>>>[0m [1mDeleting[0m old trash ... '
 expire 2>/dev/null

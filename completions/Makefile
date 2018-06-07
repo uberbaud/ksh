@@ -3,7 +3,7 @@
 
 TARGET      = completions.ksh
 # things make builds (don't git)
-OBJECTS     = git_1 help scp ssh rcctl_2
+OBJECTS     = git_1 help scp ssh rcctl_2 sysctl
 # things hand crafted (git them)
 DEPENDS     = chflags kill_1 poco rcctl_1 xfontsel
 GIT_IGN     = .gitignore
@@ -59,6 +59,12 @@ ssh: $(SSH_HOSTS)
 scp: ssh
 	@echo $@
 	@ln -fs ssh scp
+
+sysctl:
+	@echo $@
+	@sysctl >tmp.sysctl
+	@awk -F= '/^[^ \t]/ {print $$1}' tmp.sysctl >$@
+	@rm tmp.sysctl
 
 PKG_LOG = $(HOME)/hold/$(OS_VER)/pkg.log
 rcctl_2: $(PKG_LOG)

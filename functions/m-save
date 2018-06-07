@@ -1,13 +1,19 @@
 # <@(#)tag:csongor.greyshirt.net,2018-02-12:tw/20.37.00z/f1bece>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^Umsgs^u
+#: FUNCTION ^[^U+folder^u^] ^Umsgs^u
 #:   Save file to ^Bsaves^b folder
+#:     same as: refile -src +inbox "$@" +saves
 
 needs notify refile
 function m-save {
-	notify "refile -src +inbox $* +saves"
-	refile -src +inbox "$@" +saves
+	local saveto=+saves
+	[[ $1 == +* ]]&& {
+		saveto="$1"
+		shift
+	  }
+	notify "refile -src +inbox $* $saveto"
+	refile -src +inbox "$@" $saveto
 }
 
 # Copyright © 2018 by Tom Davis <tom@greyshirt.net>.

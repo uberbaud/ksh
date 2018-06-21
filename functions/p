@@ -5,7 +5,7 @@
 #:   Choose (^Tomenu^t), possibly create, and ^Tcd^t to a subdirectory of play.
 
 function p {
-	cd ~/play
+	builtin cd ~/play
 	(($#))|| return 0 # no directory given so we're done
 	(($#>1))&& {
 		sparkle >&2 <<-\
@@ -56,6 +56,22 @@ function p {
 	[[ -d $choice ]]|| mkdir -p "$choice"
 
 	cd "$choice"
+	fUSE=.created
+	if [[ -f $fUSE  ]]; then
+		first="$(<$fUSE)"
+		now="$(date +%s)"
+		((secs_per_day=24*60*60))
+		((first/=secs_per_day))
+		((now/=secs_per_day))
+		((daysused=now-first))
+		((daysused>60))&& warn	\
+			"You've been using this playground for ^B$daysused^b days."	\
+			"Isn't it time to do something permanent with it?"
+	else
+		date +%s >$fUSE
+	fi
+
+	true # leave on a good note
 }
 
 

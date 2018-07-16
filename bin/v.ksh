@@ -169,7 +169,7 @@ typeset -- has_rcs=false
 [[ -d RCS && -f RCS/"$f_name,v" ]] && {
 	has_rcs=true
 	rcsdiff -q ./"$f_name" ||
-		die 'RCS and checked out versions differ.'
+		warnOrDie 'RCS and checked out versions differ.'
 	# avoid "writable ./f_name exists; remove it? [ny](n):"
 	[[ -w ./"$f_name" ]]&& chmod a-w ./"$f_name"
 	co -q -l ./"$f_name" ||

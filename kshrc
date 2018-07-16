@@ -49,6 +49,8 @@ fi
 xdgdata=$XDG_DATA_HOME
 xdgcfg=$XDG_CONFIG_HOME
 xdgcache=$XDG_CACHE_HOME
+SYSDATA=$xdgdata/sysdata
+	[[ -d $SYSDATA ]]&& export SYSDATA || unset SYSDATA
 
 # special history file stuff
 KHIST=$KDOTDIR/history

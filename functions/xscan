@@ -13,11 +13,14 @@ function xscan {
 	+opts --no-wrap
 	+opts --no-buttons
 	+opts --textbox - $size
-	(($#))|| {
+	if (($#)); then
+		[[ -n "$(flist -noshowzero "$@")" ]]||
+			die "^Tflist $*^t found nothing"
+	else
 		scanseq='¬L'
 		[[ -n "$(flist +inbox -sequence L -noshowzero)" ]]|| scanseq=all
 		set -- +inbox $scanseq
-	  }
+	fi
 
 	(set -o nohup; scan "$@"| Xdialog "${opts[@]}" &)
 }

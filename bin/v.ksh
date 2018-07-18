@@ -55,6 +55,15 @@ function warnOrDie { #{{{1
 					'warnOrDie is ^B${warnOrDie}^b.';		;;
 	esac
 } # }}}1
+function already-in-edit {
+	warn "File is already being edited (pid=^B$1^b)"
+	needs flash-parent-window-of-pid
+	flash-parent-window-of-pid "$1"
+	integer rc=$?
+	((rc))&&
+		warn "Edit window is on desktop ^B$rc^b"
+	die "Quitting."
+}
 function safe-to-edit-vis {
 	local F="$1"
 	gsub % %% "$F"
@@ -63,14 +72,13 @@ function safe-to-edit-vis {
 	VISED_CACHE="$XDG_CACHE_HOME/vis-ed"
 	[[ -d $VISED_CACHE ]]|| mkdir -p $VISED_CACHE
 	local L=$VISED_CACHE/excl-lock-$LOCKNAME
-	get-exclusive-lock-or-exit "$LOCKNAME" $VISED_CACHE || {
-		needs x11-windowid-for-pid
-		x11-windowid-for-pid $(<$L)
-	  }
+	get-exclusive-lock-or-exit "$LOCKNAME" $VISED_CACHE ||
+		already-in-edit $(<$L)
 	print $$>$L
 }
 function save-to-edit-vise { safe-to-edit-vis "$@"; }
 function save-to-edit-vised { safe-to-edit-vis "$@"; }
+function save-to-edit-vis-ed { safe-to-edit-vis "$@"; }
 function safe-to-edit-vim { # {{{1
 	local F="$1"
 	# we set this, but it isn't used unless we return false
@@ -94,8 +102,7 @@ function safe-to-edit-nvim { #{{{1
 			s="${s% $p}"
 			desparkle "$s"; s="$REPLY"
 			if [[ $p != - ]]; then
-				needs flash-parent-window-of-pid
-				flash-parent-window-of-pid $p
+				already-in-edit $p
 			else
 				p=''
 			fi

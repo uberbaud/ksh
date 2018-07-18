@@ -59,6 +59,8 @@ function safe-to-edit-vis {
 	local F="$1"
 	gsub % %% "$F"
 	gsub / %  "$REPLY"
+	LOCKNAME="$REPLY"
+	VISED_CACHE="$XDG_CACHE_HOME/vis-ed"
 	[[ -d $VISED_CACHE ]]|| mkdir -p $VISED_CACHE
 	local L=$VISED_CACHE/excl-lock-$LOCKNAME
 	get-exclusive-lock-or-exit "$LOCKNAME" $VISED_CACHE || {

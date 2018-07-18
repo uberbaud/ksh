@@ -76,9 +76,9 @@ function safe-to-edit-vis {
 		already-in-edit $(<$L)
 	print $$>$L
 }
-function save-to-edit-vise { safe-to-edit-vis "$@"; }
-function save-to-edit-vised { safe-to-edit-vis "$@"; }
-function save-to-edit-vis-ed { safe-to-edit-vis "$@"; }
+function safe-to-edit-vise { safe-to-edit-vis "$@"; }
+function safe-to-edit-vised { safe-to-edit-vis "$@"; }
+function safe-to-edit-vis-ed { safe-to-edit-vis "$@"; }
 function safe-to-edit-vim { # {{{1
 	local F="$1"
 	# we set this, but it isn't used unless we return false

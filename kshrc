@@ -121,20 +121,42 @@ export BZR_HOME=$xdgcfg/bzr
 export CALENDAR_DIR=$xdgcfg/calendar
 export HGRCPATH=$xdgcfg/hg
 
-# default apps
-if   [[ -f /usr/local/bin/nvim ]]; then
-	export MYVIM=$HOME/.config/nvim
-	export EDITOR=/usr/local/bin/nvim
-elif [[ -f /usr/local/bin/vim ]]; then
-	export MYVIM=$HOME/.config/vim
-	export MYVIMRC=$MYVIM/vimrc
-	export VIMINIT="so $MYVIMRC"
-	export EDITOR=/usr/local/bin/vim
-else
-	export EDITOR=/usr/bin/vi
-fi
-export VISUAL=$EDITOR
-export FCEDIT=$EDITOR
+# ==== DEFAULT APPS
+# handle whether  EDITOR or VISUAL was set in $HOST.kshrc
+[[ -z ${VISUAL:-${EDITOR:-}} ]]&& {
+	L=/usr/local/bin; S=/usr/bin; U=$HOME/.local/bin
+	for VISUAL in $L/nvim $L/vim $U/vis $L/vis $L/vise $S/vi; do
+		[[ -x $VISUAL ]]&& break
+	done
+	unset L S U
+  }
+
+case $VISUAL in
+	*/nvim)
+		[[ -d $xdgcfg/nvim ]]&&
+			export MYVIM=$xdgcfg/nvim
+		;;
+	*/vim)
+		[[ -d $xdgcfg/vim ]]&&
+			export MYVIM=$xdgcfg/vim
+		[[ -n $MYVIM && -f $MYVIM/vimrc ]]&& {
+			export MYVIMRC=$MYVIM/vimrc
+			export VIMINIT="so $MYVIMRC"
+		  }
+		;;
+	*/vi)
+		[[ -f $xdgcfg/vi/nex.rc ]]&&
+			export NEXINIT=$xdgcfg/vi/nex.rc
+		[[ -f $xdgcfg/vi/ex.rc ]]&&
+			export EXINIT=$xdgcfg/vi/ex.rc
+		;;
+	# */vis?(e)) Handles $xdgcfg just fine, thank you.
+esac
+
+VISUAL=${VISUAL:-${EDITOR:-}}
+EDITOR=${EDITOR:-${VISUAL:-ed}}
+FCEDIT=${FCEDIT:-$EDITOR}
+export ${VISUAL:+VISUAL} EDITOR FCEDIT
 
 export CC="$(command -v clang)"
 export PAGER=/usr/bin/less

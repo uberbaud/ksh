@@ -179,7 +179,7 @@ function r-pullfile { # {{{1
 		touch -md "$(date -ur $modtm +'%Y-%m-%dT%H:%M:%SZ')" "./$1"
 		chmod ${perm#??} "./$1"
 		fflags-to-flagstr $flags
-		chflags $flagstr "./$1"
+		chflags $flagstr "./$1" || print "chflags $flagstr './$1'"
 		r-request-is done || r-fail
 		r-okay
 	  }

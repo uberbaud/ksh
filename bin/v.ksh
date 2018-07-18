@@ -55,6 +55,20 @@ function warnOrDie { #{{{1
 					'warnOrDie is ^B${warnOrDie}^b.';		;;
 	esac
 } # }}}1
+function safe-to-edit-vis {
+	local F="$1"
+	gsub % %% "$F"
+	gsub / %  "$REPLY"
+	[[ -d $VISED_CACHE ]]|| mkdir -p $VISED_CACHE
+	local L=$VISED_CACHE/excl-lock-$LOCKNAME
+	get-exclusive-lock-or-exit "$LOCKNAME" $VISED_CACHE || {
+		needs x11-windowid-for-pid
+		x11-windowid-for-pid $(<$L)
+	  }
+	print $$>$L
+}
+function save-to-edit-vise { safe-to-edit-vis "$@"; }
+function save-to-edit-vised { safe-to-edit-vis "$@"; }
 function safe-to-edit-vim { # {{{1
 	local F="$1"
 	# we set this, but it isn't used unless we return false
@@ -78,12 +92,8 @@ function safe-to-edit-nvim { #{{{1
 			s="${s% $p}"
 			desparkle "$s"; s="$REPLY"
 			if [[ $p != - ]]; then
-				needs x11-windowid-for-pid x11-flash-window
-				x11-windowid-for-pid $p && {
-					w=$REPLY
-					d=$(xdotool get_desktop_for_window $w); ((d++))
-					x11-flash-window -dq $w &
-				  }
+				needs flash-parent-window-of-pid
+				flash-parent-window-of-pid $p
 			else
 				p=''
 			fi
@@ -206,6 +216,8 @@ if [[ -d RCS ]]; then
 elif $hasmsg; then
 	warn 'No ^SRCS/^s.'
 fi
+
+[[ -n ${LOCKNAME:-} ]]&& release-exclusive-lock "$LOCKNAME" $VISED_CACHE
 
 }
 

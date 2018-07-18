@@ -7,9 +7,15 @@
 needs xdotool x11-windowid-for-pid x11-flash-window
 function flash-parent-window-of-pid {
 	x11-windowid-for-pid $1 && {
-		local w=$REPLY
-		d=$(xdotool get_desktop_for_window $w); ((d++))
-		x11-flash-window-dq $w &
+		local w=$REPLY d c
+		c=$(xdotool get_desktop)
+		d=$(xdotool get_desktop_for_window $w)
+		if ((c==d)); then
+			x11-flash-window $w &
+			return 0
+		else
+			return $((d+1))
+		fi
 	  }
 }
 

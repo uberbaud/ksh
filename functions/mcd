@@ -4,14 +4,14 @@
 #:   ^Tmkdir -p^t ^Unew path^u, and then ^Tcd^t there.
 
 function mcd {
-	local wantRCS=false
+	local skipRCS=true
 	[[ ${1:?Missing required parameter NEW DIRECTORY} == -R ]]&& {
 		wantRCS=true
 		shift
 	  }
 	(($#==1))|| die 'Too many arguments.'
 	mkdir -p "$1"
-	cd "$1" && $wantRCS && mkdir RCS
+	cd "$1" && $skip || mkdir RCS
   }
 
 # vim: ft=ksh ts=4

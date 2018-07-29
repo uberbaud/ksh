@@ -1,15 +1,15 @@
 # <@(#)tag:csongor.greyshirt.net,2017-08-06:tw/03.08.17z/1bd9e24>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^[^Uplay path fragment^u^|^Unew play directory^u^] ^[^T-x^t^]
+#: FUNCTION ^[^Uplay path fragment^u^|^Unew play directory^u^] ^[^T!^t^]
 #:   Choose (^Tomenu^t), possibly create, and ^Tcd^t to a subdirectory of play.
-#:     ^T-x^t  Use exact ^Uname^u (don't attempt to match a fragment).
+#:     ^T!^t  Use exact ^Uname^u (don't attempt to match a fragment).
 
 function p {
 	builtin cd ~/play
 	(($#))|| return 0 # no directory given so we're done
 	(($#>2))&& fail 'Unexpected arguments. Wanted 1 or 2.'
-	[[ $# -eq 2 && $2 != '-x' ]]&& fail 'Unknown flag (2nd argument)'
+	[[ $# -eq 2 && $2 != '!' ]]&& fail 'Unknown flag (2nd argument)'
 
 	local choice='-'
 	if (($#==2)); then

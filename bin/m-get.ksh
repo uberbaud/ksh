@@ -27,7 +27,7 @@ function bad_programmer {	# {{{2
 		"  No getopts action defined for [1m-$1[22m."
   };	# }}}2
 function list-accts { # {{{2
-	laccts=${XDG_CONFIG_HOME:?}/fetchmail/listAccts.zsh
+	laccts=${XDG_CONFIG_HOME:?}/fetchmail/listAccts.ksh
 	needs $laccts
 	$laccts
 } # }}}2

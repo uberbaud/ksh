@@ -55,7 +55,9 @@ function Done { # {{{1
 needs flist folder forceline mark pick refile rmm yes-or-no
 
 # clean out groupmail list
-: >"$NMH"/groupmail
+GROUPMAIL="$NMH"/groupmail
+[[ -e $GROUPMAIL ]]&& { [[ -w $GROUPMAIL ]]|| chmod u+w "$GROUPMAIL"; }
+: >$GROUPMAIL
 
 (($#))|| set all
 mark "$@" +inbox -sequence marked 2>/dev/null

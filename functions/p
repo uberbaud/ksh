@@ -6,6 +6,7 @@
 #:     ^T!^t  Use exact ^Uname^u (don't attempt to match a fragment).
 
 function p {
+	[[ -d ~/play ]]|| mkdir ~/play
 	builtin cd ~/play
 	(($#))|| return 0 # no directory given so we're done
 	(($#>2))&& fail 'Unexpected arguments. Wanted 1 or 2.'

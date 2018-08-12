@@ -66,7 +66,7 @@ function do-one {
 		warn "Could not create directory ^B$restdir^b."
 		return 1
 	  }
-	cat <p >"$restname"
+	cat <&p >"$restname"
 }
 
 for f; do do-one "$f"; done; exit

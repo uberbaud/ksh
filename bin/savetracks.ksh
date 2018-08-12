@@ -63,13 +63,17 @@ for t in *; do
 	SHA384="$(cksum -qa sha384b "$original")"
 	gsub '/' '_' "$SHA384"
 	SHA384="$REPLY"
-	if [[ -f ../$SHA384 ]]; then
+	FNAME=../$SHA384
+	if [[ -f $FNAME ]]; then
 		warn "sha384b already exists for ^B$t^b."
 	else
-		{ echo "$original"; cat "$original"; } | gzip -qfno ../"$SHA384"
-		chflags uchg ../"$SHA384"
+		{
+			print -- "$original"
+			cat "$original"
+		  } | gzip -qfno "$FNAME"
+		chflags uchg "$FNAME"
 	fi
-	echo "$SHA384" >"$t"
+	print -- "$SHA384" >"$t"
 done
 
 # Copyright (C) 2017 by Tom Davis <tom@greyshirt.net>.

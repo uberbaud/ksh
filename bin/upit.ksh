@@ -4,6 +4,8 @@
 
 set -o nounset;: ${FPATH:?Run from within KSH}
 
+needs desparkle die h1 new-array notify splitstr warn
+
 new-array name dotf exec cmds haz
 
 GITUP=$KDOTDIR/bin/gitup.ksh
@@ -25,6 +27,7 @@ function @ { # {{{1
 @   Fossil        .fslckout     fossil    pull co --latest
 @   Subversion    .svn          svn       update
 @   Mercurial     .hg           hg        pull update
+@   Monotone      _MTN          mtn       pull +AND+ update
 @   Bazaar        .bzr          bzr       update
 @   Darcs         .darcs        darcs     update
 @   RsyncUp       .rsyncup      rsyncup   fetch
@@ -43,11 +46,16 @@ function usage {
 	supported="^B$REPLY^b"
 	sparkle >&2 <<-\
 	===SPARKLE===
-	^F{4}Usage^f: ^T$PGM^t ^[^T-v^t^]
-	         Calls the appropriate ^BVersion Control Software^b (vcs).
+	^F{4}Usage^f: ^T$PGM^t ^[^T-v^t^] ^[^Udirectory^u ^U…^u^]
+	         For each ^Udirectory^u given, ^Tcd^t to ^Udirectory^u and call the appropriate
+	         ^BVersion Control Software^b (vcs). If none are given, uses ^S\$PWD^s.
+	         If ^Udirectory^u includes the ^Idotfile^i, the parent directory is used.
+	           ^T-v^t  Verbose.
+	
 	         Supported and installed ^Ivcs^i systems:
 	             $supported
-	         ^T-v^t  Verbose.
+	       ^T$PGM -D^t
+	         List ^Bdotfiles^b used to recognize the vcs.
 	       ^T$PGM -h^t
 	         Show this help message.
 	===SPARKLE===
@@ -55,13 +63,15 @@ function usage {
 } # }}}
 # process -options {{{1
 VERBOSE=false
+HEADER=false
 function bad_programmer {	# {{{2
 	die 'Programmer error:'	\
 		"  No getopts action defined for [1m-$1[22m."
   };	# }}}2
-while getopts ':vh' Option; do
+while getopts ':Dvh' Option; do
 	case $Option in
-		v)	VERBOSE=true;											;;
+		v)	VERBOSE=true; HEADER=true;								;;
+		D)	printf "%s\n" "${dotf[@]}" |sort; return 0;				;;
 		h)	usage;													;;
 		\?)	die "Invalid option: [1m-$OPTARG[22m.";				;;
 		\:)	die "Option [1m-$OPTARG[22m requires an argument.";	;;
@@ -72,27 +82,56 @@ done
 shift $(($OPTIND - 1))
 # ready to process non '-' prefixed arguments
 # /options }}}1
-(($#))&& die 'Too many arguments. Exepected ^Bnone^b.'
+(($#))|| set -- "$PWD"
+(($#>1))&& HEADER=true
 
 name-is-empty && die 'Impossibly, ^S$name^s is empty.'
-found=false
-integer i=${#name[*]}
-while ((i--)); do
-	$VERBOSE && notify "Looking for ^B${dotf[i]}^b."
-	[[ -a ${dotf[i]} ]]|| continue
-	found=true
 
-	EXEC="${exec[i]}"
-	which $EXEC >/dev/null 2>&1 || {
-		warn "Found ^B${dotf[i]}^b, but ${name[i]} is not installed."
-		continue
+function set_re { # {{{1
+	local IFS=\|
+	re_dots="@(${dotf[*]})"
+} #}}}1
+function do-one {( # {{{1
+	found=false
+	[[ -a $1 ]]|| {
+		desparkle "$1"
+		die "^B$REPLY^b does not exist."
 	  }
 
-	$VERBOSE && notify "Runing ^T${exec[i]} ${cmds[i]}^t."
-	"$EXEC" ${cmds[i]}
-	break
-done
+	eval "DIR=\"\${1%/$re_dots}\""
+	desparkle "$DIR"
+	dDIR="$REPLY"
+	$HEADER && h1 "$DIR"
+	$VERBOSE && notify "^Tcd^ting to ^B$dDIR^b."
+	builtin cd "$DIR" || die "Could not ^Tcd^t to ^B$dDIR^b"
 
-$found || die 'This is not a supported ^Ivcs^i repository.'
+	integer i=${#name[*]}
+	while ((i--)); do
+		$VERBOSE && notify "Looking for ^B${dotf[i]}^b."
+		[[ -a ${dotf[i]} ]]|| continue
+
+		EXEC="${exec[i]}"
+		which $EXEC >/dev/null 2>&1 || {
+			warn "Found ^B${dotf[i]}^b, but ${name[i]} is not installed."
+			continue
+		  }
+
+		$VERBOSE && notify "Found ^B${dotf[i]}^b."
+		found=true
+
+		splitstr ' +AND+ ' "${cmds[i]}"
+		for CMD in "${reply[@]}"; do
+			$VERBOSE && notify "Runing ^T$EXEC $CMD^t."
+			"$EXEC" $CMD
+		done
+		break
+	done
+
+	$found || die "^B$dDIR^b is not a supported ^Ivcs^i repository."
+)} # }}}1
+
+integer RC=0
+set_re
+for d; do do-one "$d"; ((RC+=$?)); done; exit $RC
 
 # Copyright (C) 2017 by Tom Davis <tom@greyshirt.net>.

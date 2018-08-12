@@ -153,6 +153,7 @@ function main {
 	  }
 
 	$ED ./"$workfile"
+	trackfile ./"$workfile" # track the copy in case weirdness ensues below
 	if [[ -f $rcsFile ]]; then
 		# previously checked in
 		rcsdiff -q ./"$workfile" ||

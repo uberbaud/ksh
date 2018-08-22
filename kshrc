@@ -230,7 +230,8 @@ for s in $(getent shells); do
 done
 unset s
 
-[[ -x /usr/local/bin/vis ]]&& alias vised='/usr/local/bin/vis'
+VISED=/usr/local/bin/vis
+[[ -x $VISED ]]&& alias vised="VISUAL=\"$VISED\" v" || unset VISED
 #LUA_PATH=		# lua modules paths
 #LUA_CPATH=		# C libraries paths
 #LUA_PATH_5_3=		# lua modules paths; versioned vars override standard

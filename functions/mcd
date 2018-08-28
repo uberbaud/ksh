@@ -12,7 +12,9 @@ function mcd {
 	  }
 	(($#==1))|| die 'Too many arguments.'
 	mkdir -p "$1"
-	cd "$1" && $wantRCS && mkdir RCS
+	cd "$1" || return
+	$wantRCS || return 0
+	mkdir RCS
   }
 
 # vim: ft=ksh ts=4

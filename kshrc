@@ -159,6 +159,7 @@ FCEDIT=${FCEDIT:-$EDITOR}
 export ${VISUAL:+VISUAL} EDITOR FCEDIT
 
 export CC="$(command -v clang)"
+export CXX="$(command -v clang++)"
 export PAGER=/usr/bin/less
 
 # misc

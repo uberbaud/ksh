@@ -229,6 +229,8 @@ function fileagent { # {{{1
 $i_am_the_remote && { # {{{1
 	exec 3>"$LOGFILE"
 	r-request-is hello || exit 1
+	SAVETRACKS="${MYNAME%/*}/savetracks.ksh"
+	($SAVETRACKS) 1>&3 2>&3
 	r-reply ready
 
 	r-request-is cksum || r-fail

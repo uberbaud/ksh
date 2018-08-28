@@ -78,7 +78,7 @@ export LOCALBIN=$xdgdata/bin
 # LUA wants SEMICOLON separated PATTERNS, empty item is default
 export LUA_PATH_5_3="$xdgdata/lua/5.3/?.lua;$xdgdata/lua/5.3/?/init.lua;;"
 export LUA_CPATH_5_3="$xdgdata/lua/5.3/?.so;;"
-export PERL5LIB=$xdgdata/perl5/twlib
+export PERL5LIB=$xdgdata/perl5/twlib${CPANMLIB:+:$CPANMLIB}
 export RAKUDO_HOME=$xdgdata/rakudo
 export RAKUDO_BIN=$RAKUDO_HOME/install/bin
 	RAKUDO_BIN=$RAKUDO_BIN:$RAKUDO_HOME/install/share/perl6/site/bin

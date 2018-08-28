@@ -10,6 +10,9 @@ export TZ=EST5EDT
 export EDITOR=vise
 export VISUAL=vise
 
+export CPANMLIB=$xdgdata/perl5/lib/perl5
+alias cpanm="cpanm --local-lib=${CPANMLIB%/lib/perl5}"
+
 typeset -fu pre-prompt
 export PS1=\
 '$(pre-prompt)'\

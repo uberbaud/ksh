@@ -13,7 +13,7 @@ function usage {
 	sparkle >&2 <<-\
 	===SPARKLE===
 	^F{4}Usage^f: ^T${PGM}^t
-	         Update hold/DOCSTORE and sync with uberbaud.net.
+	         Update ^Bhold/DOCSTORE^b.
 	       ^T${PGM} -h^t
 	         Show this help message.
 	===SPARKLE===

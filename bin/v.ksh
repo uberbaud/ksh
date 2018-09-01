@@ -64,21 +64,18 @@ function already-in-edit {
 		warn "Edit window is on desktop ^B$rc^b"
 	die "Quitting."
 }
-function safe-to-edit-vis {
+function safe-to-edit-general {
 	local F="$1"
 	gsub % %% "$F"
 	gsub / %  "$REPLY"
 	LOCKNAME="$REPLY"
-	VISED_CACHE="$XDG_CACHE_HOME/vis-ed"
-	[[ -d $VISED_CACHE ]]|| mkdir -p $VISED_CACHE
-	local L=$VISED_CACHE/excl-lock-$LOCKNAME
-	get-exclusive-lock-or-exit "$LOCKNAME" $VISED_CACHE ||
+	V_CACHE="$XDG_CACHE_HOME/v"
+	[[ -d $V_CACHE ]]|| mkdir -p $V_CACHE
+	local L=$V_CACHE/excl-lock-$LOCKNAME
+	get-exclusive-lock-or-exit "$LOCKNAME" $V_CACHE ||
 		already-in-edit $(<$L)
 	print $$>$L
 }
-function safe-to-edit-vise { safe-to-edit-vis "$@"; }
-function safe-to-edit-vised { safe-to-edit-vis "$@"; }
-function safe-to-edit-vis-ed { safe-to-edit-vis "$@"; }
 function safe-to-edit-vim { # {{{1
 	local F="$1"
 	# we set this, but it isn't used unless we return false
@@ -115,10 +112,8 @@ function safe-to-edit-nvim { #{{{1
 } #}}}1
 function safe-to-edit { #{{{1
 	local call="safe-to-edit-$EDBIN"
-	[[ $(whence -v "$call") == *' function' ]]|| {
-		warnOrDie "^B$call^b is not implemented."
-		return 0
-	  }
+	[[ $(whence -v "$call") == *' function' ]]||
+		call=safe-to-edit-general
 	"$call" "$@"
 } #}}}1
 function check-flags-for-writability { # {{{1
@@ -136,7 +131,7 @@ function check-flags-for-writability { # {{{1
 } # }}}1
 
 # TODO: test 'checked-out'ness with something like	
-#       [[ -n $(rlog -L -l genvoya.rem) ]]			
+#       [[ -n $(rlog -L -l bobslunch.rem) ]]		
 
 needs $ED
 EDBIN="${ED##*/}"
@@ -226,7 +221,7 @@ elif $hasmsg; then
 	warn 'No ^SRCS/^s.'
 fi
 
-[[ -n ${LOCKNAME:-} ]]&& release-exclusive-lock "$LOCKNAME" $VISED_CACHE
+[[ -n ${LOCKNAME:-} ]]&& release-exclusive-lock "$LOCKNAME" $V_CACHE
 
 }
 

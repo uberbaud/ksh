@@ -1,0 +1,19 @@
+# <@(#)tag:csongor.greyshirt.net,2018-10-16:tw/07.28.09z/54166dc>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^G(no arguments)^g
+#:   Prints matching aliases builtins, functions (existing and ^S$FPATH^s),
+#:   and executables.
+
+function matching-commands {
+	die 'Not yet implemented.'
+	(
+	# match against list of builtins
+	# match against alias
+	# match against functions
+	# find in $FPATH
+	# find in $PATH
+	)|sort -u|column
+}
+
+# Copyright © 2018 by Tom Davis <tom@greyshirt.net>.

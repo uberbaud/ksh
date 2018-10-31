@@ -2,10 +2,6 @@
 # ksh local profile
 # vim: ts=4 ft=ksh
 
-osrev=$(uname -r)
-osarc=$(uname -m)
-PKG_PATH=ftp://ftp4.usa.openbsd.org/pub/OpenBSD/$osrev/packages/$osarc
-export PKG_PATH
 export TZ=EST5EDT
 
 typeset -fu pre-prompt

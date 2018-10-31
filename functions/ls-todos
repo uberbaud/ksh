@@ -4,7 +4,7 @@
 #: FUNCTION ^G(no arguments)^g
 #:   If there's a ^STODO^s file, show it.
 
-function show-todos {
+function ls-todos {
 	[[ -f TODO ]]|| return 0
 	local needsep=false showit=false ln
 	splitstr NL "$(<TODO)" todo

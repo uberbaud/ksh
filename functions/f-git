@@ -2,25 +2,22 @@
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
 #: FUNCTION ^G(no arguments)^g
-#:   Wrapper with autochange on clone
+#:   Wrapper with auto cd and branch on clone
 
 function f-git {
-	local newdir cmd_is_clone=false gitresult
-	[[ $1 == clone ]]&& cmd_is_clone=true
+	command git "$@" || return
 
-	command git "$@"; gitresult=$?
+	[[ $1 != clone ]]&& return
 
-	# return whatever if it wasn't a clone
-	$cmd_is_clone || return $gitresult
-	# return error if it was a clone and there was an error
-	((gitresult))&& return $gitresult
-
-	eval "newdir=\"\$$#\"" # get the last parameter
-	[[ $newdir == @(http|https|git):*.git ]]&& {
-		newdir="${newdir%.git}"
-		newdir="${newdir##*/}"
+	local newdir
+	# git clone [opts] repo [local-dir-name]
+	eval "newdir=\"\${$#}\"" # get the last parameter
+	[[ $newdir == @(http|https|ftp|ftps|git|ssh):* ]]&& {
+		newdir="${newdir%.git}" # sometimes
+		newdir="${newdir##*/}"  # always
 	  }
-	cd "$newdir"
+	builtin cd "$newdir" &&
+		git checkout -b $HOST
 }
 
 # Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

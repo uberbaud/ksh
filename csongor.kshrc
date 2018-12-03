@@ -10,6 +10,7 @@ export PERLBREW_SKIP_INIT=''
 export PERLBREW_LIB=''
 perlbrew_rc=$PERLBREW_ROOT/etc/perlbrew.ksh
 [[ -f $perlbrew_rc ]]&& . $perlbrew_rc
+export GOPATH=$xdgdata/go
 
 # default apps
 export BROWSER="$(<$xdgcfg/etc/browser)"
@@ -40,6 +41,7 @@ export TZ=EST5EDT
 alias s=show
 alias m=m-part
 alias lua=lua53
+alias facebook='firefox https://www.facebook.com && exit'
 
 LOGPS1='\n'\
 '%:KSH:% \D{%Y.%m.%d.%H.%M.%S.%z} \w\n'\

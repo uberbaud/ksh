@@ -79,9 +79,9 @@ export LOCALBIN=$xdgdata/bin
 export LUA_PATH_5_3="$xdgdata/lua/5.3/?.lua;$xdgdata/lua/5.3/?/init.lua;;"
 export LUA_CPATH_5_3="$xdgdata/lua/5.3/?.so;;"
 export PERL5LIB=$xdgdata/perl5/twlib${CPANMLIB:+:$CPANMLIB}
-export RAKUDO_HOME=$xdgdata/rakudo
-export RAKUDO_BIN=$RAKUDO_HOME/install/bin
-	RAKUDO_BIN=$RAKUDO_BIN:$RAKUDO_HOME/install/share/perl6/site/bin
+#export RAKUDO_HOME=$xdgdata/rakudo
+#export RAKUDO_BIN=$RAKUDO_HOME/install/bin
+#	RAKUDO_BIN=$RAKUDO_BIN:$RAKUDO_HOME/install/share/perl6/site/bin
 export TEMPLATES_FOLDER=$xdgdata/templates
 export TMPDIR=$xdgcache/temp
 export USRBIN=$HOME/bin/ksh
@@ -96,7 +96,7 @@ export USR_PLIB=$PERL5LIB
 [[ -d $HOME/bin ]]&&
 	[[ :$PATH: == *:$HOME/bin:*		]]|| PATH="$HOME/bin:$PATH";
 
-[[ :$PATH: == *:$RAKUDO_BIN:*		]]|| PATH="$RAKUDO_BIN:$PATH"
+#[[ :$PATH: == *:$RAKUDO_BIN:*		]]|| PATH="$RAKUDO_BIN:$PATH"
 [[ :$PATH: == *:$LOCALBIN:*			]]|| PATH="$LOCALBIN:$PATH"
 [[ :$PATH: == *:$USRBIN:*			]]|| PATH="$USRBIN:$PATH"
 [[ :$PATH: == *:/usr/games:*		]]|| PATH="$PATH:/usr/games"
@@ -191,12 +191,8 @@ for i in cowmath math note; { alias $i="noglob $i"; }
 alias mathcow="noglob cowmath"
 # askfirst all commands that use ssh
 for i in ssh scp sftp rsync;	{ alias "$i=ssh-askfirst $i"; }
-# known hosts are commands to ssh to that host
-set -A known_hosts -- $(awk -F'[ ,]' '{print $1}' $xdgcfg/ssh/known_hosts)
-for i in "${known_hosts[@]}"; do
-	# skip unqualified names and dot-quads
-	[[ $i == *.* ]]|| continue
-	[[ $i == +([0-9]).+([0-9]).+([0-9]).+([0-9]) ]]&& continue
+# Make fully qualified known hosts into aliases for sshing to that host
+for i in $(grep '\.' $K/completions/ssh); do
 	alias "$i=ssh $i"
 done
 # FPATH functions are implicitly autoloaded, but the completion 
@@ -218,6 +214,7 @@ alias cd='_u="$-"; set -u; f-cd'
 alias prn="printf '  \e[35m｢\e[39m%s\e[35m｣\e[39m\n'"
 alias reboot='doas /sbin/reboot'
 
+alias k='fc -s'
 alias ff='find0 -type f'
 alias fd='find0 -type d'
 alias fn='find0 -name'

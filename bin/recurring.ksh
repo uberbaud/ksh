@@ -82,7 +82,12 @@ else
 			if (NF == 3) { printf( "    %8.2f", $3 ) }
 			printf("\n");
 		  }
-		END { printf( "                       TOTAL      %8.2f", total );
+		END {
+				lmarg="                     ";
+				dash=lmarg;
+				gsub(/ /,"=",dash);
+				printf( "  "dash"==============================================\n" );
+				printf( "  "lmarg"  TOTAL      %8.2f", total );
 				if (i>0) {
 					printf( " (" );
 					for (A in a) str=str",+"a[A];
@@ -97,8 +102,8 @@ else
 	# dom TAB Creditor OPT-SPACE [TAB RECUR-AMT]
 	awk "$AWKPGM" <<-\
 	==DATA==
-		03	Duke Energy
 		04	WikiMedia               	3.00
+		09	Duke Energy
 		10	Chase
 		10	Guardian                	3.00
 		18	Hulu                    	7.99

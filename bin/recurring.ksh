@@ -52,9 +52,10 @@ if $ALT; then
 	sparkle <<-\
 	==SPARKLE==
 		    Amazon
-		    PayPal (OpenBSD,WikiMedia)
+		    PayPal (OpenBSD,WikiMedia,Guardian)
 		    Google Payments
 		
+		    CSM
 		    Hulu
 		    Spectrum
 		    GitHub
@@ -67,23 +68,47 @@ if $ALT; then
 		    Libertarian Party
 	==SPARKLE==
 else
-	sparkle <<-\
-	==SPARKLE==
-		    03  Duke Energy
-		    04  WikiMedia                    3.00
-		    10  Chase New Card
-		    14  Chase Old Card
-		    18  Hulu                         8.55
-		    18  OpenBSD Foundation          10.00
-		    18  UNC Public Television        5.00
-		    20  Spectrum                    44.99
-		    28  GitHub                       7.00
-		
-		    *   FP (28-01)                   2.39
-		
-		                       TOTAL        80.93 (+Chase,+Duke)
-	==SPARKLE==
+	# AWKPGM {{{1
+	AWKPGM="$(cat)" <<-\
+	\==AWK==
+		BEGIN { FS="\t";i=0 }
+		NF == 2 { a[i]=$2; i++ }
+		{
+			total+=$3;
+			sub( / +$/, "", $2 );
+			if ($1 == "*")	{ printf( "     *  " ) }
+			else			{ printf( "    %0.2d  ", $1 ) }
+			printf( "%-24s", $2 );
+			if (NF == 3) { printf( "    %8.2f", $3 ) }
+			printf("\n");
+		  }
+		END { printf( "                       TOTAL      %8.2f", total );
+				if (i>0) {
+					printf( " (" );
+					for (A in a) str=str",+"a[A];
+					sub(/,/,"",str);
+					printf( "%s)\n", str );
+				  }
+		  }
+	==AWK==
+	# END AWKPGM }}}1
+
+	#data format
+	# dom TAB Creditor OPT-SPACE [TAB RECUR-AMT]
+	awk "$AWKPGM" <<-\
+	==DATA==
+		03	Duke Energy
+		04	WikiMedia               	3.00
+		10	Chase
+		10	Guardian                	3.00
+		18	Hulu                    	7.99
+		18	OpenBSD Foundation      	10.00
+		18	UNC Public Television   	5.00
+		20	Spectrum                	65.99
+		28	GitHub                  	7.00
+		28	CSM                     	11.00
+		*	FP (28-01)              	2.39
+	==DATA==
 fi
-print
 
 # Copyright (C) 2018 by Tom Davis <tom@greyshirt.net>.

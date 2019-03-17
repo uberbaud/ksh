@@ -4,6 +4,7 @@
 #: FUNCTION ^G(no arguments)^g
 #:   scan piped to Xdialog
 
+needs dir-is-empty flist new-array scan Xdialog
 function xscan {
 	local rc=$XDG_CONFIG_HOME/gtk-tw/fixed-font.rc size=927x1080
 	new-array opts
@@ -21,6 +22,11 @@ function xscan {
 		[[ -n "$(flist +inbox -sequence L -noshowzero)" ]]|| scanseq=all
 		set -- +inbox $scanseq
 	fi
+
+	dir-is-empty "$(mhpath +inbox)" && {
+		notify '^SInbox^s is empty.'
+		return 1
+	  }
 
 	(set -o nohup; scan "$@"| Xdialog "${opts[@]}" &)
 }

@@ -8,8 +8,10 @@
 function needs {
 	local badlist=''
 	for x { [[ -n "$(whence "$x")" ]] || badlist="$badlist $x"; }
-	[[ -z $badlist ]]||
-		die "Missing needed executables: [1m$badlist[0m"
+	[[ -z $badlist ]]|| {
+		desparkle "$badlist"
+		die "Missing needed commands: ^B$REPLY^b"
+	  }
 }
 
 

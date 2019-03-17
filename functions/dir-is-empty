@@ -1,0 +1,15 @@
+# <@(#)tag:csongor.greyshirt.net,2019-03-16:tw/16.15.21z/51ddd78>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Udir-name^u
+#:   Test whether a directory is empty.
+
+function dir-is-empty {
+	(($#==1))||		die 'dir-is-empty: Wants ONE directory name.'
+	local D="${1%%+(/)}"/ # normalize dirname to one trailing slash
+	[[ -d "$D" ]]||	die "^B$D^b is not a directory."
+	set "$D"*
+	[[ $1 == "$D"\* ]]
+}
+
+# Copyright © 2019 by Tom Davis <tom@greyshirt.net>.

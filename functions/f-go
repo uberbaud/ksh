@@ -5,7 +5,7 @@
 #:   Use ^Tgo -h^t for help
 
 function f-go {
-	eval "$( $LOCALBIN/go $@ )"
+	eval "$( $LOCALBIN/b-go "$@")"
   }
 
 # vim: ft=ksh ts=4

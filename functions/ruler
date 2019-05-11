@@ -3,7 +3,11 @@
 
 #: FUNCTION ^[^Uwidth^u^]
 #:   Prints a ruler of ^Uwidth^u to the screen, width defaults to ^S$COLUMNS^.
+#:   If ^Sstdin^s is not a terminal, then then ^Sstdin^s is copied to ^Sstdout^s,
+#:   a line feed is printed if the cursor is not at column 1, and finally
+#:   another ruler is printed.
 
+needs get-row-col
 function ruler {
 	typeset -- dots='....+....' Ruler=''
 	typeset -i count="${1:-${COLUMNS:-80}}"
@@ -26,6 +30,7 @@ function ruler {
 	else
 		print $Ruler
 		cat
+		forceline
 		print $Ruler
 	fi
 }

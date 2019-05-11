@@ -120,7 +120,7 @@ function r-request-is { # {{{1
 	r-log request "got: $request, expected: $expected"
 	[[ $expected == ANY || $request == $expected ]]
 } # }}}1
-function fflags-to-flagstr {
+function fflags-to-flagstr { # {{{1
 	((0xffff0000&$1))&& warn 'system flags not settable.'
 	((0x0000fff0&$1))&& warn 'unsettable or unknown flags.'
 	case $((0x000f&$1)) in
@@ -133,7 +133,7 @@ function fflags-to-flagstr {
 		6)	flagstr=uchg,uappnd;		;;
 		7)	flagstr=nodump,uchg,uappnd;	;;
 	esac
-}
+} # }}}1
 function l-getfile { # {{{1
 	l-request i-wantfile "$1"
 	local status $statvars flagstr
@@ -142,7 +142,7 @@ function l-getfile { # {{{1
 		touch -md "$(date -ur $modtm +'%Y-%m-%dT%H:%M:%SZ')" "./$1" 
 		chmod ${perm#??} "./$1"
 		fflags-to-flagstr $flags
-		chflags $flagstr "./$1"
+		[[ -n $flagstr ]]&& chflags $flagstr "./$1"
 		l-reply-is okay || return 1
 		return 0
 	}
@@ -179,7 +179,7 @@ function r-pullfile { # {{{1
 		touch -md "$(date -ur $modtm +'%Y-%m-%dT%H:%M:%SZ')" "./$1"
 		chmod ${perm#??} "./$1"
 		fflags-to-flagstr $flags
-		chflags $flagstr "./$1"
+		[[ -n $flagstr ]]&& chflags $flagstr "./$1"
 		r-request-is done || r-fail
 		r-okay
 	  }
@@ -229,6 +229,8 @@ function fileagent { # {{{1
 $i_am_the_remote && { # {{{1
 	exec 3>"$LOGFILE"
 	r-request-is hello || exit 1
+	SAVETRACKS="${MYNAME%/*}/savetracks.ksh"
+	($SAVETRACKS) 1>&3 2>&3
 	r-reply ready
 
 	r-request-is cksum || r-fail

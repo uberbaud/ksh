@@ -2,7 +2,7 @@
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
 #: FUNCTION ^Ufile name^u
-#:   Notes that a file should be synced. ^BQuietly^b ignores requests for files
+#:   Notes that a file should be synced. Ignores requests for files
 #:   whose full path name includes the string ^Isecret^i.
 
 function trackfile {
@@ -10,7 +10,10 @@ function trackfile {
 		warn "Can't track a non-existent file." "$1"
 		return 1
 	  }
-	[[ $1 == *secret* ]]&& return 0
+	[[ $1 == *secret* ]]&& {
+		warn 'Will not track a ^Bsecret^b file.'
+		return 0
+	  }
 	typeset t="$(readlink -nf "$1")" p=''
 	[[ -n "$t" ]]|| { warn 'File disappeared!'; return 1; }
 
@@ -20,6 +23,7 @@ function trackfile {
 		return 1
 	  }
 
+	chflags nouchg "$trackdir" # just in case we `chflags uchg *`ed
 	# Since we want the encoding to be decodeable, we need to escape 
 	# percent signs (%), which means we also need to escape whatever we 
 	# use to escape. We'll just use the common backslash for that.

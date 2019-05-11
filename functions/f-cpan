@@ -1,0 +1,15 @@
+# <@(#)tag:csongor.greyshirt.net,2018-04-23:tw/18.20.13z/d7568e>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^G(no arguments)^g
+#:   Dewrap CPAN
+
+function f-cpan {
+	sparkle <<-===SPARKLE===
+	  Did you mean ^Tcpan^t^K{3}m^k?
+	  If you actually want to run ^BCPAN^b, use
+	    ^Tcommand cpan ^U…^u^t
+	===SPARKLE===
+}
+
+# Copyright © 2018 by Tom Davis <tom@greyshirt.net>.

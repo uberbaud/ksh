@@ -43,15 +43,22 @@ function warnOrDie { #{{{1
 					'warnOrDie is [1m${warnOrDie}[22m.';		;;
 	esac
 } # }}}1
+function expire { # {{{1
+	pick -before -30 +deleted -seq expired &&
+		rmm -unlink expired
+	forceline
+} # }}}1
+function Done { # {{{1
+	[[ -z "$(flist +inbox -sequence marked -fast -noshowzero)" ]]
+} # }}}1
 
-needs flist mark folder pick refile yes-or-no
+needs flist folder forceline mark pick refile rmm yes-or-no
 
 # clean out groupmail list
-: >"$NMH"/groupmail
+GROUPMAIL="$NMH"/groupmail
+[[ -e $GROUPMAIL ]]&& { [[ -w $GROUPMAIL ]]|| chmod u+w "$GROUPMAIL"; }
+: >$GROUPMAIL
 
-function Done {
-	[[ -z "$(flist +inbox -sequence marked -fast -noshowzero)" ]]
-}
 (($#))|| set all
 mark "$@" +inbox -sequence marked 2>/dev/null
 folder +inbox
@@ -87,11 +94,16 @@ function X { # {{{1
   X -to    'bgumm102@gmail\.com'          notes         'Notes to Self'
   X -to    'source-changes@openbsd\.org'  obsd-cvs      'OpenBSD CVS'
   X -from  '@stackoverflow\.'             stackover     'Stack Overflow'
+CIP='alexepstein@industrialprogress.net'
+  X -from  "$CIP"                         energy        'CIP'
+
+print -nu2 ' [34m>>>[0m [1mDeleting[0m old trash ... '
+expire 2>/dev/null
 
 if Done; then
     print -u2 ' [34m>>>[0m No messages to [1remove[0m.'
 else
-    print -u2 ' [34m>>>[0m [1mRemoving[0m everything else.'
+    print -u2 ' [34m>>>[0m [1mTrashing[0m everything else.'
     refile marked -unlink -src +inbox +deleted
 fi
 
@@ -99,7 +111,7 @@ set -A files2delete ${XDG_CACHE_HOME:?}/mail/*
 if [[ $files2delete != *\* ]]; then
     print -u2 ' [34m>>>[0;1m Cleaning[0m mail workshop.'
     yes-or-no 'Delete the mail parts which maybe you'\''re using' &&
-        rm $files2delete
+        rm "${files2delete[@]}"
 fi
 
 exec 3>&-

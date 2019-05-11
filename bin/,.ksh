@@ -23,9 +23,12 @@ function usage {
 } # }}}
 (($#))&& { # {{{1
 	case "$1" in
-		-Z)	apmarg=-Z;						;;
-		-z)	apmarg=-z;						;;
-		-S)	apmarg=-S;						;;
+		##### STATE in RAM  #####
+		?(-)S)	apmarg=-S;					;; # stand-by (light sleep)
+		?(-)z)	apmarg=-z;					;; # suspend (deep sleep)
+		##### STATE in SWAP #####
+		?(-)Z)	apmarg=-Z;					;; # hibernate
+		#########################
 		-h) usage;							;;
 		*)	print -u2 "$0: Bad opt: '$1'";	;;
 	esac
@@ -49,7 +52,11 @@ function log { # {{{1
 	REPLY="${REPLY#, }"
 	[[ -z $REPLY ]]
 } # }}}1
-needs apm xlock log ${LOCALBIN=${HOME:?}/.local/bin}/set-bg-per-battery.sh
+BATUX=${LOCALBIN=${HOME:?}/.local/bin}/set-bg-per-battery.sh
+needs apm get-exclusive-lock-or-exit release-exclusive-lock log xlock $BATUX
+
+LOCK=twScreenLock
+get-exclusive-lock-or-exit $LOCK
 
 log timesheet xlock begin || warn $REPLY
 
@@ -69,6 +76,7 @@ xlock_pid=$!
 [[ -x /usr/bin/sudo ]]&&	/usr/bin/sudo -K	# revoke sudo persistance
 [[ -x /usr/bin/ssh-add ]]&&	/usr/bin/ssh-add -D	# clear ssh keys
 pkill -SIGINT -f '^zsh: aMuse player'			# stop the music
+sync	# if the battery runs out while we're hibernating, ¿maybe?
 
 # suspend returns immediately, but suspension is in the future
 [[ -n $apmarg ]]&& {
@@ -80,9 +88,11 @@ pkill -SIGINT -f '^zsh: aMuse player'			# stop the music
 
 wait $xlock_pid
 
-$LOCALBIN/set-bg-per-battery.sh >>$HOME/log/battery-monitor
+$BATUX >>$HOME/log/battery-monitor
 
 log timesheet xlock end || -warn $REPLY
 doas ifconfig iwm0 up # just in case, because you know, sometimes
+
+release-exclusive-lock $LOCK
 
 # Copyright (C) 2017 by Tom Davis <tom@greyshirt.net>.

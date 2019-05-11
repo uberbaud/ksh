@@ -4,7 +4,7 @@
 
 set -o nounset;: ${FPATH:?Run from within KSH} ${HOST:?}
 
-backvol=/vol/gnar
+backvol=/vol/kailar
 backroot=$backvol/backups
 backbase=$backroot/${HOST}
 checkonly=false
@@ -99,8 +99,8 @@ function standard-backup { # {{{1
 	rm "$backbase"/current
 } # }}}1
 function main { # {{{1
-	mount | egrep -q " $backvol " || die '^Bgnar^b is ^Bnot^b mounted.'
-	[[ -d $backroot ]]|| die 'Required ^B$backroot^b path is missing.'
+	mount | egrep -q " $backvol " || die '^Bkailar^b is ^Bnot^b mounted.'
+	[[ -d $backroot ]]|| die 'Required ^B$backroot^b path is missing.' "$backroot"
 	$checkonly && {
 		[[ -d $backbase ]]||
 			warn "Missing host backup directory ^B$backbase^b."
@@ -136,9 +136,6 @@ function main { # {{{1
 	notify 'END COPY' "Linking ^Bcurrent^b to ^B$timestamp^b."
 	ln -fs "$backto" "$backbase/current"
 	notify "Finished ^B$(Now)^b."
-	notify 'Syncing disks'
-	sync
-	notify 'Done.'
 } # }}}1
 
 main "$@"; exit

@@ -104,6 +104,7 @@ function main {
 	cd "$workingpath" || die "Could not ^Tcd^t to ^B$workingpath^b."
 
 	workfile="${filename##*/}"
+	rcsFile=RCS/$workfile,v
 	[[ -a $workfile ]]&& {
 		[[ -f $workfile ]]||
 			die "working file (^B$workfile^b) exits in"	\
@@ -112,8 +113,8 @@ function main {
 	  }
 
 	[[ -f $workfile ]]&& {
-		[[ -f RCS/$workfile,v ]]||
-			ci -q -u -i -t"-$CI_INITIAL_DESCRIPTION" ./"$workfile"
+		[[ -f $rcsFile ]]||
+			ci -q -u -i -t"-Existing hold/sys-file" ./"$workfile"
 		co -q -l ./"$workfile" || die "^Tco^t error."
 	}
 	PREF=''
@@ -129,7 +130,7 @@ function main {
 			echo >$workfile
 		fi
 		SHA384="$(cksum -qa sha384b ./"$workfile")"
-		[[ -f RCS/$workfile,v ]]&& {
+		[[ -f $rcsFile ]]&& {
 			set -A errMsg "System file and archived file have diverged."
 			[[ $warnOrDie == die ]]&&
 				errMsg[1]="Do an RCS ^Tci^t and rerun, or"
@@ -144,8 +145,16 @@ function main {
 		echo >$workfile
 	fi
 
+	[[ -f $rcsFile ]]|| {
+		# check in an existing copy so we don't lose that
+		ci -q -u -i -t"-$CI_INITIAL_DESCRIPTION" ./"$workfile"
+		# but then check it out so we can actually edit it
+		co -l ./"$workfile"
+	  }
+
 	$ED ./"$workfile"
-	if [[ -f RCS/$workfile,v ]]; then
+	trackfile ./"$workfile" # track the copy in case weirdness ensues below
+	if [[ -f $rcsFile ]]; then
 		# previously checked in
 		rcsdiff -q ./"$workfile" ||
 			ci -q -u -j ${1:+-m"$*"} ./"$workfile"

@@ -12,6 +12,7 @@ function mcd {
 	(($#==1))|| die 'Too many arguments.'
 	mkdir -p "$1"
 	cd "$1" && $wantRCS && mkdir RCS
+	true
   }
 
 # vim: ft=ksh ts=4

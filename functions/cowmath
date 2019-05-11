@@ -4,9 +4,9 @@
 #: FUNCTION ^Uexpression^u
 #:  Like math but from a cow's point of view.
 
+needs cowsay bc lolcat
 function cowmath {
-	needs cowsay bc lolcat
-	cowsay "$* = $(echo "$*"|bc)" | lolcat
+	cowsay -- "$* = $(print -- "$*"|bc)" | lolcat
 }
 
 

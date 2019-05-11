@@ -1,56 +1,55 @@
 # <@(#)tag:csongor.greyshirt.net,2017-08-06:tw/03.08.17z/1bd9e24>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^[^Uplay path fragment^u^|^Unew play directory^u^]
+#: FUNCTION ^[^Uplay path fragment^u^|^Unew play directory^u^] ^[^T!^t^]
 #:   Choose (^Tomenu^t), possibly create, and ^Tcd^t to a subdirectory of play.
+#:     ^T!^t  Use exact ^Uname^u (don't attempt to match a fragment).
 
 function p {
+	[[ -d ~/play ]]|| mkdir ~/play
 	builtin cd ~/play
 	(($#))|| return 0 # no directory given so we're done
-	(($#>1))&& {
-		sparkle >&2 <<-\
-		==SPARKLE==
-		  ^F{4}usage^f ^F{2}p^f ^Udir^u
-		==SPARKLE==
-		return 0
-	  }
-
-	local P possibles t="${1%/}" p s n=''
-	while [[ $t == *[\'/]* ]]; do
-		p="${t%%[\'/]*}"
-		s="${t#"$p"}"
-		if [[ $s == \'* ]]; then
-			n="$n$p'\''"
-		elif [[ $s == /* ]]; then
-			n="$n$p'*/*'"
-		else
-			die "Bad Programmer: matched ^[$s^]."
-		fi
-		t="${s#[\'/]}"
-	done
-	n="$n$t"
-	eval "set -A P -- *'$n'*"
-
-	integer i=0
-	for p in "${P[@]}"; { [[ -d $p ]]&& possibles[i++]="$p"; }
+	(($#>2))&& fail 'Unexpected arguments. Wanted 1 or 2.'
+	[[ $# -eq 2 && $2 != '!' ]]&& fail 'Unknown flag (2nd argument)'
 
 	local choice='-'
-
-	if ((i==0)); then
-		choice="$(umenu "<$1>" *)"
-	elif ((${#possibles[*]}>1)); then
-		local inthere=false
-		for p in "${possibles[@]}"; do
-			[[ $p == $1 ]]|| continue
-			inthere=true
-			break
-		done
-		$inthere || set -A possibles -- "<$1>" "${possibles[@]}"
-		choice="$( umenu "${possibles[@]}" )"
+	if (($#==2)); then
+		choice="$1"
 	else
-		choice="${possibles[0]}"
+		local P possibles t="${1%/}" p s n=''
+		while [[ $t == *[\'/]* ]]; do
+			p="${t%%[\'/]*}"
+			s="${t#"$p"}"
+			if [[ $s == \'* ]]; then
+				n="$n$p'\''"
+			elif [[ $s == /* ]]; then
+				n="$n$p'*/*'"
+			else
+				die "Bad Programmer: matched ^[$s^]."
+			fi
+			t="${s#[\'/]}"
+		done
+		n="$n$t"
+		eval "set -A P -- *'$n'*"
+		integer i=0
+		for p in "${P[@]}"; { [[ -d $p ]]&& possibles[i++]="$p"; }
+
+		if ((i==0)); then
+			choice="$(umenu "<$1>" *)"
+		elif ((${#possibles[*]}>1)); then
+			local inthere=false
+			for p in "${possibles[@]}"; do
+				[[ $p == $1 ]]|| continue
+				inthere=true
+				break
+			done
+			$inthere || set -A possibles -- "<$1>" "${possibles[@]}"
+			choice="$( umenu "${possibles[@]}" )"
+		else
+			choice="${possibles[0]}"
+		fi
+		[[ $choice == "<$1>" ]]&& choice="$1"
 	fi
-	[[ $choice == "<$1>" ]]&& choice="$1"
 
 	[[ -n $choice ]]|| return
 	[[ -d $choice ]]|| mkdir -p "$choice"

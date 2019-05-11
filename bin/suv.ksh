@@ -145,10 +145,15 @@ function main {
 		echo >$workfile
 	fi
 
-	[[ -f $rcsFile ]]||
+	[[ -f $rcsFile ]]|| {
+		# check in an existing copy so we don't lose that
 		ci -q -u -i -t"-$CI_INITIAL_DESCRIPTION" ./"$workfile"
+		# but then check it out so we can actually edit it
+		co -l ./"$workfile"
+	  }
 
 	$ED ./"$workfile"
+	trackfile ./"$workfile" # track the copy in case weirdness ensues below
 	if [[ -f $rcsFile ]]; then
 		# previously checked in
 		rcsdiff -q ./"$workfile" ||

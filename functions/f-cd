@@ -11,7 +11,7 @@ function f-cd {
 	# undo the alias nounset bit
 	[[ -n ${_u:-} && $_u != *u* && $- == *u* ]]&& set +u
 	builtin cd "$@" && {
-		show-todos '== TODO =='
+		ls-todos '== TODO =='
 		true # leave on a good note since `cd` did
 	  }
 }

@@ -52,7 +52,11 @@ function log { # {{{1
 	REPLY="${REPLY#, }"
 	[[ -z $REPLY ]]
 } # }}}1
-needs apm xlock log ${LOCALBIN=${HOME:?}/.local/bin}/set-bg-per-battery.sh
+BATUX=${LOCALBIN=${HOME:?}/.local/bin}/set-bg-per-battery.sh
+needs apm get-exclusive-lock-or-exit release-exclusive-lock log xlock $BATUX
+
+LOCK=twScreenLock
+get-exclusive-lock-or-exit $LOCK
 
 log timesheet xlock begin || warn $REPLY
 
@@ -84,9 +88,11 @@ sync	# if the battery runs out while we're hibernating, ¿maybe?
 
 wait $xlock_pid
 
-$LOCALBIN/set-bg-per-battery.sh >>$HOME/log/battery-monitor
+$BATUX >>$HOME/log/battery-monitor
 
 log timesheet xlock end || -warn $REPLY
 doas ifconfig iwm0 up # just in case, because you know, sometimes
+
+release-exclusive-lock $LOCK
 
 # Copyright (C) 2017 by Tom Davis <tom@greyshirt.net>.

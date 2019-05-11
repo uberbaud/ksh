@@ -4,7 +4,7 @@
 #: FUNCTION ^Uvarname^u …
 #:   Single quote the value of a variable, or if it is empty set it
 #:     to NULL.
-#:   Cannot ^TSQLify^t variables named ^Sn^s, ^So^s, ^Sp^s, or ^S^t^s.
+#:   Cannot ^TSQLify^t variables named ^Sn^s, ^So^s, ^Sp^s, or ^St^s.
 
 function SQLifyOne {
 	[[ $1 == ?(n|o|p|t) ]]&&

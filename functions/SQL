@@ -10,6 +10,7 @@
 #:     it's set before the initial call to SQL.
 #:   Uses ^S$SQL_AUTODIE^s (^Itrue^i, ^Iwarn^i, or ^Ifalse^i). Defaults to ^Itrue^i.
 #:   Uses ^S$SQL_VERBOSE^s (^Itrue^i or ^Ifalse^i). Defaults to ^S${verbose:-^s^Nfalse^n^S}^s.
+#:   ^NSee also: SQLify^n
 
 function SQL {
 	needs sqlite3

@@ -15,10 +15,9 @@ function search-path {
 		pf=''
 		for p in "${paths[@]}"; do
 			[[ -f $p/$f ]]|| continue
-			pf="$p/$f"
+			reply[i++]="$p/$f"
 			break
 		done
-		reply[i++]="$pf"
 	done
 }
 

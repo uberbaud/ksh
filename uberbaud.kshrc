@@ -2,11 +2,12 @@
 # ksh local profile
 # vim: ts=4 ft=ksh
 
-osrev=$(uname -r)
-osarc=$(uname -m)
-PKG_PATH=ftp://ftp4.usa.openbsd.org/pub/OpenBSD/$osrev/packages/$osarc
-export PKG_PATH
 export TZ=EST5EDT
+export EDITOR=vise
+export VISUAL=vise
+
+export CPANMLIB=$xdgdata/perl5/lib/perl5
+alias cpanm="cpanm --local-lib=${CPANMLIB%/lib/perl5}"
 
 typeset -fu pre-prompt
 export PS1=\

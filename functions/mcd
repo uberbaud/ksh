@@ -1,7 +1,8 @@
 # <@(#)tag:csongor.greyshirt.net,2017-08-11:tw/19.05.36z/4b3dca2>
 
-#: FUNCTION ^[^T-R-t^] ^Unew directory^u
+#: FUNCTION ^[^T-R^t^] ^Unew directory^u
 #:   ^Tmkdir -p^t ^Unew path^u, and then ^Tcd^t there.
+#:       ^T-R^t    Create a subdirectory ^BRCS^b in the new directory.
 
 function mcd {
 	local wantRCS=false
@@ -11,8 +12,9 @@ function mcd {
 	  }
 	(($#==1))|| die 'Too many arguments.'
 	mkdir -p "$1"
-	cd "$1" && $wantRCS && mkdir RCS
-	true
+	cd "$1" || return
+	$wantRCS || return 0
+	mkdir RCS
   }
 
 # vim: ft=ksh ts=4

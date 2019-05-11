@@ -136,6 +136,9 @@ function main { # {{{1
 	notify 'END COPY' "Linking ^Bcurrent^b to ^B$timestamp^b."
 	ln -fs "$backto" "$backbase/current"
 	notify "Finished ^B$(Now)^b."
+	notify 'Syncing disks'
+	sync
+	notify 'Done.'
 } # }}}1
 
 main "$@"; exit

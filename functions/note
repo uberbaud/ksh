@@ -46,9 +46,10 @@ function note {(
 	xclip -out -selection clipboard >$seqnote
 	repolink="$noterepo/$(date -u +'%Y-%m-%dz')-${OLDPWD##*/}-$seqnum"
 	tries=0
-	while ! ln -s $PWD/$seqnote "$repolink" 2>/dev/null; do
+	while ! ln -s "$PWD/$seqnote" "$repolink" 2>/dev/null; do
 		[[ "$(readlink "$repolink")" == $PWD/$seqnote ]]&& break
 		repolink="${repolink%%,+([0-9])},$((tries++))"
+exit
 	done
 	(($#))|| {
 		SHA384="$(cksum -qa sha384b "$seqnote")"

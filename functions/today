@@ -1,0 +1,17 @@
+# <@(#)tag:csongor.greyshirt.net,2017-07-28:tw/04.55.10z/1d59ed9>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^[^U-u^u^]
+#:   Show current timestamp in the local timezone.
+#:   ^T-u^t  Show the UTC version.
+
+function today {
+	(($#>1))&& die 'Too many arguments (at most "-u").'
+	(($#))&& {
+		[[ $1 == -u ]]|| die 'Unknown argument ("-u" or nothing)'
+	}
+	date ${1:-} +'%Y-%m-%d'
+}
+
+
+# Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

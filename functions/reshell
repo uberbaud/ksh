@@ -16,7 +16,7 @@ function reshell {
 					LC_ALL LC_COLLATE LC_CTYPE	\
 					LC_MESSAGES LC_MONETARY		\
 					LC_NUMERIC LC_TIME LANG		\
-					NLSPATH
+					LD_LIBRARY_PATH NLSPATH
 	while getopts ':e:fn' Opt; do
 		case $Opt in
 			e)	useenv="$OPTARG";									;;

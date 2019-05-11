@@ -10,6 +10,8 @@ PKG_PATH=ftp://ftp4.usa.openbsd.org/pub/OpenBSD/$osrev/packages/$osarc
 export PKG_PATH
 export TZ=EST5EDT
 
+eval "$(env -i perl -I$HOME/perl5/lib/perl5 -Mlocal::lib)"
+
 typeset -fu pre-prompt
 export PS1=\
 '$(pre-prompt)'\

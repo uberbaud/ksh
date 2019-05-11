@@ -20,6 +20,7 @@ export TERM
 export SYSLOCAL=/usr/local
 export ISO_DATE='%Y-%m-%d %H:%M:%S %z'
 export URI_AUTHORITY='greyshirt.net'
+export XDIALOG_NO_GMSGS=1	# Xdialog Gdk/GLib/Gtk will not g_log()
 
 # XDG paths
 if [[ -d ${XDG_CONFIG_HOME:-~/.config} ]]; then
@@ -48,6 +49,8 @@ fi
 xdgdata=$XDG_DATA_HOME
 xdgcfg=$XDG_CONFIG_HOME
 xdgcache=$XDG_CACHE_HOME
+SYSDATA=$xdgdata/sysdata
+	[[ -d $SYSDATA ]]&& export SYSDATA || unset SYSDATA
 
 # special history file stuff
 KHIST=$KDOTDIR/history
@@ -72,12 +75,15 @@ export HISTFILE=$fhist
 export HISTSIZE=8191
 export LD_LIBRARY_PATH=$xdgdata/c/lib
 export LOCALBIN=$xdgdata/bin
-export PERL5LIB=$xdgdata/perl5/twlib
-export RAKUDO_HOME=$xdgdata/rakudo
-export RAKUDO_BIN=$RAKUDO_HOME/install/bin
-	RAKUDO_BIN=$RAKUDO_BIN:$RAKUDO_HOME/install/share/perl6/site/bin
+# LUA wants SEMICOLON separated PATTERNS, empty item is default
+export LUA_PATH_5_3="$xdgdata/lua/5.3/?.lua;$xdgdata/lua/5.3/?/init.lua;;"
+export LUA_CPATH_5_3="$xdgdata/lua/5.3/?.so;;"
+export PERL5LIB=$xdgdata/perl5/twlib${CPANMLIB:+:$CPANMLIB}
+#export RAKUDO_HOME=$xdgdata/rakudo
+#export RAKUDO_BIN=$RAKUDO_HOME/install/bin
+#	RAKUDO_BIN=$RAKUDO_BIN:$RAKUDO_HOME/install/share/perl6/site/bin
 export TEMPLATES_FOLDER=$xdgdata/templates
-export TMPDIR=$xdgdata/temp
+export TMPDIR=$xdgcache/temp
 export USRBIN=$HOME/bin/ksh
 export USR_CLIB=$xdgdata/c/lib
 export PERL_UNICODE=AS
@@ -90,7 +96,7 @@ export USR_PLIB=$PERL5LIB
 [[ -d $HOME/bin ]]&&
 	[[ :$PATH: == *:$HOME/bin:*		]]|| PATH="$HOME/bin:$PATH";
 
-[[ :$PATH: == *:$RAKUDO_BIN:*		]]|| PATH="$RAKUDO_BIN:$PATH"
+#[[ :$PATH: == *:$RAKUDO_BIN:*		]]|| PATH="$RAKUDO_BIN:$PATH"
 [[ :$PATH: == *:$LOCALBIN:*			]]|| PATH="$LOCALBIN:$PATH"
 [[ :$PATH: == *:$USRBIN:*			]]|| PATH="$USRBIN:$PATH"
 [[ :$PATH: == *:/usr/games:*		]]|| PATH="$PATH:/usr/games"
@@ -115,22 +121,45 @@ export BZR_HOME=$xdgcfg/bzr
 export CALENDAR_DIR=$xdgcfg/calendar
 export HGRCPATH=$xdgcfg/hg
 
-# default apps
-if   [[ -f /usr/local/bin/nvim ]]; then
-	export MYVIM=$HOME/.config/nvim
-	export EDITOR=/usr/local/bin/nvim
-elif [[ -f /usr/local/bin/vim ]]; then
-	export MYVIM=$HOME/.config/vim
-	export MYVIMRC=$MYVIM/vimrc
-	export VIMINIT="so $MYVIMRC"
-	export EDITOR=/usr/local/bin/vim
-else
-	export EDITOR=/usr/bin/vi
-fi
-export VISUAL=$EDITOR
-export FCEDIT=$EDITOR
+# ==== DEFAULT APPS
+# handle whether  EDITOR or VISUAL was set in $HOST.kshrc
+[[ -z ${VISUAL:-${EDITOR:-}} ]]&& {
+	L=/usr/local/bin; S=/usr/bin; U=$HOME/.local/bin
+	for VISUAL in $L/nvim $L/vim $U/vis $L/vis $L/vise $S/vi; do
+		[[ -x $VISUAL ]]&& break
+	done
+	unset L S U
+  }
+
+case $VISUAL in
+	*/nvim)
+		[[ -d $xdgcfg/nvim ]]&&
+			export MYVIM=$xdgcfg/nvim
+		;;
+	*/vim)
+		[[ -d $xdgcfg/vim ]]&&
+			export MYVIM=$xdgcfg/vim
+		[[ -n $MYVIM && -f $MYVIM/vimrc ]]&& {
+			export MYVIMRC=$MYVIM/vimrc
+			export VIMINIT="so $MYVIMRC"
+		  }
+		;;
+	*/vi)
+		[[ -f $xdgcfg/vi/nex.rc ]]&&
+			export NEXINIT=$xdgcfg/vi/nex.rc
+		[[ -f $xdgcfg/vi/ex.rc ]]&&
+			export EXINIT=$xdgcfg/vi/ex.rc
+		;;
+	# */vis?(e)) Handles $xdgcfg just fine, thank you.
+esac
+
+VISUAL=${VISUAL:-${EDITOR:-}}
+EDITOR=${EDITOR:-${VISUAL:-ed}}
+FCEDIT=${FCEDIT:-$EDITOR}
+export ${VISUAL:+VISUAL} EDITOR FCEDIT
 
 export CC="$(command -v clang)"
+export CXX="$(command -v clang++)"
 export PAGER=/usr/bin/less
 
 # misc
@@ -162,33 +191,30 @@ for i in cowmath math note; { alias $i="noglob $i"; }
 alias mathcow="noglob cowmath"
 # askfirst all commands that use ssh
 for i in ssh scp sftp rsync;	{ alias "$i=ssh-askfirst $i"; }
-# known hosts are commands to ssh to that host
-set -A known_hosts -- $(awk -F'[ ,]' '{print $1}' $xdgcfg/ssh/known_hosts)
-for i in "${known_hosts[@]}"; do
-	# skip unqualified names and dot-quads
-	[[ $i == *.* ]]|| continue
-	[[ $i == +([0-9]).+([0-9]).+([0-9]).+([0-9]) ]]&& continue
+# Make fully qualified known hosts into aliases for sshing to that host
+for i in $(grep '\.' $K/completions/ssh); do
 	alias "$i=ssh $i"
 done
 # FPATH functions are implicitly autoloaded, but the completion 
 # mechanism doesn't know about them unless we explicitly autoload them
 IFS=:
-for p in $FPATH; { for i in $F/*; { typeset -fu "${i##*/}"; } }
+for p in $FPATH; { for i in $p/*; { typeset -fu "${i##*/}"; } }
 IFS=" $TAB$NL"
 # clean up
 unset p i
 
 alias clear='f-clear ' # expand alias of $2
 alias cls='clear colorls $LS_OPTIONS'
-alias doas='doas '
-alias halt='doas /sbin/halt -p'
+alias doas='as-root '
 alias i-can-haz-inet='i-can-haz-inet;E=$?;printf "  %s\n" "$REPLY";(return $E)&&:'
 alias ls='/usr/local/bin/colorls $LS_OPTIONS'
 alias noglob='set -f;noglob '; function noglob { set +f; ("$@"); }
+alias no2='2>/dev/null '
 alias cd='_u="$-"; set -u; f-cd'
 alias prn="printf '  \e[35m｢\e[39m%s\e[35m｣\e[39m\n'"
-alias reboot='doas /sbin/reboot'
+alias reboot='as-root /sbin/reboot'
 
+alias k='fc -s'
 alias ff='find0 -type f'
 alias fd='find0 -type d'
 alias fn='find0 -name'
@@ -201,6 +227,13 @@ for s in $(getent shells); do
 	alias ${s##*/}="reshell $s"
 done
 unset s
+
+VISED=/usr/local/bin/vis
+[[ -x $VISED ]]&& alias vised="VISUAL=\"$VISED\" v" || unset VISED
+#LUA_PATH=		# lua modules paths
+#LUA_CPATH=		# C libraries paths
+#LUA_PATH_5_3=		# lua modules paths; versioned vars override standard
+#LUA_CPATH_5_3=		# C libraries paths; versioned vars override standard
 
 KCOMPLETE=$KDOTDIR/completions
 makeout=$KCOMPLETE/make.out

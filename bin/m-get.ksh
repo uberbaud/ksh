@@ -27,7 +27,7 @@ function bad_programmer {	# {{{2
 		"  No getopts action defined for [1m-$1[22m."
   };	# }}}2
 function list-accts { # {{{2
-	laccts=${XDG_CONFIG_HOME:?}/fetchmail/listAccts.zsh
+	laccts=${XDG_CONFIG_HOME:?}/fetchmail/listAccts.ksh
 	needs $laccts
 	$laccts
 } # }}}2
@@ -125,15 +125,17 @@ function group {
 } 2>/dev/null
 
 group drgfly    --list-id 'users\.dragonflybsd\.org'
-group otech     --list-id 'tech\.openbsd\.org'
 group obugs     --list-id 'bugs\.openbsd\.org'
+group otech     --list-id 'tech\.openbsd\.org'
 group omisc     --list-id 'misc\.openbsd\.org'
 group obsd      --list-id 'source-changes\.openbsd\.org'
 
 scanseq='¬L'
 [[ -n "$(flist +inbox -sequence L -noshowzero)" ]]|| scanseq='all'
 scan +inbox $scanseq
-: >"$NMH/groupmail" # truncate, we'll append if we have any groups
+GROUPMAIL="${NMH:?}"/groupmail
+[[ -e $GROUPMAIL ]]&& { [[ -w $GROUPMAIL ]]|| chmod u+w "$GROUPMAIL"; }
+: >$GROUPMAIL # truncate, we'll append if we have any groups
 groups-not-empty && {
 	printf '                      %-9s %s\n' "${scanout[@]}"
 	print -r -- "${groups[*]}" >"$NMH/groupmail"

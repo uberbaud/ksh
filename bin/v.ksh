@@ -55,6 +55,27 @@ function warnOrDie { #{{{1
 					'warnOrDie is ^B${warnOrDie}^b.';		;;
 	esac
 } # }}}1
+function already-in-edit {
+	warn "File is already being edited (pid=^B$1^b)"
+	needs flash-parent-window-of-pid
+	flash-parent-window-of-pid "$1"
+	integer rc=$?
+	((rc))&&
+		warn "Edit window is on desktop ^B$rc^b"
+	die "Quitting."
+}
+function safe-to-edit-general {
+	local F="$1"
+	gsub % %% "$F"
+	gsub / %  "$REPLY"
+	LOCKNAME="$REPLY"
+	V_CACHE="$XDG_CACHE_HOME/v"
+	[[ -d $V_CACHE ]]|| mkdir -p $V_CACHE
+	local L=$V_CACHE/excl-lock-$LOCKNAME
+	get-exclusive-lock-or-exit "$LOCKNAME" $V_CACHE ||
+		already-in-edit $(<$L)
+	print $$>$L
+}
 function safe-to-edit-vim { # {{{1
 	local F="$1"
 	# we set this, but it isn't used unless we return false
@@ -78,12 +99,7 @@ function safe-to-edit-nvim { #{{{1
 			s="${s% $p}"
 			desparkle "$s"; s="$REPLY"
 			if [[ $p != - ]]; then
-				needs x11-windowid-for-pid x11-flash-window
-				x11-windowid-for-pid $p && {
-					w=$REPLY
-					d=$(xdotool get_desktop_for_window $w); ((d++))
-					x11-flash-window -dq $w &
-				  }
+				already-in-edit $p
 			else
 				p=''
 			fi
@@ -96,10 +112,8 @@ function safe-to-edit-nvim { #{{{1
 } #}}}1
 function safe-to-edit { #{{{1
 	local call="safe-to-edit-$EDBIN"
-	[[ $(whence -v "$call") == *' function' ]]|| {
-		warnOrDie "^B$call^b is not implemented."
-		return 0
-	  }
+	[[ $(whence -v "$call") == *' function' ]]||
+		call=safe-to-edit-general
 	"$call" "$@"
 } #}}}1
 function check-flags-for-writability { # {{{1
@@ -117,7 +131,7 @@ function check-flags-for-writability { # {{{1
 } # }}}1
 
 # TODO: test 'checked-out'ness with something like	
-#       [[ -n $(rlog -L -l genvoya.rem) ]]			
+#       [[ -n $(rlog -L -l bobslunch.rem) ]]		
 
 needs $ED
 EDBIN="${ED##*/}"
@@ -169,7 +183,7 @@ typeset -- has_rcs=false
 [[ -d RCS && -f RCS/"$f_name,v" ]] && {
 	has_rcs=true
 	rcsdiff -q ./"$f_name" ||
-		die 'RCS and checked out versions differ.'
+		warnOrDie 'RCS and checked out versions differ.'
 	# avoid "writable ./f_name exists; remove it? [ny](n):"
 	[[ -w ./"$f_name" ]]&& chmod a-w ./"$f_name"
 	co -q -l ./"$f_name" ||
@@ -206,6 +220,8 @@ if [[ -d RCS ]]; then
 elif $hasmsg; then
 	warn 'No ^SRCS/^s.'
 fi
+
+[[ -n ${LOCKNAME:-} ]]&& release-exclusive-lock "$LOCKNAME" $V_CACHE
 
 }
 

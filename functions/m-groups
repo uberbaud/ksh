@@ -4,7 +4,7 @@
 #: FUNCTION ^G(no arguments)^g
 #:   Review mail groups
 
-needs h1 yes-or-no show
+needs notify whence mhshow
 : ${NMH:?}
 function m-groups {
 	local G

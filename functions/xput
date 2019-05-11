@@ -1,11 +1,15 @@
 # <@(#)tag:csongor.greyshirt.net,2017-08-16:tw/20.50.02z/50f0734>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^G(no arguments)^g
-#:   Paste clipboard to ^SSTDOUT^s.
+#: FUNCTION ^[^Uclipbuffer^u^]
+#:   Paste clipbuffer to ^SSTDOUT^s.
+#:   Buffers are: ^Bprimary^b, ^Bsecondary^b, or ^Bclipboard^b.
+#:      Buffer defaults to ^Bclipboard^b.
 
 function xput {
-	xclip -selection clipboard -out
+	[[ $1 == @(primary|secondary|clipboard|) ]]||
+		die 'Unknown X selection buffer name.'
+	xclip -selection "${1:-clipboard}" -out
 }
 
 # Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

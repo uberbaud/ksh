@@ -49,6 +49,10 @@ function warnOrDie { #{{{1
 	esac
 } # }}}1
 
+#   v new line
+NL='
+' # ^ new line
+TAB='	'
 # wrap script guts in a function so edits to this script file don't 
 # affect running instances of the script.
 function main {
@@ -59,9 +63,11 @@ function main {
 	\==AWK==
 	NR==1			{next}
 	/\/dev\/sd0/	{next}
-					{sub(/^\/vol\//,"",$6);print $6}
+					{print $NF}
 	==AWK==
-	+haves $(df -P|awk "$awkpgm")
+	IFS="$NL"
+	+haves $(df -P|awk -F'/' "$awkpgm")
+	IFS=" $TAB$NL"
 	if haves-is-empty; then
 		(($#==1)) && die 'No such drive mounted.'
 		(($#)) && die 'No such drives mounted.'
@@ -92,7 +98,7 @@ function main {
 			+wants "${haves[want_id]}"
 		done
 	fi
-	want-is-empty && return 1
+	wants-is-empty && return 1
 
 	for want in "${wants[@]}"; do
 		[[ $want == /* ]]|| want="/vol/$want"

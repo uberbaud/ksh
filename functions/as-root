@@ -2,12 +2,16 @@
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
 #: FUNCTION ^Ucmd^u ^Uarg1^u ^S…^s ^UargN^u
-#:   Run doas, but more forgivingly
+#:   Run doas, but with three (3) tries.
 
-needs doas
+needs /usr/bin/doas
 function as-root {
-	doas true || doas true || doas true || die 'Bad credentials'
-	doas "$@"
+	2>/dev/null /usr/bin/doas -n "$@"	||
+		/usr/bin/doas true				||
+		/usr/bin/doas true				||
+		/usr/bin/doas true				||
+		die 'Bad credentials'
+	/usr/bin/doas "$@"
 }
 
 # Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

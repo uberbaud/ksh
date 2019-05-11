@@ -4,9 +4,9 @@
 #: FUNCTION ^G(no arguments)^g
 #:   Wrapper
 
+needs as-root
 function f-syspatch {
-	doas true || doas true || doas true || die 'Want rootification.'
-	doas /usr/sbin/syspatch "$@"
+	as-root /usr/sbin/syspatch "$@"
 }
 
 # Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

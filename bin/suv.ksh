@@ -8,9 +8,9 @@ set -A vopts --
 
 # Usage {{{1
 typeset -- this_pgm="${0##*/}"
+desparkle "$this_pgm"
+PGM="$REPLY"
 function usage {
-	desparkle "$this_pgm"
-	PGM="$REPLY"
 	sparkle >&2 <<-\
 	===SPARKLE===
 	^F{4}Usage^f: ^T$PGM^t ^[^T-f^t^] ^Ufile^u ^[^Ucheckin message^u^]

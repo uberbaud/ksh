@@ -116,6 +116,7 @@ typeset -i16 X=$A$$$B
 : ${M-Neither URI_AUTHORITY nor EMAIL is set.}
 
 #	'@' = \0100, '(' = \050, '#' = \043, ')' = \051
-print -n '<\0100\050\043\051'"tag:$M.$H,$D:$U/$T/${X#?(-)16#}>"
+#print -n '<\0100\050\043\051'"tag:$M.$H,$D:$U/$T/${X#?(-)16#}>"
+print -n '<\0100\050\043\051'"tag:$U.$M.$H,$D,$T/${X#?(-)16#}>"
 
 # Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

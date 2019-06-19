@@ -13,10 +13,11 @@ function usage {
 	PGM="$REPLY"
 	sparkle >&2 <<-\
 	===SPARKLE===
-	^F{4}Usage^f: ^T${PGM}^t ^[^T-f^t^] ^[^Unwid^u^]
+	^F{4}Usage^f: ^T${PGM}^t ^[^T-f^t^] ^[^Unwid^u^|down^]
 	         Connect to a wifi base station, perhaps the world.
 	           The ^Unwid^u is the name of the base station.
-	           ^T-f^t  Force. Kill the current connection, and reconnect.
+	           ^T-f^t    Force. Kill the current connection, and reconnect.
+	           ^Tdown^t  kill wifi and nothing else
 	       ^T${PGM} -h^t
 	         Show this help message.
 	===SPARKLE===
@@ -51,6 +52,21 @@ function warnOrDie { #{{{1
 			;;
 	esac
 } # }}}1
+function get-wifi-device { # {{{1
+
+	awkpgm="$(cat)" <<-\
+		\==AWK==
+			/^[^ \t]/ {d=$1}
+			/^\tmedia: IEEE802.11/ {print d}
+		==AWK==
+
+	set -- $(ifconfig -a|awk -F: "$awkpgm")
+
+	(($#))||	die 'Could not find a ^Bwifi^b device.'
+	(($#>1))&&	die 'Multiple ^Bwifi^b devices found. Bailing.'
+
+	wifi="$1"
+} # }}}1
 # LOG-INET-STATS ←→ DELETE THIS {{{1
 LOG_INET_STATS_RUNS=0
 LOG_INET_STATS_awkpgm="$(cat)" <<-\
@@ -79,6 +95,12 @@ needs doas ifconfig dhclient awk
 (($#))||	die 'scanning is not yet implemented.'
 (($#>1))&&	die 'Too many arguments. Expected at most one (1).'
 
+[[ $1 == down ]]&& {
+	get-wifi-device
+	doas ifconfig $wifi down
+	exit 0
+  }
+
 i-can-haz-inet&& warnOrDie "You're already connected to the Internet."
 
 LOG-INET-STATS # ← DELETE THIS
@@ -97,16 +119,7 @@ gsub '
 ' ' ' "$(sed -e '/^[[:space:]]*;/d' -e '/^[[:space:]]*$/d' "$cfg")"
 eval "set -A wifiopts -- $REPLY"
 
-awkpgm="$(cat)" <<-\
-	\==AWK==
-		/^[^ \t]/ {d=$1}
-		/^\tmedia: IEEE802.11/ {print d}
-	==AWK==
-
-set -A wifi -- $(ifconfig -a|awk -F: "$awkpgm")
-
-((${#wifi[*]}))||	die 'Could not find a ^Bwifi^b device.'
-((${#wifi[*]}>1))&&	die 'Multiple ^Bwifi^b devices found. Bailing.'
+get-wifi-device
 
 # Three strikes and you're out.
 # Requires *persist* attribute in /etc/doas.conf

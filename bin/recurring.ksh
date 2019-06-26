@@ -109,7 +109,7 @@ else
 		18	Hulu                    	7.99
 		18	OpenBSD Foundation      	10.00
 		18	UNC Public Television   	5.00
-		20	Spectrum                	65.99
+		22	Spectrum                	65.99
 		28	GitHub                  	7.00
 		28	CSM                     	11.00
 		*	FP (28-01)              	2.39

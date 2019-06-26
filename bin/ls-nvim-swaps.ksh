@@ -3,6 +3,7 @@
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
 
 set -o nounset;: ${FPATH:?Run from within KSH}
+unset FILE DIR PID SWPF
 
 # Usage {{{1
 typeset -- this_pgm="${0##*/}"

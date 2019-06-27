@@ -66,7 +66,7 @@ function mnt-fs {
 		return 1
 	  }
 	notify fsck
-	doas fsck "$@" "$dev" || {
+	doas fsck -t $2 "$dev" || {
 		warn "Could not ^Tfsck^t ^S$devD^s."
 		return 1
 	}

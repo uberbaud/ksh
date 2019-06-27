@@ -65,7 +65,12 @@ function mnt-fs {
 		warn "Could not ^Tmkdir^t ^S$mntpntD^s."
 		return 1
 	  }
-	echo mount "$@" "$dev" "$mntpnt"
+	notify fsck
+	doas fsck "$@" "$dev" || {
+		warn "Could not ^Tfsck^t ^S$devD^s."
+		return 1
+	}
+	notify mount "$@" "$dev" "$mntpnt"
 	doas mount "$@" "$dev" "$mntpnt" || {
 		warn "Could not ^Tmount^t ^S$devD^s."
 		return 1

@@ -117,7 +117,7 @@ nwid="${cfg#$wifi_config/[0-9][0-9],}"
 #     ↓
 gsub '
 ' ' ' "$(sed -e '/^[[:space:]]*;/d' -e '/^[[:space:]]*$/d' "$cfg")"
-eval "set -A wifiopts -- $REPLY"
+eval "set -- $REPLY"
 
 get-wifi-device
 
@@ -132,7 +132,7 @@ done
 # set it up
 desparkle "$nwid"
 notify "Connecting to ^B$REPLY^b."
-doas ifconfig $wifi nwid "$nwid" "${wifiopts[@]}"
+doas ifconfig $wifi nwid "$nwid" "$@"
 doas ifconfig $wifi up
 notify 'Getting an address.'
 doas dhclient $wifi

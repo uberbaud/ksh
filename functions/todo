@@ -6,6 +6,7 @@
 #:   the description text if none is given. Uses ^S./TODO^s.
 
 function todo {
+	[[ $1 == -h ]]&& die 'Use ^Thelp todo^t'
 	[[ $PWD == ${HOME?} ]]&& {
 		local C="${XDG_DATA_HOME?}/conky/conky.1"
 		(($#))&& print -r -- "$*" >>"$C"

@@ -11,8 +11,9 @@ function usage {
 	PGM="$REPLY"
 	sparkle >&2 <<-\
 	===SPARKLE===
-	^F{4}Usage^f: ^T$PGM^t ^[^T-R^t^] ^Ustruct_name^u ^[^Tdir1^t … ^TdirN^t^]
-	         Finds a C struct definition in *.h found in given directories, or ^S.^s.
+	^F{4}Usage^f: ^T$PGM^t ^[-m ^Ufile glob^u^] ^[^T-R^t^] ^Ustruct_name^u ^[^Tdir1^t … ^TdirN^t^]
+	         Finds a C struct definition in ^S*.h^s found in given directories, or ^S\$PWD^s.
+	           ^T-m^t  uses ^Ufile glob^u instead of ^S*.h^s.
 	           ^T-R^t  recurseses subdirectories.
 	       ^T$PGM -h^t
 	         Show this help message.
@@ -24,9 +25,11 @@ function bad_programmer {	# {{{2
 	die 'Programmer error:'	\
 		"  No getopts action defined for [1m-$1[22m."
   };	# }}}2
+fglob='*.h'
 recurse=false
-while getopts ':hR' Option; do
+while getopts ':hm:R' Option; do
 	case $Option in
+		m)	fglob="$OPTARG";									;;
 		R)	recurse=true;										;;
 		h)	usage;												;;
 		\?)	die "Invalid option: ^B-$OPTARG^b.";				;;
@@ -54,9 +57,9 @@ sname="$1"; shift
 (($#))|| set -- .
 
 $recurse || depth='-maxdepth 1'
-set -- $(find "$@" -type f -name '*.h' ${depth:-})
+set -- $(find "$@" -type f -name "$fglob" ${depth:-})
 
-(($#))|| die 'No header files found.'
+(($#))|| die 'No C or header files found.'
 
 awkpgm="$(cat)" <<-\
 	==AWK==

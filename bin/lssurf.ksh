@@ -50,12 +50,16 @@ function show-verbose-header { printf "$fmtVerbose" WINID PID URL; }
 function show-verbose {
 	printf "$fmtVerbose" $1 $(xprop -id $1 _NET_WM_PID|tr -cd [0-9]) $2;
 }
+function show-regular-nosurfs { :; }
+function show-verbose-nosurfs { warn 'No Surfs found.'; }
 
 set -A query -- '_SURF_URI' 'WM_NAME'
-set -A xids -- $(xdotool search --class '^Surf$')
+set -- $(xdotool search --class '^Surf$')
+(($#))|| { ${show}-nosurfs; exit 0; }
+
 
 ${show}-header
-for id in "${xids[@]}"; do
+for id; do
 	url="$(xprop -id $id ${query[hover]})"
 	url="${url#*\"}"; url="${url%\"}" # remove quotes and everything outside
 	((hover))&& url=${url#* | }

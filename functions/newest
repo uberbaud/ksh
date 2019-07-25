@@ -40,7 +40,7 @@ function newest {
 
 	((count))|| die 'Useless count of zero (0).'
 
-	stat -f '%Hp%t%m%t%N' "${filelist[@]}" |
+	stat -f '%Hp%t%m%t%N' -- "${filelist[@]}" |
 		awk -F'\t' '$1 == "10" { print $2"\t"$3; }' |
 		sort -nr | cut -f 2 | head -n $count
 

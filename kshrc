@@ -210,6 +210,7 @@ alias i-can-haz-inet='i-can-haz-inet;E=$?;printf "  %s\n" "$REPLY";(return $E)&&
 alias ls='/usr/local/bin/colorls $LS_OPTIONS'
 alias noglob='set -f;noglob '; function noglob { set +f; ("$@"); }
 alias no2='2>/dev/null '
+alias noerr='2>/dev/null '
 alias cd='_u="$-"; set -u; f-cd'
 alias prn="printf '  \e[35m｢\e[39m%s\e[35m｣\e[39m\n'"
 alias reboot='as-root /sbin/reboot'

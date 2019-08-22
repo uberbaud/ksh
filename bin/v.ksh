@@ -64,7 +64,7 @@ function already-in-edit {
 		warn "Edit window is on desktop ^B$rc^b"
 	die "Quitting."
 }
-function safe-to-edit-general {
+function safe-to-edit { #{{{1
 	local F="$1"
 	gsub % %% "$F"
 	gsub / %  "$REPLY"
@@ -76,46 +76,6 @@ function safe-to-edit-general {
 		already-in-edit $(<$L)
 	print $$>$L
 }
-function safe-to-edit-vim { # {{{1
-	local F="$1"
-	# we set this, but it isn't used unless we return false
-	set -A reply -- 'Swap files found.'
-	[[ $F == $HOME/* ]]&& F="~$USER/${F#$HOME/}"
-	! (vim -r 2>&1|egrep "$F")
-} # }}}1
-function safe-to-edit-nvim { #{{{1
-	local swaps s p d w
-	set -A reply --
-	needs ls-nvim-swaps
-	new-array swaps
-	splitstr NL "$(ls-nvim-swaps "$1")" swaps
-	if swaps-not-empty; then
-		reply_next_id=0
-		reply[reply_next_id++]="Swap files found:"
-		for s in "${swaps[@]}"; do
-			d=''
-			w=''
-			p="${s##* }"
-			s="${s% $p}"
-			desparkle "$s"; s="$REPLY"
-			if [[ $p != - ]]; then
-				already-in-edit $p
-			else
-				p=''
-			fi
-			reply[reply_next_id]="$s p^S$p^s d^B$d^b"
-		done
-		return 1
-	else
-		return 0
-	fi
-} #}}}1
-function safe-to-edit { #{{{1
-	local call="safe-to-edit-$EDBIN"
-	[[ $(whence -v "$call") == *' function' ]]||
-		call=safe-to-edit-general
-	"$call" "$@"
-} #}}}1
 function check-flags-for-writability { # {{{1
 	local UCHG=16#2 UAPPND=16#4 SCHG=16#20000 SAPPND=16#40000
 	local NOWRITES=$((UCHG|UAPPND|SCHG|SAPPND))

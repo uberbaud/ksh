@@ -37,8 +37,20 @@ function pkg {
 			for u in "${h[@]}"; { w3m "$u"; }
 			;;
 		grep|query)
+			local casen=true
+			while getopts ':iI' Option; do
+				case $Option in
+					i) casen=true;								;;
+					I) casen=false;								;;
+					\?) die "Invalid option: ^B-$OPTARG^b.";	;;
+					\:) die "Option ^B-$OPTARG^b requires an argument."; ;;
+					*)  die "BAD PROGRAMMER. Need a getopt case for $Option."
+						;;
+				esac
+			done
+			if $casen; then mOpts="i"; fi
 			typeset ndx="$pkghome/v$osv.ndx"
-			typeset pkgblob="$(perl -ne "print if m/$1/;" "$ndx")"
+			typeset pkgblob="$(perl -ne "print if m/$1/${mOpts:-};" "$ndx")"
 			print -r "$pkgblob" | column -s "$TAB" -t
 			splitstr NL "$pkgblob" PKGs
 			typeset i=0 l=${#PKGs[*]}

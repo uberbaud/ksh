@@ -4,8 +4,9 @@
 #: FUNCTION ^Tadd^t^|^Tcheck^t^|^Tdelete^t^|^Scmd^s ^Uargs...^u
 #:   performs pkg_^Scmd^s, possibly using ^Tdoas^t, possibly logging the action.
 #: FUNCTION ^Tgrep^t ^Uregex^u
-#: FUNCTION ^Tquery^t ^Uregex^u
+#: FUNCTION ^Tquery^t ^[^T-I^t^] ^Uregex^u
 #:   performs a ^Bperl5 regex^b search on the index file.
+#:       ^T-I^t  case sensitive (default is case insensitive)
 #:   example: ^Tpkg query '\b(?^i:lisp)\b'^t
 #:       performs a case insenstive word bounded search for ^Slisp^s.
 #: FUNCTION ^Tinstalled^t

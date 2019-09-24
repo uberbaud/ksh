@@ -1,0 +1,26 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2019-09-24,00.29.05z/1761cd1>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Ulock name^u ^[^Ulock path^u^] ^= ^S$REPLY^s
+#:   Create a name for use by {get,release}-exclusive-lock\*
+
+function generate-exclusive-lock-name {
+	local T L P
+	REPLY=''
+
+	T="${2:-${TMPDIR:-/tmp}}"
+	[[ -n ${2:-} ]]|| P=excl-lock-
+	L="$T/${P:-}${1:?Missing exclusive lock name}"
+
+	[[ -d $T ]]|| {
+		desparkle "$T"
+		warn "^S$REPLY^s is not a directory."
+		REPLY=''
+		return 1
+	  }
+
+	REPLY="$L"
+	return 0
+}
+
+# Copyright © 2019 by Tom Davis <tom@greyshirt.net>.

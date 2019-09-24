@@ -6,21 +6,19 @@
 #:   which defaults to $TMPDIR or if that's unset, to /tmp.
 #:   Exits with 0 on success and >0 on failure.
 
+needs generate-exclusive-lock-name
 function get-exclusive-lock-or-exit {
-	local T="${2:-${TMPDIR:-/tmp}}" U L P=excl-lock-
-	[[ -n ${2:-} ]]&& P=''
-	L="$T/$P${1:?Missing exclusive lock name}"
+	local L U lnRC
 
-	[[ -d $T ]]|| {
-		warn '^S$TMPDIR^s does not point to a directory.'; return 1
-	  }
+	generate-exclusive-lock-name "$@" || return 1
+	L="$REPLY"; REPLY=''
 
-	U="$(mktemp $T/$P.XXXXXXXXXXX)" || {
+	U="$(mktemp "${L%/*}"/excl-lock.XXXXXXXXXXX)" || {
 		warn 'Could not create a temporary file.'; return 1
 	  }
 
 	ln "$U" "$L" 2>/dev/null;
-	integer lnRC=$?
+	lnRC=$?
 
 	rm "$U"
 

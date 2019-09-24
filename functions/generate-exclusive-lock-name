@@ -10,7 +10,7 @@ function generate-exclusive-lock-name {
 
 	T="${2:-${TMPDIR:-/tmp}}"
 	[[ -n ${2:-} ]]|| P=excl-lock-
-	L="$T/${P:-}${1:?Missing exclusive lock name}"
+	L="$T/${P:-}${1:?Missing resource name}"
 
 	[[ -d $T ]]|| {
 		desparkle "$T"

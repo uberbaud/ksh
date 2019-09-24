@@ -71,7 +71,7 @@ function safe-to-edit { #{{{1
 	LOCKNAME="$REPLY"
 	V_CACHE="$XDG_CACHE_HOME/v"
 	[[ -d $V_CACHE ]]|| mkdir -p $V_CACHE
-	local L=$V_CACHE/excl-lock-$LOCKNAME
+	local L=$V_CACHE/$LOCKNAME
 	get-exclusive-lock-or-exit "$LOCKNAME" $V_CACHE ||
 		already-in-edit $(<$L)
 	print $$>$L

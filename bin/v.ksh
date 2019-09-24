@@ -55,7 +55,7 @@ function warnOrDie { #{{{1
 					'warnOrDie is ^B${warnOrDie}^b.';		;;
 	esac
 } # }}}1
-function already-in-edit {
+function already-in-edit { # {{{1
 	warn "File is already being edited (pid=^B$1^b)"
 	needs flash-parent-window-of-pid
 	flash-parent-window-of-pid "$1"
@@ -63,7 +63,7 @@ function already-in-edit {
 	((rc))&&
 		warn "Edit window is on desktop ^B$rc^b"
 	die "Quitting."
-}
+} # }}}1
 function safe-to-edit { #{{{1
 	local F="$1"
 	gsub % %% "$F"

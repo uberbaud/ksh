@@ -1,0 +1,7 @@
+^BHexidecimal to Binary^b
+
+    0000 ^B0^b      0100 ^B4^b      1000 ^B8^b      1100 ^Bc^b
+    0001 ^B1^b      0101 ^B5^b      1001 ^B9^b      1101 ^Bd^b
+    0010 ^B2^b      0110 ^B6^b      1010 ^Ba^b      1110 ^Be^b
+    0011 ^B3^b      0111 ^B7^b      1011 ^Bb^b      1111 ^Bf^b
+

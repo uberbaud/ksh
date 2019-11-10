@@ -33,7 +33,7 @@ In which case, clone this repository to `$XDG_CONFIG_HOME/ksh`.
 Usage
 ======
 
-Basically, you're on your own if you want to use any of this.
+Basically, if you want to use any of this, you're on your own.
 
 On OpenBSD there is a help command (`/usr/bin/help`) which is 
 essentially the same (possibly exactly the same) as `man help`.  
@@ -49,7 +49,8 @@ them with the `-h` flag.
 Contributing
 =============
 
-Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
+Please see [CONTRIBUTING](CONTRIBUTING.md) for details. TLDR; I'm not 
+looking for help other than bugfixes.
 
 Copyright
 ==========

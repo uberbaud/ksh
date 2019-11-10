@@ -81,7 +81,7 @@ branch="$(git rev-parse --abbrev-ref HEAD 2>/dev/null)"
 		git diff-index --cached --name-status -r --ignore-submodules HEAD |
 			sed 's/^/        /' >&2
 		warn 'Committing'
-		git commit -a || FAIL
+		git commit -av || FAIL
 	  }
   }
 

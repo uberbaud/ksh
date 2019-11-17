@@ -3,7 +3,7 @@
 
 #: FUNCTION ^[^Udescription text^u^]
 #:   Add new todo item with ^Udescription text^u or open a window to edit 
-#:   the description text if none is given. Uses ^S./TODO^s.
+#:   the description text if none is given. Uses file ^S./TODO^s.
 
 function todo {
 	[[ $1 == -h ]]&& die 'Use ^Thelp todo^t'

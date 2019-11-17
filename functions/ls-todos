@@ -12,6 +12,7 @@ function ls-todos {
 		[[ $ln == \@* ]]&& {
 			if [[ $ln == *' DONE '* ]]; then
 				showit=false
+				needsep=false
 			else
 				showit=true
 			fi

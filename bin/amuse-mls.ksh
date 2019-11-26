@@ -49,7 +49,9 @@ needs amuse:get-workpath SQL
 
 if (($#)); then
 	for P; do
-		[[ $P == +([A-Za-z0-9 ]) ]]|| { warn "Bad filter ^U$P^u."; continue; }
+		[[ $P == +([A-Za-z0-9 ]) ]]|| {
+			warn "Bad filter ^U$P^u."; continue;
+		  }
 		where="${where:-} OR value LIKE '$P%'"
 	done
 	where="${where# OR }"
@@ -81,8 +83,8 @@ SQL <<-\
 	 ;
 	==SQL==
 
-(( $(set +u; print ${#reply[*]}) ))|| die "No results WHERE $where;"
+(( $(set +u; print ${#sqlreply[*]}) ))|| die "No results WHERE $where;"
 
-for r in "${reply[@]}"; { print -- "$r"; } | column
+for r in "${sqlreply[@]}"; { print -- "$r"; } | column
 
 # Copyright (C) 2018 by Tom Davis <tom@greyshirt.net>.

@@ -22,7 +22,7 @@ function usage {
 	PGM="$REPLY"
 	sparkle >&2 <<-\
 	===SPARKLE===
-	^F{4}Usage^f: ^T$PGM^t ^[^T-x^t^|^T-l^t^] ^Upresentation^u
+	^F{4}Usage^f: ^T$PGM^t ^[^T-k^t^|^T-l^t^] ^Upresentation^u
 	         Initializes 2nd display, and starts the presentation and a terminal
 	         on that display.
 	           ^T-k^t  Kills the opened windows and turns off the display.
@@ -137,6 +137,7 @@ function loop { #{{{1
 	warn '^Sloop^s is not implemented.'
 } #}}}1
 function on { #{{{1
+# close any open windows with --name " uberbaud-present$"
 	init_2nd_display
 	init_surf
 	init_term

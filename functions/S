@@ -1,0 +1,15 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2019-11-19,18.16.56z/3462a99>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^G(no arguments)^g
+#:   show a presentation file (html)
+
+function S {
+	local XID
+	XID=$(xdotool search --name ' uberbaud-present$')
+	xprop -id $XID	\
+		-f _SURF_GO 8s	\
+		-set _SURF_GO "file://$PWD/${1:?}"
+}
+
+# Copyright © 2019 by Tom Davis <tom@greyshirt.net>.

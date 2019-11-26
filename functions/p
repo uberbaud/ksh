@@ -52,7 +52,7 @@ function p {
 	fi
 
 	[[ -n $choice ]]|| return
-	[[ -d $choice ]]|| mkdir -p "$choice"
+	[[ -d $choice ]]|| mkdir -p "$choice/RCS"
 
 	cd "$choice"
 	fUSE=.created

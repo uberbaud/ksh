@@ -1,0 +1,15 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2019-11-26,03.11.25z/8308e2>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^G(no arguments)^g
+#:   Prints ^Ssqlreply^s tab-delimited.
+
+needs sql-fields
+function sql-reply {
+	local T
+	for T in "${sqlreply[@]}"; do
+		sql-fields "$T"
+	done 
+}
+
+# Copyright © 2019 by Tom Davis <tom@greyshirt.net>.

@@ -121,9 +121,9 @@ function get-newday-vars { #{{{1
 	  SELECT morning FROM health.weight WHERE morning IS NOT NULL $LASTONE;
 	  SELECT evening FROM health.weight WHERE evening IS NOT NULL $LASTONE;
 	==SQLITE==
-	NEWDAY="${reply[0]}"
-	LASTMORNING="${reply[1]}"
-	LASTEVENING="${reply[2]}"
+	NEWDAY="${sqlreply[0]}"
+	LASTMORNING="${sqlreply[1]}"
+	LASTEVENING="${sqlreply[2]}"
 } #}}}1
 function save-info { # {{{1
 	local d="$1" m="$2" e="$3"
@@ -138,8 +138,8 @@ function save-info { # {{{1
 function dump { #{{{1
 	printf '%s\t%s\t%s\n' date mornings evenings
 	integer i=0
-	while ((i<${#reply[*]})); do
-		print -- "${reply[i++]}"
+	while ((i<${#sqlreply[*]})); do
+		print -- "${sqlreply[i++]}"
 	done
 } #}}}1
 function entry { # {{{1
@@ -178,7 +178,7 @@ function graph { # {{{1
 	SQL <<-==SQLITE==
 		SELECT date(day), morning, evening
 		  FROM health.weight
-		 WHERE day >= ${reply[0]}
+		 WHERE day >= ${sqlreply[0]}
 		 ORDER BY day ASC
 			 ;
 		==SQLITE==

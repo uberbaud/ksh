@@ -1,7 +1,7 @@
 # <@(#)tag:csongor.greyshirt.net,2017-10-13:tw/01.47.44z/8c58de>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
 
-#: FUNCTION ^[^USQL statement(s)^u^] ^= reply
+#: FUNCTION ^[^USQL statement(s)^u^] ^= sqlreply
 #:   Co-processicize sqlite3 and sugar the interaction. If no SQL statement
 #:     is given on the command line, reads it from ^Sstdin^s.
 #:   Starts the co-process if it isn't already going.
@@ -26,7 +26,7 @@ function SQL {
 
 	SQLSEP="${SQLSEP:-"$(print '\034')"}" # ^\ -> field separator
 	(($#))&& sql="$*" || sql="$(cat)"
-	set -A reply --
+	set -A sqlreply --
 	((${SQLFD[0]:-}))|| {
 		sqlite3 -noheader -batch -list -separator "$SQLSEP" 2>&1 |&
 		nextfd || die 'No available file descriptor.'; SQLFD[0]="$REPLY"
@@ -50,14 +50,14 @@ function SQL {
 	while :; do
 		read -ru${SQLFD[0]} response
 		[[ $response == $READY ]]&& break
-		reply[i++]="$response"
+		sqlreply[i++]="$response"
 		$verbose && print -ru2 -- "$response"
 	done
 
-	[[ ${reply[0]:-} == Error:* ]]&& {
-		reply[i]="$sql"
-		$autodie && die "${reply[@]}"
-		$autowarn && warn "${reply[@]}"
+	[[ ${sqlreply[0]:-} == Error:* ]]&& {
+		sqlreply[i]="$sql"
+		$autodie && die "${sqlreply[@]}"
+		$autowarn && warn "${sqlreply[@]}"
 		return 1
 	  }
 	return 0

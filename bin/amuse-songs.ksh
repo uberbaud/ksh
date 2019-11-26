@@ -5,6 +5,7 @@
 set -o nounset;: ${FPATH:?Run from within KSH}
 
 which=full
+list=false
 
 # Usage {{{1
 typeset -- this_pgm="${0##*/}"
@@ -13,9 +14,10 @@ function usage {
 	PGM="$REPLY"
 	sparkle >&2 <<-\
 	===SPARKLE===
-	^F{4}Usage^f: ^T$PGM^t ^[^T-r^t^]
-	         Show song info.
-	         ^T-r^t  raw vtags output.
+	^F{4}Usage^f: ^T$PGM^t ^[^T-r^t^|^T-l^t^] ^UsqlPattern^u
+	         Show or edit list of songs matching ^%^UsqlPattern^u^%.
+	         ^T-l^t  list, do not edit.
+	         ^T-r^t  raw vtags output (implies ^T-l^t).
 	       ^T$PGM -h^t
 	         Show this help message.
 	===SPARKLE===
@@ -26,9 +28,10 @@ function bad_programmer {	# {{{2
 	die 'Programmer error:'	\
 		"  No getopts action defined for [1m-$1[22m."
   };	# }}}2
-while getopts ':rh' Option; do
+while getopts ':lrh' Option; do
 	case $Option in
-		r)	which=raw;											;;
+		l)	list=true;											;;
+		r)	which=raw; list=true;								;;
 		h)	usage;												;;
 		\?)	die "Invalid option: ^B-$OPTARG^b.";				;;
 		\:)	die "Option ^B-$OPTARG^b requires an argument.";	;;
@@ -56,13 +59,14 @@ amuse:get-workpath
 SQL "ATTACH '$REPLY/amuse.db3' AS amuse;"
 
 function show-raw {
+
 	SQL <<-==SQLITE==
 	SELECT file, kind, label, value
 	  FROM amuse.vtags
-	 WHERE value LIKE '%$1%'
+	 WHERE value LIKE $1
 	     ;
 	==SQLITE==
-	sql-reply
+	sql-reply ''
 }
 
 function show-full {
@@ -72,16 +76,25 @@ function show-full {
 	 WHERE id IN (
 		 SELECT file
 		  FROM amuse.vtags
-		 WHERE value LIKE '%$1%'
+		 WHERE value LIKE $1
 		)
 	 ORDER BY performer, album, track
 		;
 	==SQLITE==
-	sql-reply
+	sql-reply ''
 }
 
+$list || PipeEdit='| pipedit song.list'
+[[ -t 1 ]]&& Pager='| less -FLSwX'
 
-for W { show-$which $W; }; exit
+function main {
+	for W; do
+		W="%$W%"
+		SQLify W
+		show-$which "$W"
+	done
+}
 
+eval "main \"\$@\" ${PipeEdit:-} ${Pager:-}"; exit
 
 # Copyright (C) 2019 by Tom Davis <tom@greyshirt.net>.

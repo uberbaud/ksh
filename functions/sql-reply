@@ -6,9 +6,9 @@
 
 needs sql-fields
 function sql-reply {
-	local T
+	local T S="${1:-}"
 	for T in "${sqlreply[@]}"; do
-		sql-fields "$T"
+		sql-fields "$T"  "$S"
 	done 
 }
 

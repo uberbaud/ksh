@@ -161,7 +161,20 @@ export ${VISUAL:+VISUAL} EDITOR FCEDIT
 export CC="$(command -v clang)"
 export CXX="$(command -v clang++)"
 export PAGER=/usr/bin/less
-
+#export AUTOCONF_VERSION=$(
+#	/bin/ls /usr/local/bin/autoconf-*	|
+#		awk -F- '{print $NF}'			|
+#		sort -nr						|
+#		head -n 1
+#  )
+export AUTOCONF_VERSION=2.69
+#export AUTOMAKE_VERSION=$(
+#	/bin/ls /usr/local/bin/automake-*	|
+#		awk -F- '{print $NF}'			|
+#		sort -nr						|
+#		head -n 1
+#)
+export AUTOMAKE_VERSION=1.16
 # misc
 export CLICOLOR=1
 export COLORTERM=truecolor

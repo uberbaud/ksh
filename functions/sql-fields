@@ -1,0 +1,19 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2019-11-26,03.13.42z/12493e>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^G(no arguments)^g
+#:   prints ^S$1^s split on ^S$SQLSEP^s tab-delimited.
+
+function sql-fields {
+	local TAB SEP F
+	SEP='  '
+	TAB='	'
+	splitstr "$SQLSEP" "$1" sqlfields 
+	for F in "${sqlfields[@]}"; do
+		print -rn -- "$SEP$F" 
+		SEP="$TAB"
+	done
+	print
+}
+
+# Copyright © 2019 by Tom Davis <tom@greyshirt.net>.

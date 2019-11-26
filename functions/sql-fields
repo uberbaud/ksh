@@ -6,7 +6,7 @@
 
 function sql-fields {
 	local TAB SEP F
-	SEP='  '
+	SEP="${2-  }"
 	TAB='	'
 	splitstr "$SQLSEP" "$1" sqlfields 
 	for F in "${sqlfields[@]}"; do

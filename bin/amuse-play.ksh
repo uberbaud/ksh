@@ -46,7 +46,7 @@ function warnOrDie { #{{{1
 	esac
 } # }}}1
 
-(($#))|| die 'Expected one (1) ^Usong id^u.'
+(($#))|| die 'Expected one or two arguments: ^Usong id^u ^[^Ustartpos^u^].'
 [[ $1 == +([0-9]) ]]|| die 'Expected ^Usong id^u (^Sinteger^s).'
 
 needs amuse:get-workpath $player
@@ -62,7 +62,8 @@ F="${sqlreply[0]#?}"
 P="${sqlreply[0]%"$F"}"
 song="./$P/$F.oga"
 
+shift
 #notify "  with: $player" "    in: $PWD" "trying: $song"
-exec $player "$song"
+exec $player "$song" "$@"
 
 # Copyright (C) 2019 by Tom Davis <tom@greyshirt.net>.

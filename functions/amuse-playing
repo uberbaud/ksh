@@ -6,7 +6,8 @@
 
 function amuse-playing {
 	amuse:set-env
-	cat ${now_playing:?}
+	read -r id song < ${now_playing:?}
+	notify "$song"
 }
 
 

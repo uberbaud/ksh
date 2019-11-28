@@ -6,6 +6,7 @@ set -o nounset;: ${FPATH:?Run from within KSH}
 
 which=full
 list=false
+action=append
 
 # Usage {{{1
 typeset -- this_pgm="${0##*/}"
@@ -16,6 +17,7 @@ function usage {
 	===SPARKLE===
 	^F{4}Usage^f: ^T$PGM^t ^[^T-r^t^|^T-l^t^] ^UsqlPattern^u
 	         Show or edit list of songs matching ^%^UsqlPattern^u^%.
+	         ^T-p^t  prepend to ^Ssong.lst^s (defaults to ^Sappend^s).
 	         ^T-l^t  list, do not edit.
 	         ^T-r^t  raw vtags output (implies ^T-l^t).
 	       ^T$PGM -h^t
@@ -28,10 +30,11 @@ function bad_programmer {	# {{{2
 	die 'Programmer error:'	\
 		"  No getopts action defined for [1m-$1[22m."
   };	# }}}2
-while getopts ':lrh' Option; do
+while getopts ':lprh' Option; do
 	case $Option in
-		l)	list=true;											;;
-		r)	which=raw; list=true;								;;
+		l)	action=list;											;;
+		p)	action=prepend;										;;
+		r)	which=raw; action=list;								;;
 		h)	usage;												;;
 		\?)	die "Invalid option: ^B-$OPTARG^b.";				;;
 		\:)	die "Option ^B-$OPTARG^b requires an argument.";	;;
@@ -56,6 +59,7 @@ function warnOrDie { #{{{1
 needs amuse:get-workpath sql-reply
 
 amuse:get-workpath
+ARD="${XDG_DATA_HOME:?}/run/amuse"
 SQL "ATTACH '$REPLY/amuse.db3' AS amuse;"
 
 function show-raw {
@@ -84,8 +88,23 @@ function show-full {
 	sql-reply ''
 }
 
-$list || PipeEdit='| pipedit song.list'
-[[ -t 1 ]]&& Pager='| less -FLSwX'
+PipeEdit='| pipedit song.lst'
+case $action in
+	list)
+		[[ -t 1 ]]&& Action='| less -FLSwX'
+		PipeEdit=
+		;;
+	append)
+		Action=">>$ARD/song.lst"
+		;;
+	prepend)
+		N="$ARD/song.new"
+		O="$ARD/song.lst"
+		Action=">'$N'; cat '$O'>>'$N'; mv '$N' '$O'"
+		;;
+	*)	die 'Bad Programmer:' "No such action: ^B$action^b."
+		;;
+esac
 
 function main {
 	for W; do
@@ -95,6 +114,6 @@ function main {
 	done
 }
 
-eval "main \"\$@\" ${PipeEdit:-} ${Pager:-}"; exit
+eval "main \"\$@\" ${PipeEdit:-} ${Action:-}"; exit 0
 
 # Copyright (C) 2019 by Tom Davis <tom@greyshirt.net>.

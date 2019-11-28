@@ -6,7 +6,7 @@
 
 function amuse-final {
 	amuse:set-env
-	echo 'true' >"${final:?}"
+	print true >"${final:?}"
 }
 
 

@@ -1,0 +1,12 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2019-11-27,05.57.26z/6f7abb>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^G(no arguments)^g
+#:   Start a stopped or paused amuse.
+
+function amuse-play {
+	amuse:set-env
+	print play >${signal:?}
+}
+
+# Copyright © 2019 by Tom Davis <tom@greyshirt.net>.

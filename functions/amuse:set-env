@@ -5,32 +5,39 @@
 #:   Set and sanity-check common ^IaMuse^i variables.
 
 function amuse:set-env {
-	: ${HOME:?} ${XDG_MUSIC_DIR:?} ${me:?}
-	amusePlayerId='aMuse player'
-	music_dir="${XDG_MUSIC_DIR:-${HOME}/media/music}"
-		export music_dir
+	local E i
+	: ${HOME:?} ${XDG_DATA_HOME:?} ${me:?}
 
-	amuse_home="${me}"/util/amuse
-	amuse_db="${amuse_home}"/amuse.db
-	amuse_run="${XDG_DATA_HOME}"/run/amuse
-	amuse_pid="${amuse_run}"/amuse-pid
-		export amuse_home amuse_db amuse_run amuse_pid
+	AMUSE_DATA_DIR="$XDG_DATA_HOME/amuse"
+	export AMUSE_DATA_DIR
+	ADD="$AMUSE_DATA_DIR"
 
-	now_playing="${amuse_run}"/playing
-	paused_at="${amuse_run}"/paused-at
-	skipped_bytes="${amuse_run}"/skipped-bytes
-	final="${amuse_run}"/final
-	again="${amuse_run}"/again
-	fflog="${amuse_run}"/fflog
-		export fflog now_playing paused_at skipped_bytes
+	AMUSE_RUN_DIR="$XDG_DATA_HOME/run/amuse"
+	export AMUSE_RUN_DIR
+	ARD="$AMUSE_RUN_DIR"
 
-	music_list="${amuse_run}"/togo.lst
-		export music_list
+	amuse_db="${ADD}"/amuse.db
+	amuse_run="$ARD"
+	amuse_pid="$amuse_run"/amuse-pid
+	player_pid="$amuse_run"/playsong-pid
+		export amuse_db amuse_run amuse_pid player_pid
 
-	[[ -d $amuse_home ]]|| die "No such directory [1m$amuse_home[0m."
-	[[ -d $amuse_run  ]]|| die "No such directory [1m$amuse_run[0m."
-	[[ -d $music_dir  ]]|| die "No such directory [1m$music_dir[0m."
+	now_playing="$amuse_run"/playing
+	paused_at="$amuse_run"/paused-at
+	final="$amuse_run"/final
+	again="$amuse_run"/again
+		export now_playing paused_at final again
 
+	signal="$amuse_run"/signal
+	music_list="$amuse_run"/song.lst
+		export signal music_list
+
+	i=0
+	[[ -d $ADD ]]||	E[i++]="^B$ADD^b"
+	[[ -d $ARD ]]||	E[i++]="^B$ARD^b"
+	((i))&& die 'Missing directories:' "${E[@]}"
+
+	true
 }
 
 

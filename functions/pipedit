@@ -14,7 +14,7 @@ function pipedit {
 	else
 		File=pipedit."$1"
 	fi
-	TmpDir="$(mktemp -d pipedit-XXXXXXXXX)" ||
+	TmpDir="$(mktemp -td pipedit-XXXXXXXXX)" ||
 		die 'Could not ^Tmktemp^t directory'
 	cat >"$TmpDir/$File"
 	exec 4<>/dev/tty

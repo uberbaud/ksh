@@ -7,10 +7,9 @@
 
 function amuse-stop {
 	amuse:set-env
-	: ${paused_at:?}
-	needs pause
-	pause
-	: >$paused_at
+	: "${final:?}" "${signal:?}"
+	print true >"$final"
+	print quit >"$signal"
 }
 
 

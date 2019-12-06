@@ -1,0 +1,18 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2019-12-02,22.15.16z/3d3e44c>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^G(no arguments)^g
+#:   Sets ^SAMUSE_COMMANDS^s, ^SAMUSE_RUN_DIR^s, and ^SAMUSE_DATA_HOME^s, and
+#:   creates ^Sis-valid-amuse-cmd^s
+
+function amuse:env {
+	: "${XDG_DATA_HOME:?-}"
+	AMUSE_COMMANDS='again final pause play restart skip stop'
+	AMUSE_RUN_DIR=$XDG_DATA_HOME/run/amuse
+	AMUSE_DATA_HOME=$XDG_DATA_HOME/amuse
+	gsub \  \| "$AMUSE_COMMANDS"
+	eval "function is-valid-amuse-cmd { [[ \${1:-} == @($REPLY) ]]; }"
+	REPLY=
+}
+
+# Copyright © 2019 by Tom Davis <tom@greyshirt.net>.

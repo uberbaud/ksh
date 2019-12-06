@@ -5,10 +5,15 @@
 #:   Wrapper around trap with some memory.
 #:   Uses ^S$TRAPEXIT^s array.
 
+needs new-array
 function add-exit-action {
-	set -A TRAPEXIT -- "${TRAPEXIT[@]:-}" "$@"
-	local IFS=';'
-	trap "${TRAPEXIT[*]:-}" EXIT
+	local C fnTrap=
+	[[ -n ${NEXT_TRAPONEXIT_ID:-} ]]|| new-array TrapOnExit
+	+TrapOnExit "$@"
+	for C in "${TrapOnExit[@]}"; do
+		fnTrap="$fnTrap;$C"
+	done
+	trap "${fnTrap#;}" EXIT
 }
 
 # Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

@@ -1,0 +1,16 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2019-12-03,05.09.30z/3f13a9>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^G(no arguments)^g
+#:   Wraps commands
+
+needs amuse:env amuse:send-cmd
+function amuse:cmd-wrappers {
+	local cmd
+	amuse:env
+	for cmd in $AMUSE_COMMANDS; do
+		eval "function $cmd { amuse:send-cmd $cmd; }"
+	done
+}
+
+# Copyright © 2019 by Tom Davis <tom@greyshirt.net>.

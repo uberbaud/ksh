@@ -62,7 +62,17 @@ if (($?)); then
 	fhist=$KHIST
 else
 	histmark="# OLDHISTORY $(date -u +'%Y-%m-%d %H:%M:%S Z')"
-	trap "awk '/^$histmark\$/{p=1;next}p' $fhist>>$KHIST && rm $fhist" EXIT
+	T="$(cat)" <<-===
+	function ShHistCleanUp {
+		local fhist KHIST
+		fhist='$fhist'
+		KHIST='$KHIST'
+		awk '/^$histmark\$/{p=1;next}p' "\$fhist">>"\$KHIST" &&
+			rm "\$fhist"
+	}
+	===
+	eval "$T"
+	add-exit-action ShHistCleanUp
 	tail -n 127 $KHIST>$fhist
 	print "$histmark" >>$fhist
 fi
@@ -199,6 +209,9 @@ NL='
 for p in f amuse; do
 	for i in $F/$p-*; { i="${i#$F/}"; alias "${i#$p-}=$i"; }
 done
+# and some special love for amuse: bits
+for i in $F/amuse:*; { i="${i#$F/}"; alias "@${i#amuse:}=$i"; }
+amuse:cmd-wrappers
 # noglobs
 for i in cowmath math note; { alias $i="noglob $i"; }
 alias mathcow="noglob cowmath"

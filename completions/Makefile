@@ -5,7 +5,7 @@ TARGET      = completions.ksh
 # things make builds (don't git)
 OBJECTS     = git_1 help scp ssh rcctl_2 sysctl
 # things hand crafted (git them)
-DEPENDS     = chflags inc kill_1 perlbrew poco rcctl_1 xfontsel
+DEPENDS     = chflags inc kill_1 mget perlbrew poco rcctl_1 xfontsel
 GIT_IGN     = .gitignore
 
 .poison empty OS_VER
@@ -47,6 +47,12 @@ HELP_UPBIN=$(KDOTDIR)/bin/update-help-completions.ksh
 help:
 	@echo $@
 	$(HELP_UPBIN)
+
+MAIL_ACCT_DIR=$(XDG_CONFIG_HOME)/fetchmail
+MAIL_ACCOUNTS=$(MAIL_ACCT_DIR)/accounts
+mget: $(MAIL_ACCOUNTS)
+	@echo $@
+	@$(MAIL_ACCT_DIR)/listAccts.ksh -r >$@
 
 SSH_HOSTS=$(XDG_CONFIG_HOME)/ssh/known_hosts
 ssh: $(SSH_HOSTS)

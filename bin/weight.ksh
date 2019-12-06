@@ -188,6 +188,7 @@ function graph { # {{{1
 	datdir=$(mktemp -d)
 	data="$datdir/plot.dat"
 	trap "rm $data; rmdir $datdir" EXIT
+	add-exit-action "rm $data" "rmdir $datdir"
 	dump >$data
 	print ${data:?}
 

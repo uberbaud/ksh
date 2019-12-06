@@ -56,11 +56,11 @@ function warnOrDie { #{{{1
 
 (($#))|| die 'Missing required search pattern'
 
-needs amuse:get-workpath sql-reply
+needs amuse:env sql-reply
 
-amuse:get-workpath
-ARD="${XDG_DATA_HOME:?}/run/amuse"
-SQL "ATTACH '$REPLY/amuse.db3' AS amuse;"
+amuse:env
+ARD="${AMUSE_RUN_DIR:?}"
+SQL "ATTACH '${AMUSE_DATA_HOME:?}/amuse.db3' AS amuse;"
 
 function show-raw {
 
@@ -75,7 +75,7 @@ function show-raw {
 
 function show-full {
 	SQL <<-==SQLITE==
-	SELECT id, performer || '/' || album || '/' || track || '-' || song
+	SELECT id, performer || '|' || album || '|' || track || '|' || song
 	  FROM vsongs
 	 WHERE id IN (
 		 SELECT file
@@ -114,6 +114,6 @@ function main {
 	done
 }
 
-eval "main \"\$@\" ${PipeEdit:-} ${Action:-}"; exit 0
+eval "main \"\$@\" ${PipeEdit:-} ${Action:-}";amuse:send-cmd play; exit
 
 # Copyright (C) 2019 by Tom Davis <tom@greyshirt.net>.

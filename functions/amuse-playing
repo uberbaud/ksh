@@ -1,14 +1,22 @@
-# <@(#)tag:csongor.greyshirt.net,2017-08-06:tw/19.04.54z/3251ca>
+# <@(#)tag:tw.csongor.greyshirt.net,2019-12-03,17.39.56z/574d5bd>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
 #: FUNCTION ^G(no arguments)^g
-#:   What's the aMuse player playing?
+#:   Show what's playing
 
+needs amuse:env
 function amuse-playing {
-	amuse:set-env
-	read -r id song < ${now_playing:?}
-	notify "$song"
+	local P
+	amuse:env
+	P="$AMUSE_RUN_DIR"/playing
+	[[ -s $P ]]|| return 1
+	IFS='	|' read -r id performer album track title <"$P"
+	sparkle <<-==SPARKLE==
+		         ^Gid:^g ^N$id^n
+		  ^Gperformer:^g ^N$performer^n
+		      ^Galbum:^g ^N$album^n
+		      ^Gtrack:^g ^S$track^s $title
+	==SPARKLE==
 }
 
-
-# Copyright © 2017 by Tom Davis <tom@greyshirt.net>.
+# Copyright © 2019 by Tom Davis <tom@greyshirt.net>.

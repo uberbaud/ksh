@@ -1,0 +1,25 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2019-12-02,23.29.29z/3dda354>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^[^Ufile1^u ^S…^s^]
+#:   List redirections to/from files.
+
+function ls-redirs {
+	for F; do
+		print -nr -- "$F:"
+		[[ -f $F ]]|| {
+			print ' not a file.'
+			continue
+		  }
+		print
+		sed -E -e "s/(^|[[:space:]])#.*//" "$F"	|
+			egrep -o "[<>][^[:space:])]+"		|
+			egrep -v "<<|[<>]&"					|
+			sed -E -e "s/^[<>]+//"				|
+			sort								|
+			uniq								|
+			sed -e 's/^/    /'
+	done
+}
+
+# Copyright © 2019 by Tom Davis <tom@greyshirt.net>.

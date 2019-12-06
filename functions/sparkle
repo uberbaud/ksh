@@ -14,6 +14,7 @@
 
 
 function sparkle {
+	set +vx
 	# start by changing ^^ to GROUP SEPARATOR \x1e
 	sed	-E											\
 		-e 's/\^\^//g'							\

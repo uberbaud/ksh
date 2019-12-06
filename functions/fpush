@@ -1,0 +1,23 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2019-12-03,20.35.01z/22b70df>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^G(no arguments)^g
+#:   Push a set of lines (in reverse) to the beginning of a given file.
+
+function fpush {
+	local F BUFFER= LINES i NL
+	F="${1:?Missing required argument: file_name}"
+	[[ -a $F ]]|| : >"$F"
+	[[ -f $F ]]|| fullstop "$F: not a file."
+
+	i=0
+	while IFS= read ln; do
+		LINES[i++]="$ln"
+	done
+	((i))|| return 0 # if there weren't any lines, there's nothing to do
+	[[ -s $F ]]&& BUFFER="$(<$F)"
+	while ((i--)) { print -r -- "${LINES[i]}"; } >"$F"
+	print -nr -- "$BUFFER" >>"$F"
+}
+
+# Copyright © 2019 by Tom Davis <tom@greyshirt.net>.

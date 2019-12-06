@@ -14,10 +14,12 @@
 #:            ^BNEXT_^S$varname^s_ID^b to ^B0^b
 
 function new-array {
+	local V
 	typeset -u N
 	for V; do
-		N="NEXT_${V}_ID"
-		eval "function +$V { for I { $V[$N++]=\"\$I\"; } }"
+		eval N="NEXT_${V}_ID"
+		eval "$N=0"
+		eval "function +$V { local I; for I { $V[$N++]=\"\$I\"; } }"
 		eval "function $V-reset { set -A $V --; $N=0; }"
 		eval "function $V-is-empty { ( set +o nounset; ((!\${#$V[*]})); ); }"
 		eval "function $V-not-empty { ( set +o nounset; ((\${#$V[*]})); ); }"

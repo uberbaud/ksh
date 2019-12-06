@@ -45,7 +45,8 @@ function warnOrDie { #{{{1
 	esac
 } # }}}1
 
-needs amuse:get-workpath SQL
+needs amuse:env SQL
+amuse:env
 
 if (($#)); then
 	for P; do
@@ -71,8 +72,7 @@ fi
 
 SQL_AUTODIE=true
 SQL_VERBOSE=false
-amuse:get-workpath
-SQL "ATTACH '$REPLY/amuse.db3' AS amuse;"
+SQL "ATTACH '${AMUSE_DATA_HOME:?}/amuse.db3' AS amuse;"
 SQL <<-\
 	==SQL==
 	SELECT DISTINCT value

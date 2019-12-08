@@ -198,9 +198,11 @@ print -- $$ >server-pid
 
 SQL "ATTACH '$AMUSE_DATA_HOME/amuse.db3' AS amuse;"
 
-trap hQuit		TERM
-trap ''			HUP INT QUIT TSTP USR1 USR2
+trap hQuit		TERM QUIT
+trap ''			HUP INT TSTP USR1 USR2
 add-exit-action hCleanUp
+
+trap # log trap ### DELETE ME /// DEBUG ###
 
 PLAY=startup			# Global variable/function returning 0 (true) or
 						# !0 (false)

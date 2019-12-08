@@ -19,6 +19,7 @@ function search-path {
 			break
 		done
 	done
+	((i)) # return true on found, false on not
 }
 
 # Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

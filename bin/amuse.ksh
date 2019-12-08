@@ -41,6 +41,46 @@ done
 shift $((OPTIND-1))
 # ready to process non '-' prefixed arguments
 # /options }}}1
+function start-ui { #{{{1
+	[[ -s ui-pid ]]&& {
+		local PROCNAME
+		# ui-pid is set, but is it really running?
+		PROCNAME="$(ps -ocommand= -p $(<ui-pid))" && {
+			[[ $PROCNAME == */amuse-ui.ksh ]]&&
+				return 1 # ui-pid points to a running amuse-ui
+
+			# bad PID, or PID points to something else, so CLEAR IT
+			print 'Clearing ui-pid'
+			: >amuse-ui
+		  }
+	  }
+
+	print 'Starting: amuse-ui'
+	/usr/local/bin/st						\
+		-c amuse-ui							\
+		-T amuse							\
+		-e ~/.config/ksh/bin/amuse-ui.ksh	\
+		&
+
+} #}}}1
+function start-server { #{{{1
+	[[ -s server-pid ]]&& {
+		local PROCNAME
+		# server-pid is set, but is it really running?
+		PROCNAME="$(ps -ocommand= -p $(<server-pid))" && {
+			[[ $PROCNAME == */amuse-server.ksh ]]&&
+				return 1 # server-pid points to a running amuse-server
+
+			# bad PID, or PID points to something else,
+			# --- so clear everything ---
+			print 'Clearing server-pid and sigpipe'
+			: >server-pid
+			rm -f sigpipe
+		  }
+	  }
+	print 'Starting: amuse-server'
+	~/.config/ksh/bin/amuse-server.ksh &
+} #}}}
 function start { #{{{1
 	local BUF
 	exec >~/log/amuse.log 2>&1 </dev/null
@@ -48,22 +88,8 @@ function start { #{{{1
 	BUF="$(head -n 3 played.lst)"
 	>played.lst print -- "$BUF"
 
-	if [[ -s ui-pid ]]; then
-		print 'Already running: amuse-ui'
-	else
-		print 'Starting: amuse-ui'
-		nohup /usr/local/bin/st					\
-			-c amuse-ui							\
-			-T amuse							\
-			-e ~/.config/ksh/bin/amuse-ui.ksh	&
-	fi
-
-	if [[ -s server-pid ]]; then
-		print 'Already running: amuse-server'
-	else
-		print 'Starting: amuse-server'
-		nohup ~/.config/ksh/bin/amuse-server.ksh &
-	fi
+	start-ui
+	start-server
 
 } #}}}1
 function stop { #{{{1

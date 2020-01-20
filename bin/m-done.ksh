@@ -83,8 +83,10 @@ function X { # {{{1
 		printRefileMsg "$msg"
 		refile picked -unlink -src +inbox +"$box"
 	fi
-	Done &&
-		function X { printf "$M$P$B Skipping $S %s$C (no more messages)"; }
+	Done && {
+		local F="$M$P$B Skipping $S %s$C (no more messages)"
+		eval "function X { printf '$F' \"\$4\"; }"
+	  }
 } # }}}1
 
 # X  Key    Pattern                        mailbox       message
@@ -101,7 +103,7 @@ print -nu2 ' [34m>>>[0m [1mDeleting[0m old trash ... '
 expire 2>/dev/null
 
 if Done; then
-    print -u2 ' [34m>>>[0m No messages to [1remove[0m.'
+    print -u2 ' [34m>>>[0m No messages to [1mremove[0m.'
 else
     print -u2 ' [34m>>>[0m [1mTrashing[0m everything else.'
     refile marked -unlink -src +inbox +deleted

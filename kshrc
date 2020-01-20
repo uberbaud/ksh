@@ -110,6 +110,7 @@ export USR_PLIB=$PERL5LIB
 [[ :$PATH: == *:$LOCALBIN:*			]]|| PATH="$LOCALBIN:$PATH"
 [[ :$PATH: == *:$USRBIN:*			]]|| PATH="$USRBIN:$PATH"
 [[ :$PATH: == *:/usr/games:*		]]|| PATH="$PATH:/usr/games"
+[[ :$PATH: == *:${JDK_PATH:-///}:*	]]|| PATH="$PATH:$JDK_PATH"
 
 # input, locale, and such
 set -o vi -o vi-tabcomplete
@@ -235,11 +236,13 @@ alias doas='as-root '
 alias i-can-haz-inet='i-can-haz-inet;E=$?;printf "  %s\n" "$REPLY";(return $E)&&:'
 alias ls='/usr/local/bin/colorls $LS_OPTIONS'
 alias noglob='set -f;noglob '; function noglob { set +f; ("$@"); }
+alias hush='>/dev/null 2>&1 '
 alias no2='2>/dev/null '
 alias noerr='2>/dev/null '
 alias cd='_u="$-"; set -u; f-cd'
 alias prn="printf '  \e[35m｢\e[39m%s\e[35m｣\e[39m\n'"
 alias reboot='as-root /sbin/reboot'
+alias vncsam='vncviewer -x11cursor -noraiseonbeep sam.lan'
 
 alias k='fc -s'
 alias ff='find0 -type f'

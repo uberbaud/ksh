@@ -11,6 +11,7 @@ export PERLBREW_LIB=''
 perlbrew_rc=$PERLBREW_ROOT/etc/perlbrew.ksh
 [[ -f $perlbrew_rc ]]&& . $perlbrew_rc
 export GOPATH=$xdgdata/go
+export JDK_PATH=/usr/local/jdk-1.8.0/bin
 
 # default apps
 export BROWSER="$(<$xdgcfg/etc/browser)"

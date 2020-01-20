@@ -1,0 +1,21 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2019-12-08,01.51.37z/461e133>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Ufunction name^u ^[^Tas^t ^Unew name^] ^UFunction description^u
+#:   Saves the named function as a file to the first path in ^S$FPATH^s.
+
+function fsave {
+	local fName fText
+	fName="${1:?Missing required function name}"; shift
+	fText="$(typeset -f $fName)" ||
+		die 'No such function'
+	fText="${fText%\}*}"
+	fText="${fText#*\{}"
+	[[ ${1:?Missing required function description} == [Aa][Ss] ]]&& {
+		fName="${2:?Missing required new function name}"
+		shift 2
+	  }
+	FBODY="$fText" new -t ksh -x function $F/$fName "$*"
+}
+
+# Copyright © 2019 by Tom Davis <tom@greyshirt.net>.

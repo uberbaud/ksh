@@ -36,7 +36,8 @@ function usage {
 	           ^T-q^t  Quiet, list generated passwords to ^Bstdout^b, nothing else.
 	           ^T-v^t  Verbose, give some additional information.
 	       ^BRetention Options^b
-	           ^[^T-e^t ^Uemail address^u^] ^[^T-u^t ^Uuser name^u^] ^[^T-O^t ^Uid-type:id^u^] ^[^Udomain^u^]
+	           ^[^T-r^t^] ^[^T-e^t ^Uemail address^u^] ^[^T-u^t ^Uuser name^u^] ^[^T-O^t ^Uid-type:id^u^] ^[^Udomain^u^]
+	           ^T-r^t  Updates (resets) existing password and any id info.
 	       ^T$PGM -h^t
 	         Show this help message.
 	===SPARKLE===
@@ -47,6 +48,7 @@ function bad_programmer {	# {{{2
 	die 'Programmer error:'	\
 		"  No getopts action defined for [1m-$1[22m."
   };	# }}}2
+updatePassword=false
 alphabetIsSet=false;	infoIsSet=false
 allowUC=false;   allowLC=false;   allowSYM=false;   allowDIG=false
 requireUC=false; requireLC=false; requireSYM=false; requireDIG=false
@@ -101,7 +103,7 @@ function add-custom-id { #{{{2
 	add-id "${1%%:*}" "${1#*:}"
 } #}}}2
 
-while getopts ':a:c:n:x:e:u:O:s:qh' Option; do
+while getopts ':a:c:n:x:e:u:O:s:qrh' Option; do
 	case $Option in
 		a)  set-alphabet "$OPTARG";									;;
 		c)  posint count "$OPTARG";									;;
@@ -112,6 +114,7 @@ while getopts ':a:c:n:x:e:u:O:s:qh' Option; do
 		O)  add-custom-id "$OPTARG";								;;
 		s)  symbols="$OPTARG";										;;
 		q)  quiet=true;												;;
+		r)	updatePassword=true;									;;
 		h)	usage;													;;
 		\?)	die "Invalid option: [1m-$OPTARG[22m.";				;;
 		\:)	die "Option [1m-$OPTARG[22m requires an argument.";	;;
@@ -148,7 +151,7 @@ $alphabetIsSet || set-alphabet "$defaultAlphabet"
 
 # /options }}}1
 
-needs cut random umenu xclip
+needs cut random umenu xclip new-array
 
 (($# <= 1 ))|| die 'Too many arguments. Expected one (1).'
 typeset -l domain=''
@@ -156,13 +159,19 @@ typeset -l domain=''
 
 if $infoIsSet; then
 	[[ -n $domain ]]|| die '^Udomain^u is required to ^Brecord^b ^Uinfo^u.'
+elif $updatePassword; then
+	[[ -n $domain ]]|| die '^Udomain^u is required to ^Bupdate^b password.'
 elif [[ -n $domain ]]; then
 	die '^Uemail addr^u, ^Uuser name^u, or some other ^Uid^u must be supplied' \
 		'when saving to ^Udomain^u.pwd'
 fi
 
 pwdFile="$HOME/.local/secrets/$domain.pwd"
-[[ -a $pwdFile ]]&& die 'Password file for ^B$domain^b already exists.'
+if $updatePassword; then
+	[[ -a $pwdFile ]]|| die 'Password file for ^B$domain^b does not exists.'
+else
+	[[ -a $pwdFile ]]&& die 'Password file for ^B$domain^b already exists.'
+fi
 
 allowed=''
 $allowSYM || $requireSYM	&& allowed="$allowed$punct"
@@ -206,6 +215,19 @@ done
 
 results-not-empty || die 'Weirdly, ^S$results^b is empty.'
 
+function show-ids { #{{{1
+	for ln; do print -r -- "$ln"; done
+} #}}}1
+function new-file { #{{{1
+	local File="$1"
+	notify "It is also saved in ^B$File^b."
+	show-ids "$@" | tee -a "$File"
+} #}}}1
+function update-file { #{{{1
+	die 'Unimplemented'
+} # }}}1
+
+
 if $quiet; then
 	printf "%s\n" "${results[@]}"
 else
@@ -217,10 +239,13 @@ else
 	notify 'Your new ^Bpassword^b has been copied to the ^Bclipboard^b.'
 	add-id 'pwd' "$password"
 	if [[ -n $domain ]]; then
-		notify "It is also saved in ^B$pwdFile^b."
-		for ln in "${ids[@]}"; do print -r "$ln"; done | tee -a "$pwdFile"
+		if $updatePassword; then
+			update-file "$pwdFile" "${ids[@]}"
+		else
+			new-file "$pwdFile" "${ids[@]}"
+		fi
 	else
-		for ln in "${ids[@]}"; do print -r "$ln"; done
+		show-ids "${ids[@]}"
 	fi
 fi
 

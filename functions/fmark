@@ -1,0 +1,13 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2019-12-08,01.42.22z/2b6590c>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^G(no arguments)^g
+#:   Creates a function ^SisOldFunction^s for ^Tfchanged^t to test against.
+
+function fmark {
+	set -- $(typeset +f)
+	local IFS='|'
+	eval "function isOldFunction { [[ \${1:?} == @($*) ]]; }"
+}
+
+# Copyright © 2019 by Tom Davis <tom@greyshirt.net>.

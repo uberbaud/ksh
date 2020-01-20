@@ -8,6 +8,7 @@ needs amuse:env amuse:send-cmd
 function amuse:cmd-wrappers {
 	local cmd
 	amuse:env
+	unalias $AMUSE_COMMANDS
 	for cmd in $AMUSE_COMMANDS; do
 		eval "function $cmd { amuse:send-cmd $cmd; }"
 	done

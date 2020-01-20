@@ -5,7 +5,8 @@ TARGET      = completions.ksh
 # things make builds (don't git)
 OBJECTS     = git_1 help scp ssh rcctl_2 sysctl
 # things hand crafted (git them)
-DEPENDS     = chflags inc kill_1 mget perlbrew poco rcctl_1 xfontsel
+DEPENDS     = chflags inc kill_1 mediainfo mget perlbrew poco rcctl_1
+DEPENDS    += xfontsel
 GIT_IGN     = .gitignore
 
 .poison empty OS_VER

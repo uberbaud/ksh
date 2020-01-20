@@ -57,6 +57,10 @@ needs awk zcat
 (($#==1))||	die 'Too many arguments, expected one (1): ^Upattern^u.'
 cd ~/hold/DOCSTORE || die 'Could not ^Tcd^t to ^BDOCSTORE^b.'
 
+#   ↓ newline
+NL='
+' # ↑ newline
+
 AWKPGM="$(cat)" <<-\
 	===AWKPGM===
 	NR == 1	{ f=\$0; next }
@@ -66,24 +70,18 @@ AWKPGM="$(cat)" <<-\
 desparkle "$AWKPGM"
 splitstr NL "$REPLY" dAWKPGM
 
-#   ↓ newline
-NL='
-' # ↑ newline
-
-function only-in-files {( # {{{1
-	IFS="$NL"
-	while read -r F; do
+function only-in-files { # {{{1
+	while IFS= read -r F; do
 		[[ -f $F ]]|| continue
 		print -r -- "$F"
 	done
-)} # }}}1
-function only-out-files {( # {{{1
-	IFS="$NL"
-	while read -r F; do
+} # }}}1
+function only-out-files { # {{{1
+	while IFS= read -r F; do
 		[[ -f $F ]]&& continue
 		print -r -- "$F"
 	done
-)} # }}}1
+} # }}}1
 
 if $ins && $outs; then
 	alias only-files=cat

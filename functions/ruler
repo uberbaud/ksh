@@ -7,7 +7,7 @@
 #:   a line feed is printed if the cursor is not at column 1, and finally
 #:   another ruler is printed.
 
-needs get-row-col
+needs forceline
 function ruler {
 	typeset -- dots='....+....' Ruler=''
 	typeset -i count="${1:-${COLUMNS:-80}}"

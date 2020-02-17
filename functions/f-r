@@ -10,13 +10,22 @@ function f-r {
 	if (($#)); then
 		readme="$1"
 	else
-		set -- [Rr][Ee][Aa][Dd]+([Mm][Ee]){.[Mm]{[Dd],arkdown},}*
+		set -- [Rr][Ee][Aa][Dd]*
 		for p; do
 			[[ -f "$p" ]]&& { readme="$p"; break; }
 		done
 		[[ -n "$readme" ]]|| die 'No README found.'
 	fi
-	nvim -MR +'set nolist norelativenumber nonumber colorcolumn=' "$readme"
+
+	typeset -l lext="${readme##*.}"
+	if [[ $lext == @(m?(?(ar)k)d?(?(o)?(w)n)?(t?(e)xt)|rmd) ]]; then
+		needs markdown-to-html w3m
+		markdown-to-html "$readme" | w3m -T text/html
+	else
+		needs nvim
+		typeset opts='set nolist norelativenumber nonumber colorcolumn='
+		nvim -MR +"$opts" "$readme"
+	fi
 }
 
 # Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

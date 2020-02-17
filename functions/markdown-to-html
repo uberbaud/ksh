@@ -1,0 +1,14 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2020-02-08,19.24.26z/1a6622>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Ufile name^u
+#:   Convert a markdown file to full html.
+
+needs cmark
+function markdown-to-html {
+    print "<html>\n<head><title>${1##*/}</title></head>\n<body>\n"
+    cmark --to html --smart --validate-utf8 README.md 
+    print "</body>\n</html>"
+}
+
+# Copyright © 2020 by Tom Davis <tom@greyshirt.net>.

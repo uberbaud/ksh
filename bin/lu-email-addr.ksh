@@ -55,7 +55,7 @@ typeset -l pattern="$REPLY"		# lower case bits
 [[ $pattern == '.*' ]]&&	return 1
 pattern='(^| )'"$pattern"
 
-awkpgm="$(cat)" <<-\
+awkpgm="$(</dev/stdin)" <<-\
 	==AWK==
 	{
 		l=tolower(\$1);				# match lower case bits

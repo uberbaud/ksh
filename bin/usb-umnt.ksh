@@ -59,7 +59,7 @@ function main {
 	local awkpgm haves wants have want
 	new-array haves wants
 
-	awkpgm="$(cat)" <<-\
+	awkpgm="$(</dev/stdin)" <<-\
 	\==AWK==
 	NR==1			{next}
 	/\/dev\/sd0/	{next}

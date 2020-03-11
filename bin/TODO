@@ -2,3 +2,5 @@
     implement v =...
 @ 2019-01-21 06:42:54 Z
     refactor pass-* with reuse
+@ 2020-03-11 15:36:58 Z
+    revise present.ksh to be usable if no external display is detected.

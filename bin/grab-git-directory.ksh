@@ -52,7 +52,7 @@ gitraw=https://raw.githubusercontent.com
 [[ $1 == $giturl/* ]]|| die 'URL does not point to ^Bgithub^b.'
 
 # $AWKPGM {{{1
-AWKPGM="$(cat)" <<-\
+AWKPGM="$(</dev/stdin)" <<-\
 	\==AWKPGM==
     /^[ \t]*<td class="content">/ {
 			p=1

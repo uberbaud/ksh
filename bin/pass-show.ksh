@@ -54,7 +54,7 @@ pwrec="$secrets/$domain.pwd"
 
 cat "$pwrec" >&2 || exit 1
 
-awkpgm="$(cat)" <<-\
+awkpgm="$(</dev/stdin)" <<-\
 	\==AWKPGM==
 	BEGIN		{ FS=":[ \t]+" }
 	/^p(wd)?: /	{ print $2; nextfile }

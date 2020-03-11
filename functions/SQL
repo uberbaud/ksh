@@ -25,7 +25,7 @@ function SQL {
 	[[ $autodie == warn ]]&& { autodie=false; autowarn=true; }
 
 	SQLSEP="${SQLSEP:-"$(print '\034')"}" # ^\ -> field separator
-	(($#))&& sql="$*" || sql="$(cat)"
+	(($#))&& sql="$*" || sql="$(</dev/stdin)"
 	set -A sqlreply --
 	((${SQLFD[0]:-}))|| {
 		sqlite3 -noheader -batch -list -separator "$SQLSEP" 2>&1 |&

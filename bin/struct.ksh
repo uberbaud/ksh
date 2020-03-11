@@ -61,7 +61,7 @@ set -- $(find "$@" -type f -name "$fglob" ${depth:-})
 
 (($#))|| die 'No C or header files found.'
 
-awkpgm="$(cat)" <<-\
+awkpgm="$(</dev/stdin)" <<-\
 	==AWK==
 	BEGIN { p=0; f=0 }
 	/struct[ \t]+$sname[ \t]*{/ {

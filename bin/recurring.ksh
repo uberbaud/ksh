@@ -69,7 +69,7 @@ if $ALT; then
 	==SPARKLE==
 else
 	# AWKPGM {{{1
-	AWKPGM="$(cat)" <<-\
+	AWKPGM="$(</dev/stdin)" <<-\
 	\==AWK==
 		BEGIN { FS="\t";i=0 }
 		NF == 2 { a[i]=$2; i++ }

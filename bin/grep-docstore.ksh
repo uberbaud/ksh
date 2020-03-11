@@ -61,7 +61,7 @@ cd ~/hold/DOCSTORE || die 'Could not ^Tcd^t to ^BDOCSTORE^b.'
 NL='
 ' # ↑ newline
 
-AWKPGM="$(cat)" <<-\
+AWKPGM="$(</dev/stdin)" <<-\
 	===AWKPGM===
 	NR == 1	{ f=\$0; next }
 	/$1/	{ print f; nextfile }

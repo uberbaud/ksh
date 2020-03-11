@@ -126,8 +126,10 @@ shift $(($OPTIND - 1))
 # ready to process non '-' prefixed arguments
 
 [[ -n $symbols ]]&& {
-	$quiet || [[ $symbols == *[^[:punct:]]* ]]&&
-		warn 'Non-punctuation characters included by ^T-s^t.'
+	$quiet || {
+		[[ $symbols == +([[:punct:]]) ]]||
+			warn 'Non-punctuation characters included by ^T-s^t.'
+	  }
 	punct="$symbols"
   }
 

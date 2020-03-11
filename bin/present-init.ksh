@@ -4,9 +4,10 @@
 
 set -o nounset;: ${FPATH:?Run from within KSH}
 
+: ${XDG_DOCUMENTS_DIR:?}
+initialURL="file://$XDG_DOCUMENTS_DIR/presentations/uberbaud-logo.html"
 Title='uberbaud-presentation' # <title>...</title> in html file
 Display1='eDP-1'
-initialURL="file://$XDG_DOCUMENTS_DIR/presentations/uberbaud-logo.html"
 
 PGMBIN="$(readlink -fn "$0")"
 PGMDIR="${PGMBIN%/*}"
@@ -22,11 +23,10 @@ function usage {
 	PGM="$REPLY"
 	sparkle >&2 <<-\
 	===SPARKLE===
-	^F{4}Usage^f: ^T$PGM^t ^[^T-k^t^|^T-l^t^] ^Upresentation^u
+	^F{4}Usage^f: ^T$PGM^t ^[^T-k^t^]
 	         Initializes 2nd display, and starts the presentation and a terminal
 	         on that display.
 	           ^T-k^t  Kills the opened windows and turns off the display.
-	           ^T-l^t  Enters loop.
 	           ^Upresentation^u  opens the file or ^S^Upresentation^u/present.html^s.
 	             If no ^Upresentation^u is given, attempts to open ^S./present.html^s.
 	       ^T$PGM -h^t
@@ -39,10 +39,9 @@ function bad_programmer {	# {{{2
 	die 'Programmer error:'	\
 		"  No getopts action defined for [1m-$1[22m."
   };	# }}}2
-while getopts ':klh' Option; do
+while getopts ':kh' Option; do
 	case $Option in
 		k)	DO=off;												;;
-		l)	DO=loop;											;;
 		h)	usage;												;;
 		\?)	die "Invalid option: ^B-$OPTARG^b.";				;;
 		\:)	die "Option ^B-$OPTARG^b requires an argument.";	;;
@@ -53,31 +52,8 @@ done
 shift $((OPTIND-1))
 # ready to process non '-' prefixed arguments
 # /options }}}1
-function warnOrDie { #{{{1
-	case $warnOrDie in
-		die)  die "$@" 'Use [1m-f22m to force an edit.';		;;
-		warn) warn "$@";											;;
-		*)    die '[1mProgrammer error[22m:' \
-					'warnOrDie is [1m${warnOrDie}[22m.';		;;
-	esac
-} # }}}1
 
-PRESENTATION_FILE=
-if [[ -n ${1:-} ]]; then
-	if [[ -d $1 ]]; then
-		PRESENTATION_FILE="$(readlink -fn "$1/present.html")"
-	else
-		PRESENTATION_FILE="$(readlink -fn "${1%.html}.html")"
-	fi
-	[[ -n $PRESENTATION_FILE ]]|| die "No such file ^B$1^b."
-else
-	PRESENTATION_FILE="$(readlink -fn present.html)"
-fi
-[[ -n "$PRESENTATION_FILE" ]]&& {
-	[[ -a $PRESENTATION_FILE ]]|| die "^B$PRESENTATION_FILE^b does not exist."
-	[[ -f $PRESENTATION_FILE ]]|| die "^B$PRESENTATION_FILE^b is not a file."
-	[[ -s $PRESENTATION_FILE ]]|| die "^B$PRESENTATION_FILE^b is empty."
-  }
+(($#))&& die 'Unexpected parameters.'
 
 function init_2nd_display { #{{{1
 	local geom
@@ -112,29 +88,20 @@ function set_window_full_on_d2 { #{{{1
 	xdotool set_desktop_for_window $1 -1 # sticky / every window
 } #}}}1
 function surf-xid { #{{{1
-	surfxid=$(xdotool search $* --name " $Title\$")
+	surfxid=${SURF_XID:-"$(xdotool search $* --name " $Title\$")"}
 } #}}}1
 function init_surf { #{{{1
 	start surf "$initialURL"
 	surf-xid --sync
 	set_window_full_on_d2 $surfxid
-	[[ -n $PRESENTATION_FILE ]]&&
-		xprop -id $surfxid	\
-			-f _SURF_GO 8s	\
-			-set _SURF_GO "file://$PRESENTATION_FILE"
 } #}}}1
 function st-xid { #{{{1
-	stxid=$(xdotool search $* --class '^presTerm$')
+	stxid=${ST_XID:-"$(xdotool search $* --class '^presTerm$')"}
 } #}}}1
 function init_term { #{{{1
 	st -c presTerm -f 'Liberation Mono:pixelsize=36:antialias=true' &
 	st-xid --sync
 	set_window_full_on_d2 $stxid
-} #}}}1
-function loop { #{{{1
-	surf-xid
-	st-xid
-	warn '^Sloop^s is not implemented.'
 } #}}}1
 function on { #{{{1
 # close any open windows with --name " uberbaud-present$"
@@ -150,8 +117,15 @@ function off { #{{{1
 	xdotool windowclose $surfxid
 	set -- $(xrandr|egrep -v "^$Display1 "|awk '/ connected / {print $1}')
 	for D { xrandr --output $D --off; }
+	surfxid=
 } #}}}1
 
-$DO; exit
+function put-cmds { #{{{1
+	print -r -- "SURF_XID=${surfxid:-}"
+	print -r -- "ST_XID=${stxid:-}"
+	print -r -- "export SURF_XID ST_XID"
+} #}}}1
+
+$DO; put-cmds; exit
 
 # Copyright (C) 2019 by Tom Davis <tom@greyshirt.net>.

@@ -11,7 +11,7 @@ function obsd {
 	# arbitary number after which the file list will be shown as "*"
 	MAXFILES=${OBSD_MAXFILE_LIST:-7}
 	(($MAXFILES))|| warn 'OBSD_MAXFILE_LIST is set to 0, no files listed.'
-	filter="$(cat)" <<-\
+	filter="$(</dev/stdin)" <<-\
 		\==AWK==
 		# |>>> inbox:5          ← when there's more than one (1) message
 		/^>>> [a-z]+:[0-9]+$/			{ N=$2; p=0; }
@@ -53,7 +53,7 @@ function obsd {
 							{printf( "%s ", $0 );}
 		==AWK==
 
-	refold="$(cat)" <<-\
+	refold="$(</dev/stdin)" <<-\
 	==AWK==
 	/^[a-z]+:[0-9]+\$/ {X=\$0;next}
 		{printf "%-${W}s%s\n",X,\$0;X="";}

@@ -106,7 +106,7 @@ function rainbowify-line {
 
 function rainbowify-stdin {
 	local t='' p=''
-	t="$(cat)"
+	t="$(</dev/stdin)"
 	# remove any existing ansi escapes
 	while [[ $t == *'['+([!mK])[mK]* ]]; do
 		p="$p${t%%'['+([!mK])[mK]*}"

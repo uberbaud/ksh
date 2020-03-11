@@ -6,7 +6,7 @@
 
 function _show_function_help {
 	local awkpgm
-	awkpgm="$(cat)" <<-\
+	awkpgm="$(</dev/stdin)" <<-\
 		\==AWK==
 			/^#:/	{p=1}
 			!p		{ next }

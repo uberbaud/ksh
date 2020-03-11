@@ -78,7 +78,7 @@ function mnt-fs {
 	notify "Mounted ^S$devD^s at ^S$mntpntD^s."
 }
 
-awkpgm="$(cat)" <<-\
+awkpgm="$(</dev/stdin)" <<-\
 	\==AWKPGM==
 	/^label: /		{print substr($0,8)}
 	/^  [abd-p]:/	{print $1,$4}

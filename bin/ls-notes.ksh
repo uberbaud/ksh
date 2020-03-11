@@ -64,7 +64,7 @@ for H; do
 	fi
 done
 
-AWKPGM="$(cat)" <<-\
+AWKPGM="$(</dev/stdin)" <<-\
 	\===AWK===
 		/<@\(#\)tag:/ {next}
 		FNR == 2 && /^[0-9][0-9][0-9][0-9]-[01][0-9]-[0-3][0-9].* Z/ {

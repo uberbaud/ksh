@@ -54,7 +54,7 @@ function warnOrDie { #{{{1
 } # }}}1
 function get-wifi-device { # {{{1
 
-	awkpgm="$(cat)" <<-\
+	awkpgm="$(</dev/stdin)" <<-\
 		\==AWK==
 			/^[^ \t]/ {d=$1}
 			/^\tmedia: IEEE802.11/ {print d}
@@ -69,7 +69,7 @@ function get-wifi-device { # {{{1
 } # }}}1
 # LOG-INET-STATS ←→ DELETE THIS {{{1
 LOG_INET_STATS_RUNS=0
-LOG_INET_STATS_awkpgm="$(cat)" <<-\
+LOG_INET_STATS_awkpgm="$(</dev/stdin)" <<-\
 	\==AWK==
 		BEGIN			{ FS=":" }
 		/^[^\t]/		{ d=$1; next }

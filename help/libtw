@@ -1,0 +1,41 @@
+^Blibtw^b
+
+^BSYNOPSIS^b
+    #include <notify_usr.h>
+
+    char *^Bsparkle^b( const char *^Utext^u )
+    void ^Bvmessage^b(
+        const char * const ^Upref1^u,
+        const char * const ^UprefN^u,
+        const char * const ^Ufmt^u,
+        va_list            ^Uap^u
+      )
+    void ^Bmessage^b(
+        const char * const ^Upref1^u,
+        const char * const ^UprefN^u,
+        const char * const ^Ufmt^u,
+        ...
+    )
+    void ^Binform^b( const char * const ^Ufmt^u, ... )
+    void ^Bcaution^b( const char * const ^Ufmt^u, ... )
+    void ^Bdie^b( const char * const ^Ufmt^u, ... )
+
+^BDESCRIPTION^b
+    ^Bsparkle()^b transforms its argument by expanding caret-sequences
+    to ANSI escape sequences. (see ^Ssparkle^s help document) and returns
+    that transformation.
+
+    The other functions ^Bsparkle()^b their ^Ufmt^u arguments and print
+    messages to ^Sstderr^s.  ^Bvmessage()^b and ^Bmessage^b precede the
+    first line of output with ^Upref1^u and any other lines with
+    ^UprefN^u. ^Binform()^b, ^Bcaution^b, and ^Bdie^b are wrappers around
+    ^Bvmessage()^b with predefined ^Upref1^u and ^UprefN^us. ^Bdie()^b
+    calls ^Texit(-1)^t.
+
+^BRETURN VALUES^b
+    ^Bsparkle()^b returns its transformed input. The others are guaranteed
+    to return or die on error.
+
+^BBUILDING^b
+    Where ^NCPATH^n^T=^t^S$HOME^s^T/.local/c^t
+    Use ^Tclang -I/^t^S$CPATH^s^T/api -L^t^S$CPATH^s^T/lib -ltw ^U...^u^t

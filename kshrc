@@ -79,11 +79,14 @@ fi
 
 # paths
 export me=$HOME/work/clients/me
+export CPATH=$xdgdata/c
 export FPATH=$KDOTDIR/functions
 export HISTCONTROL=ignoredups:ignorespace
 export HISTFILE=$fhist
 export HISTSIZE=8191
-export LD_LIBRARY_PATH=$xdgdata/c/lib
+export LD_LIBRARY_PATH=$CPATH/lib
+export USR_CLIB=$CPATH/lib
+export USR_INCL=$CPATH/api
 export LOCALBIN=$xdgdata/bin
 # LUA wants SEMICOLON separated PATTERNS, empty item is default
 export LUA_PATH_5_3="$xdgdata/lua/5.3/?.lua;$xdgdata/lua/5.3/?/init.lua;;"
@@ -92,10 +95,10 @@ export PERL5LIB=$xdgdata/perl5/twlib${CPANMLIB:+:$CPANMLIB}
 #export RAKUDO_HOME=$xdgdata/rakudo
 #export RAKUDO_BIN=$RAKUDO_HOME/install/bin
 #	RAKUDO_BIN=$RAKUDO_BIN:$RAKUDO_HOME/install/share/perl6/site/bin
+export CARGO_HOME=$xdgcfg/cargo
 export TEMPLATES_FOLDER=$xdgdata/templates
 export TMPDIR=$xdgcache/temp
 export USRBIN=$HOME/bin/ksh
-export USR_CLIB=$xdgdata/c/lib
 export PERL_UNICODE=AS
 export USR_PLIB=$PERL5LIB
 
@@ -131,6 +134,7 @@ export BC_ENV_ARG=$xdgcfg/etc/bc.rc
 export BZR_HOME=$xdgcfg/bzr
 export CALENDAR_DIR=$xdgcfg/calendar
 export HGRCPATH=$xdgcfg/hg
+export KAKOUNE_POSIX_SHELL=/usr/local/bin/dash
 
 # ==== DEFAULT APPS
 # handle whether  EDITOR or VISUAL was set in $HOST.kshrc

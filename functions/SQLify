@@ -10,22 +10,14 @@ function SQLifyOne {
 	[[ $1 == ?(n|o|p|t) ]]&&
 		die 'Cannot ^TSQLify^t variables named ^Sn^s, ^So^s, ^Sp^s, or ^S^t^s.'
 	local n o p='' t
-	eval t="\"\$$1\""
+	eval t="\$$1"
 	[[ -z $t ]]&& { eval $1=NULL; return; }
 	while [[ $t == *\'* ]]; do
 		p="$p${t%%\'*}''"
 		t="${t#*\'}"
 	done
-	# protect metachars ('\', '"', and '$') for eval
-	for o in \\ \" \$ \`; do
-		t="$p$t"; p=''; n=\\"$o"
-		while [[ $t == *"$o"* ]]; do
-			p="$p${t%%"$o"*}$n"
-			t="${t#*"$o"}"
-		done
-	done
 
-	eval "$1=\"'$p$t'\""
+	eval "$1=\$p\$t"
 }
 
 function SQLify { while (($#)) { SQLifyOne $1; shift; }; }

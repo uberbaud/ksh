@@ -98,6 +98,7 @@ function X { # {{{1
   X -from  '@stackoverflow\.'             stackover     'Stack Overflow'
 CIP='alexepstein@industrialprogress.net'
   X -from  "$CIP"                         energy        'CIP'
+  X -from  'LowesEreceipt@lowes\.com'     receipts      "Lowe's Receipt"
 
 print -nu2 ' [34m>>>[0m [1mDeleting[0m old trash ... '
 expire 2>/dev/null

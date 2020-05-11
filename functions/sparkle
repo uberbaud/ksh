@@ -3,8 +3,9 @@
 
 #: FUNCTION ^G(no arguments)^g
 #:   Transform marked ^SSTDIN^s to colorized ^SSTDOUT^s.
-#:     ^B^^B bold^b           ^E^^E error^e             ^G^^G grey^g
-#:     ^I^^I italic^i         ^N^^N notice^n            ^S^^S special^s
+#:     ^B^^B bold^b           ^T^^C^t ^Ghidden^g            ^E^^E error^e
+#:     ^G^^G grey^g           ^T^^H^t ^Ghidden^g            ^I^^I italic^i
+#:     ^N^^N notice^n         ^R^^R reverse^r           ^S^^S special^s
 #:     ^T^^T tty^t            ^U^^U underline^u         ^W^^W warning^w
 #:     ^T^^F{^t^U0-255^u^T}^t ^Gforeground^g      ^T^^=^t ^=
 #:     ^T^^K{^t^U0-255^u^T}^t ^Gbackground^g      ^^[:punct:] ^= ^T^^S^t^Upunct^u^T^^s^t
@@ -20,18 +21,24 @@ function sparkle {
 		-e 's/\^\^//g'							\
 		-e 's/\^B/[1m/g'							\
 		-e 's/\^b/[22m/g'							\
+		-e 's/\^C/[8m/g'							\
+		-e 's/\^c/[28m/g'							\
 		-e 's/\^E/[31m/g'							\
 		-e 's/\^e/[39m/g'							\
 		-e 's/\^F\{([0-9]+)\}/[38;5;\1m/g'		\
 		-e 's/\^f/[39m/g'							\
 		-e 's/\^G/[38;5;248m/g'					\
 		-e 's/\^g/[39m/g'							\
+		-e 's/\^H/[8m/g'							\
+		-e 's/\^h/[28m/g'							\
 		-e 's/\^I/[3m/g'							\
 		-e 's/\^i/[23m/g'							\
 		-e 's/\^K\{([0-9]+)\}/[48;5;\1m/g'		\
 		-e 's/\^k/[49m/g'							\
 		-e 's/\^N/[38;5;12m/g'					\
 		-e 's/\^n/[39m/g'							\
+		-e 's/\^R/[7m/g'							\
+		-e 's/\^r/[27m/g'							\
 		-e 's/\^S/[35m/g'							\
 		-e 's/\^s/[39m/g'							\
 		-e 's/\^T/[32m/g'							\

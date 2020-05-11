@@ -11,22 +11,8 @@ function gsub {
 		p="$p${text%%"$old"*}$new"
 		text="${text#*"$old"}"
 	done
-	# shortcut
-	[[ $varname == REPLY ]]&& {
-		REPLY="$p$text"
-		return
-	  }
 
-	# protect metachars ('\', '"', and '$') for eval
-	for old in \\ \" \$ \`; do
-		text="$p$text"; p=''; new=\\"$old"
-		while [[ $text == *"$old"* ]]; do
-			p="$p${text%%"$old"*}$new"
-			text="${text#*"$old"}"
-		done
-	done
-
-	eval "$varname=\"$p$text\""
+	eval "$varname=\$p\$text"
 }
 
 # Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

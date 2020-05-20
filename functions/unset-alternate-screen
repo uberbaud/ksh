@@ -1,0 +1,11 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2020-05-20,04.11.38z/28ad7ac>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^G(no arguments)^g
+#:   Reverts to primary screen
+
+function unset-alternate-screen {
+	print -n -- '\033[?1049l\033[?25h'
+}
+
+# Copyright © 2020 by Tom Davis <tom@greyshirt.net>.

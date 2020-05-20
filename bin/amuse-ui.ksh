@@ -49,12 +49,6 @@ function get-size { #{{{1
 	PLAYED=$(((LINES-2)/4))
 	PLAYING=$((PLAYED+1))
 } #}}}1
-function set-alternate-scrn { #{{{1
-	print -n -- '\033[?1049h\033[?25l'
-} #}}}1
-function unset-alternate-scrn { #{{{1
-	print -n -- '\033[?1049l\033[?25h'
-} #}}}1
 function set-buffer { # {{{1
 	local i
 	i=$PLAYED

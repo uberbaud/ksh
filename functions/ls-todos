@@ -1,31 +1,44 @@
 # <@(#)tag:csongor.greyshirt.net,2017-08-04:tw/17.02.36z/4702a42>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^G(no arguments)^g
-#:   If there's a ^STODO^s file, show it.
+#: FUNCTION ^[^T-H^t^] ^[^Umatch1^u ^T…^t ^[^UmatchN^u^]^]
+#:   Print any unfinished tasks from ^STODO^s file, possibly filtering.
+#:     ^T-H^t  Print ^N== TODO ==^n header
 
 function ls-todos {
 	[[ -f TODO ]]|| return 0
-	local needsep=false showit=false ln
-	splitstr NL "$(<TODO)" todo
-	for ln in "${todo[@]}"; do
-		[[ $ln == \@* ]]&& {
-			if [[ $ln == *' DONE '* ]]; then
-				showit=false
-				needsep=false
+	local TODO="$(<TODO)" Sep="$NL@ " Head Body ShowIt=false
+	TODO="${TODO#${Sep#$NL}}"
+	splitstr "$Sep" "$TODO" todo
+	: Pipe to sparkle; {
+		[[ ${1:-} == -H ]]&& {
+			print -- "  ^N== TODO ==^n"
+			shift
+		  }
+		Sep=''
+		for Task in "${todo[@]}"; do
+			Head="${Task%%$NL*}"
+			[[ $Head == *' DONE ' ]]&& continue
+			Body="${Task#$Head$NL}"
+			if (($#)); then
+				for Match; do
+					[[ $Body == *$Match* ]]&& {
+						ShowIt=true
+						break
+					  }
+				done
 			else
-				showit=true
+				ShowIt=true
 			fi
-			$needsep && printf ' -----\n'
-			needsep=true
-			continue
-		  }
-		$showit && {
-			(($#))&& { print "  ^F{12}$1^f"; set --; }
-			print "$ln"
-		  }
-	done | sparkle
-	unset todo
+			$ShowIt && {
+				gsub "$NL" "$NL    " "$Body"
+				print "$Sep$Body"
+				Sep="  ^N----^n$NL"
+				ShowIt=false
+			  }
+		done
+	  } | sparkle
+	unset todo REPLY
 }
 
 

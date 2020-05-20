@@ -16,6 +16,7 @@ function todo {
 	local now="$(date -u +'%Y-%m-%d %H:%M:%S Z')"
 	local H="@ $now" TODO="$*"
 	[[ -n $TODO ]]|| TODO="$(vtmp TODO)"
+	[[ -n $TODO ]]|| return 0
 	splitstr NL "$TODO" todo
 	[[ -f RCS/TODO,v ]]&& co -q -l TODO
 	{ printf '%s\n' "$H"; printf '    %s\n' "${todo[@]}"; } >>TODO

@@ -70,7 +70,7 @@ function filter-tasks {
 		Body="${Task#$Head$NL}"
 		head[i]="$Head"
 		body[i]="$Body"
-		[[ $Head == *' DONE ' ]]|| {
+		[[ $Head == *' DONE '* ]]|| {
 			for Match; do
 				[[ $Body == *$Match* ]]|| continue
 				DoneList="$DoneList $i"
@@ -82,7 +82,9 @@ function filter-tasks {
 }
 
 function mark-as-done {
-	head[taskNum]="${head[taskNum]} DONE $TimeStamp"
+set -x
+	local i=$1
+	head[i]="${head[i]} DONE $TimeStamp"
 }
 
 function handle-donelist {
@@ -111,10 +113,16 @@ function handle-donelist {
 
 function update-TODO-file {
 	local Task i=0
+	[[ -f RCS/TODO,v ]]&& co -q -l TODO
 	while ((i<$1)); do
 		print -- "@ ${head[i]}$NL${body[i]}"
 		((i++))
 	done >TODO
+	if [[ -f RCS/TODO,v ]]; then
+		ci -q -j -m'complete' -u TODO
+	elif [[ -d RCS ]]; then
+		ci -q -i -t-'Stuff that needs doing.' -u TODO
+	fi
 }
 
 function main {

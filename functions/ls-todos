@@ -18,7 +18,7 @@ function ls-todos {
 		Sep=''
 		for Task in "${todo[@]}"; do
 			Head="${Task%%$NL*}"
-			[[ $Head == *' DONE ' ]]&& continue
+			[[ $Head == *' DONE '* ]]&& continue
 			Body="${Task#$Head$NL}"
 			if (($#)); then
 				for Match; do

@@ -15,7 +15,7 @@ function usage {
 	===SPARKLE===
 	^F{4}Usage^f: ^T$PGM^t ^[^T-f^t^] ^Ufile^u ^[^Ucheckin message^u^]
 	         Edit a copy of a file in ^B~/hold^b, then overwrite the original
-	         with the copy. (More secure that ^Tdoas vim ^Ufile^u^t).
+	         with the copy. (More secure than ^Tdoas vim ^Ufile^u^t).
 	         ^T-f^t    Force an edit, even if ^Isystem^i and ^Iarchive^i
 	               files differ.
 	       ^T$PGM -h^t
@@ -50,13 +50,9 @@ function warnOrDie { #{{{1
 					"warnOrDie is ^S${warnOrDie}^s.";		;;
 	esac
 } # }}}1
-function as-root { # {{{1
-	doas true || doas true || doas true || return 255
-	doas "$@"
-} # }}}1
 
 (($#))|| die 'Missing required argument ^Ufile^u.'
-needs ci co $ED
+needs ci co $ED as-root
 
 CI_INITIAL_DESCRIPTION='OpenBSD system file'
 LOCKBASE="${XDG_DATA_HOME:?}"/run/suv/locks

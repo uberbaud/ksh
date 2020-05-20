@@ -46,24 +46,24 @@ function warnOrDie { #{{{1
 	esac
 } # }}}1
 
-unalias doas
-needs doas ifconfig
+unalias as-root
+needs as-root ifconfig
 # wrap script guts in a function so edits to this script file don't 
 # affect running instances of the script.
 function main {
 	em0status="$(ifconfig em0|awk -F': ' '/status/ {print $2}')"
 	if [[ $em0status == 'no carrier' ]]; then
-		doas ifconfig em0 down
-		doas ifconfig iwm0 up
-		doas ifconfig iwm0 join "$@"
+		as-root ifconfig em0 down
+		as-root ifconfig iwm0 up
+		as-root ifconfig iwm0 join "$@"
 	else
-		doas ifconfig iwm0 -join "$1"
-		doas ifconfig iwm0 down
-		doas ifconfig em0 up
+		as-root ifconfig iwm0 -join "$1"
+		as-root ifconfig iwm0 down
+		as-root ifconfig em0 up
 	fi
 }
 
-doas true||doas true||doas true|| die "Bad credentials"
+as-root true||as-root true||as-root true|| die "Bad credentials"
 #   v capture a newline in a variable
 IFS='
 '

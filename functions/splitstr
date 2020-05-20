@@ -1,21 +1,21 @@
 # <@(#)tag:csongor.greyshirt.net,2017-08-04:tw/17.08.06z/4ae51ff>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^Ucharstr^u ^Ustring^u ^[^Uarray name^u^]
-#:   Splits a ^Ustring^u on ^Ucharstr^u into ^Uarray name^u (or ^S$reply^s).
+#: FUNCTION ^Umatch^u ^Ustring^u ^[^Uarray name^u^]
+#:   Splits a ^Ustring^u on ^Umatch^u into ^Uarray name^u (or ^S$reply^s).
+#:   where ^Umatch^u is any string, and so is ^Ustring^u.
 
 function splitstr {
-	local IFS="$1"
-	[[ $1 == NL  ]]&&	IFS='
+	local Match="$1" Str="$2" Vname="${3:-reply}" Head i=0
+	[[ $Match == TAB  ]]&&	Match='	' # ← ACTUAL TAB CHARACTER
+	[[ $Match == NL  ]]&&	Match='
 ' # ← SINGLE QUOTE!!! ENCAPSULATING newline
-	[[ $1 == TAB  ]]&&	IFS='	' # ← ACTUAL TAB CHARACTER
-	local reset=false
-	[[ $- == *f* ]]|| {
-		reset=true
-		set -f
-	  }
-	set -A ${3:-reply} -- $2
-	$reset && set +f
+	while [[ $Str == *$Match* ]]; do
+		Head="${Str%%"$Match"*}"
+		Str="${Str#"$Head$Match"}"
+		eval $Vname[i++]=\$Head
+	done
+	eval $Vname[i]=\$Str
 	true
 }
 

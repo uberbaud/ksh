@@ -12,6 +12,7 @@ function warn {
 	else
 		printf '  ^Wwarning^w: %s\n' "$ln1"
 	fi | sparkle
+	false # we got here with a non-zero $?, lets leave that way too
   } >&2
 
 

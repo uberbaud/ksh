@@ -82,7 +82,6 @@ function filter-tasks {
 }
 
 function mark-as-done {
-set -x
 	local i=$1
 	head[i]="${head[i]} DONE $TimeStamp"
 }

@@ -8,6 +8,7 @@ backvol=/vol/gnar
 backroot=$backvol/backups
 backbase=$backroot/${HOST}
 checkonly=false
+onlycheck_attached=false
 
 desparkle "$backbase"
 backbaseD="$REPLY"
@@ -22,6 +23,7 @@ function usage {
 	^F{4}Usage^f: ^T$PGM^t
 	         Performs an ^Trsync^t backup to ^S$backbaseD^s.
 	         ^T-c^t  Only ^Bcheck^b that the backup device is mounted."
+	         ^T-C^t  Only ^Bcheck^b that the backup device is plugged in."
 	       ^T$PGM -h^t
 	         Show this help message.
 	===SPARKLE===
@@ -32,8 +34,9 @@ function bad_programmer {	# {{{2
 	die 'Programmer error:'	\
 		"  No getopts action defined for [1m-$1[22m."
   };	# }}}2
-while getopts ':ch' Option; do
+while getopts ':cCh' Option; do
 	case $Option in
+		C)	onlycheck_attached=true;								;;
 		c)	checkonly=true;											;;
 		h)	usage;													;;
 		\?)	die "Invalid option: [1m-$OPTARG[22m.";				;;
@@ -98,13 +101,22 @@ function standard-backup { # {{{1
 	do-rsync --link-dest="$lastback"
 	rm "$backbase"/current
 } # }}}1
+function check-attached {
+	local diskname diskid allnames
+	IFS=: read diskname diskid <${XDG_CONFIG_HOME:?}/etc/backup-device
+	allnames="$(sysctl -n hw.disknames),"
+	[[ $allnames == *:$diskid,* ]]||
+		die "Backup Device ^S$diskname^s is not attached."
+	true
+}
 function main { # {{{1
+	check-attached; $onlycheck_attached && return
 	mount | egrep -q " $backvol " || die '^Bgnar^b is ^Bnot^b mounted.'
 	[[ -d $backroot ]]|| die 'Required ^B$backroot^b path is missing.'
 	$checkonly && {
 		[[ -d $backbase ]]||
 			warn "Missing host backup directory ^B$backbase^b."
-		exit
+		exit 0 # we can create it later, no need to panic
 	  }
 
 	[[ -d $backbase ]]|| {

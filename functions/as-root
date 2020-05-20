@@ -6,10 +6,11 @@
 
 needs /usr/bin/doas
 function as-root {
-	2>/dev/null /usr/bin/doas -n "$@"	||
-		/usr/bin/doas true				||
-		/usr/bin/doas true				||
-		/usr/bin/doas true				||
+	local cfg=/etc/doas.conf
+	[[ $(/usr/bin/doas -C $cfg "$@") == permit* ]]	||
+		/usr/bin/doas true							||
+		/usr/bin/doas true							||
+		/usr/bin/doas true							||
 		die 'Bad credentials'
 	/usr/bin/doas "$@"
 }

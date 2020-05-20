@@ -45,9 +45,7 @@ function warnOrDie { #{{{1
 } # }}}1
 
 : ${USER:?}
-needs df awk egrep
-
-doas true || doas true || doas true || die 'Could not ^Brootify^b.'
+needs df awk egrep as-root
 
 set -A fatopts -- -t msdos -s -o rw,noexec,nosuid,-g=$USER,-u=$USER
 set -A ffsopts -- -t ffs -s -o rw,noexec,nodev,sync,softdep
@@ -60,18 +58,18 @@ function mnt-fs {
 	desparkle "$mntpnt";	mntpntD="$REPLY"
 	desparkle "$dev";		devD="$REPLY"
 	df -P | egrep -q "^$dev " && return 0
-	[[ -d $mntpnt ]]|| doas mkdir "$mntpnt"
+	[[ -d $mntpnt ]]|| as-root mkdir "$mntpnt"
 	(($?))&& {
 		warn "Could not ^Tmkdir^t ^S$mntpntD^s."
 		return 1
 	  }
 	notify fsck
-	doas fsck -t $2 "$dev" || {
+	as-root fsck -t $2 "$dev" || {
 		warn "Could not ^Tfsck^t ^S$devD^s."
 		return 1
 	}
 	notify "mount $* $dev $mntpnt"
-	doas mount "$@" "$dev" "$mntpnt" || {
+	as-root mount "$@" "$dev" "$mntpnt" || {
 		warn "Could not ^Tmount^t ^S$devD^s."
 		return 1
 	  }
@@ -87,7 +85,7 @@ awkpgm="$(</dev/stdin)" <<-\
 function mnt-drv {
 	dev="$1"
 	id="${2:-}"
-	splitstr NL "$(doas disklabel "$dev" | awk "${awkpgm[@]}")" diskinfo
+	splitstr NL "$(as-root disklabel "$dev" | awk "${awkpgm[@]}")" diskinfo
 	label="${diskinfo[0]}"
 	unset diskinfo[0]; set -A diskinfo -- "${diskinfo[@]}"
 	label="${label%%+([[:space:]])}"

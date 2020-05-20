@@ -1,0 +1,11 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2020-05-20,04.10.32z/2bd403d>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^G(no arguments)^g
+#:   Set alternate screen
+
+function set-alternate-screen {
+	print -n -- '\033[?1049h\033[?25l'
+}
+
+# Copyright © 2020 by Tom Davis <tom@greyshirt.net>.

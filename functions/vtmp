@@ -16,7 +16,7 @@ function vtmp {
 	cat		"$1"
 	rm		"$1"
 	rmdir $PWD
-	builtin cd -
+	builtin cd - >/dev/null 2>&1
 }
 
 

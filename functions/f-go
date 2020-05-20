@@ -5,7 +5,10 @@
 #:   Use ^Tgo -h^t for help
 
 function f-go {
-	eval "$( $LOCALBIN/b-go "$@")"
+	local cmd="$( $LOCALBIN/b-go "$@")"
+	[[ $cmd == cd\ *pwd ]]&&
+		cmd="builtin $cmd;ls-todos -H"
+	eval "$cmd"
   }
 
 # vim: ft=ksh ts=4

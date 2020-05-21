@@ -9,6 +9,7 @@ full_pgm_path="$(readlink -nf "$0")"
 : ${full_pgm_path:?}
 this_pgm="${0##*/}"
 LOGLEVELS='^Bnone^b, ^Bnormal^b, or ^Ball^b.'
+keep=false
 function usage {
 	desparkle "$this_pgm"
 	PGM="$REPLY"
@@ -17,6 +18,7 @@ function usage {
 	^F{4}Usage^f: ^T${PGM}^t ^[-L ^Uloglevel^u^] ^[^Uuser^u^T@^t^]^Uhost^u^T:^t^Uremote dir^u ^Ulocal dir^u
 	         Sync two directories over ssh
 	           ^Ulocal dir^u defaults to \$PWD
+	         ^T-k^t Keep tempory files.
 	         ^T-L^t ^Uloglevel^u
 	             Where loglevel is one of
 	               ^Bnone^b (no output),
@@ -40,7 +42,7 @@ i_am_the_local=true
 i_am_the_remote=false
 integer LOGNONE=-1 LOGNORM=0 LOGDBUG=1
 VERBOSITY_LEVEL=$LOGNORM
-while getopts ':hR:L:' Option; do
+while getopts ':hR:L:k' Option; do
 	case $Option in
 		R)	LOGFILE="$HOME/log/synrdir-$OPTARG"
 			i_am_the_local=false
@@ -54,6 +56,7 @@ while getopts ':hR:L:' Option; do
 				*)	die "Bad ^Ulog level^u, expected one of $LOGLEVELS"; ;;
 			esac
 			;;
+		k)	keep=true;											;;
 		h)	usage;												;;
 		\?)	die "Invalid option: ^B-$OPTARG^b.";				;;
 		\:)	die "Option ^B-$OPTARG^b requires an argument.";	;;
@@ -208,9 +211,13 @@ function l-quit { # {{{1
 } # }}}1
 function l-cleanup { # {{{1
 	[[ -n $tmppath ]]&& {
-		[[ -f $rlst ]]&& rm "$rlst"
-		[[ -f $llst ]]&& rm "$llst"
-		rmdir "$tmppath"
+		if $keep; then
+			notify "Keeping temporary files in ^S$tmppath^s."
+		else
+			[[ -f $rlst ]]&& rm "$rlst"
+			[[ -f $llst ]]&& rm "$llst"
+			rmdir "$tmppath"
+		fi
 	}
 } # }}}1
 function fileagent { # {{{1

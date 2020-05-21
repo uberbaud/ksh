@@ -4,11 +4,20 @@
 
 set -o nounset;: ${FPATH:?Run from within KSH} ${HOST:?}
 
-backvol=/vol/gnar
+fconfig=${XDG_CONFIG_HOME:?}/etc/backup-device
+[[ -f $fconfig ]]||
+	die "Missing configuration file ^S$fconfig^s."
+IFS=: read diskname diskid <$fconfig ||
+	die "Could not read configuration file ^$fconfig^s."
+[[ -n $diskname ]]||	die "Could not read diskname."
+[[ -n $diskid ]]||		die "Could not read diskid."
+
+backvol=/vol/$diskname
 backroot=$backvol/backups
-backbase=$backroot/${HOST}
+backbase=$backroot/${HOST:?}
 checkonly=false
 onlycheck_attached=false
+quiet=false
 
 desparkle "$backbase"
 backbaseD="$REPLY"
@@ -21,9 +30,14 @@ function usage {
 	sparkle >&2 <<-\
 	===SPARKLE===
 	^F{4}Usage^f: ^T$PGM^t
-	         Performs an ^Trsync^t backup to ^S$backbaseD^s.
-	         ^T-c^t  Only ^Bcheck^b that the backup device is mounted."
-	         ^T-C^t  Only ^Bcheck^b that the backup device is plugged in."
+	         Performs an ^Trsync^t backup to ^S/vol/^Udisk name^u/backups/^U\$HOST^u^s
+	         currently: ^S$backbaseD^s.
+	         ^T-C^t  Only ^Bcheck^b that backup device ^S$diskid^s is plugged in.
+	         ^T-c^t  Only ^Bcheck^b that the backup device is mounted
+	             at ^S$backvol^s.
+	         ^T-q^t  Suppress availabilty failure messages.
+	           ^GUses configuration file ^S$fconfig^s^g
+	           ^Gwith one line formated ^Udisk name^u:^Udisk id^u.^g
 	       ^T$PGM -h^t
 	         Show this help message.
 	===SPARKLE===
@@ -34,10 +48,11 @@ function bad_programmer {	# {{{2
 	die 'Programmer error:'	\
 		"  No getopts action defined for [1m-$1[22m."
   };	# }}}2
-while getopts ':cCh' Option; do
+while getopts ':cCqh' Option; do
 	case $Option in
 		C)	onlycheck_attached=true;								;;
 		c)	checkonly=true;											;;
+		q)	quiet=true;												;;
 		h)	usage;													;;
 		\?)	die "Invalid option: [1m-$OPTARG[22m.";				;;
 		\:)	die "Option [1m-$OPTARG[22m requires an argument.";	;;
@@ -48,14 +63,7 @@ done
 shift $(($OPTIND - 1))
 # ready to process non '-' prefixed arguments
 # /options }}}1
-function warnOrDie { #{{{1
-	case $warnOrDie in
-		die)  die "$@" 'Use [1m-f22m to force an edit.';		;;
-		warn) warn "$@";											;;
-		*)    die '[1mProgrammer error[22m:' \
-					'warnOrDie is [1m${warnOrDie}[22m.';		;;
-	esac
-} # }}}1
+(($#))&& die 'Unexpected arguments.'
 
 needs awk egrep mount rsync
 
@@ -73,6 +81,10 @@ rsync_opts="$(awk '{print $1}')" <<-\
 	--whole-file		# don't use delta-xfer (faster on local hd)
 	===
 
+function dieQuietly { #{{{1
+	$quiet && exit 1
+	die "$@"
+} #}}}1
 function Now { date -u +'%Y-%m-%d_%H:%M:%SZ'; }
 function do-rsync { # {{{1
 	notify 'BEGIN COPY'
@@ -101,17 +113,20 @@ function standard-backup { # {{{1
 	do-rsync --link-dest="$lastback"
 	rm "$backbase"/current
 } # }}}1
-function check-attached {
-	local diskname diskid allnames
-	IFS=: read diskname diskid <${XDG_CONFIG_HOME:?}/etc/backup-device
+function check-attached { #{{{
+	local allnames
 	allnames="$(sysctl -n hw.disknames),"
 	[[ $allnames == *:$diskid,* ]]||
-		die "Backup Device ^S$diskname^s is not attached."
+		dieQuietly "Backup Device ^S$diskname^s is not attached."
 	true
+} #}}}1
+function check-mounted {
+	mount | egrep -q " $backvol " ||
+		dieQuietly "^B$diskname^b is ^Bnot^b mounted."
 }
 function main { # {{{1
 	check-attached; $onlycheck_attached && return
-	mount | egrep -q " $backvol " || die '^Bgnar^b is ^Bnot^b mounted.'
+	check-mounted
 	[[ -d $backroot ]]|| die 'Required ^B$backroot^b path is missing.'
 	$checkonly && {
 		[[ -d $backbase ]]||

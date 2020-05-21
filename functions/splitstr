@@ -15,7 +15,7 @@ function splitstr {
 		Str="${Str#"$Head$Sep"}"
 		eval $Vname[i++]=\$Head
 	done
-	eval $Vname[i]=\$Str
+	eval "[[ -n \$Str ]] && $Vname[i]=\$Str"
 	true
 }
 

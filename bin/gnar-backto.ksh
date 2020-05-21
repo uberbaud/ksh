@@ -15,8 +15,9 @@ IFS=: read diskname diskid <$fconfig ||
 backvol=/vol/$diskname
 backroot=$backvol/backups
 backbase=$backroot/${HOST:?}
-checkonly=false
+onlycheck_mounted=false
 onlycheck_attached=false
+stop_after_mount=false
 quiet=false
 
 desparkle "$backbase"
@@ -35,6 +36,8 @@ function usage {
 	         ^T-C^t  Only ^Bcheck^b that backup device ^S$diskid^s is plugged in.
 	         ^T-c^t  Only ^Bcheck^b that the backup device is mounted
 	             at ^S$backvol^s.
+	         ^T-m^t  Mount backup device if not already mounted, but
+	             don't perform backup.
 	         ^T-q^t  Suppress availabilty failure messages.
 	           ^GUses configuration file ^S$fconfig^s^g
 	           ^Gwith one line formated ^Udisk name^u:^Udisk id^u.^g
@@ -48,10 +51,11 @@ function bad_programmer {	# {{{2
 	die 'Programmer error:'	\
 		"  No getopts action defined for [1m-$1[22m."
   };	# }}}2
-while getopts ':cCqh' Option; do
+while getopts ':cCmqh' Option; do
 	case $Option in
 		C)	onlycheck_attached=true;								;;
-		c)	checkonly=true;											;;
+		c)	onlycheck_mounted=true;									;;
+		m)	stop_after_mount=true;									;;
 		q)	quiet=true;												;;
 		h)	usage;													;;
 		\?)	die "Invalid option: [1m-$OPTARG[22m.";				;;
@@ -65,7 +69,7 @@ shift $(($OPTIND - 1))
 # /options }}}1
 (($#))&& die 'Unexpected arguments.'
 
-needs awk egrep mount rsync
+needs awk egrep mount rsync usb-mnt
 
 rsync_opts="$(awk '{print $1}')" <<-\
 	===
@@ -118,26 +122,35 @@ function check-attached { #{{{
 	allnames="$(sysctl -n hw.disknames),"
 	[[ $allnames == *:$diskid,* ]]||
 		dieQuietly "Backup Device ^S$diskname^s is not attached."
+	$onlycheck_attached && exit
 	true
 } #}}}1
-function check-mounted {
-	mount | egrep -q " $backvol " ||
-		dieQuietly "^B$diskname^b is ^Bnot^b mounted."
-}
-function main { # {{{1
-	check-attached; $onlycheck_attached && return
-	check-mounted
-	[[ -d $backroot ]]|| die 'Required ^B$backroot^b path is missing.'
-	$checkonly && {
-		[[ -d $backbase ]]||
-			warn "Missing host backup directory ^B$backbase^b."
-		exit 0 # we can create it later, no need to panic
+function check-mounted { #{{{1
+	local rc
+	mount | egrep -q " $backvol "
+	rc=$?
+	$onlycheck_mounted && {
+		(($rc))&&
+			dieQuietly "Backup Device ^S$diskname^s is not mounted."
+		exit $rc
 	  }
+	return $rc
+} #}}}1
+function try-mounting { #{{{1
+	notify "Trying to mount ^S$diskname^s."
+	usb-mnt
+	check-mounted ||
+		die "Could not mount ^S$diskname^s at ^S$backvol^s."
+} #}}}1
 
+function main { # {{{1
+	check-attached
+	check-mounted || try-mounting
 	[[ -d $backbase ]]|| {
 		warn "Creating missing host backup directory ^B$backbase^b."
-		mkdir "$backbase" || die "Could not ^Tmkdir^t ^B$backbase^b."
+		mkdir -p "$backbase" || die "Could not ^Tmkdir^t ^B$backbase^b."
 	}
+	$stop_after_mount && return
 
 	splitstr : "$(getent passwd $(id -un))"
 	readonly realhome="${reply[5]}"

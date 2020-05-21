@@ -17,9 +17,10 @@ function usage {
 	         Update hold/DOCSTORE and sync with uberbaud.net.
 	       ^T${PGM} -h^t
 	         Show this help message.
-	    ^GNote^g
+	    ^GNote on Environment Variables:^g
+	       Exporting ^S\$KEEP_FILES^s will cause ^Tsynrdir^t to keep work files.
 	       Exporting ^S\$LOGLEVEL^s will set ^Tsynrdir^t to that log level.
-	       Use ^Tsynrdir -h^t for allowable values.
+	         Use ^Tsynrdir -h^t for allowable values.
 	===SPARKLE===
 	exit 0
 } # }}}
@@ -48,7 +49,7 @@ docstore=$HOME/hold/DOCSTORE
 [[ -d $docstore ]]|| die "^B$docstore^b is not a directory."
 cd "$docstore" || die "Could not ^Tcd^t to ^B$docstore^b."
 
-synropt="${LOGLEVEL:+"-L $LOGLEVEL"}"
+synropt="${LOGLEVEL:+"-L $LOGLEVEL"} ${KEEP_FILES:+-k}"
 
 function main {
 	notify "Updating ^SDOCSTORE^s"

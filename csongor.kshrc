@@ -4,12 +4,12 @@
 
 # paths
 export PERL_CPANM_HOME=$xdgdata/cpanm
-export PERLBREW_ROOT=$xdgdata/perl5/perlbrew
+export PERLBREW_ROOT=$xdgdata/perlbrew
 export PERLBREW_HOME=$xdgcache/perlbrew
 export PERLBREW_SKIP_INIT=''
-export PERLBREW_LIB=''
-perlbrew_rc=$PERLBREW_ROOT/etc/perlbrew.ksh
-[[ -f $perlbrew_rc ]]&& . $perlbrew_rc
+export PERLBREW_LIB=$PERLBREW_ROOT/perls/current/lib
+#perlbrew_rc=$PERLBREW_ROOT/etc/perlbrew.ksh
+#[[ -f $perlbrew_rc ]]&& . $perlbrew_rc
 export GOPATH=$xdgdata/go
 export JDK_PATH=/usr/local/jdk-1.8.0/bin
 

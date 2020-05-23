@@ -1,0 +1,14 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2020-05-23,00.59.43z/4d187c0>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^G(no arguments)^g
+#:   Wrapper around cpanm
+
+needs cpanm
+function f-cpanm {
+	local log=$HOME/hold/$(uname -r)/cpanm-install.lst
+	for a { print -- "$a" >>$log; }
+	command cpanm -l $XDG_DATA_HOME "$@"
+}
+
+# Copyright © 2020 by Tom Davis <tom@greyshirt.net>.

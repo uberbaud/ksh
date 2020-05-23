@@ -91,19 +91,22 @@ export LOCALBIN=$xdgdata/bin
 # LUA wants SEMICOLON separated PATTERNS, empty item is default
 export LUA_PATH_5_3="$xdgdata/lua/5.3/?.lua;$xdgdata/lua/5.3/?/init.lua;;"
 export LUA_CPATH_5_3="$xdgdata/lua/5.3/?.so;;"
-export PERL5LIB=$xdgdata/perl5/twlib${CPANMLIB:+:$CPANMLIB}
-#export RAKUDO_HOME=$xdgdata/rakudo
-#export RAKUDO_BIN=$RAKUDO_HOME/install/bin
-#	RAKUDO_BIN=$RAKUDO_BIN:$RAKUDO_HOME/install/share/perl6/site/bin
 export CARGO_HOME=$xdgcfg/cargo
 export TEMPLATES_FOLDER=$xdgdata/templates
 export TMPDIR=$xdgcache/temp
 export USRBIN=$HOME/bin/ksh
 export PERL_UNICODE=AS
-export USR_PLIB=$PERL5LIB
 
 ####### IMPORT LOCAL BITS
 [[ -f $KDOTDIR/$HOST.kshrc ]]&& . $KDOTDIR/$HOST.kshrc
+
+# have cpanm install things where we want them
+export USR_PLIB=$xdgdata/lib/perl5
+export PERL5LIB=$USR_PLIB
+# ^ add? -> # ${PERLBREW_LIB:+:$PERLBREW_LIB}
+export PERL_MB_OPT="--install_base $USR_PLIB"
+export PERL_MM_OPT="INSTALL_BASE=$USR_PLIB"
+
 
 ####### SET PATH
 [[ -d $HOME/bin ]]&&
@@ -114,6 +117,8 @@ export USR_PLIB=$PERL5LIB
 [[ :$PATH: == *:$USRBIN:*			]]|| PATH="$USRBIN:$PATH"
 [[ :$PATH: == *:/usr/games:*		]]|| PATH="$PATH:/usr/games"
 [[ :$PATH: == *:${JDK_PATH:-///}:*	]]|| PATH="$PATH:$JDK_PATH"
+PERLBREW_BIN=$PERLBREW_ROOT/perls/current/bin
+[[ :$PATH: == *:$PERLBREW_BIN:*		]]|| PATH="$PERLBREW_BIN:$PATH"
 
 # input, locale, and such
 set -o vi -o vi-tabcomplete

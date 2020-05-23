@@ -4,14 +4,22 @@
 #: FUNCTION ^Ucmd^u ^Uarg1^u ^S…^s ^UargN^u
 #:   Run doas, but with three (3) tries.
 
-needs /usr/bin/doas
+needs /usr/bin/doas prn-cmd
 function as-root {
 	local cfg=/etc/doas.conf
+	# if we're not interactive, print what we're doing
+	[[ $- == *i* ]]|| {
+		print -n '\033[1mdoas>\033[39m '
+		prn-cmd "$@"
+	  } >&2
+	# check that we need a password, then get it with true
 	[[ $(/usr/bin/doas -C $cfg "$@") == permit* ]]	||
 		/usr/bin/doas true							||
 		/usr/bin/doas true							||
 		/usr/bin/doas true							||
 		die 'Bad credentials'
+	# now that we have credentials attached, we can run the command
+	# without entering it again.
 	/usr/bin/doas "$@"
 }
 

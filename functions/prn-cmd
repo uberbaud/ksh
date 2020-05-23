@@ -1,0 +1,15 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2020-05-23,01.26.13z/1813adb>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^G(no arguments)^g
+#:   ^BPrint^b ^Ucommand^u ^Uargs underlined^u
+
+function prn-cmd {
+	local U='[4m' u='[24m'
+	(($#))|| return
+	print -rn -- "[1m$1[22m"; shift
+	for a { print -rn -- " $U$a$u"; }
+	print
+}
+
+# Copyright © 2020 by Tom Davis <tom@greyshirt.net>.

@@ -7,17 +7,12 @@
 #:   Cannot ^TSQLify^t variables named ^Sn^s, ^So^s, ^Sp^s, or ^St^s.
 
 function SQLifyOne {
-	[[ $1 == ?(n|o|p|t) ]]&&
-		die 'Cannot ^TSQLify^t variables named ^Sn^s, ^So^s, ^Sp^s, or ^S^t^s.'
-	local n o p='' t
-	eval t="\$$1"
-	[[ -z $t ]]&& { eval $1=NULL; return; }
-	while [[ $t == *\'* ]]; do
-		p="$p${t%%\'*}''"
-		t="${t#*\'}"
+	eval "set -- '$1' '' \"\$$1\""
+	[[ -z $3 ]]&& { eval $1=NULL; return; }
+	while [[ $3 == *\'* ]]; do
+		set -- "$1" "$2${3%%\'*}''" "${3#*\'}"
 	done
-
-	eval "$1=\$p\$t"
+	eval "$1=\'\$2\$3\'"
 }
 
 function SQLify { while (($#)) { SQLifyOne $1; shift; }; }

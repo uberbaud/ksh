@@ -13,6 +13,10 @@ function as-root {
 		print -n '\033[48;5;217;31mdoas>\033[39m '
 		prn-cmd "$@"
 	  } >&2
+	# check if we're always denied before we require a password or three
+	[[ $(/usr/bin/doas -C $cfg "$@") == deny ]]&&
+		die '^Tdoas^t is ^Wdenied^w for this user with this command.'
+
 	# check that we need a password, then get it with true
 	[[ $(/usr/bin/doas -C $cfg "$@") == 'permit nopass' ]]	||
 		/usr/bin/doas true									||

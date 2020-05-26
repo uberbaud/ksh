@@ -16,9 +16,8 @@
     (. /etc/suid_profile))
 
   (.Interactive: If ENV is set eg:
-    (`export ENV=$XDG_CONFIG_HOME/ksh/kshrc)
+    ('export ENV=$XDG_CONFIG_HOME/ksh/kshrc')
     then the file named by $ENV is executed.)
-
 
 
 ; <@(#)tag:csongor.greyshirt.net,2017-04-13:tw/05.55.29z/1ce9ea9>

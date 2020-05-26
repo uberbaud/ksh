@@ -37,16 +37,7 @@ done
 shift $((OPTIND-1))
 # ready to process non '-' prefixed arguments
 # /options }}}1
-function warnOrDie { #{{{1
-	case $warnOrDie in
-		die)  die "$@" 'Use [1m-f22m to force an edit.';		;;
-		warn) warn "$@";											;;
-		*)    die '[1mProgrammer error[22m:' \
-					'warnOrDie is [1m${warnOrDie}[22m.';		;;
-	esac
-} # }}}1
 
-unalias as-root
 needs as-root ifconfig
 # wrap script guts in a function so edits to this script file don't 
 # affect running instances of the script.
@@ -63,8 +54,6 @@ function main {
 	fi
 }
 
-as-root true||as-root true||as-root true|| die "Bad credentials"
-#   v capture a newline in a variable
 IFS='
 '
 #   ^ capture a newline in a variable

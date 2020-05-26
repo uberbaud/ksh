@@ -10,7 +10,7 @@ function as-root {
 	local cfg=/etc/doas.conf
 	# if we're not interactive, print what we're doing
 	[[ $- == *i* ]]|| {
-		print -n '\033[48;5;217;31mdoas>\033[39m '
+		print -n '\033[41;37mdoas>\033[49;31m '
 		prn-cmd "$@"
 	  } >&2
 	# check if we're always denied before we require a password or three

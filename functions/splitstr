@@ -7,6 +7,7 @@
 
 function splitstr {
 	local Sep="$1" Str="$2" Vname="${3:-reply}" Head i=0
+	unset -v $Vname
 	[[ $Sep == TAB  ]]&&	Sep='	' # ← ACTUAL TAB CHARACTER
 	[[ $Sep == NL  ]]&&	Sep='
 ' # ← SINGLE QUOTE!!! ENCAPSULATING newline

@@ -48,7 +48,6 @@ function main {
 		as-root ifconfig iwm0 up
 		as-root ifconfig iwm0 join "$@"
 	else
-		as-root ifconfig iwm0 -join "$1"
 		as-root ifconfig iwm0 down
 		as-root ifconfig em0 up
 	fi

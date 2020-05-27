@@ -140,8 +140,8 @@ TOMORROW="$(date -r $((TS+86400)) +'%b %d ')"
 expectday=''
 nt='
 	' # <<< NEWLINE,TAB
-gsub "$nt" ' ' "$evblob" # deformat multiline events
-splitstr NL "$REPLY" calevs
+gsub "$nt" ' ' "$evblob" evblob  # deformat multiline events
+splitstr NL "$evblob" calevs
 for ln in "${calevs[@]}"; do
 	splitstr TAB "$ln" tuple
 	[[ ${tuple[0]:-} == $expectday ]]|| {

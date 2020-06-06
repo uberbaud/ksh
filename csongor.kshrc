@@ -12,6 +12,8 @@ export PERLBREW_LIB=$PERLBREW_ROOT/perls/current/lib
 #[[ -f $perlbrew_rc ]]&& . $perlbrew_rc
 export GOPATH=$xdgdata/go
 export JDK_PATH=/usr/local/jdk-1.8.0/bin
+export RAKUBREW_HOME=$xdgdata/rakubrew
+eval "$($RAKUBREW_HOME/bin/rakubrew init Sh)"
 
 # default apps
 export BROWSER="$(<$xdgcfg/etc/browser)"

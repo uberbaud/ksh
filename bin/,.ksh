@@ -70,6 +70,9 @@ new-array opts
 +opts	-password	' '
 +opts	-info		"'I can't die but once.' -- Harriet Tubman"
 
+COMPTON=$(pgrep compton)
+[[ -n $COMPTON ]]&& kill $COMPTON
+
 xlock "${opts[@]}" &
 xlock_pid=$!
 
@@ -85,8 +88,9 @@ sync	# if the battery runs out while we're hibernating, ¿maybe?
   }
 
 # pause here untile we've unlocked the screen
-
 wait $xlock_pid
+
+[[ -n $COMPTON ]]&& compton -b --config $XDG_CONFIG_HOME/x11/compton.conf
 
 $BATUX >>$HOME/log/battery-monitor
 

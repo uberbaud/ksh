@@ -1,0 +1,16 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2020-06-06,14.31.20z/4e5f29>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^[^Ulogname^u^]
+#:   Redirects ^Sstderr^s to ^S${^s^Ulogname^u^F{13}:-^f~/log/^S${^s^N0^n^F{13}##^f^F{3}*^f/^}.log^}
+
+# 1. We want to keep $0 as the CALLERs name, so we use bash style
+#    declaration FUNC ()
+# 2. We don't want an alias expansion to create a function with some
+#    other name, so quote (at least) part of the name
+\log-stderr () {
+	exec 2>${1:-~/log/${0##*/}.log}
+	set -o verbose -o xtrace
+}
+
+# Copyright © 2020 by Tom Davis <tom@greyshirt.net>.

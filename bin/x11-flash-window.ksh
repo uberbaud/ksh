@@ -77,8 +77,9 @@ function main {
 
 	xdotool windowraise $1 || die "Could not raise window."
 
-	typeset -i WINDOW X Y WIDTH HEIGHT SCREEN
-	eval $(xdotool getwindowgeometry --shell $1)
+	# make sure variables are not typeset weirdly
+	unset WINDOW X Y WIDTH HEIGHT SCREEN
+	eval "$(xdotool getwindowgeometry --shell $1)"
 	(($1==WINDOW))||
 		die 'Weird geometry results.' \
 			"WINDOW $WINDOW, X $X, Y $Y, WIDTH $WIDTH, HEIGHT $HEIGHT"

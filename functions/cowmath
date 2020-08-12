@@ -6,7 +6,9 @@
 
 needs cowsay bc lolcat
 function cowmath {
-	cowsay -- "$* = $(print -- "$*"|bc)" | lolcat
+	MSG='Moo?'
+	(($#))&& MSG="$* = $(print -- "$*"|bc)"
+	cowsay -- "$MSG" | lolcat
 }
 
 

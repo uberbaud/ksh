@@ -242,7 +242,7 @@ unset p i
 alias clear='f-clear ' # expand alias of $2
 alias cls='clear colorls $LS_OPTIONS'
 alias doas='as-root '
-alias i-can-haz-inet='i-can-haz-inet;E=$?;printf "  %s\n" "$REPLY";(return $E)&&:'
+alias i-can-haz-inet='i-can-haz-inet;E=$?;print -r -- "  $REPLY";(return $E)&&:'
 alias ls='/usr/local/bin/colorls $LS_OPTIONS'
 alias noglob='set -f;noglob '; function noglob { set +f; ("$@"); }
 alias hush='>/dev/null 2>&1 '

@@ -57,7 +57,7 @@ function reshell {
 
 	set -A setenvs -- SHELL="$s"
 	for k in "${keepvars[@]}"; do
-		eval 'v="$'"$k"'"'
+		eval v=\$k
 		[[ -n $v ]]&& setenvs[${#setenvs[*]}]="$k=$v"
 	done
 

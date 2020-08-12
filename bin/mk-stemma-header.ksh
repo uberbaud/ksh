@@ -13,12 +13,12 @@ function usage {
 	===SPARKLE===
 	^F{4}Usage^f: ^T$PGM^t ^[^Uoptions^u^]
 	         Make a ^Uwhat^u and ^URFC4151 tag^u compatible stemma
-	             ^I<marker+tag:machine.domain,date:user/timez/uniqrand>^i
-	             ^T-H^t ^Udomain^u        defaults to ^T\${URI_AUTHORITY-\${EMAIL#*@}}^t
+	             ^I<marker+tag:user.machine.domain,date,timez/uniqrand>^i
+	             ^T-U^t ^Uuser^u          defaults to ^T\$(id -n)^t
 	             ^T-M^t ^Umachine name^u  defaults to ^T\${\$(uname -m)%.*}^t
+	             ^T-H^t ^Udomain^u        defaults to ^T\${URI_AUTHORITY-\${EMAIL#*@}}^t
 	             ^T-D^t ^Uiso date^u      defaults to ^T\$(date -u +%Y-%m-%d)^t
 	             ^T-T^t ^Utimez^u         defaults to ^T\$(date -u +%H.%M.%Sz)^t
-	             ^T-U^t ^Uuser^u          defaults to ^T\$(id -n)^t
 	         It is an error to specify a date or time but not both.
 	       ^T$PGM -h^t
 	         Show this help message.
@@ -105,11 +105,12 @@ fi
 D="${DTs%:*}"
 T="${DTs#*:}"
 
-# Use the pid, but prefix it with 1–2 digits, and suffix it with 1
-# digit, making the result unpredictable while maintaining uniqueness.
-random -e 100;	A=$?; ((A))|| A='' # 0 prefix is octal, so don't
+# Use the pid, but suffix it with with 3 digits, making the result
+# unpredictable while maintaining uniqueness.
+random -e 10;	A=$?;
 random -e 10;	B=$?
-typeset -i16 X=$A$$$B
+random -e 10;	C=$?
+typeset -i16 X=$$$A$B$C
 [[ -n ${M:-} ]]|| { M="$(uname -n)"; M="${M%.*}"; }
 [[ -n ${U:-} ]]|| { U="$(id -un)"; }
 [[ -n ${H:-} ]]|| { H="${URI_AUTHORITY-${EMAIL#*@}}"; }

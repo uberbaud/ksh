@@ -45,9 +45,11 @@ function warnOrDie { #{{{1
 } # }}}1
 function expire-old-mail { # {{{1
 	print -nu2 ' [34m>>>[0m [1mDeleting[0m old trash ... '
-	pick -before -30 +deleted -seq expired 2>/dev/null &&
+	if pick -before -30 +deleted -seq expired 2>/dev/null; then
 		rmm -unlink expired
-	forceline
+	else
+		print -- '^Gnothing to delete.^g' | sparkle
+	fi
 } # }}}1
 function Done { # {{{1
 	[[ -z "$(flist +inbox -sequence marked -fast -noshowzero)" ]]

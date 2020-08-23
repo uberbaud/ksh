@@ -43,11 +43,12 @@ function warnOrDie { #{{{1
 					'warnOrDie is [1m${warnOrDie}[22m.';		;;
 	esac
 } # }}}1
-function expire { # {{{1
+function expire-old-mail { # {{{1
+	print -nu2 ' [34m>>>[0m [1mDeleting[0m old trash ... '
 	pick -before -30 +deleted -seq expired &&
 		rmm -unlink expired
 	forceline
-} # }}}1
+} 2>/dev/null # }}}1
 function Done { # {{{1
 	[[ -z "$(flist +inbox -sequence marked -fast -noshowzero)" ]]
 } # }}}1
@@ -89,6 +90,8 @@ function X { # {{{1
 	  }
 } # }}}1
 
+expire-old-mail
+
 # X  Key    Pattern                        mailbox       message
 # ─ ─────  ─────────────────────────────  ────────────  ───────────────
   X -from  '@yt\.lan'                     yt.lan        '@yt.lan'
@@ -99,9 +102,7 @@ function X { # {{{1
 CIP='alexepstein@industrialprogress.net'
   X -from  "$CIP"                         energy        'CIP'
   X -from  'LowesEreceipt@lowes\.com'     receipts      "Lowe's Receipt"
-
-print -nu2 ' [34m>>>[0m [1mDeleting[0m old trash ... '
-expire 2>/dev/null
+  X -from  'permies@permies.com'          permies       "permies"
 
 if Done; then
     print -u2 ' [34m>>>[0m No messages to [1mremove[0m.'

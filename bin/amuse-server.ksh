@@ -69,12 +69,13 @@ function play-file { # {{{1
 	print $! >player-pid
 	wait $! || action=paused
 	: >player-pid
-	[[ -s again || -s paused-at ]]||
+	[[ -s again || -s paused-at ]]|| {
 		PlayingBuf="$(<playing)"
 		: >playing
 		PlayedBuf="$(<played.lst)"
 		print -r -- "$PlayingBuf" >played.lst
 		print -r -- "$PlayedBuf" >>played.lst
+	  }
 	print $action >sigpipe
 } # }}}1
 function play-one-song { #{{{1
@@ -82,7 +83,9 @@ function play-one-song { #{{{1
 	[[ -s player-pid ]]&& return 1
 
 	# keep or put next song in playing
+
 	if [[ -s playing && -s paused-at ]]; then
+		# song was paused
 		startpos=$(<paused-at)
 	elif [[ -s playing && -s again ]]; then
 		N=$(<again)
@@ -93,12 +96,12 @@ function play-one-song { #{{{1
 		fi
 		startpos=
 	else
+		# Grab the song from the list
 		fpop song.lst >playing || return 1
 		startpos=
 	fi
 	read amuse_id song <playing
 	file-from-id "$amuse_id"
-	#notify "$song"
 	play-file "$REPLY" $startpos &
 	FN_PLAY_PID=$!
 

@@ -220,8 +220,7 @@ for p in f amuse; do
 	for i in $F/$p-*; { i="${i#$F/}"; alias "${i#$p-}=$i"; }
 done
 # and some special love for amuse: bits
-for i in $F/amuse:*; { i="${i#$F/}"; alias "@${i#amuse:}=$i"; }
-amuse:cmd-wrappers
+amuse:create-cmd-wrappers
 # noglobs
 for i in cowmath math note; { alias $i="noglob $i"; }
 alias mathcow="noglob cowmath"

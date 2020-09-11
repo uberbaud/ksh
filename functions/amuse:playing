@@ -5,7 +5,7 @@
 #:   Show what's playing
 
 needs amuse:env
-function amuse-playing {
+function amuse:playing {
 	local P
 	amuse:env
 	P="$AMUSE_RUN_DIR"/playing

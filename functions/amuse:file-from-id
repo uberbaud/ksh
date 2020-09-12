@@ -1,0 +1,20 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2020-09-12,00.25.59z/354958e>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Usong id^u
+#:   Does a database lookup.
+
+needs amuse:env grep notify sqlite3
+function amuse:file-from-id {
+	local D Q R F P
+	amuse:env
+	D="${AMUSE_DATA_HOME:?}"/amuse.db3
+	Q="SELECT pcm_sha384b FROM files WHERE id = ${1:?}"
+	R="$(sqlite3 "$D" "$Q" 2>/dev/null | grep -v '^--')"
+	F="${R#?}"
+	P="${R%"$F"}"
+	REPLY="$AMUSE_DATA_HOME/$P/$F.oga"
+	notify "$P/$F.oga"
+}
+
+# Copyright © 2020 by Tom Davis <tom@greyshirt.net>.

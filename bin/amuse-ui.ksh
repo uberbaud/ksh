@@ -49,7 +49,7 @@ function get-size { #{{{1
 	PLAYED=$(((LINES-2)/4))
 	PLAYING=$((PLAYED+1))
 } #}}}1
-function set-buffer { # {{{1
+function update-screen { # {{{1
 	local i
 	i=$PLAYED
 	while ((i)); do
@@ -97,22 +97,22 @@ function set-buffer { # {{{1
 	[[ -s again ]]&&
 		status="$status again: $(<again) "
 	L="$status"
-	print -n -- "\033[$i;1H $L "
+	print -n -- "\033[$i;1H $L \033[0m"
 } # }}}1
 function main-loop { #{{{1
 	get-size
-	set-alternate-scrn
-	set-buffer
+	set-alternate-screen
 	while $CONTINUE; do
+		update-screen
 		jobs -p %sleep >/dev/null 2>&1 || { sleep 999 & }
 		wait %sleep
 	done
 	kill -TERM %sleep  >/dev/null 2>&1
 } #}}}1
-function CleanUp { unset-alternate-scrn; : >ui-pid; }
-function hTerm	{ CONTINUE=false;		}
-function hWinch	{ get-size; set-buffer;	}
-function hUsr	{ set-buffer;			}
+function CleanUp { unset-alternate-screen; : >ui-pid;	}
+function hTerm	{ CONTINUE=false;						}
+function hWinch	{ get-size;								}
+function hUsr	{ :;									}
 
 needs amuse:env
 

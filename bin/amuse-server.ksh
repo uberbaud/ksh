@@ -28,8 +28,8 @@ function bad_programmer {	# {{{2
 while getopts ':h' Option; do
 	case $Option in
 		h)	usage;													;;
-		\?)	fullstop "Invalid option: ^B-$OPTARG^b.";				;;
-		\:)	fullstop "Option ^B-$OPTARG^b requires an argument.";	;;
+		\?)	fullstop "Invalid option: -$OPTARG.";					;;
+		\:)	fullstop "Option -$OPTARG requires an argument.";		;;
 		*)	bad_programmer "$Option";								;;
 	esac
 done
@@ -193,7 +193,7 @@ function evloop { # {{{1
 
 # do everything in the AMUSE RUN DIRECTORY
 builtin cd "${AMUSE_RUN_DIR:?}" ||
-	fullstop 'Could not ^Tcd^t to ^S^B$AMUSE_RUN_DIR^s.'
+	fullstop 'Could not `cd` to "$AMUSE_RUN_DIR".'
 [[ -a sigpipe ]]&& fullstop 'Server already running.'
 
 mkfifo sigpipe || fullstop 'Is server already running?'

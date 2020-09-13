@@ -12,8 +12,8 @@
 #:   Uses ^S$SQL_VERBOSE^s (^Itrue^i or ^Ifalse^i). Defaults to ^S${verbose:-^s^Nfalse^n^S}^s.
 #:   ^NSee also: SQLify^n
 
+needs sqlite3
 function SQL {
-	needs sqlite3
 	local sql response READY='\007\007\007' # three bells
 	local verbose="${SQL_VERBOSE:-${verbose:-false}}"
 	local autodie="${SQL_AUTODIE:-true}" autowarn=false

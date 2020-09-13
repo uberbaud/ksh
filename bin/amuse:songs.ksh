@@ -75,7 +75,8 @@ function show-raw {
 
 function show-full {
 	SQL <<-==SQLITE==
-	SELECT id, performer || '|' || album || '|' || track || '|' || song
+	SELECT id,
+		performer || '|' || album || '|' || track || '|' || song || '|' || dtenths
 	  FROM vsongs
 	 WHERE id IN (
 		 SELECT file

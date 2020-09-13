@@ -9,10 +9,14 @@ function amuse:file-from-id {
 	local D Q R F P
 	amuse:env
 	D="${AMUSE_DATA_HOME:?}"/amuse.db3
-	Q="SELECT pcm_sha384b FROM files WHERE id = ${1:?}"
-	R="$(sqlite3 "$D" "$Q" 2>/dev/null | grep -v '^--')"
-	F="${R#?}"
-	P="${R%"$F"}"
+	# @@@ will be the separator between sqlite3 informative output and
+	# real data
+	Q="SELECT '@@@',pcm_sha384b, dseconds FROM files WHERE id = ${1:?}"
+	set -- $(sqlite3 -separator ' ' "$D" "$Q" 2>/dev/null)
+	while [[ $1 != @@@ ]] { shift; }; shift
+	F="${1#?}"
+	P="${1%"$F"}"
+	DURATION="$2"
 	REPLY="$AMUSE_DATA_HOME/$P/$F.oga"
 	notify "$P/$F.oga"
 }

@@ -65,8 +65,9 @@ function file-from-id { # {{{1
 } # }}}1
 function play-file { # {{{1
 	local action=played PlayedBuf PlayingBuf
-	play-one-ogg "$1" ${2:-} >paused-at &
+	play-one-ogg "$1" ${2:-} >paused-at 3>timeplayed &
 	print $! >player-pid
+	: >timeplayed
 	wait $! || action=paused
 	: >player-pid
 	[[ -s again || -s paused-at ]]|| {
@@ -199,13 +200,12 @@ builtin cd "${AMUSE_RUN_DIR:?}" ||
 mkfifo sigpipe || fullstop 'Is server already running?'
 print -- $$ >server-pid
 
+SQLSEP='	'
 SQL "ATTACH '$AMUSE_DATA_HOME/amuse.db3' AS amuse;"
 
 trap hQuit		TERM QUIT
 trap ''			HUP INT TSTP USR1 USR2
 add-exit-action hCleanUp
-
-trap # log trap ### DELETE ME /// DEBUG ###
 
 PLAY=startup			# Global variable/function returning 0 (true) or
 						# !0 (false)

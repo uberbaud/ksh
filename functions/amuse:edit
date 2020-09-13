@@ -8,6 +8,7 @@ needs amuse:env
 function amuse:edit {
 	amuse:env
 	${VISUAL:-${EDITOR:-vi}} "${AMUSE_RUN_DIR:?}"/song.lst
+	kill -USR1 $(<"${AMUSE_RUN_DIR:?}"/ui-pid)
 }
 
 # Copyright © 2019 by Tom Davis <tom@greyshirt.net>.

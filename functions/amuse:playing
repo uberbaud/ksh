@@ -4,18 +4,23 @@
 #: FUNCTION ^G(no arguments)^g
 #:   Show what's playing
 
-needs amuse:env
+needs amuse:env s2hms
 function amuse:playing {
-	local P
+	local T P dhms psecs phms rhms dtenths dsecs
 	amuse:env
 	P="$AMUSE_RUN_DIR"/playing
+	T="$AMUSE_RUN_DIR"/timeplayed
 	[[ -s $P ]]|| return 1
-	IFS='	|' read -r id performer album track title <"$P"
+	IFS='	|' read -r id performer album track title dtenths <"$P"
+	dsecs=${dtenths%?};					dhms="$(s2hms $dsecs)"
+	psecs=$(<$T); psecs=${psecs%?};		phms="$(s2hms $psecs)"
+	rsecs=$((dsecs-psecs));				rhms="$(s2hms $rsecs)"
 	sparkle <<-==SPARKLE==
 		         ^Gid:^g ^N$id^n
 		  ^Gperformer:^g ^N$performer^n
 		      ^Galbum:^g ^N$album^n
 		      ^Gtrack:^g ^S$track^s $title
+		       ^Gtime:^g ^N$phms^n ^Gof^g ^N$dhms^n^G,^g ^N$rhms^n ^Gremaining^g
 	==SPARKLE==
 }
 

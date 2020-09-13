@@ -3,6 +3,7 @@
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
 
 apmarg=''
+pgm="${0##*/}"
 # Usage {{{1
 typeset -- this_pgm="${0##*/}"
 function usage {
@@ -21,6 +22,7 @@ function usage {
 	===SPARKLE===
 	exit 0
 } # }}}
+function Warn { print -u2 "$pgm: $*"; }
 (($#))&& { # {{{1
 	case "$1" in
 		##### STATE in RAM  #####
@@ -30,27 +32,10 @@ function usage {
 		?(-)Z)	apmarg=-Z;					;; # hibernate
 		#########################
 		-h) usage;							;;
-		*)	print -u2 "$0: Bad opt: '$1'";	;;
+		*)	Warn "Bad parameter: '$1'";		;;
 	esac
-} # }}}1
-function needs { # {{{1
-	typeset badlist=""
-	for x { [[ -n "$(whence "$x")" ]] || badlist="$badlist $x"; }
-    [[ -z $badlist ]] || die "Missing needed executables:^[[1m$badlist^[[0m"
-} # }}}1
-function log { # {{{1
-	typeset logdir logfile
-	REPLY=""
-	logdir="$HOME"/log
-	[[ -d $logdir ]] || {
-		REPLY="$REPLY, $logdir is not a directory, writing to \$HOME"
-		logdir="$HOME"
-	}
-	logfile="$logdir/$1"
-	shift
-	print "$(date -u +'%Y-%m-%d %H:%M:%S Z')  " "$@" > "$logfile" || REPLY="$REPLY, problem writing to $logfile."
-	REPLY="${REPLY#, }"
-	[[ -z $REPLY ]]
+	shift; (($#))&&
+		Warn "Unexpected parameters: $*"
 } # }}}1
 BATUX=${LOCALBIN=${HOME:?}/.local/bin}/set-bg-per-battery.sh
 needs apm get-exclusive-lock-or-exit release-exclusive-lock log xlock $BATUX
@@ -78,8 +63,8 @@ xlock_pid=$!
 
 [[ -x /usr/bin/sudo ]]&&	/usr/bin/sudo -K	# revoke sudo persistance
 [[ -x /usr/bin/ssh-add ]]&&	/usr/bin/ssh-add -D	# clear ssh keys
-pkill -SIGINT -f '^zsh: aMuse player'			# stop the music
-sync	# if the battery runs out while we're hibernating, ¿maybe?
+amuse:send-cmd pause	# stop the music
+sync					# if the battery runs out while we're hibernating
 
 # suspend returns immediately, but suspension is in the future
 [[ -n $apmarg ]]&& {
@@ -90,14 +75,19 @@ sync	# if the battery runs out while we're hibernating, ¿maybe?
 # pause here untile we've unlocked the screen
 wait $xlock_pid
 
+# reset anything that needs resetting
 [[ -n $COMPTON ]]&&
 	compton -b --config $XDG_CONFIG_HOME/x11/compton.conf
 
 $BATUX >>$HOME/log/battery-monitor
 
-log timesheet xlock end || -warn $REPLY
-doas ifconfig iwm0 up # just in case, because you know, sometimes
+log timesheet xlock end || Warn $REPLY
 
+# RESET SOME DEVICES, just in case, because you know, sometimes.
+doas ifconfig iwm0 up
+doas rcctl reload sndiod
+
+# CLEAN UP
 release-exclusive-lock $LOCK
 
 # Copyright (C) 2017 by Tom Davis <tom@greyshirt.net>.

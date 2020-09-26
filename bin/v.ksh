@@ -161,8 +161,10 @@ typeset -- has_rcs=false
 CKSUM_BEFORE="$(cksum -qa sha1b "$f_fullpath")"
 $ED "$f_fullpath"
 CKSUM_AFTER="$(cksum -qa sha1b "$f_fullpath")"
-[[ $CKSUM_BEFORE != $CKSUM_AFTER ]]&&
+[[ $CKSUM_BEFORE != $CKSUM_AFTER ]]&& {
 	trackfile "$f_fullpath"
+	[[ -f .LAST_UPDATED ]]&& date -u +"$ISO_DATE" >.LAST_UPDATED
+  }
 
 if [[ -d RCS ]]; then
 	new-array rcsopts

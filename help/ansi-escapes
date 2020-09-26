@@ -10,7 +10,7 @@
     ^T\e[^t^Sr^s^T;^t^Sc^s^TH^t  Cursor to line ^Sr^s and column ^Sc^s
     ^T\e[^t^Sr^s^T;^t^Sc^s^Tf^t  ''
 
-        When ^Sn^s is not specified, it defaults to one (1).
+        When ^Sn^s is not specified, it defaults to one ^(1^).
 
     ^T\e[J^t     Clear from cursor to end of the screen
     ^T\e[0J^t    ''

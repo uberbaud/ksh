@@ -47,8 +47,8 @@ function warnOrDie { #{{{1
 : ${USER:?}
 needs df awk egrep as-root
 
-set -A fatopts -- -t msdos -s -o rw,noexec,nosuid,-g=$USER,-u=$USER
-set -A ffsopts -- -t ffs -s -o rw,noexec,nodev,sync,softdep
+fatopts="-t msdos -s -o rw,noexec,nosuid,-g=$USER,-u=$USER"
+ffsopts='-t ffs -s -o rw,noexec,nodev,sync,softdep'
 
 function mnt-fs {
 	dev=/dev/"$1"
@@ -58,7 +58,7 @@ function mnt-fs {
 	desparkle "$mntpnt";	mntpntD="$REPLY"
 	desparkle "$dev";		devD="$REPLY"
 	df -P | egrep -q "^$dev " && return 0
-	[[ -d $mntpnt ]]|| as-root mkdir "$mntpnt"
+	[[ -d $mntpnt ]]|| mkdir "$mntpnt"
 	(($?))&& {
 		warn "Could not ^Tmkdir^t ^S$mntpntD^s."
 		return 1
@@ -98,8 +98,8 @@ function mnt-drv {
 	fstype="${diskinfo#*: }"
 
 	case "$fstype" in
-		MSDOS)	mnt-fs "$dev$part" "$label" "${fatopts[@]}";	;;
-		4.2BSD)	mnt-fs "$dev$part" "$label" "${ffsopts[@]}";	;;
+		MSDOS)	mnt-fs "$dev$part" "$label" $fatopts;			;;
+		4.2BSD)	mnt-fs "$dev$part" "$label" $ffsopts;			;;
 		*)		warn "Unknown type <^B$fstype^b>.";				;;
 	esac
 }

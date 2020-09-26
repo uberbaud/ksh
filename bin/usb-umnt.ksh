@@ -103,7 +103,7 @@ function main {
 	for want in "${wants[@]}"; do
 		[[ $want == /* ]]|| want="/vol/$want"
 		notify "Unmounting ^B$want^b."
-		as-root umount "$want" && as-root rmdir "$want"
+		as-root umount "$want" && rmdir "$want"
 	done
 
 }

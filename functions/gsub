@@ -15,4 +15,4 @@ function gsub {
 	eval "$varname=\$p\$text"
 }
 
-# Copyright © 2017 by Tom Davis <tom@greyshirt.net>.
+# Copyright © 2017,2020 by Tom Davis <tom@greyshirt.net>.

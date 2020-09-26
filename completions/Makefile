@@ -6,7 +6,7 @@ TARGET      = completions.ksh
 OBJECTS     = git_1 help scp ssh rcctl_2 sysctl
 # things hand crafted (git them)
 DEPENDS     = chflags inc kill_1 mediainfo mget perlbrew poco rcctl_1
-DEPENDS    += xfontsel
+DEPENDS    += sndioctl xfontsel
 GIT_IGN     = .gitignore
 
 .poison empty OS_VER
@@ -45,9 +45,10 @@ git_1: $(GIT_CONFIG)
 	@awk $(GIT_ALIAS_PGM) $(GIT_CONFIG) >>$@
 
 HELP_UPBIN=$(KDOTDIR)/bin/update-help-completions.ksh
-help:
-	@echo $@
-	$(HELP_UPBIN)
+HELP_FCHG=$(KDOTDIR)/functions/.LAST_UPDATED
+HELP_HCHG=$(KDOTDIR)/help/.LAST_UPDATED
+help: $(HELP_FCHG) $(HELP_HCHG)
+	@$(HELP_UPBIN)
 
 MAIL_ACCT_DIR=$(XDG_CONFIG_HOME)/fetchmail
 MAIL_ACCOUNTS=$(MAIL_ACCT_DIR)/accounts

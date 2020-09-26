@@ -63,7 +63,7 @@ xlock_pid=$!
 
 [[ -x /usr/bin/sudo ]]&&	/usr/bin/sudo -K	# revoke sudo persistance
 [[ -x /usr/bin/ssh-add ]]&&	/usr/bin/ssh-add -D	# clear ssh keys
-amuse:send-cmd pause	# stop the music
+(amuse:send-cmd pause)	# stop the music
 sync					# if the battery runs out while we're hibernating
 
 # suspend returns immediately, but suspension is in the future
@@ -86,6 +86,7 @@ log timesheet xlock end || Warn $REPLY
 # RESET SOME DEVICES, just in case, because you know, sometimes.
 doas ifconfig iwm0 up
 doas rcctl reload sndiod
+sndioctl output.level=$(<$XDG_CONFIG_HOME/etc/sndioctl.rc)
 
 # CLEAN UP
 release-exclusive-lock $LOCK

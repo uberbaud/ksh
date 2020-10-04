@@ -5,3 +5,8 @@
 
     ^BPass a ^Ufile descriptor^u via ^Usocket^u^b
         Example code in ^BCMSG_DATA(3)^b
+
+    ^BGet the ^Tsizeof^t a structure for malloc^b
+        ^Tstruct mydata  *x;^t
+        ^Tx = malloc(sizeof(*x));^t
+

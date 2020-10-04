@@ -1,0 +1,13 @@
+^Bman sections^b
+
+        1         General commands (tools and utilities).
+        2         System calls and error numbers.
+        3         Library functions.
+        3p        perl(1) programmer's reference guide.
+        4         Device drivers.
+        5         File formats.
+        6         Games.
+        7         Miscellaneous information.
+        8         System maintenance and operation commands.
+        9         Kernel internals.
+

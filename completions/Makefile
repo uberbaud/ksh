@@ -9,7 +9,7 @@ DEPENDS     = chflags inc kill_1 mediainfo mget perlbrew poco rcctl_1
 DEPENDS    += sndioctl xfontsel
 GIT_IGN     = .gitignore
 
-.poison empty OS_VER
+.poison empty OSREV
 .poison empty KDOTDIR
 .poison empty XDG_CONFIG_HOME
 
@@ -74,7 +74,7 @@ sysctl:
 	@awk -F= '/^[^ \t]/ {print $$1}' tmp.sysctl >$@
 	@rm tmp.sysctl
 
-PKG_LOG = $(HOME)/hold/$(OS_VER)/pkg.log
+PKG_LOG = $(HOME)/hold/$(OSREV)/pkg.log
 rcctl_2: $(PKG_LOG)
 	@echo $@
 	@/bin/ls -1 /etc/rc.d >$@

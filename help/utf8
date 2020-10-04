@@ -12,10 +12,10 @@
         ^Tucont=$(print '\0200-\0277')"^t
         ^T[[ $str == *[$ustart]+([$ucont])* ]]^t
       ^GNote: a longest match (^g^#^#^G) must be used in prefix deletion substitutions.^g
-      one-liner by Ted Unangst <tedu@openbsd.org>
 
     ^BC Continuation Character Test^b
         ^Tisu8cont(unsigned char c)^t
         ^T{ return MB_CUR_MAX > 1 && (c & (0x80 | 0x40)) == 0x80; }^t
       ^GNote: MB_CUR_MAX is set by setlocale(3)^g
+      one-liner by Ted Unangst <tedu@openbsd.org>
 

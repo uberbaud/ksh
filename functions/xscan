@@ -4,16 +4,21 @@
 #: FUNCTION ^G(no arguments)^g
 #:   scan piped to Xdialog
 
-needs dir-is-empty flist new-array scan Xdialog
+needs dir-is-empty flist new-array scan yad
 function xscan {
-	local rc=$XDG_CONFIG_HOME/gtk-tw/fixed-font.rc size=927x1080
 	new-array opts
-	+opts --rc-file $rc
-	+opts --wmclass xscan
-	+opts --left
-	+opts --no-wrap
+	+opts --geometry 900x1080+0+0
 	+opts --no-buttons
-	+opts --textbox - $size
+	+opts --no-markup
+	+opts --hscroll-policy=never
+	+opts --vscroll-policy=always
+	+opts --list
+	+opts --column "msg"
+	+opts --column date
+	+opts --column from
+	+opts --column subject
+	+opts --print-column 1
+	+opts --ellipsize END
 	if (($#)); then
 		[[ -n "$(flist -noshowzero "$@")" ]]||
 			die "^Tflist $*^t found nothing"
@@ -28,7 +33,7 @@ function xscan {
 		return 1
 	  }
 
-	(set -o nohup; scan "$@"| Xdialog "${opts[@]}" &)
+	(set -o nohup; scan -form scan.nlfields "$@"| yad "${opts[@]}" &)
 }
 
 # Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

@@ -276,9 +276,10 @@ VISED=/usr/local/bin/vis
 KCOMPLETE=$KDOTDIR/completions
 makeout=$KCOMPLETE/make.out
 get-exclusive-lock completion-make
-make OS_VER="$(uname -r)" -C $KCOMPLETE >$KCOMPLETE/make.out
+make -C $KCOMPLETE >$KCOMPLETE/make.out
 [[ -s $makeout ]]&& {
 	notify 'Recompiled completion modules:'
+	COLUMNS=${COLUMNS:-$(tput col)}
 	column -c $((COLUMNS-8)) $makeout|expand|sed -e 's/^/    /'
   }
 rm $makeout

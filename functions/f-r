@@ -10,10 +10,11 @@ function f-r {
 	if (($#)); then
 		readme="$1"
 	else
-		set -- [Rr][Ee][Aa][Dd]*
+		set -- @([Rr][Ee][Aa][Dd]*|*.[Rr][Ee][Aa][Dd][Mm][Ee])
 		for p; do
 			[[ -f "$p" ]]&& { readme="$p"; break; }
 		done
+
 		[[ -n "$readme" ]]|| die 'No README found.'
 	fi
 

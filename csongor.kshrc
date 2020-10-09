@@ -12,8 +12,8 @@ export PERLBREW_LIB=$PERLBREW_ROOT/perls/current/lib
 #[[ -f $perlbrew_rc ]]&& . $perlbrew_rc
 export GOPATH=$xdgdata/go
 export JDK_PATH=/usr/local/jdk-1.8.0/bin
-export RAKUBREW_HOME=$xdgdata/rakubrew
-eval "$($RAKUBREW_HOME/bin/rakubrew init Sh)"
+#export RAKUBREW_HOME=$xdgdata/rakubrew
+#eval "$($RAKUBREW_HOME/bin/rakubrew init Sh)"
 
 # default apps
 export BROWSER="$(<$xdgcfg/etc/browser)"
@@ -27,8 +27,12 @@ export MAILPATH=''
 export MAIL_HOME=$xdgcfg/mail
 export MAILRC=$MAIL_HOME/mail.rc
 export MBOX=$MAIL_HOME/mbox
-export NMH=$xdgcfg/nmh
-export MH=$NMH/config
+#=== (N)MH
+#export NMH=$xdgcfg/nmh
+#export MH=$NMH/config
+#=== (M)MH
+export MMH=$xdgcfg/mmh
+MMH_BIN_PATH=/usr/local/mmh/bin
 
 # misc
 export dskBROWSER=1

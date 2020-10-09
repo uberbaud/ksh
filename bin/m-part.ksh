@@ -11,8 +11,9 @@ function usage {
 	PGM="$REPLY"
 	sparkle >&2 <<-\
 	===SPARKLE===
-	^F{4}Usage^f: ^T${PGM}^t
+	^F{4}Usage^f: ^T${PGM}^t ^[^T-H^t^]
 	         save a mail part to disk and try to open it.
+	           ^T-H^t  Force type to ^Shtml^s.
 	       ^T${PGM} -h^t
 	         Show this help message.
 	===SPARKLE===

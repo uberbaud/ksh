@@ -12,7 +12,7 @@ function usage {
 	sparkle >&2 <<-\
 	===SPARKLE===
 	^F{4}Usage^f: ^T${PGM}^t ^[^Uacct list^u^]
-	         Download (fetchmail), import into NMH (inc), and do some
+	         Download (fetchmail), import into MMH (inc), and do some
 	         processing.
 	       ^T${PGM} -l^t
 	         List available accounts.
@@ -133,12 +133,12 @@ group obsd      --list-id 'source-changes\.openbsd\.org'
 scanseq='¬L'
 [[ -n "$(flist +inbox -sequence L -noshowzero)" ]]|| scanseq='all'
 scan +inbox $scanseq
-GROUPMAIL="${NMH:?}"/groupmail
+GROUPMAIL="${MMH:?}"/groupmail
 [[ -e $GROUPMAIL ]]&& { [[ -w $GROUPMAIL ]]|| chmod u+w "$GROUPMAIL"; }
 : >$GROUPMAIL # truncate, we'll append if we have any groups
 groups-not-empty && {
 	printf '                      %-9s %s\n' "${scanout[@]}"
-	print -r -- "${groups[*]}" >"$NMH/groupmail"
+	print -r -- "${groups[*]}" >"$MMH/groupmail"
   }
 
 # Copyright (C) 2017 by Tom Davis <tom@greyshirt.net>.

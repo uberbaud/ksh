@@ -153,7 +153,8 @@ $alphabetIsSet || set-alphabet "$defaultAlphabet"
 
 # /options }}}1
 
-needs cut random umenu xclip new-array
+umask u=rw,go=
+needs cut random umenu xclip new-array umask
 
 (($# <= 1 ))|| die 'Too many arguments. Expected one (1).'
 typeset -l domain=''

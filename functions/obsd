@@ -5,7 +5,7 @@
 #:   Handle mail from the OpenBSD CVS change list specially.
 
 function obsd {
-	local filter='' W=10 refold=''
+	local filter='' W=5 refold='' P="${PAGER:-less}"
 	needs show fold awk $P cat
 
 	# arbitary number after which the file list will be shown as "*"
@@ -13,8 +13,8 @@ function obsd {
 	(($MAXFILES))|| warn 'OBSD_MAXFILE_LIST is set to 0, no files listed.'
 	filter="$(</dev/stdin)" <<-\
 		\==AWK==
-		# |>>> inbox:5          ← when there's more than one (1) message
-		/^>>> [a-z]+:[0-9]+$/			{ N=$2; p=0; }
+		# |>>> Message 5          ← when there's more than one (1) message
+		/^>>> Message [0-9]+$/			{ N=$3; p=0; }
 		# |(Message inbox:5)    ← when there's only one (1) message
 		/^\(Message [a-z]+:[0-9]+\)$/	{ sub("\\)",""); N=$2; p=0; }
 		# from start of log message excluding the header
@@ -32,12 +32,12 @@ function obsd {
 			p=1;
 			B=0;
 			printf( "%s%s\n", L, N);
-			x="(";
+			x="^G";
 			if (length(F) > MAXFILES)
 				printf("(*");
 			else
 				for (k in F) {printf( "%s%s", x, k ); x=" "}
-			printf( ") " );
+			printf( "^g " );
 			delete F;
 			Fx=0;
 			L = "\n";
@@ -46,8 +46,6 @@ function obsd {
 		# until a blank line
 		p==0						{next;}
 		/^$/						{B=1; next}
-		# |ok kettenis@[ dhill@]
-		/^[Oo][Kk]( [a-z]+@,?)+$/	{next;}
 		B==1				{printf( "\n\n" ); B=0;}
 		# always
 							{printf( "%s ", $0 );}
@@ -55,19 +53,30 @@ function obsd {
 
 	refold="$(</dev/stdin)" <<-\
 	==AWK==
-	/^[a-z]+:[0-9]+\$/ {X=\$0;next}
-		{printf "%-${W}s%s\n",X,\$0;X="";}
+	/^$/ {next}							# skip blank lines
+	/^[0-9]+\$/ {X="obsd:";Y=\$0;next}
+		{printf "^N%-5s^n^B%-${W}s^b%s\n",X,Y,\$0;X="";Y=""}
 	==AWK==
 
-	local OUTPUT linecount
-	OUTPUT="$( show +inbox obsd -nocheckmime -form mhl.body	|
-				awk -v MAXFILES=$MAXFILES "$filter"			|
-				fold -s -w $((COLUMNS-W-2))					|
-				awk "$refold"
-			)"
-	linecount=$(print "$OUTPUT"|wc -l|tr -cd '[0-9')
+	COLUMNS=${COLUMNS:-$(tput cols)}
+	local spesc ok eok rby blnk
+	spesc='s/\^/^^/g'
+	ok='s/[Oo][Kk]( [a-z]+@,?)+//g'
+	eok='s/[Oo][Kk]( [a-z]+@?,?)+[[:space:]]*$//g'
+	rby='s/ ?reported by [a-z]+//'
+	blnk='/^[[:space:]]$/d'
 
-	local P="${PAGER:-less}"
+	local OUTPUT linecount
+	OUTPUT="$(
+		show +inbox obsd -form mhl.body								|
+		sed -E -e "$spesc" -e "$ok" -e "$eok" -e "$rby" -e "$blnk"	|
+		awk -v MAXFILES=$MAXFILES "$filter"			|
+		fold -s -w $((COLUMNS-W-7))					|
+		awk "$refold"								|
+		sparkle
+	  )"
+	linecount=$(print "$OUTPUT"|wc -l|tr -cd '[0-9]')
+
 	[[ -t 1 ]]||			P=cat
 	((linecount<LINES))&&	P=cat
 

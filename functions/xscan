@@ -13,12 +13,12 @@ function xscan {
 	+opts --hscroll-policy=never
 	+opts --vscroll-policy=always
 	+opts --list
-	+opts --column "msg"
-	+opts --column date
-	+opts --column from
-	+opts --column subject
+	+opts --column 'msg'
+	+opts --column 'date'
+	+opts --column 'from'
+	+opts --column 'subject'
 	+opts --print-column 1
-	+opts --ellipsize END
+#	+opts --ellipsize END
 	if (($#)); then
 		[[ -n "$(flist -noshowzero "$@")" ]]||
 			die "^Tflist $*^t found nothing"

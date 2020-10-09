@@ -58,11 +58,11 @@ function Done { # {{{1
 needs flist folder forceline mark pick refile rmm yes-or-no
 
 # clean out groupmail list
-GROUPMAIL="$NMH"/groupmail
+GROUPMAIL="${MMH:?}"/groupmail
 [[ -e $GROUPMAIL ]]&& { [[ -w $GROUPMAIL ]]|| chmod u+w "$GROUPMAIL"; }
 : >$GROUPMAIL
 
-(($#))|| set all
+(($#))|| set a # 'a' is for 'all'
 mark "$@" +inbox -sequence marked 2>/dev/null
 folder +inbox
 
@@ -84,7 +84,7 @@ function X { # {{{1
 		printSkipMsg "$msg"
 	else
 		printRefileMsg "$msg"
-		refile picked -unlink -src +inbox +"$box"
+		refile picked -src +inbox +"$box"
 	fi
 	Done && {
 		local F="$M$P$B Skipping $S %s$C (no more messages)"
@@ -110,10 +110,11 @@ if Done; then
     print -u2 ' [34m>>>[0m No messages to [1mremove[0m.'
 else
     print -u2 ' [34m>>>[0m [1mTrashing[0m everything else.'
-    refile marked -unlink -src +inbox +deleted
+    refile marked -nolink -src +inbox +deleted
 fi
 
-set -A files2delete ${XDG_CACHE_HOME:?}/mail/*
+MAILTEMP="${XDG_CACHE_HOME:?}/mail"
+set -A files2delete "$MAILTEMP"/*
 if [[ $files2delete != *\* ]]; then
     print -u2 ' [34m>>>[0;1m Cleaning[0m mail workshop.'
     yes-or-no 'Delete the mail parts which maybe you'\''re using' &&

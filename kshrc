@@ -113,12 +113,13 @@ export PERL_MM_OPT="INSTALL_BASE=$USR_PLIB"
 	[[ :$PATH: == *:$HOME/bin:*		]]|| PATH="$HOME/bin:$PATH";
 
 #[[ :$PATH: == *:$RAKUDO_BIN:*		]]|| PATH="$RAKUDO_BIN:$PATH"
+[[ :$PATH: == *:$MMH_BIN_PATH:*		]]|| PATH="$MMH_BIN_PATH:$PATH"
 [[ :$PATH: == *:$LOCALBIN:*			]]|| PATH="$LOCALBIN:$PATH"
 [[ :$PATH: == *:$USRBIN:*			]]|| PATH="$USRBIN:$PATH"
 [[ :$PATH: == *:/usr/games:*		]]|| PATH="$PATH:/usr/games"
 [[ :$PATH: == *:${JDK_PATH:-///}:*	]]|| PATH="$PATH:$JDK_PATH"
 PERLBREW_BIN=$PERLBREW_ROOT/perls/current/bin
-[[ :$PATH: == *:$PERLBREW_BIN:*		]]|| PATH="$PERLBREW_BIN:$PATH"
+[[ :$PATH: == *:$PERLBREW_BIN:*		]]|| PATH="$PATH:$PERLBREW_BIN"
 
 # input, locale, and such
 set -o vi -o vi-tabcomplete

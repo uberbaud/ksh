@@ -4,17 +4,17 @@
 #: FUNCTION ^G(no arguments)^g
 #:   Review mail groups
 
-needs notify whence mhshow
-: ${NMH:?}
+needs notify whence show
+: ${MMH:?}
 function m-groups {
 	local G
-	set -- $(<"${NMH:?}"/groupmail)
+	set -- $(<"${MMH:?}"/groupmail)
 	for G; do
 		notify "$G"
 		if [[ $(whence $G) == $G ]]; then
 			$G
 		else
-			mhshow +inbox $G -textonly -form mhl.group
+			show +inbox $G -form mhl.group
 		fi
 	done
 }

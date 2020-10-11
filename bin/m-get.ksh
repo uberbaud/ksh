@@ -52,6 +52,32 @@ function warnOrDie { #{{{1
 					'warnOrDie is [1m${warnOrDie}[22m.';		;;
 	esac
 } # }}}1
+function show-new-mail { # {{{1
+	((LINES))|| LINES=$(tput lines)
+	scanseq='¬L'
+	[[ -n "$(flist +inbox -sequence L -noshowzero)" ]]|| scanseq='a'
+	pick +inbox $scanseq -nolist 2>/dev/null |&
+	read -p c hits
+	if ((c>(LINES-8))); then
+		xscan
+	elif ((c)); then
+		scan +inbox $scanseq
+	else
+		notify "All new mail is group mail."
+	fi
+} # }}}1
+function group { # {{{1
+	mark +inbox -sequence x -delete all
+	x="$(pick +inbox -sequence x -sequence "$@")"; x="${x:-0}"; x="${x% *}"
+	mark +inbox -sequence x -delete oldhat
+	y="$(pick +inbox x -nolist)"; y="${y:-0}"; y="${y% *}"
+	(($y+$x))&& {
+		+scanout "$1:" "new $y, total $x"
+		+groups "$1"
+		mark +inbox -sequence L -add "$1"
+	  }
+} 2>/dev/null # }}}1
+function P { printf '      ^F{4}─^f %s\n' "$1" | sparkle >&2; }
 
 i-can-haz-inet || die "$REPLY"
 
@@ -62,7 +88,6 @@ notify 'Generating ^Sfetchmailrc^s.'
 (($#))|| set -- \*
 $accToFetch "$@"
 
-function P { printf '      ^F{4}─^f %s\n' "$1" | sparkle >&2; }
 
 notify 'Downloading remote messages…'
 fetchmail 2>&1 | while read -r resp; do
@@ -112,27 +137,14 @@ inc -nochangecur >/dev/null
 new-array scanout
 new-array groups
 
-function group {
-	mark +inbox -sequence x -delete all
-	x="$(pick +inbox -sequence x -sequence "$@")"; x="${x:-0}"; x="${x% *}"
-	mark +inbox -sequence x -delete oldhat
-	y="$(pick +inbox x -nolist)"; y="${y:-0}"; y="${y% *}"
-	(($y+$x))&& {
-		+scanout "$1:" "new $y, total $x"
-		+groups "$1"
-		mark +inbox -sequence L -add "$1"
-	  }
-} 2>/dev/null
-
 group drgfly    --list-id 'users\.dragonflybsd\.org'
 group obugs     --list-id 'bugs\.openbsd\.org'
 group otech     --list-id 'tech\.openbsd\.org'
 group omisc     --list-id 'misc\.openbsd\.org'
 group obsd      --list-id 'source-changes\.openbsd\.org'
 
-scanseq='¬L'
-[[ -n "$(flist +inbox -sequence L -noshowzero)" ]]|| scanseq='all'
-scan +inbox $scanseq
+show-new-mail
+
 GROUPMAIL="${MMH:?}"/groupmail
 [[ -e $GROUPMAIL ]]&& { [[ -w $GROUPMAIL ]]|| chmod u+w "$GROUPMAIL"; }
 : >$GROUPMAIL # truncate, we'll append if we have any groups

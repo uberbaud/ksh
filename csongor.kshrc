@@ -2,6 +2,9 @@
 # ksh local profile
 # vim: ts=4 ft=ksh
 
+# special
+HOLD_SYSBASE=~/hold/$(uname -r)
+[[ -d $HOLD_SYSBASE ]]|| mkdir -p $HOLD_SYSBASE
 # paths
 export PERL_CPANM_HOME=$xdgdata/cpanm
 export PERLBREW_ROOT=$xdgdata/perlbrew

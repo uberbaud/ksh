@@ -32,7 +32,7 @@ function ls-todos {
 			fi
 			$ShowIt && {
 				gsub "$NL" "$NL    " "$Body"
-				print "$Sep$Body"
+				print -- "$Sep$Body"
 				Sep="  ^N----^n$NL"
 				ShowIt=false
 			  }

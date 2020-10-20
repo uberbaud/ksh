@@ -52,7 +52,7 @@ function pkg {
 			if $casen; then mOpts="i"; fi
 			typeset ndx="$pkghome/v$osv.ndx"
 			typeset pkgblob="$(perl -ne "print if m/$1/${mOpts:-};" "$ndx")"
-			print -r "$pkgblob" | column -s "$TAB" -t
+			print -r -- "$pkgblob" | column -s "$TAB" -t
 			splitstr NL "$pkgblob" PKGs
 			typeset i=0 l=${#PKGs[*]}
 			while ((i<l)) { PKGs[i]="${PKGs[i]%%$TAB*}"; ((i++)); }
@@ -79,7 +79,7 @@ function pkg {
 			;;
 	esac
 
-	$record && print $cmd "$@" >> $HOME/hold/$osv/pkg.log
+	$record && print -- $cmd "$@" >> $HOME/hold/$osv/pkg.log
 
 }
 

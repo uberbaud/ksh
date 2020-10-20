@@ -98,7 +98,7 @@ function main {
 	xdotool windowraise $1;			sleep 0.2
 	xdotool windowraise $imgwinid;	sleep 0.3
 	kill $imgpid
-}
+} 2>/dev/null
 
 main "$@"; exit
 

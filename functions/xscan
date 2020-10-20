@@ -24,7 +24,7 @@ function xscan {
 			die "^Tflist $*^t found nothing"
 	else
 		scanseq='¬L'
-		[[ -n "$(flist +inbox -sequence L -noshowzero)" ]]|| scanseq=all
+		[[ -n "$(flist +inbox -sequence L -noshowzero)" ]]|| scanseq=a
 		set -- +inbox $scanseq
 	fi
 

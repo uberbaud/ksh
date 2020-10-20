@@ -11,7 +11,7 @@ function usage {
 	PGM="$REPLY"
 	sparkle >&2 <<-\
 	===SPARKLE===
-	^F{4}Usage^f: ^T$PGM^t ^[^Uoptions^u^]
+	^F{4}Usage^f: ^T$PGM^t ^[^Uoptions^u^] ^[^Uprefix^u ^[^Usuffix^u^]^]
 	         Make a ^Uwhat^u and ^URFC4151 tag^u compatible stemma
 	             ^I<marker+tag:user.machine.domain,date,timez/uniqrand>^i
 	             ^T-U^t ^Uuser^u          defaults to ^T\$(id -n)^t
@@ -80,7 +80,9 @@ function warnOrDie { #{{{1
 					'warnOrDie is [1m${warnOrDie}[22m.';		;;
 	esac
 } # }}}1
-(($#))&& die 'Too many nonflag parameters. Expected none.'
+(($#>2))&& die 'Too many nonflag parameters. Expected at most two (2).'
+pfx=${1:+${1% } }
+sfx=${2:+ ${2# }}
 
 bins[0]='date'
 bins[1]='random'
@@ -118,6 +120,6 @@ typeset -i16 X=$$$A$B$C
 
 #	'@' = \0100, '(' = \050, '#' = \043, ')' = \051
 #print -n '<\0100\050\043\051'"tag:$M.$H,$D:$U/$T/${X#?(-)16#}>"
-print -n '<\0100\050\043\051'"tag:$U.$M.$H,$D,$T/${X#?(-)16#}>"
+print -n "$pfx"'<\0100\050\043\051'"tag:$U.$M.$H,$D,$T/${X#?(-)16#}>$sfx"
 
 # Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

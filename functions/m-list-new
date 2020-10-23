@@ -1,0 +1,22 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2020-10-23,14.37.41z/50e3da3>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^G(no arguments)^g
+#:   List new mail (^Tscan^t or ^Txscan^t) and ^Sgroups^s.
+
+function m-list-new {
+	((LINES))|| LINES=$(tput lines)
+	scanseq='¬L'
+	[[ -n "$(flist +inbox -sequence L -noshowzero)" ]]|| scanseq='a'
+	pick +inbox $scanseq -nolist 2>/dev/null |&
+	read -p c hits
+	if ((c>(LINES-8))); then
+		xscan
+	elif ((c)); then
+		scan +inbox $scanseq
+	else
+		notify "All new mail is group mail."
+	fi
+}
+
+# Copyright © 2020 by Tom Davis <tom@greyshirt.net>.

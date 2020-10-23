@@ -52,20 +52,6 @@ function warnOrDie { #{{{1
 					'warnOrDie is [1m${warnOrDie}[22m.';		;;
 	esac
 } # }}}1
-function show-new-mail { # {{{1
-	((LINES))|| LINES=$(tput lines)
-	scanseq='¬L'
-	[[ -n "$(flist +inbox -sequence L -noshowzero)" ]]|| scanseq='a'
-	pick +inbox $scanseq -nolist 2>/dev/null |&
-	read -p c hits
-	if ((c>(LINES-8))); then
-		xscan
-	elif ((c)); then
-		scan +inbox $scanseq
-	else
-		notify "All new mail is group mail."
-	fi
-} # }}}1
 function group { # {{{1
 	mark +inbox -sequence x -delete a
 	x="$(pick +inbox -sequence x -sequence "$@")"; x="${x:-0}"; x="${x% *}"
@@ -82,7 +68,7 @@ function P { printf '      ^F{4}─^f %s\n' "$1" | sparkle >&2; }
 i-can-haz-inet || die "$REPLY"
 
 accToFetch=${XDG_CONFIG_HOME:?}/fetchmail/accTofetch.ksh
-needs $accToFetch fetchmail inc m-msgcount mark pick scan
+needs $accToFetch fetchmail inc m-list-new m-msgcount mark pick scan
 
 msgCount=$(m-msgcount)
 ((msgCount))&& {
@@ -151,7 +137,7 @@ group otech     --list-id 'tech\.openbsd\.org'
 group omisc     --list-id 'misc\.openbsd\.org'
 group obsd      --list-id 'source-changes\.openbsd\.org'
 
-show-new-mail
+m-list-new
 
 GROUPMAIL="${MMH:?}"/groupmail
 [[ -e $GROUPMAIL ]]&& { [[ -w $GROUPMAIL ]]|| chmod u+w "$GROUPMAIL"; }

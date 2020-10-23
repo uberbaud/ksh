@@ -16,12 +16,12 @@ function usage {
 	         Print useful bits from C source files
 	           Filter options:
 	             ^T-e^t  enums (includeing ^Stypedef^sed)
-	             ^T-f^t  static function prototypes
+	             ^T-f^t  function prototypes
 	             ^T-m^t  macro definitions
 	             ^T-s^t  structures (including ^Stypedef^sed)
 	             ^T-u^t  unions (including ^Stypedef^sed)
 	             ^T-t^t  typedefs (excluding ^Senums^s and ^Sstructures^s)
-	             ^T-F^t  function prototypes
+	             ^T-F^t  static function prototypes
 	           Other options:
 	             ^T-q^t  Do not print filenames.
 	             ^T-r^t  Print ^Bclang-format^b output, do not filter.
@@ -47,12 +47,12 @@ RAWOUT=false
 while getopts ':efmsFtuqrh' Option; do
 	case $Option in
 		e)	wENUMS=true;										;;
-		f)	wFUNCS=true;										;;
+		f)	wFEXTS=true;										;;
 		m)	wMACROS=true;										;;
 		s)	wSTRUCTS=true;										;;
 		u)	wUNIONS=true;										;;
 		t)	wTYPEDEFS=true;										;;
-		F)	wFEXTS=true;										;;
+		F)	wFUNCS=true;										;;
 		q)	QUIET=true;											;;
 		r)	RAWOUT=true;										;;
 		h)	usage;												;;

@@ -64,15 +64,28 @@ function already-in-edit { # {{{1
 		warn "Edit window is on desktop ^B$rc^b"
 	die "Quitting."
 } # }}}1
+function clear-dead-edit { # {{{1
+	local ovpid=$1 lockfile="$2" ovcmd
+	ovcmd=$(/bin/ps -o command= -p $ovpid)
+	# if there's really an edit session, return 1 (we didn't clear a
+	# dead edit).
+	[[ ${ovcmd:-} == /bin/ksh\ /home/tw/bin/ksh/v\ * ]]&& return 1
+	# otherwise, the lockfile is bogus, so clear it
+	rm "$lockfile"
+	return 0
+} # }}}1
 function safe-to-edit { #{{{1
-	local F="$1"
+	local F="$1" ovpid
 	gsub % %% "$F"
 	gsub / %  "$REPLY"
 	LOCKNAME="$REPLY"
 	V_CACHE="$XDG_CACHE_HOME/v"
 	[[ -d $V_CACHE ]]|| mkdir -p $V_CACHE
-	get-exclusive-lock-or-exit "$LOCKNAME" $V_CACHE ||
-		already-in-edit $(<$REPLY)
+	while ! get-exclusive-lock-or-exit "$LOCKNAME" $V_CACHE; do
+		ovpid=$(<$REPLY)
+		clear-dead-edit $ovpid $REPLY ||
+			already-in-edit $ovpid
+	done
 	LOCKFILE="$REPLY"
 	print $$>$LOCKFILE
 }

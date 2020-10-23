@@ -71,7 +71,7 @@ function group { # {{{1
 	x="$(pick +inbox -sequence x -sequence "$@")"; x="${x:-0}"; x="${x% *}"
 	mark +inbox -sequence x -delete oldhat
 	y="$(pick +inbox x -nolist)"; y="${y:-0}"; y="${y% *}"
-	(($y+$x))&& {
+	((y+x))&& {
 		+scanout "$1:" "new $y, total $x"
 		+groups "$1"
 		mark +inbox -sequence L -add "$1"
@@ -82,7 +82,19 @@ function P { printf '      ^F{4}─^f %s\n' "$1" | sparkle >&2; }
 i-can-haz-inet || die "$REPLY"
 
 accToFetch=${XDG_CONFIG_HOME:?}/fetchmail/accTofetch.ksh
-needs $accToFetch inc pick scan mark fetchmail m-msgcount
+needs $accToFetch fetchmail inc m-msgcount mark pick scan
+
+msgCount=$(m-msgcount)
+((msgCount))&& {
+	notify 'Noting old messages.'
+	mark +inbox a -sequence oldhat 2>/dev/null
+  }
+
+msgCount=$(from|wc -l)
+((msgCount))&& {
+		notify 'Incorporating local messages.'
+		inc -nochangecur >/dev/null
+	}
 
 notify 'Generating ^Sfetchmailrc^s.'
 (($#))|| set -- \*
@@ -125,16 +137,10 @@ done
 # regenerate fetchmail with all accounts enabled
 $accToFetch
 
-msgCount=$(from|wc -l)
-((msgCount))&& {
-		notify 'Incorporating new mail from mailbox'
-		inc -nochangecur >/dev/null
-	}
 msgCount=$(m-msgcount)
 ((msgCount))|| { notify 'Nothing more to do, quitting'; exit 0; }
 
 /usr/bin/clear # clear, but keep the buffer
-mark +inbox a -sequence oldhat 2>/dev/null
 
 new-array scanout
 new-array groups

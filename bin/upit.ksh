@@ -24,7 +24,7 @@ function @ { # {{{1
 #   name          dotf          exec      SUBCOMMANDS (cmds)
 @   Git           .git          $GITUP    simple
 @   Git+Modules   .gitmodules   $GITUP    modules
-@   Fossil        .fslckout     fossil    pull co --latest
+@   Fossil        .fslckout     fossil    pull +AND+ co --latest
 @   Subversion    .svn          svn       update
 @   Mercurial     .hg           hg        pull update
 @   Monotone      _MTN          mtn       pull +AND+ update

@@ -4,6 +4,8 @@
 
 set -o nounset;: ${FPATH:?Run from within KSH}
 
+DRYRUN=false
+
 # Usage {{{1
 typeset -- this_pgm="${0##*/}"
 function usage {
@@ -11,8 +13,9 @@ function usage {
 	PGM="$REPLY"
 	sparkle >&2 <<-\
 	===SPARKLE===
-	^F{4}Usage^f: ^T${PGM}^t ^Ufile^u ^[^Ufile2 ...^u^]
+	^F{4}Usage^f: ^T${PGM}^t ^[^T-n^t^] ^Ufile^u ^[^Ufile2 ...^u^]
 	         Open files with an appropriate app.
+	           ^T-n^t  Show open commands, but don't do it.
 	       ^T${PGM} -h^t
 	         Show this help message.
 	===SPARKLE===
@@ -23,8 +26,9 @@ function bad_programmer {	# {{{2
 	die 'Programmer error:'	\
 		"  No getopts action defined for [1m-$1[22m."
   };	# }}}2
-while getopts ':h' Option; do
+while getopts ':nh' Option; do
 	case $Option in
+		n)	DRYRUN=true;											;;
 		h)	usage;													;;
 		\?)	die "Invalid option: [1m-$OPTARG[22m.";				;;
 		\:)	die "Option [1m-$OPTARG[22m requires an argument.";	;;
@@ -73,7 +77,7 @@ function exec-handler { # {{{1
 	gsub \' "'\\''" "$arg"
 	gsub '%s' "'$REPLY'" "$cmd"
 	eval "set -- $REPLY"
-	nohup "$@" </dev/null >>$HOME/log/open 2>&1 &
+	$DRYRUN|| nohup "$@" </dev/null >>$HOME/log/open 2>&1 &
 } # }}}1
 function open-one-file { # {{{1
 	REPLY=''

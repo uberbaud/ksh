@@ -23,7 +23,9 @@ function get-exclusive-lock {
 		warn 'Could not create a temporary file.'; return 1
 	  }
 
-	while ! ln "$U" "$L" 2>/dev/null; do watch-file "$L"; done
+	while ! ln "$U" "$L" 2>/dev/null; do
+		watch-file "$L" 2>/dev/null
+	done
 
 	rm "$U"
 	REPLY="$L"

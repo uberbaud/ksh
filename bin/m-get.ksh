@@ -78,7 +78,7 @@ msgCount=$(m-msgcount)
 
 msgCount=$(from|wc -l)
 ((msgCount))&& {
-		notify 'Incorporating local messages.'
+		notify 'Incorporating ^Blocal^b messages.'
 		inc -nochangecur >/dev/null
 	}
 
@@ -86,7 +86,7 @@ notify 'Generating ^Sfetchmailrc^s.'
 (($#))|| set -- \*
 $accToFetch "$@"
 
-notify 'Downloading remote messages…'
+notify 'Downloading ^Bremote^b messages…'
 fetchmail 2>&1 | while read -r resp; do
 	case "$resp" in
 		'reading message '*) continue; ;;

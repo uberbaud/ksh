@@ -19,6 +19,7 @@ export JDK_PATH=/usr/local/jdk-1.8.0/bin
 #export RAKUBREW_HOME=$xdgdata/rakubrew
 #eval "$($RAKUBREW_HOME/bin/rakubrew init Sh)"
 export TCLLIBPATH=$xdgdata/tcl
+export RLWRAP_HOME=$xdgcfg/rlwrap
 
 # default apps
 export BROWSER="$(<$xdgcfg/etc/browser)"
@@ -47,6 +48,7 @@ export CSONGOR_XTERM_WINDOW_BG='#FFFFFF' CSONGOR_XTERM_WINDOW_FG='#000000'
 export CVSROOT='anoncvs@anoncvs4.usa.openbsd.org:/cvs'
 export LESSKEY=$xdgcfg/less/lesskey.compiled
 export PRINTER=poco
+export TCL_USE_VERSION=8.6
 
 export TZ=EST5EDT
 
@@ -54,6 +56,8 @@ alias s=show
 alias m=m-part
 alias lua=lua53
 alias facebook='firefox https://www.facebook.com && exit'
+alias tclsh='cond-rlwrap tclsh${TCL_USE_VERSION}'
+alias wish='cond-rlwrap wish${TCL_USE_VERSION}'
 
 LOGPS1='\n'\
 '%:KSH:% \D{%Y.%m.%d.%H.%M.%S.%z} \w\n'\

@@ -1,0 +1,26 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2020-10-30,20.37.58z/1d1abdf>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Ucommand^u
+#:   ^Trlwrap^t ^Bonly if^b there are no arguments to ^Ucommand^u.
+
+needs rlwrap
+function cond-rlwrap {
+	local WRAPIT=true cmd fflag rlflags
+
+	cmd=${1:-Missing required command to rlwrap.}
+	shift
+
+	(($#))&& WRAPIT=false
+	[[ -t 0 ]]|| WRAPIT=false
+	[[ -t 1 ]]|| WRAPIT=false
+	if $WRAPIT; then
+		fflag=${RLWRAP_HOME:-:}/${cmd##*/}_flags
+		[[ -f $fflag ]]&& rlflags="$(<$fflag)"
+		rlwrap ${rlflags:-} -- "$cmd" "$@"
+	else
+		"$cmd" "$@"
+	fi
+}
+
+# Copyright © 2020 by Tom Davis <tom@greyshirt.net>.

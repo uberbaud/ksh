@@ -47,8 +47,11 @@ function warnOrDie { #{{{1
 : ${USER:?}
 needs df awk egrep as-root
 
-fatopts="-t msdos -s -o rw,noexec,nosuid,-g=$USER,-u=$USER"
 ffsopts='-t ffs -s -o rw,noexec,nodev,sync,softdep'
+fatopts="-t msdos -s -o rw,noexec,nosuid,-g=$USER,-u=$USER"
+cdopts="-t cd9660 -s -o rw,noexec,nosuid,-g"
+
+WANT_FSCK=true
 
 function mnt-fs {
 	dev=/dev/"$1"
@@ -63,11 +66,14 @@ function mnt-fs {
 		warn "Could not ^Tmkdir^t ^S$mntpntD^s."
 		return 1
 	  }
-	notify fsck
-	as-root fsck -t $2 "$dev" || {
-		warn "Could not ^Tfsck^t ^S$devD^s."
-		return 1
-	}
+	
+	$WANT_FSCK && {
+		notify fsck
+		as-root fsck -t $2 "$dev" || {
+			warn "Could not ^Tfsck^t ^S$devD^s."
+			return 1
+		  }
+	  }
 	notify "mount $* $dev $mntpnt"
 	as-root mount "$@" "$dev" "$mntpnt" || {
 		warn "Could not ^Tmount^t ^S$devD^s."
@@ -78,7 +84,14 @@ function mnt-fs {
 
 awkpgm="$(</dev/stdin)" <<-\
 	\==AWKPGM==
-	/^label: /		{print substr($0,8)}
+	function printname() {
+		if (label)		print label;
+		else if (disk)	print disk;
+		else			print "unknown"
+	}
+	/^disk: /		{disk=substr($0,7)}
+	/^label: /		{label=substr($0,8)}
+	/^$/			{printname()}
 	/^  [abd-p]:/	{print $1,$4}
 	==AWKPGM==
 
@@ -98,8 +111,11 @@ function mnt-drv {
 	fstype="${diskinfo#*: }"
 
 	case "$fstype" in
-		MSDOS)	mnt-fs "$dev$part" "$label" $fatopts;			;;
-		4.2BSD)	mnt-fs "$dev$part" "$label" $ffsopts;			;;
+		MSDOS)		mnt-fs "$dev$part" "$label" $fatopts;		;;
+		4.2BSD)		mnt-fs "$dev$part" "$label" $ffsopts;		;;
+		ISO9660)	WANT_FSCK=false
+					mnt-fs "$dev$part" "$label" $cdopts
+					;;
 		*)		warn "Unknown type <^B$fstype^b>.";				;;
 	esac
 }

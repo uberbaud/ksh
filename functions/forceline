@@ -6,6 +6,7 @@
 #:   Useful mostly in prompts.
 
 function forceline {
+	local IFS=' '
 	set -- $($HOME/.local/bin/get-row-col)
 	(($2==1))|| print -- '\033[7m%\033[0m' >/dev/tty
   }

@@ -38,6 +38,7 @@ done
 shift $(($OPTIND - 1))
 # ready to process non '-' prefixed arguments
 # /options }}}1
+needs tidy
 
 work=${XDG_CACHE_HOME:?}/mail
 
@@ -62,6 +63,9 @@ for f in *; do
 		H="${f%.*}.html"
 		mv "$f" "$H" && f="$H"
 	fi
+	# fix all the Microsoft broken html marked as xhtml
+	[[ $f == *.html ]]&&
+		tidy -config $MMH/tidy.cfg --error-file $f.err $f
 	+parts "$f"
 done
 rm $mark

@@ -121,6 +121,9 @@ if [[ $files2delete != *\* ]]; then
         rm "${files2delete[@]}"
 fi
 
+# the MMH `show` litters `mhpath +` with temp files, get rid of them
+rm -f $(mhpath +)/show?????? >/dev/null 2>&1
+
 exec 3>&-
 
 # Copyright (C) 2017 by Tom Davis <tom@greyshirt.net>.

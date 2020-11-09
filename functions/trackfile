@@ -3,9 +3,11 @@
 
 #: FUNCTION ^Ufile name^u
 #:   Notes that a file should be synced. Ignores requests for files
-#:   whose full path name includes the string ^Isecret^i.
+#:   whose full path name includes the string ^U^Isecret^i^u or which are
+#:   in ^S$XDG_CACHE_HOME^s, ^S$TMPDIR^s, or ^S/tmp^s.
 
 function trackfile {
+	local istemp=false
 	[[ -f "$1" ]]|| {
 		warn "Can't track a non-existent file." "$1"
 		return 1
@@ -14,8 +16,21 @@ function trackfile {
 		warn 'Will not track a ^Bsecret^b file.'
 		return 0
 	  }
+
 	typeset t="$(readlink -nf "$1")" p=''
 	[[ -n "$t" ]]|| { warn 'File disappeared!'; return 1; }
+
+	[[ $t == /tmp/* ]]&&									istemp=true
+	[[ -n $TMPDIR && $t == $TMPDIR/* ]]&&					istemp=true
+	[[ -n $XDG_CACHE_HOME && $t == $XDG_CACHE_HOME/* ]]&&	istemp=true
+	$istemp && {
+		warn 'Will not track a ^Btemporary^b file.'
+		return 0
+	  }
+	[[ $t == *secret* ]]&& {
+		warn 'Will not track a ^Bsecret^b file.'
+		return 0
+	  }
 
 	typeset trackdir="$HOME"/hold/DOCSTORE/TRACK
 	[[ -d $trackdir ]]|| mkdir -p "$trackdir" || {

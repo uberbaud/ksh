@@ -1,18 +1,25 @@
 # <@(#)tag:csongor.greyshirt.net,2017-07-28:tw/04.55.10z/1d59ed9>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^[^U-u^u^]
+#: FUNCTION ^[^T-u^t^|^T-c^t^]
 #:   Show current timestamp in the local timezone.
 #:   ^T-u^t  Show the UTC version.
+#:   ^T-c^t  Compact format for filename parts. Implies ^T-u^t
 
 function now {
-	(($#>1))&& die 'Too many arguments (at most "-u").'
-	local fmt="${ISO_DATE:-%Y-%m-%d %H:%M:%S %z}"
+	local fmt utc
+	(($#>1))&& die 'Too many arguments (at most "-u" or "-t").'
+
+	fmt="${ISO_DATE:-%Y-%m-%d %H:%M:%S %z}"
 	(($#))&& {
-		[[ $1 == -u ]]|| die 'Unknown argument ("-u" or nothing)'
-		fmt="${fmt%\%z}Z"
+		case $1 in
+			-c)	fmt='%Y%m%d-%H%M%S';			;;
+			-u)	fmt="${fmt%\%z}Z";				;;
+			*)	die 'Unknown argument.';		;;
+		esac
+		utc=-u
 	}
-	date $1 +"$fmt"
+	date ${utc:-} +"$fmt"
 }
 
 

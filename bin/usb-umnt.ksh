@@ -48,7 +48,11 @@ function warnOrDie { #{{{1
 					'warnOrDie is [1m${warnOrDie}[22m.';		;;
 	esac
 } # }}}1
-
+function dev-from-mntpnt { # {{{1
+	local mntpnt
+	gsub / '\/' "$1" mntpnt
+	df -P|awk "/ $mntpnt\$/ {print \$1}"
+} # }}}1
 #   v new line
 NL='
 ' # ^ new line
@@ -102,8 +106,10 @@ function main {
 
 	for want in "${wants[@]}"; do
 		[[ $want == /* ]]|| want="/vol/$want"
+		dev=$(dev-from-mntpnt $want)
 		notify "Unmounting ^B$want^b."
-		as-root umount "$want" && rmdir "$want"
+		as-root /sbin/umount "$want" && rmdir "$want"
+		[[ -n $dev ]]&& as-root /bin/eject $dev
 	done
 
 }

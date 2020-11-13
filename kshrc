@@ -96,6 +96,7 @@ export TEMPLATES_FOLDER=$xdgdata/templates
 export TMPDIR=$xdgcache/temp
 export USRBIN=$HOME/bin/ksh
 export PERL_UNICODE=AS
+export PSQLRC=$xdgcfg/pg/psqlrc
 
 ####### IMPORT LOCAL BITS
 [[ -f $KDOTDIR/$HOST.kshrc ]]&& . $KDOTDIR/$HOST.kshrc
@@ -250,7 +251,6 @@ alias no2='2>/dev/null '
 alias noerr='2>/dev/null '
 alias cd='_u="$-"; set -u; f-cd'
 alias prn="printf '  \e[35m｢\e[39m%s\e[35m｣\e[39m\n'"
-alias reboot='as-root /sbin/reboot'
 alias vncsam='vncviewer -x11cursor -noraiseonbeep sam.lan'
 
 alias k='fc -s'

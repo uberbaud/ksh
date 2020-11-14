@@ -2,7 +2,8 @@
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
 #: FUNCTION ^Ucommand^u
-#:   ^Trlwrap^t ^Bonly if^b there are no arguments to ^Ucommand^u.
+#:   ^Trlwrap^t ^Bonly if^b there are no arguments to ^Ucommand^u, and
+#:       if ^SFORCE_RLWRAP^s is set and not false, no, or 0
 
 needs rlwrap
 function cond-rlwrap {
@@ -14,6 +15,10 @@ function cond-rlwrap {
 	(($#))&& WRAPIT=false
 	[[ -t 0 ]]|| WRAPIT=false
 	[[ -t 1 ]]|| WRAPIT=false
+	[[ -n ${FORCE_RLWRAP:-} ]]&& {
+		typeset -l force=$FORCE_RLWRAP
+		[[ $FORCE_RLWRAP != @(false|no|0) ]]&& WRAPIT=true
+	  }
 	if $WRAPIT; then
 		fflag=${RLWRAP_HOME:-:}/${cmd##*/}_flags
 		[[ -f $fflag ]]&& rlflags="$(<$fflag)"

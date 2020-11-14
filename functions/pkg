@@ -26,7 +26,7 @@ function pkg {
 	case $cmd in
 		add)		as-root $bin -i "$@"; record=true;					;;
 		check)		as-root $bin "$@";									;;
-		delete)		as-root $bin "$@"; as-root $bin -a; record=true;	;;
+		delete)		as-root $bin "$@" && as-root $bin -a; record=true;	;;
 		install)	die 'Did you mean ^Tadd^t or ^Tinstall^Ued^u^t?';	;;
 		installed)	/usr/sbin/pkg_info -mz;								;;
 		update)		as-root pkg_add -u "$@";							;;

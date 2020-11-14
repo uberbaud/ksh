@@ -13,21 +13,25 @@ function usage {
 	PGM="$REPLY"
 	sparkle >&2 <<-\
 	===SPARKLE===
-	^F{4}Usage^f: ^T$PGM^t
+	^F{4}Usage^f: ^T$PGM^t^[^T-a^t^] ^[^T-c^t^]
 	         List all notes for a directory.
+	           ^T-a^t  List ALL notes from everywhere!
+	           ^T-c^t  Compact (don't list dates)
 	       ^T$PGM -h^t
 	         Show this help message.
 	===SPARKLE===
 	exit 0
 } # }}}
 # process -options {{{1
+WANT_DATES=true
 function bad_programmer {	# {{{2
 	die 'Programmer error:'	\
 		"  No getopts action defined for [1m-$1[22m."
   };	# }}}2
-while getopts ':ah' Option; do
+while getopts ':ach' Option; do
 	case $Option in
 		a)	REPO="$XDG_DATA_HOME/sysdata/notes"; SUFFIX="";			;;
+		c)	WANT_DATES=false;										;;
 		h)	usage;													;;
 		\?)	die "Invalid option: [1m-$OPTARG[22m.";				;;
 		\:)	die "Option [1m-$OPTARG[22m requires an argument.";	;;
@@ -52,6 +56,8 @@ needs awk less sparkle
 [[ -d $REPO ]]|| exit 0		#empty
 cd $REPO || die 'Could not ^Tcd^t into ^B$REPO^b.'
 
+IFS='
+'
 set -- $(/bin/ls *"$SUFFIX" 2>/dev/null|sort -n)
 (($#))|| exit 0	#empty
 
@@ -68,6 +74,7 @@ AWKPGM="$(</dev/stdin)" <<-\
 	\===AWK===
 		/<@\(#\)tag:/ {next}
 		FNR == 2 && /^[0-9][0-9][0-9][0-9]-[01][0-9]-[0-3][0-9].* Z/ {
+				if (skipdate) {next}
 				if (FNR != NR) { print "" }
 				print "^B"$0"^b"
 				next
@@ -77,7 +84,10 @@ AWKPGM="$(</dev/stdin)" <<-\
 	===AWK===
 
 function main {
-	awk "$AWKPGM" "${notes[@]}"|sparkle|less -iMSx4 -FXc
+	local s=1
+	$WANT_DATES && s=0
+
+	awk -v skipdate=$s "$AWKPGM" "${notes[@]}"|sparkle|less -iMSx4 -FXc
 	((x))&& warn "Bad links:" "${badlinks[@]}"
 }
 main; exit 0

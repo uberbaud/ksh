@@ -54,14 +54,14 @@ function update-screen { # {{{1
 	i=$PLAYED
 	while ((i)); do
 		((i--))
-		IFS="$TAB" read -r id song || song=''
+		IFS="$TAB" read -r id song dur || song=''
 		BUFFER[i]="$song"
 	done <played.lst
-	IFS="$TAB" read -r id song <playing
+	IFS="$TAB" read -r id song dur <playing
 	BUFFER[PLAYING-1]="$song"
 	i=$((PLAYING-1))
 	while ((++i<LINES)); do
-		IFS="$TAB" read -r id song || song=''
+		IFS="$TAB" read -r id song dur || song=''
 		BUFFER[i]="$song"
 	done <song.lst
 

@@ -50,7 +50,7 @@ function warnOrDie { #{{{1
 
 needs file
 
-sysdata=${XDG_DATA_HOME:?}/sysdata
+sysdata=${SYSDATA:?}
 [[ -f $sysdata/mime.types ]]||    die 'Missing ^B$sysdata/mime.types^b'
 [[ -f $sysdata/mime.handlers ]]|| die 'Missing ^B$sysdata/mime.handlers^b'
 

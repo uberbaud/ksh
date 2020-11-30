@@ -3,13 +3,13 @@
 
 #: FUNCTION ^[^Unote text^u^]
 #:   Jot a quick note.
-#:   Stores notes to ^B^S$PWD^s/NOTES^b and links in ^B^S$XDG_DATA_HOME^s/sysdata/notes^b.
+#:   Stores notes to ^B^S$PWD^s/NOTES^b and links in ^B^S$SYSDATA^s/notes^b.
 #:   ^GList notes with^g ^Tls-notes^t.
 
 needs xclip
 function note {(
 	local NOTES="$PWD"/NOTES OLDPWD="$PWD" setnoglob=false
-	local noterepo=${XDG_DATA_HOME:-$HOME/.local}/sysdata/notes
+	local noterepo=${SYSDATA:?}/notes
 	[[ $PWD == */NOTES ]]&& NOTES="$PWD"
 	[[ $NOTES == $HOME ]]&& NOTES=${XDG_DOCUMENTS_DIR:-$HOME/docs}/NOTES
 	[[ -d $noterepo ]]|| {

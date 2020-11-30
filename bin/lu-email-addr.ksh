@@ -45,7 +45,7 @@ function warnOrDie { #{{{1
 	esac
 } # }}}1
 
-emailf=$XDG_DATA_HOME/sysdata/emails.tsv
+emailf=${SYSDATA:?}/emails.tsv
 [[ -f $emailf ]]|| die "Can't find the email file."
 
 gsub [[:punct:]] '.*' "$*"		# no punctuation

@@ -30,7 +30,7 @@ function bad_programmer {	# {{{2
   };	# }}}2
 while getopts ':ach' Option; do
 	case $Option in
-		a)	REPO="$XDG_DATA_HOME/sysdata/notes"; SUFFIX="";			;;
+		a)	REPO="${SYSDATA:?}/notes"; SUFFIX="";					;;
 		c)	WANT_DATES=false;										;;
 		h)	usage;													;;
 		\?)	die "Invalid option: [1m-$OPTARG[22m.";				;;

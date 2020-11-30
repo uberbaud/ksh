@@ -7,7 +7,8 @@
 needs clearout
 function t {
 	local tempdir curdir
-	tempdir=$(mktemp -d)	|| die 'Could not ^Tmktemp -d^t.'
+	tempdir=$(mktemp -d ${TMPDIR:-/tmp}/play.XXXXXXXXX)	||
+		die 'Could not ^Tmktemp -d^t.'
 	curdir=$PWD
 	builtin cd $tempdir		|| {
 		rm -f "$tempdir"

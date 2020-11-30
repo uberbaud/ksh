@@ -30,16 +30,26 @@ function i-can-haz-inet {
 	}
 
     needs dig
-    local NAME='uberbaud.net' ADDR='208.167.249.143' digopts DIG
-    # @8.8.8.8      : google DNS
-    # +short        : inet address only
-    # +time=1       : 1 second to timeout instead of default 5 seconds
-    # A             : section type
+    local NAME ADDR digopts DIG
+	#NAME='fred.lan'
+	#ADDR='192.168.17.1'
+    ## +short        : inet address only
+    ## +time=1       : 1 second to timeout instead of default 5 seconds
+    ## A             : section type
+	#DIG="$(dig +short +time=1 $NAME A 2>/dev/null)" || {
+	#	REPLY='DNS lookup for "fred.lan" failed.'
+	#	return 2
+	#  }
+
+	# try again
+    NAME='uberbaud.net'
+	ADDR='208.167.249.143'
 	DIG="$(dig +short +time=1 $NAME A 2>/dev/null)" || {
 		REPLY='local DNS lookup failed.'
 		return 2
 	  }
 	[[ -n $DIG ]]|| {
+    	# @8.8.8.8      : google DNS
 		DIG="$(dig @8.8.8.8 +short +time=1 $NAME A 2>/dev/null)" || {
 			REPLY='local and google DNS lookups failed.'
 			return 2

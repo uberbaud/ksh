@@ -47,18 +47,19 @@ function start-ui { #{{{1
 	[[ -s ui-pid ]]&& {
 		local PROCNAME
 		# ui-pid is set, but is it really running?
-		PROCNAME="$(ps -ocommand= -p $(<ui-pid))" && {
+		PROCNAME="$(ps -ocommand= -p $(<ui-pid) 2>/dev/null)" && {
 			[[ $PROCNAME == */amuse-ui.ksh ]]&&
 				return 1 # ui-pid points to a running amuse-ui
 
 			# bad PID, or PID points to something else, so CLEAR IT
 			print 'Clearing ui-pid'
-			: >amuse-ui
+			: >ui-pid
 		  }
 	  }
 
 	print 'Starting: amuse-ui'
-	/usr/local/bin/st						\
+	nohup >/dev/null 2>&1					\
+		/usr/local/bin/st					\
 		-c amuse-ui							\
 		-T amuse							\
 		-e ~/.config/ksh/bin/amuse-ui.ksh	\
@@ -69,7 +70,7 @@ function start-server { #{{{1
 	[[ -s server-pid ]]&& {
 		local PROCNAME
 		# server-pid is set, but is it really running?
-		PROCNAME="$(ps -ocommand= -p $(<server-pid))" && {
+		PROCNAME="$(ps -ocommand= -p $(<server-pid) 2>/dev/null)" && {
 			[[ $PROCNAME == */amuse-server.ksh ]]&&
 				return 1 # server-pid points to a running amuse-server
 
@@ -81,14 +82,34 @@ function start-server { #{{{1
 		  }
 	  }
 	print 'Starting: amuse-server'
-	~/.config/ksh/bin/amuse-server.ksh &
+	nohup >~/log/amuse-server.log 2>&1		\
+		~/.config/ksh/bin/amuse-server.ksh	&
 } #}}}
+function start-watchtime { #{{{1
+	[[ -s watchtime-pid ]]&& {
+		local PROCNAME
+		# watchtime-pid is set, but is it really running?
+		PROCNAME="$(ps -ocommand= -p $(<watchtime-pid) 2>/dev/null)" && {
+			[[ $PROCNAME == */amuse-watchtime.ksh ]]&&
+				return 1 # ui-pid points to a running amuse-ui
+
+			# bad PID, or PID points to something else, so CLEAR IT
+			print 'Clearing watchtime-pid'
+			: >watchtime-pid
+		  }
+	  }
+
+	print 'Starting: amuse-watchtime'
+	nohup >~/log/amuse-watchtime.log 2>&1	\
+	~/.config/ksh/bin/amuse-watchtime.ksh	&
+
+} #}}}1
 function CleanUp { # {{{1
-	local server=false ui=false player=false S
+	local server=false ui=false player=false watchtime=false S
 	# Server
 	[[ -s server-pid ]]&& {
 		server=true
-		S=$(ps -o state= $(<server-pid))
+		S=$(ps -o command= $(<server-pid) 2>/dev/null)
 		[[ -z $S ]]&& server=false
 	  }
 	if $server; then
@@ -104,7 +125,7 @@ function CleanUp { # {{{1
 	# Player
 	[[ -s player-pid ]]&& {
 		player=true
-		S=$(ps -o state= $(<player-pid))
+		S=$(ps -o command= $(<player-pid) 2>/dev/null)
 		[[ -z $S ]]&& player=false
 	  }
 	if $player; then
@@ -119,7 +140,7 @@ function CleanUp { # {{{1
 	# UI
 	[[ -s ui-pid ]]&& {
 		ui=true
-		S=$(ps -o state= $(<ui-pid))
+		S=$(ps -o command= $(<ui-pid) 2>/dev/null)
 		[[ -z $S ]]&& ui=false
 	  }
 	if $ui; then
@@ -128,21 +149,34 @@ function CleanUp { # {{{1
 		notify '@muse ^Bui^b is not running' 'cleaning up.'
 		: >ui-pid
 	fi
+
+	# WATCHTIME
+	[[ -s watchtime-pid ]]&& {
+		watchtime=true
+		S=$(ps -o command= $(<watchtime-pid) 2>/dev/null)
+		[[ -z $S ]]&& watchtime=false
+	  }
+	if $watchtime; then
+		notify '@muse ^Bwatchtime^b is running' 'Skipping.'
+	else
+		notify '@muse ^Bwatchtime^b is not running' 'cleaning up.'
+		: >watchtime-pid
+	fi
 } #}}}1
 function Start { #{{{1
 	local BUF
-	exec >~/log/amuse.log 2>&1 </dev/null
 
 	BUF="$(head -n 3 played.lst)"
 	>played.lst print -- "$BUF"
 
 	start-ui
 	start-server
+	start-watchtime
 
 } #}}}1
 function Stop { #{{{1
 	local p F N
-	for p in server ui; do
+	for p in server ui watchtime; do
 		F="$p-pid"
 		N="amuse-$p"
 		if [[ -s $F ]]; then
@@ -158,6 +192,10 @@ function Restart { Stop; Start; }
 needs amuse:env
 amuse:env
 cd "${AMUSE_RUN_DIR:?}" || die 'Could not ^Tcd^t to ^S$AMUSE_RUN_DIR^s.'
+
+#typeset -f -t start-ui start-server start-watchtime	\
+#	CleanUp Start Stop Restart
+#set -x
 
 $ACTION; exit
 

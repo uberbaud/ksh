@@ -43,24 +43,15 @@ function warnOrDie { #{{{1
 					'warnOrDie is [1m${warnOrDie}[22m.';		;;
 	esac
 } # }}}1
-
-: ${USER:?}
-needs df awk egrep as-root
-
-ffsopts='-t ffs -s -o rw,noexec,nodev,sync,softdep'
-fatopts="-t msdos -s -o rw,noexec,nosuid,-g=$USER,-u=$USER"
-cdopts="-t cd9660 -s -o rw,noexec,nosuid,-g"
-
-WANT_FSCK=true
-
-function mnt-fs {
+function mnt-fs { # {{{1
+	local dev mntpnt mntpntD devD
 	dev=/dev/"$1"
-	mntpnt=/vol/"$2"
+	mntpnt="$2"
 	shift 2
 
 	desparkle "$mntpnt";	mntpntD="$REPLY"
 	desparkle "$dev";		devD="$REPLY"
-	df -P | egrep -q "^$dev " && return 0
+	df -P | egrep -q "^$dev " && return 0 # already mounted
 	[[ -d $mntpnt ]]|| mkdir "$mntpnt"
 	(($?))&& {
 		warn "Could not ^Tmkdir^t ^S$mntpntD^s."
@@ -80,8 +71,23 @@ function mnt-fs {
 		return 1
 	  }
 	notify "Mounted ^S$devD^s at ^S$mntpntD^s."
-}
+} # }}}1
+function mount-fs-ondev-at { # {{{1
+	local fstype devpart mntpnt
+	fstype="$1"
+	devpart="$2"
+	mntpnt="$3"
 
+	case "$fstype" in
+		MSDOS)		mnt-fs "$devpart" "$mntpnt" $fatopts;		;;
+		4.2BSD)		mnt-fs "$devpart" "$mntpnt" $ffsopts;		;;
+		ISO9660)	WANT_FSCK=false
+					mnt-fs "$devpart" "$mntpnt" $cdopts
+					;;
+		*)		warn "Unknown type <^B$fstype^b>.";				;;
+	esac
+} # }}}1
+# mnt-drv and resources {{{1
 awkpgm="$(</dev/stdin)" <<-\
 	\==AWKPGM==
 	function printname() {
@@ -95,7 +101,9 @@ awkpgm="$(</dev/stdin)" <<-\
 	/^  [abd-p]:/	{print $1,$4}
 	==AWKPGM==
 
+
 function mnt-drv {
+	local dev diskinfo fstype id label namefile newlabel part
 	dev="$1"
 	id="${2:-}"
 	splitstr NL "$(as-root disklabel "$dev" | awk "${awkpgm[@]}")" diskinfo
@@ -109,23 +117,42 @@ function mnt-drv {
 
 	part="${diskinfo%: *}"
 	fstype="${diskinfo#*: }"
+	WANT_FSCK=true
+	mount-fs-ondev-at "$fstype" "$dev$part" /vol/"$label"
 
-	case "$fstype" in
-		MSDOS)		mnt-fs "$dev$part" "$label" $fatopts;		;;
-		4.2BSD)		mnt-fs "$dev$part" "$label" $ffsopts;		;;
-		ISO9660)	WANT_FSCK=false
-					mnt-fs "$dev$part" "$label" $cdopts
-					;;
-		*)		warn "Unknown type <^B$fstype^b>.";				;;
-	esac
+	# rename mount point IF there's a non-empty devname.txt file
+	namefile=/vol/"$label"/devname.txt
+	[[ -f $namefile ]]&& {
+		newlabel=$(<$namefile)
+		[[ -n $newlabel && $newlabel != $label ]]&& {
+			as-root umount /vol/"$label"
+			rmdir /vol/"$label"
+			WANT_FSCK=false
+			mount-fs-ondev-at "$fstype" "$dev$part" /vol/"$newlabel"
+		  }
+	  }
+
+} # }}}1
+
+: ${USER:?}
+needs df awk egrep as-root
+
+ffsopts='-t ffs -s -o rw,noexec,nodev,sync,softdep'
+fatopts="-t msdos -s -o rw,noexec,nosuid,-g=$USER,-u=$USER"
+cdopts="-t cd9660 -s -o rw,noexec,nosuid,-g"
+
+function main {
+
+
+	splitstr , "$(sysctl -n hw.disknames)" disknames
+	for d in "${disknames[@]}"; do
+		[[ $d == sd0:* ]]&& continue
+		desparkle "$d"
+		notify "Trying to mount ^B$REPLY^b."
+		mnt-drv "${d%%:*}" "${d#:}"
+	done
 }
 
-splitstr , "$(sysctl -n hw.disknames)" disknames
-for d in "${disknames[@]}"; do
-	[[ $d == sd0:* ]]&& continue
-	desparkle "$d"
-	notify "Trying to mount ^B$REPLY^b."
-	mnt-drv "${d%%:*}" "${d#:}"
-done
+main "$@"; exit
 
 # Copyright (C) 2017 by Tom Davis <tom@greyshirt.net>.

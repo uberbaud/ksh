@@ -1,0 +1,25 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2020-11-10,22.17.06z/1a6ac7c>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^G(no arguments)^g
+#:   Lists known hosts other than dotted quads.
+
+function list-known-hosts {
+	local dq dssh fknown fnames
+
+	dssh=${HOME:?}/.ssh
+		[[ -d $dssh ]]||		die 'No ^S.ssh^s directory.'
+	fknown=$dssh/known_hosts
+		[[ -f $fknown ]]||		die 'No ^Sknown_hosts^s file.'
+	fnames=$dssh/known-host-names
+
+	[[ $fnames -ot $fknown ]]&& {
+		dq='^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$'
+		[[ -e $fnames ]]|| touch $fnames
+		[[ -w $fnames ]]|| die '^S$fnames^s is not writable'
+		awk '{print $1}' $fknown|tr , \\n|egrep -v "$dq"|sort >$fnames
+	  }
+	print -r -- "$(<$fnames)"
+}
+
+# Copyright © 2020 by Tom Davis <tom@greyshirt.net>.

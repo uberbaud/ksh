@@ -4,6 +4,7 @@
 
 set -o nounset;: ${FPATH:?Run from within KSH}
 
+UPPER_LIMIT=20
 # Usage {{{1
 typeset -- this_pgm="${0##*/}"
 function usage {
@@ -38,6 +39,45 @@ done
 shift $(($OPTIND - 1))
 # ready to process non '-' prefixed arguments
 # /options }}}1
+function tidy-repeat { # {{{1
+	local i n
+	# HTML Tidy // tidy-html5 5.7.24
+	# tidy's output is dependent on input features such as DOCTYPE and
+	# the html namespace declarations, so we repeat the process until
+	# the output is consistent.
+	i=0
+	while ((i<$UPPER_LIMIT)); do
+		n=$((i+1))
+		tidy -config ${MMH:?}/tidy.cfg --error-file $n.err $i.html > $n.html
+		cmp -s $i.html $n.html && break
+		((i++))
+	done
+	REPLY=$n
+} # }}}1
+function clean-html {( # {{{1
+	local file tdir ferr fhtml
+	file=$(readlink -fn "${1:?}")
+	tdir="$(mktemp -d)"
+	cd $tdir			|| die "Could not ^Tcd^t to ^S$tdir^s."
+	ln "$file" 0.html	|| die "Could not ^Tln^t to ^S$file^s."
+	tidy-repeat
+	((REPLY))&& {
+		fhtml=$REPLY.html
+		print "$(<$fhtml)" >$file
+		for ferr in *.err; do
+			print -r -- "### $ferr ###"
+			print -r -- "$(<$ferr)"
+			print
+		done >$file.err
+	  }
+	if ((REPLY < UPPER_LIMIT)); then
+		rm *.{html,err}
+		rmdir "$PWD"	|| die "Could not ^Trmdir^t ^S$PWD^s."
+	else
+		warn "^Ttidy^ ran ^B$REPLY^b times without standardizing"	\
+			 "Did ^Enot^e ^Trmdir^t ^S$PWD^s"
+	fi
+)} # }}}1
 needs tidy
 
 work=${XDG_CACHE_HOME:?}/mail
@@ -63,9 +103,8 @@ for f in *; do
 		H="${f%.*}.html"
 		mv "$f" "$H" && f="$H"
 	fi
-	# fix all the Microsoft broken html marked as xhtml
-	[[ $f == *.html ]]&&
-		tidy -config $MMH/tidy.cfg --error-file $f.err $f
+	# fix all the Microsoft (et al.) broken html marked as xhtml
+	[[ $f == *.html ]]&& clean-html "$f"
 	+parts "$f"
 done
 rm $mark

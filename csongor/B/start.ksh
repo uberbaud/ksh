@@ -141,7 +141,7 @@ function optcmd-fsobject { # {{{1
 		mkdir -p "$HOME/${TRG#?}"
 		return $?
 	  }
-	typeset -- SRC="$(readlink -f "${REALHOME}/$2")"
+	typeset -- SRC="$(readlink -f "${REALHOME}/${2#!}")"
 	[[ -n $SRC ]]|| return 1
 
 	if [ $t "$SRC" ]; then

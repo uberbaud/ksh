@@ -1,0 +1,12 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2020-11-10,08.34.27z/4a59fab>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^G(no arguments)^g
+#:   Wrapper with bells
+
+function f-reboot {
+	/usr/bin/pkill '^xlogo$'
+	/usr/bin/doas /sbin/reboot
+}
+
+# Copyright © 2020 by Tom Davis <tom@greyshirt.net>.

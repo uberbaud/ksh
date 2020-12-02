@@ -1,0 +1,30 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2020-11-10,19.54.58z/2bd2478>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Uhost^u ^Upath^u ^[^Upath2 …^u^]
+#:   ^Ttar^t ^Upath^u | ^Tssh^t ^Uhost^u ^Ttar^t
+#:   ^GNote: uses^g ^S$VERBOSE^s ^Gset but not @(false|no|0)^g
+#:         ^GIf path is not absolute, it will be prefixed with ^S$PWD^s.
+
+needs is-known-host ssh tar
+function ssh-clonedir {
+	local host path v
+	host=${1:-ssh-clonedir: missing required parameter _host_}
+		shift
+	is-known-host "$host" || {
+		desparkle "$host"
+		die "^S$REPLY^s is not a known host."
+	  }
+	[[ ${VERBOSE:-0} != @(0|false|no) ]]&& v=v
+	for path; do
+		[[ $path != /* ]]&& path="$PWD/$path"
+		if [[ -a $path ]]; then
+			tar cz${v-}Pf - "$path" |
+				ssh "$host" 'tar xzPf -'
+		else
+			warn "No such file or directory: ^S$path^s."
+		fi
+	done
+}
+
+# Copyright © 2020 by Tom Davis <tom@greyshirt.net>.

@@ -1,0 +1,17 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2020-11-13,20.27.44z/1952b1e>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^G(no arguments)^g
+#:   Wrapper to ^Trlwrap^t and load an initialization file
+
+needs cond-rlwrap head sort
+function f-chibi-scheme {
+	local initF force mylib
+	force=${FORCE_RLWRAP-true}
+	mylib=${XDG_DATA_HOME:?}/chibi-scheme
+	initF=init.scm
+	FORCE_RLWRAP=$force cond-rlwrap \
+		chibi-scheme -A$mylib -l$initF "$@"
+}
+
+# Copyright © 2020 by Tom Davis <tom@greyshirt.net>.

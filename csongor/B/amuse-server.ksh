@@ -45,7 +45,7 @@ amuse:env	# Sets AMUSE_COMMANDS, AMUSE_RUN_DIR, AMUSE_DATA_HOME, and
 CONTINUE=true
 function kill-player { #{{{1
 	[[ -s player-pid ]]|| return
-	kill -HUP $(<player-pid)
+	kill -HUP $(<player-pid) # -pid sends to group, including watch-file
 	wait $FN_PLAY_PID
 } #}}}1
 function sig		{ >sigpipe print -- "$1" &	}
@@ -63,20 +63,23 @@ function file-from-id { # {{{1
 	P="${sqlreply[0]%"$F"}"
 	REPLY="$AMUSE_DATA_HOME/$P/$F.oga"
 } # }}}1
+function move-played-to-history {
+	local PlayedBuf PlayingBuf
+	PlayingBuf="$(<playing)"
+	: >playing
+	PlayedBuf="$(<played.lst)"
+	print -r -- "$PlayingBuf" >played.lst
+	print -r -- "$PlayedBuf" >>played.lst
+}
 function play-file { # {{{1
 	local action=played PlayedBuf PlayingBuf
+	print -- 0 >timeplayed
 	play-one-ogg "$1" ${2:-} >paused-at 3>timeplayed &
 	print $! >player-pid
-	: >timeplayed
 	wait $! || action=paused
 	: >player-pid
-	[[ -s again || -s paused-at ]]|| {
-		PlayingBuf="$(<playing)"
-		: >playing
-		PlayedBuf="$(<played.lst)"
-		print -r -- "$PlayingBuf" >played.lst
-		print -r -- "$PlayedBuf" >>played.lst
-	  }
+	[[ -s again || -s paused-at ]]||
+		move-played-to-history
 	print $action >sigpipe
 } # }}}1
 function play-one-song { #{{{1
@@ -96,12 +99,18 @@ function play-one-song { #{{{1
 			: >again
 		fi
 		startpos=
+	elif [[ -s final && -s again ]]; then
+		# we don't want to continue, but we need to do some clean up
+		:
+	elif [[ -s final ]]; then
+		# we're kind of done
+		m
 	else
 		# Grab the song from the list
 		fpop song.lst >playing || return 1
 		startpos=
 	fi
-	read amuse_id song <playing
+	read amuse_id the_rest <playing
 	file-from-id "$amuse_id"
 	play-file "$REPLY" $startpos &
 	FN_PLAY_PID=$!
@@ -111,50 +120,46 @@ function play-one-song { #{{{1
 function docmd-again { #{{{1
 	local N=0
 	[[ -s again ]]&& N=$(<again)
-	print $((again+1))>again
+	print $((N+1)) >again
 } #}}}1
 function docmd-final { #{{{1
 	print true >final
-	PLAY=false
+	return 1
 } #}}}1
 function docmd-pause { #{{{1
 	kill-player
-	PLAY=false
+	return 1
 } #}}}1
 function docmd-play { #{{{1
-	PLAY=true
-} #}}}1
-function docmd-skip { #{{{1
-	kill-player
-	: >paused-at
-	PLAY=true
+	return 0
 } #}}}1
 function docmd-restart { #{{{1
-	do-again
-	do-skip
-	PLAY=true
+	docmd-again
+	docmd-skip
+	return 0
 } #}}}1
 function docmd-stop { #{{{1
-	do-pause
+	kill-player
 	: >paused-at
-	PLAY=false
+	move-played-to-history
+	return 1
+} #}}}1
+function docmd-skip { #{{{1
+	docmd-stop
+	return 0
 } #}}}1
 function docmd-played { #{{{1
-	PLAY=true
+	return 0
 	[[ -s final ]]&& {
 		: >final
-		PLAY=false
+		return 1
 	  }
 } #}}}1
 function docmd-paused { #{{{1
-	PLAY=false
+	return 1
 } #}}}1
 function startup { #{{{1
-	[[ -s paused-at ]]&& {
-		PLAY=false
-		return 1
-	  }
-	PLAY=true
+	[[ -s paused-at ]]&& return 1
 	return 0
 } #}}}1
 function is-valid-cmd { # {{{1
@@ -172,10 +177,16 @@ function handle-cmd { # {{{1
 		fi
 		return
 	  }
-	docmd-$cmd
-	$PLAY && play-one-song
-	[[ -s ui-pid ]]&&
-		kill -USR1 $(<ui-pid)
+
+	# if we're NOT PLAYING, ignore all commands EXCEPT play
+	[[ -s playing && ! -s paused-at ]] ||
+		[[ $cmd == play ]]|| return
+
+	docmd-$cmd && {
+		[[ -s ui-pid ]]&& kill -USR1 -$(<ui-pid)
+		play-one-song
+	  }
+	[[ -s ui-pid ]]&& kill -USR1 -$(<ui-pid)
 } # }}}1
 function evloop { # {{{1
 	local cmd
@@ -207,8 +218,6 @@ trap hQuit		TERM QUIT
 trap ''			HUP INT TSTP USR1 USR2
 add-exit-action hCleanUp
 
-PLAY=startup			# Global variable/function returning 0 (true) or
-						# !0 (false)
 #_________________________________________________________________________
 sig no-op		# prime the fifo so it is opened (no fatal error
 				# bypassing SIGEXIT) and give the loop something to do

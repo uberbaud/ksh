@@ -6,6 +6,7 @@
 #:   and run a second command whose name and argument are in the banner
 
 function f-clear {
+	local IFS=' '
 	# short circut if FD[2] isn't a terminal
 	[[ -t 2 ]]|| { tput clear; "$@"; return; }
 	print -u2 '\033[H\033[2J\033[3J\033[H\c'

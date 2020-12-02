@@ -1,0 +1,25 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2020-11-25,07.21.35z/30aff70>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^G(no arguments)^g
+#:   List connected devices on local lan.
+
+function ls-lan {
+	local l h awkpgm lan
+	awkpgm="$(</dev/stdin)" <<-\
+	\==AWK==
+	/not found:/	{printf("  %s\n\033[1A",$1);next}
+					{printf("  %-16s  %s\n",$1,$NF)}
+	==AWK==
+	lan=$(ifconfig|awk '/^\tinet / && $2 ~ "^192\.168\." {print $2}')
+	[[ -n $lan ]]|| die "We are not on a ^S192.168^s network."
+	lan=${lan%.+([0-9])}
+	for l in $(jot 255); do
+		h=$lan.$l
+		print -n "$h "
+		host $h
+	done | awk "$awkpgm"
+
+}
+
+# Copyright © 2020 by Tom Davis <tom@greyshirt.net>.

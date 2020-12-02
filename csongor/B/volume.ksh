@@ -19,9 +19,12 @@ function usage {
 	PGM="$REPLY"
 	sparkle >&2 <<-\
 	===SPARKLE===
-	^F{4}Usage^f: ^T$PGM^t ^[^Uvolume^u^|^T+^t^|^T-^t^]
+	^F{4}Usage^f: ^T$PGM^t ^[^Uvolume^u^|^T+^t^|^T-^t^|^T-m^t^|^Tmute^t^|^T-t^t^|^Ttoggle-mute^t^]
 	         Change the volume. ^Uvolume^u can be as a percent, or a
 	         float between 0 and 1, or a ^T+^t or ^T-^t to increase or decrease.
+	           ^T-m^t^|^Tmute^t^*         mute on
+	           ^T-t^t^|^Ttoggle-mute^t^*  toggle mute
+	               ^*^/ everything after the initial ^Tm^t or ^Tt^t is ignored
 
 	         If no argument is given, ^T$PGM^t prints the current volume.
 
@@ -35,8 +38,10 @@ function bad_programmer {	# {{{2
 	die 'Programmer error:'	\
 		"  No getopts action defined for [1m-$1[22m."
   };	# }}}2
-while getopts ':h' Option; do
+while getopts ':mh' Option; do
 	case $Option in
+		m)	set mute;											;;
+		t)	set toggle-mute;									;;
 		h)	usage;												;;
 		\?)	die "Invalid option: ^B-$OPTARG^b.";				;;
 		\:)	die "Option ^B-$OPTARG^b requires an argument.";	;;
@@ -55,6 +60,12 @@ function warnOrDie { #{{{1
 					'warnOrDie is [1m${warnOrDie}[22m.';		;;
 	esac
 } # }}}1
+function mute { # {{{1
+	sndioctl -q output.mute=1
+} # }}}
+function toggle-mute { # {{{1
+	sndioctl -q output.mute=$((!$(sndioctl -n output.mute)))
+} # }}}
 function set-volume		{ # {{{1
 	sndioctl output.level${1:+=$1} |
 		tee $XDG_CONFIG_HOME/etc/sndioctl.rc
@@ -63,17 +74,21 @@ function set-as-percent	{ set-volume $(dc -e "3k ${1%\%} 100/p");	}
 function adjust-volume { # {{{1
 	local op=$1
 	set -- $(sndioctl -n output.level output.mute)
+	(($2))&& { # don't adjust if we're muted, just unmute
+		sndioctl -q output.mute=0
+		return
+	  }
 	set-volume $(dc -e "5k $1 $vstep $op p")
-	(($2))&& sndioctl -q output.mute=0
 } # }}}1
-function bad-volume-fmt {
+function bad-volume-fmt { # {{{1
 	desparkle "$1"
 	die 'Bad volume format'										\
 		"Found: ^B$REPLY^b"										\
 		'Expected ^Iunit range^i: ^T0.000^t−^T1.000^t, or'	\
 		'         ^Ipercentage^i: ^T0^t−^T100^t, or'			\
 		'         ^Iadjustment^i: ^T+^t or ^T-^t'
-}
+} # }}}1
+
 
 # wrap script guts in a function so edits to this script file don't 
 # affect running instances of the script.
@@ -85,6 +100,8 @@ function main {
 		100?(.*(0))?(%))			set-volume		1;		;;
 		+|-)						adjust-volume	$1;		;;
 		'')							set-volume		'';		;;
+		m*)							mute;					;;
+		t*)							toggle-mute;			;;
 		*)							bad-volume-fmt	$1;		;;
 	esac
 }

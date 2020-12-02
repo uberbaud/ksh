@@ -1,0 +1,17 @@
+<@(#)tag:tw.csongor.greyshirt.net,2020-12-02,15.21.21z/d0a151>
+2020-12-02 15:21:21 Z
+
+Initialization Files
+
+  Login
+    /etc/profile
+    $HOME/.profile
+
+  Privileged: Does not read /etc/profile or $HOME/.profile
+    /etc/suid_profile
+
+  Interactive: If ENV is set eg:
+
+    'export ENV=$XDG_CONFIG_HOME/ksh/kshrc'
+
+  then the file named by $ENV is executed.

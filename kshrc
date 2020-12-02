@@ -11,16 +11,13 @@ export HOME="$(getent passwd $USER | awk -F: '{print $6}')"
 TTY="${TTY:-$(basename "$(tty)")}"
 export HOSTNAME=${HOSTNAME:-$(uname -n)}
 export HOST=${HOSTNAME%%.*}
-[[ -n $console ]]|| {
-	console=$(sysctl kern.consdev)
-	console=${console#*=}
-  }
 export TERM
 
 export SYSLOCAL=/usr/local
-export ISO_DATE='%Y-%m-%d %H:%M:%S %z'
 export URI_AUTHORITY='greyshirt.net'
-export XDIALOG_NO_GMSGS=1	# Xdialog Gdk/GLib/Gtk will not g_log()
+export KDOTDIR
+[[ -d "${ENV%/*}" ]]&&
+	KDOTDIR="${ENV%/*}"
 
 # XDG paths
 if [[ -d ${XDG_CONFIG_HOME:-~/.config} ]]; then
@@ -30,13 +27,9 @@ if [[ -d ${XDG_CONFIG_HOME:-~/.config} ]]; then
 	fi
 	for v in $(typeset +); do [[ $v == XDG_* ]]&& export $v; done
 
-	if [[ -d $XDG_CONFIG_HOME/ksh ]]; then
-		export KDOTDIR=$XDG_CONFIG_HOME/ksh
-		K=$KDOTDIR
-		F=$K/functions
-		B=$K/bin
-		H=$K/help
-	fi
+	[[ -z $KDOTDIR && -d $XDG_CONFIG_HOME/ksh ]]&&
+		KDOTDIR=$XDG_CONFIG_HOME/ksh
+
 else
 	XDG_CONFIG_HOME=$HOME/.config
 	XDG_DATA_HOME=$HOME/.local
@@ -50,16 +43,27 @@ xdgdata=$XDG_DATA_HOME
 xdgcfg=$XDG_CONFIG_HOME
 xdgcache=$XDG_CACHE_HOME
 SYSDATA=$xdgdata/sysdata
-	[[ -d $SYSDATA ]]&& export SYSDATA || unset SYSDATA
+[[ -d $SYSDATA ]]&& export SYSDATA || unset SYSDATA
+
+[[ -n $KDOTDIR ]]&& {
+	K=$KDOTDIR			; KU=$KDOTDIR/$HOST
+	F=$K/functions		; [[ -d $KU/F ]]&& FU=$KU/F
+	B=$K/bin			; [[ -d $KU/B ]]&& BU=$KU/B
+	H=$K/help
+
+	[[ -d $KU ]]|| mkdir $KU
+	export FPATH=$F${FU+:$FU}
+	KHIST=$KDOTDIR/H/history
+  }
+
 
 # special history file stuff
-KHIST=$KDOTDIR/history
 histcache=$xdgcache/history
 [[ -d $histcache ]]|| mkdir -p $histcache
 fhist=$(mktemp $histcache/ksh-hist.XXXXXXXXXXXX)
 if (($?)); then
 	print '  \033[38;5;172mwarning\033[0m: Using common history.'
-	fhist=$KHIST
+	fhist=${KHIST:-/tmp}
 else
 	histmark="# OLDHISTORY $(date -u +'%Y-%m-%d %H:%M:%S Z')"
 	T="$(cat)" <<-===
@@ -78,9 +82,7 @@ else
 fi
 
 # paths
-export me=$HOME/work/clients/me
 export CPATH=$xdgdata/c
-export FPATH=$KDOTDIR/functions
 export HISTCONTROL=ignoredups:ignorespace
 export HISTFILE=$fhist
 export HISTSIZE=8191
@@ -96,9 +98,10 @@ export TEMPLATES_FOLDER=$xdgdata/templates
 export TMPDIR=$xdgcache/temp
 export USRBIN=$HOME/bin/ksh
 export PERL_UNICODE=AS
+export PSQLRC=$xdgcfg/pg/psqlrc
 
 ####### IMPORT LOCAL BITS
-[[ -f $KDOTDIR/$HOST.kshrc ]]&& . $KDOTDIR/$HOST.kshrc
+[[ -f $KU/kshrc ]]&& . $KU/kshrc
 
 # have cpanm install things where we want them
 export USR_PLIB=$xdgdata/lib/perl5
@@ -125,22 +128,16 @@ PERLBREW_BIN=$PERLBREW_CURRENT/bin
 set -o vi -o vi-tabcomplete
 set -o braceexpand -o ignoreeof -o physical
 
-export GTK_IM_MODULE=xim
 export INPUTRC=$xdgcfg/init/input.rc
 export LANG=en_US.UTF-8
 for v in ALL COLLATE CTYPE MESSAGES MONETARY NUMERIC TIME; do
 	export LC_$v=$LANG
 done
-export QT_IM_MODULE=xim
-export XCOMPOSEFILE=$xdgcfg/x11/Compose.tw
-export XMODIFIERS='@im=none'
 
 # init files and paths
 export BC_ENV_ARG=$xdgcfg/etc/bc.rc
 export BZR_HOME=$xdgcfg/bzr
-export CALENDAR_DIR=$xdgcfg/calendar
 export HGRCPATH=$xdgcfg/hg
-export KAKOUNE_POSIX_SHELL=/usr/local/bin/dash
 
 # ==== DEFAULT APPS
 # handle whether  EDITOR or VISUAL was set in $HOST.kshrc
@@ -199,8 +196,6 @@ export AUTOMAKE_VERSION=1.16
 # misc
 export CLICOLOR=1
 export COLORTERM=truecolor
-export GNUPGHOME=$xdgdata/gnupg
-export GPG_AGENT=$SYSLOCAL/bin/gpg-agent
 export ISO_DATE='%Y-%m-%d %H:%M:%S %z'
 export ISO_WEEK='%G-W%V-%u'
 export LESS='-RcgiSw#8'
@@ -217,19 +212,8 @@ NL='
 # functions or the executables, we name those functions with the 'f-' 
 # prefix and then alias those to the name without the 'f-'. Everybody 
 # wins.
-for p in f amuse; do
-	for i in $F/$p-*; { i="${i#$F/}"; alias "${i#$p-}=$i"; }
-done
-# and some special love for amuse: bits
-amuse:create-cmd-wrappers
-# noglobs
-for i in cowmath math note; { alias $i="noglob $i"; }
-alias mathcow="noglob cowmath"
-# askfirst all commands that use ssh
-for i in ssh scp sftp rsync;	{ alias "$i=ssh-askfirst $i"; }
-# Make fully qualified known hosts into aliases for sshing to that host
-for i in $(grep '\.' $K/completions/ssh); do
-	alias "$i=ssh $i"
+for p in $F ${FU:-}; do
+	for i in $p/f-*; { i="${i#$p/}"; alias "${i#f-}=$i"; }
 done
 # FPATH functions are implicitly autoloaded, but the completion 
 # mechanism doesn't know about them unless we explicitly autoload them
@@ -239,50 +223,32 @@ IFS=" $TAB$NL"
 # clean up
 unset p i
 
-alias clear='f-clear ' # expand alias of $2
+alias cd='_u="$-"; set -u; f-cd'
 alias cls='clear colorls $LS_OPTIONS'
 alias doas='as-root '
-alias i-can-haz-inet='i-can-haz-inet;E=$?;print -r -- "  $REPLY";(return $E)&&:'
-alias ls='/usr/local/bin/colorls $LS_OPTIONS'
-alias noglob='set -f;noglob '; function noglob { set +f; ("$@"); }
 alias hush='>/dev/null 2>&1 '
+alias k='fc -s'
+alias ls='/usr/local/bin/colorls $LS_OPTIONS'
 alias no2='2>/dev/null '
 alias noerr='2>/dev/null '
-alias cd='_u="$-"; set -u; f-cd'
+alias noglob='set -f;noglob '; function noglob { set +f; ("$@"); }
 alias prn="printf '  \e[35m｢\e[39m%s\e[35m｣\e[39m\n'"
-alias reboot='as-root /sbin/reboot'
-alias vncsam='vncviewer -x11cursor -noraiseonbeep sam.lan'
 
-alias k='fc -s'
-alias ff='find0 -type f'
-alias fd='find0 -type d'
-alias fn='find0 -name'
-alias ffn='find0 -type f -name'
-alias fdn='find0 -type d -name'
-alias x0='xargs -0'
-
-for s in $(getent shells); do
-	[[ $s == $SHELL ]]&& continue
-	alias ${s##*/}="reshell $s"
-done
-unset s
-
-VISED=/usr/local/bin/vis
-[[ -x $VISED ]]&& alias vised="VISUAL=\"$VISED\" v" || unset VISED
-#LUA_PATH=		# lua modules paths
-#LUA_CPATH=		# C libraries paths
-#LUA_PATH_5_3=		# lua modules paths; versioned vars override standard
-#LUA_CPATH_5_3=		# C libraries paths; versioned vars override standard
-
-KCOMPLETE=$KDOTDIR/completions
-makeout=$KCOMPLETE/make.out
-get-exclusive-lock completion-make
-make -C $KCOMPLETE >$KCOMPLETE/make.out
-[[ -s $makeout ]]&& {
-	notify 'Recompiled completion modules:'
-	COLUMNS=${COLUMNS:-$(tput col)}
-	column -c $((COLUMNS-8)) $makeout|expand|sed -e 's/^/    /'
+[[ -n $KDOTDIR ]]&& {
+	KCOMPLETE=$KDOTDIR/completions
+	: run in sub-shell for exceptions sake; (
+		makeout=$KCOMPLETE/make.out
+		get-exclusive-lock completion-make
+		make -C $KCOMPLETE >$KCOMPLETE/make.out
+		[[ -s $makeout ]]&& {
+			notify 'Recompiled completion modules:'
+			COLUMNS=${COLUMNS:-$(tput col)}
+			column -c $((COLUMNS-8)) $makeout|expand|sed -e 's/^/    /'
+		  }
+		rm $makeout
+		release-exclusive-lock completion-make
+	)
+	. $KCOMPLETE/completions.ksh
   }
-rm $makeout
-release-exclusive-lock completion-make
-. $KDOTDIR/completions/completions.ksh
+
+# fin

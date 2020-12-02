@@ -9,6 +9,8 @@
 #:       ^T-I^t  case sensitive (default is case insensitive)
 #:   example: ^Tpkg query '\b(?^i:lisp)\b'^t
 #:       performs a case insenstive word bounded search for ^Slisp^s.
+#: FUNCTION ^Tupdate^t^|^Tupgrade^t
+#:       updates installed packages.
 #: FUNCTION ^Tinstalled^t
 #:   lists manually installed packages in a format which can be used by
 #:   ^Tpkg_add -l^t to do a best effort with flavors but not hampered by
@@ -26,10 +28,11 @@ function pkg {
 	case $cmd in
 		add)		as-root $bin -i "$@"; record=true;					;;
 		check)		as-root $bin "$@";									;;
-		delete)		as-root $bin "$@"; as-root $bin -a; record=true;	;;
+		delete)		as-root $bin "$@" && as-root $bin -a; record=true;	;;
 		install)	die 'Did you mean ^Tadd^t or ^Tinstall^Ued^u^t?';	;;
 		installed)	/usr/sbin/pkg_info -mz;								;;
-		update)		as-root pkg_add -u "$@";							;;
+		update|upgrade)
+			as-root pkg_add -u "$@";									;;
 		web|www)
 			needs w3m
 			typeset f u h F

@@ -135,7 +135,6 @@ function set-hex3 { # {{{1
 	set-hex6 "#$r$r$g$g$b$b"
 } # }}}1
 function set-16-colors { # {{{1
-set -x
 	local hex
 	warn 'The default pallette is often changed.' 'Therefore these are only approximations.'
 	case $1 in
@@ -149,7 +148,7 @@ set -x
 		 7) hex='#c0c0c0';		;;
 		 8) hex='#808080';		;;
 		 9) hex='#ff0000';		;;
-		11) hex='#00ff00';		;;
+		11) hex='#ffff00';		;;
 		12) hex='#0000ff';		;;
 		13) hex='#ff00ff';		;;
 		14) hex='#00ffff';		;;

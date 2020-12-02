@@ -4,6 +4,8 @@
 
 set -o nounset;: ${FPATH:?Run from within KSH}
 
+ltype='performer'
+
 # Usage {{{1
 typeset -- this_pgm="${0##*/}"
 function usage {
@@ -11,9 +13,11 @@ function usage {
 	PGM="$REPLY"
 	sparkle >&2 <<-\
 	===SPARKLE===
-	^F{4}Usage^f: ^T$PGM^t ^[^Upattern^u^]
-	         List performers, albums, songs filtered by given parameters.
-	         If no pattern is given, a random letter is used.
+	^F{4}Usage^f: ^T$PGM^t ^[^T-a^t^|^T-s^t^] ^[^Upattern^u^]
+	         List performers matching ^Upattern^u.
+	         If no pattern is given, a random beggining letter is used.
+	           ^T-a^t  Search for matching ^Balbum names^b instead of performer.
+	           ^T-s^t  Search for matching ^Bsong names^b instead of performer.
 	       ^T$PGM -h^t
 	         Show this help message.
 	===SPARKLE===
@@ -24,8 +28,10 @@ function bad_programmer {	# {{{2
 	die 'Programmer error:'	\
 		"  No getopts action defined for [1m-$1[22m."
   };	# }}}2
-while getopts ':h' Option; do
+while getopts ':ash' Option; do
 	case $Option in
+		a)	ltype='album';											;;
+		s)	ltype='song';											;;
 		h)	usage;													;;
 		\?)	die "Invalid option: [1m-$OPTARG[22m.";				;;
 		\:)	die "Option [1m-$OPTARG[22m requires an argument.";	;;
@@ -77,7 +83,7 @@ SQL <<-\
 	==SQL==
 	SELECT DISTINCT value
 	  FROM amuse.vtags
-	 WHERE label = 'performer'
+	 WHERE label = '$ltype'
 	   AND ( $where )
 	   ORDER BY lower(value)
 	 ;

@@ -1,5 +1,5 @@
 #!/bin/ksh
-# <@(#)tag:tw.csongor.greyshirt.net,2019-07-15,15.48.36z/574c245>
+# <@(#)tag:tw.csongor.greyshirt.net,2020-09-15,05.47.11z/5901eae>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
 
 set -o nounset;: ${FPATH:?Run from within KSH}
@@ -11,10 +11,8 @@ function usage {
 	PGM="$REPLY"
 	sparkle >&2 <<-\
 	===SPARKLE===
-	^F{4}Usage^f: ^T$PGM^t ^[-m ^Ufile glob^u^] ^[^T-R^t^] ^Ustruct_name^u ^[^Tdir1^t … ^TdirN^t^]
-	         Finds a C struct definition in ^S*.h^s found in given directories, or ^S\$PWD^s.
-	           ^T-m^t  uses ^Ufile glob^u instead of ^S*.h^s.
-	           ^T-R^t  recurseses subdirectories.
+	^F{4}Usage^f: ^T$PGM^t
+	         Sends USR2 signals on changes to $AMUSE_RUN_DIR/timeplayed.
 	       ^T$PGM -h^t
 	         Show this help message.
 	===SPARKLE===
@@ -25,12 +23,8 @@ function bad_programmer {	# {{{2
 	die 'Programmer error:'	\
 		"  No getopts action defined for [1m-$1[22m."
   };	# }}}2
-fglob='*.h'
-recurse=false
-while getopts ':hm:R' Option; do
+while getopts ':h' Option; do
 	case $Option in
-		m)	fglob="$OPTARG";									;;
-		R)	recurse=true;										;;
 		h)	usage;												;;
 		\?)	die "Invalid option: ^B-$OPTARG^b.";				;;
 		\:)	die "Option ^B-$OPTARG^b requires an argument.";	;;
@@ -50,31 +44,27 @@ function warnOrDie { #{{{1
 	esac
 } # }}}1
 
-needs find awk
+CONTINUE=true
+function hSig		{ CONTINUE=false;		}
+function hCleanUp	{ : >watchtime-pid;		}
+needs amuse:env watch-file
+amuse:env
+cd ${AMUSE_RUN_DIR:?}
+print -- $$ >watchtime-pid
 
-(($#))|| die 'Missing required parameter ^Sstruct_name^s'
-sname="$1"; shift
-(($#))|| set -- .
+trap hSig HUP INT TSTP TERM QUIT
+add-exit-action hCleanUp
 
-$recurse || depth='-maxdepth 1'
-set -- $(find "$@" -type f -name "$fglob" ${depth:-})
+# wrap script guts in a function so edits to this script file don't 
+# affect running instances of the script.
+function main {
+	while $CONTINUE; do
+		[[ -s ui-pid ]]&&
+			kill -USR2 $(<ui-pid)
+		watch-file timeplayed || break
+	done
+}
 
-(($#))|| die 'No C or header files found.'
+main "$@"; exit
 
-awkpgm="$(</dev/stdin)" <<-\
-	==AWK==
-	BEGIN { p=0; f=0 }
-	/struct[ \t]+$sname[ \t]*{/ {
-			printf("%s:%d\n", FILENAME, FNR);
-			p=1
-			f=1
-		}
-	p	{ printf( "    %s\n", \$0 ) }
-	/}/ { p=0 }
-	END { exit !f }
-	==AWK==
-
-awk "$awkpgm" "$@"
-
-
-# Copyright (C) 2019 by Tom Davis <tom@greyshirt.net>.
+# Copyright (C) 2020 by Tom Davis <tom@greyshirt.net>.

@@ -11,16 +11,10 @@ export HOME="$(getent passwd $USER | awk -F: '{print $6}')"
 TTY="${TTY:-$(basename "$(tty)")}"
 export HOSTNAME=${HOSTNAME:-$(uname -n)}
 export HOST=${HOSTNAME%%.*}
-[[ -n $console ]]|| {
-	console=$(sysctl kern.consdev)
-	console=${console#*=}
-  }
 export TERM
 
 export SYSLOCAL=/usr/local
-export ISO_DATE='%Y-%m-%d %H:%M:%S %z'
 export URI_AUTHORITY='greyshirt.net'
-export XDIALOG_NO_GMSGS=1	# Xdialog Gdk/GLib/Gtk will not g_log()
 export KDOTDIR
 [[ -d "${ENV%/*}" ]]&&
 	KDOTDIR="${ENV%/*}"
@@ -88,7 +82,6 @@ else
 fi
 
 # paths
-export me=$HOME/work/clients/me
 export CPATH=$xdgdata/c
 export HISTCONTROL=ignoredups:ignorespace
 export HISTFILE=$fhist
@@ -135,22 +128,16 @@ PERLBREW_BIN=$PERLBREW_CURRENT/bin
 set -o vi -o vi-tabcomplete
 set -o braceexpand -o ignoreeof -o physical
 
-export GTK_IM_MODULE=xim
 export INPUTRC=$xdgcfg/init/input.rc
 export LANG=en_US.UTF-8
 for v in ALL COLLATE CTYPE MESSAGES MONETARY NUMERIC TIME; do
 	export LC_$v=$LANG
 done
-export QT_IM_MODULE=xim
-export XCOMPOSEFILE=$xdgcfg/x11/Compose.tw
-export XMODIFIERS='@im=none'
 
 # init files and paths
 export BC_ENV_ARG=$xdgcfg/etc/bc.rc
 export BZR_HOME=$xdgcfg/bzr
-export CALENDAR_DIR=$xdgcfg/calendar
 export HGRCPATH=$xdgcfg/hg
-export KAKOUNE_POSIX_SHELL=/usr/local/bin/dash
 
 # ==== DEFAULT APPS
 # handle whether  EDITOR or VISUAL was set in $HOST.kshrc
@@ -209,8 +196,6 @@ export AUTOMAKE_VERSION=1.16
 # misc
 export CLICOLOR=1
 export COLORTERM=truecolor
-export GNUPGHOME=$xdgdata/gnupg
-export GPG_AGENT=$SYSLOCAL/bin/gpg-agent
 export ISO_DATE='%Y-%m-%d %H:%M:%S %z'
 export ISO_WEEK='%G-W%V-%u'
 export LESS='-RcgiSw#8'
@@ -227,19 +212,8 @@ NL='
 # functions or the executables, we name those functions with the 'f-' 
 # prefix and then alias those to the name without the 'f-'. Everybody 
 # wins.
-for p in f amuse; do
-	for i in $F/$p-*; { i="${i#$F/}"; alias "${i#$p-}=$i"; }
-done
-# and some special love for amuse: bits
-amuse:create-cmd-wrappers
-# noglobs
-for i in cowmath math note; { alias $i="noglob $i"; }
-alias mathcow="noglob cowmath"
-# askfirst all commands that use ssh
-for i in ssh scp sftp rsync;	{ alias "$i=ssh-askfirst $i"; }
-# Make fully qualified known hosts into aliases for sshing to that host
-for i in $(grep '\.' $K/completions/ssh); do
-	alias "$i=ssh $i"
+for p in $F ${FU:-}; do
+	for i in $p/f-*; { i="${i#$p/}"; alias "${i#f-}=$i"; }
 done
 # FPATH functions are implicitly autoloaded, but the completion 
 # mechanism doesn't know about them unless we explicitly autoload them
@@ -249,39 +223,16 @@ IFS=" $TAB$NL"
 # clean up
 unset p i
 
-alias clear='f-clear ' # expand alias of $2
+alias cd='_u="$-"; set -u; f-cd'
 alias cls='clear colorls $LS_OPTIONS'
 alias doas='as-root '
-alias i-can-haz-inet='i-can-haz-inet;E=$?;print -r -- "  $REPLY";(return $E)&&:'
-alias ls='/usr/local/bin/colorls $LS_OPTIONS'
-alias noglob='set -f;noglob '; function noglob { set +f; ("$@"); }
 alias hush='>/dev/null 2>&1 '
+alias k='fc -s'
+alias ls='/usr/local/bin/colorls $LS_OPTIONS'
 alias no2='2>/dev/null '
 alias noerr='2>/dev/null '
-alias cd='_u="$-"; set -u; f-cd'
+alias noglob='set -f;noglob '; function noglob { set +f; ("$@"); }
 alias prn="printf '  \e[35m｢\e[39m%s\e[35m｣\e[39m\n'"
-alias vncsam='vncviewer -x11cursor -noraiseonbeep sam.lan'
-
-alias k='fc -s'
-alias ff='find0 -type f'
-alias fd='find0 -type d'
-alias fn='find0 -name'
-alias ffn='find0 -type f -name'
-alias fdn='find0 -type d -name'
-alias x0='xargs -0'
-
-for s in $(getent shells); do
-	[[ $s == $SHELL ]]&& continue
-	alias ${s##*/}="reshell $s"
-done
-unset s
-
-VISED=/usr/local/bin/vis
-[[ -x $VISED ]]&& alias vised="VISUAL=\"$VISED\" v" || unset VISED
-#LUA_PATH=		# lua modules paths
-#LUA_CPATH=		# C libraries paths
-#LUA_PATH_5_3=		# lua modules paths; versioned vars override standard
-#LUA_CPATH_5_3=		# C libraries paths; versioned vars override standard
 
 [[ -n $KDOTDIR ]]&& {
 	KCOMPLETE=$KDOTDIR/completions
@@ -299,3 +250,5 @@ VISED=/usr/local/bin/vis
 	)
 	. $KCOMPLETE/completions.ksh
   }
+
+# fin

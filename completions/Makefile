@@ -81,6 +81,7 @@ rcctl_2: $(PKG_LOG)
 
 $(PKG_LOG):
 	@echo $@
+	@mkdir -p $(PKG_LOG:H)
 	@touch $(PKG_LOG)
 
 .PHONY: all clean

@@ -21,6 +21,9 @@ export SYSLOCAL=/usr/local
 export ISO_DATE='%Y-%m-%d %H:%M:%S %z'
 export URI_AUTHORITY='greyshirt.net'
 export XDIALOG_NO_GMSGS=1	# Xdialog Gdk/GLib/Gtk will not g_log()
+export KDOTDIR
+[[ -d "${ENV%/*}" ]]&&
+	KDOTDIR="${ENV%/*}"
 
 # XDG paths
 if [[ -d ${XDG_CONFIG_HOME:-~/.config} ]]; then
@@ -30,13 +33,9 @@ if [[ -d ${XDG_CONFIG_HOME:-~/.config} ]]; then
 	fi
 	for v in $(typeset +); do [[ $v == XDG_* ]]&& export $v; done
 
-	if [[ -d $XDG_CONFIG_HOME/ksh ]]; then
-		export KDOTDIR=$XDG_CONFIG_HOME/ksh
-		K=$KDOTDIR
-		F=$K/functions
-		B=$K/bin
-		H=$K/help
-	fi
+	[[ -z $KDOTDIR && -d $XDG_CONFIG_HOME/ksh ]]&&
+		KDOTDIR=$XDG_CONFIG_HOME/ksh
+
 else
 	XDG_CONFIG_HOME=$HOME/.config
 	XDG_DATA_HOME=$HOME/.local
@@ -50,16 +49,27 @@ xdgdata=$XDG_DATA_HOME
 xdgcfg=$XDG_CONFIG_HOME
 xdgcache=$XDG_CACHE_HOME
 SYSDATA=$xdgdata/sysdata
-	[[ -d $SYSDATA ]]&& export SYSDATA || unset SYSDATA
+[[ -d $SYSDATA ]]&& export SYSDATA || unset SYSDATA
+
+[[ -n $KDOTDIR ]]&& {
+	K=$KDOTDIR			; KU=$KDOTDIR/$HOST
+	F=$K/functions		; [[ -d FU=$KU/F ]]&& FU=$KU/F
+	B=$K/bin			; [[ -d FB=$KU/B ]]&& FB=$KU/B
+	H=$K/help
+
+	[[ -d $KU ]]|| mkdir $KU
+	export FPATH=$F${FU+:$FU}
+	KHIST=$KDOTDIR/H/history
+  }
+
 
 # special history file stuff
-KHIST=$KDOTDIR/history
 histcache=$xdgcache/history
 [[ -d $histcache ]]|| mkdir -p $histcache
 fhist=$(mktemp $histcache/ksh-hist.XXXXXXXXXXXX)
 if (($?)); then
 	print '  \033[38;5;172mwarning\033[0m: Using common history.'
-	fhist=$KHIST
+	fhist=${KHIST:-/tmp}
 else
 	histmark="# OLDHISTORY $(date -u +'%Y-%m-%d %H:%M:%S Z')"
 	T="$(cat)" <<-===
@@ -80,7 +90,6 @@ fi
 # paths
 export me=$HOME/work/clients/me
 export CPATH=$xdgdata/c
-export FPATH=$KDOTDIR/functions
 export HISTCONTROL=ignoredups:ignorespace
 export HISTFILE=$fhist
 export HISTSIZE=8191
@@ -99,7 +108,7 @@ export PERL_UNICODE=AS
 export PSQLRC=$xdgcfg/pg/psqlrc
 
 ####### IMPORT LOCAL BITS
-[[ -f $KDOTDIR/$HOST.kshrc ]]&& . $KDOTDIR/$HOST.kshrc
+[[ -f $KU/kshrc ]]&& . $KU/kshrc
 
 # have cpanm install things where we want them
 export USR_PLIB=$xdgdata/lib/perl5
@@ -274,15 +283,19 @@ VISED=/usr/local/bin/vis
 #LUA_PATH_5_3=		# lua modules paths; versioned vars override standard
 #LUA_CPATH_5_3=		# C libraries paths; versioned vars override standard
 
-KCOMPLETE=$KDOTDIR/completions
-makeout=$KCOMPLETE/make.out
-get-exclusive-lock completion-make
-make -C $KCOMPLETE >$KCOMPLETE/make.out
-[[ -s $makeout ]]&& {
-	notify 'Recompiled completion modules:'
-	COLUMNS=${COLUMNS:-$(tput col)}
-	column -c $((COLUMNS-8)) $makeout|expand|sed -e 's/^/    /'
+[[ -n $KDOTDIR ]]&& {
+	KCOMPLETE=$KDOTDIR/completions
+	: run in sub-shell for exceptions sake; (
+		makeout=$KCOMPLETE/make.out
+		get-exclusive-lock completion-make
+		make -C $KCOMPLETE >$KCOMPLETE/make.out
+		[[ -s $makeout ]]&& {
+			notify 'Recompiled completion modules:'
+			COLUMNS=${COLUMNS:-$(tput col)}
+			column -c $((COLUMNS-8)) $makeout|expand|sed -e 's/^/    /'
+		  }
+		rm $makeout
+		release-exclusive-lock completion-make
+	)
+	. $KCOMPLETE/completions.ksh
   }
-rm $makeout
-release-exclusive-lock completion-make
-. $KDOTDIR/completions/completions.ksh

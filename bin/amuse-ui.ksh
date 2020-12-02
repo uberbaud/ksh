@@ -192,38 +192,16 @@ function update-screen { # {{{1
 	i=$lastRowPLAYED
 	while ((i)); do
 		((i--))
-<<<<<<< Updated upstream
-		IFS="$TAB" read -r id song dur || song=''
-||||||| constructed merge base
-		IFS="$TAB" read -r id song || song=''
-=======
 		IFS="$TAB" read -r id song dtenths || song=''
->>>>>>> Stashed changes
 		BUFFER[i]="$song"
 	done <played.lst
-<<<<<<< Updated upstream
-	IFS="$TAB" read -r id song dur <playing
-	BUFFER[PLAYING-1]="$song"
-	i=$((PLAYING-1))
-||||||| constructed merge base
-	IFS="$TAB" read -r id song <playing
-	BUFFER[PLAYING-1]="$song"
-	i=$((PLAYING-1))
-=======
 	IFS="$TAB" read -r id song DURATION <playing
 	DSEC=${DURATION%?}
 	DHMS=$(s2hms $DSEC)
 	BUFFER[rowPLAYING-1]="$song"
 	i=$((rowPLAYING-1))
->>>>>>> Stashed changes
 	while ((++i<LINES)); do
-<<<<<<< Updated upstream
-		IFS="$TAB" read -r id song dur || song=''
-||||||| constructed merge base
-		IFS="$TAB" read -r id song || song=''
-=======
 		IFS="$TAB" read -r id song dtenths || song=''
->>>>>>> Stashed changes
 		BUFFER[i]="$song"
 	done <song.lst
 

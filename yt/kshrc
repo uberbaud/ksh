@@ -3,6 +3,7 @@
 # vim: ts=4 ft=ksh
 
 export PRINTER=poco
+export ABDUCO_CMD=/bin/ksh
 
 osrev=$(uname -r)
 osarc=$(uname -m)

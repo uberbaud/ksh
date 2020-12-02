@@ -48,7 +48,7 @@ SYSDATA=$xdgdata/sysdata
 [[ -n $KDOTDIR ]]&& {
 	K=$KDOTDIR			; KU=$KDOTDIR/$HOST
 	F=$K/functions		; [[ -d $KU/F ]]&& FU=$KU/F
-	B=$K/bin			; [[ -d $KU/B ]]&& FB=$KU/B
+	B=$K/bin			; [[ -d $KU/B ]]&& BU=$KU/B
 	H=$K/help
 
 	[[ -d $KU ]]|| mkdir $KU

@@ -4,16 +4,9 @@
 #: FUNCTION ^Umsg line1^u ^[^Umsg line…N^u^]
 #:   Output a notice to ^SSTDERR^s.
 
+needs message
 function notify {
-	(($#))|| set '^GNo message provided.^g'
-	local ln1="$1"; shift
-	if (($#)); then
-		printf ' ^N>>>^n %s\n' "$ln1"
-		printf '     %s\n' "$@"
-	else
-		printf ' ^N>>>^n %s\n' "$ln1"
-	fi | sparkle
-} >&2
-
+	message ' ^N>>>^n' '    ' "$@"
+}
 
 # Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

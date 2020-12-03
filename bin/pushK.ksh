@@ -45,6 +45,8 @@ function warnOrDie { #{{{1
 } # }}}1
 (($#))&& die 'Unexpected arguments. Expected ^Bnone^b.'
 
+needs git h1
+
 i-can-haz-inet	|| die 'No internet' "$REPLY"
 cd ${KDOTDIR:?}	|| die 'Could not ^Tcd^t to ^S$KDOTDIR^s.'
 
@@ -91,7 +93,7 @@ function + {
 		cmd="${cmd:+$cmd }$1"
 		shift
 	done
-	notify "$cmd"
+	h1 "$cmd"
 	git $cmd || die "${2:-^B$cmd^b}"
 }
 

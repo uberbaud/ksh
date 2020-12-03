@@ -4,17 +4,12 @@
 #: FUNCTION ^Umsg-ln1^u ^[^Umsg-ln…N^u^]
 #:   Output an error message to ^SSTDERR^s and exit.
 
+needs message
 function die {
-	(($#))|| set '^GNo message provided^g'
-	local ln1="$1"; shift
-	if (($#)); then
-		printf '  ^EFAILED^e: %s\n' "$ln1"
-		printf '          %s\n' "$@"
-	else
-		printf '  ^EFAILED^e: %s\n' "$ln1"
-	fi | sparkle
+	message '  ^EFAILED^e:' '         ' "$@"
+	# don't exit a user's shell, just get back to the prompt
 	[[ -o interactive ]]&& kill -s TERM $$
 	exit ${errno:-1}
-  } >&2
+  }
 
 # vim: ft=ksh ts=4

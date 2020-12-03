@@ -1,0 +1,20 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2020-12-03,22.24.43z/1e95609>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^G(no arguments)^g
+#:   Generalized bit for notify, warn, and die.
+
+function message {
+	local prefix_first prefix_others s
+	prefix_first=${1:?Missing prefix_first}
+	prefix_others=${2:?Missing prefix_others}
+	shift 2
+	(($#))|| set '^GNo message provided.^g'
+	{
+		print -- "$prefix_first $1"
+		shift
+		for s { print -- "$prefix_others $s"; }
+	} | sparkle >&2
+}
+
+# Copyright © 2020 by Tom Davis <tom@greyshirt.net>.

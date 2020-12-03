@@ -97,11 +97,11 @@ function + {
 	git $cmd || die "${2:-^B$cmd^b}"
 }
 
-+ checkout master
++ checkout master --quiet
 + merge $HOST
 [[ -n $(git status --short) ]]&&
 	+ commit --all		msg 'did not commit ^Bmaster^b'
 + push
-+ checkout $HOST
++ checkout $HOST --quiet
 
 # Copyright (C) 2017 by Tom Davis <tom@greyshirt.net>.

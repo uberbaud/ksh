@@ -11,7 +11,7 @@ set -A complete_fossil_1 -- 3-way-merge add addremove alerts all amend annotate 
 set -A complete_inc -- +inbox -help -nochangecur
 set -A complete_kill_1 -- -9 -CONT -HUP -INFO -INT -KILL -STOP -USR1 -USR2
 set -A complete_mediainfo -- --Help-Output --Info-Parameters --Output='General;%Duration/String3%,Audio;%OverallBitRate%'
-set -A complete_mget -- bgumm102@gmail.com developer@tbdavis.com occupant@greyshirt.net subscriber@greyshirt.net tbdavis@tbdavis.com tom@tbdavis.com uberbaud@tbdavis.com
+set -A complete_mget -- 
 set -A complete_perlbrew -- alias available clean clone-modules download exec help info init install install-cpanm install-multiple install-patchperl lib list off self-install self-upgrade switch switch-off uninstall upgrade-perl use version
 set -A complete_pkg_1 -- add check delete grep installed query update web www
 set -A complete_poco -- copies= duplex economy fit-to-page manualfeed page-ranges= raw reverse

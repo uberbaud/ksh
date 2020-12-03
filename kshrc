@@ -71,14 +71,17 @@ else
 		local fhist KHIST
 		fhist='$fhist'
 		KHIST='$KHIST'
-		awk '/^$histmark\$/{p=1;next}p' "\$fhist">>"\$KHIST" &&
-			rm "\$fhist"
+		awk '/^$histmark\$/{p=1;next}p' "\$fhist">>"\$KHIST"
+		(($?))&& { warn 'Did not update \$K/H/history'; return; }
+		rm "\$fhist"
 	}
 	===
 	eval "$T"
 	add-exit-action ShHistCleanUp
 	tail -n 127 $KHIST>$fhist
 	print "$histmark" >>$fhist
+	HISTFILE="$fhist"
+	notify "HISTFILE=$fhist"
 fi
 
 # paths

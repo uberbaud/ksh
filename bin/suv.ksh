@@ -50,12 +50,25 @@ function warnOrDie { #{{{1
 					"warnOrDie is ^S${warnOrDie}^s.";		;;
 	esac
 } # }}}1
+function remove-lockfile { # {{{1
+	local lockfile base file expectedCmd
+	lockfile="$1/$2"
+	base=$1
+	file=$2
+	expectedCmd=/home/tw/bin/ksh/suv
+	set -- $(ps -ocommand= -p $(<$lockfile))
+	[[ -n ${1:-} && $1 == /bin/ksh			&&
+	   -n ${2:-} && $2 == $expectedCmd		&&
+	   -n ${3:-} && $3 == $filename
+	]]&& return 1
+	rm "$lockfile"
+} # }}}1
 
 (($#))|| die 'Missing required argument ^Ufile^u.'
 needs ci co $ED as-root
 
 CI_INITIAL_DESCRIPTION='OpenBSD system file'
-LOCKBASE="${XDG_DATA_HOME:?}"/run/suv/locks
+LOCKBASE="${XDG_CACHE_HOME:?}"/suv/locks
 [[ -d $LOCKBASE ]]|| {
 	mkdir -p "$LOCKBASE" || die 'Could not ^Tmkdir^t ^S$LOCKBASE^s.'
   }
@@ -81,10 +94,13 @@ filepath="${filename%/*}"
 		"Instead, use ^T:W^t inside ^Tvim^t (^Tv^t or ^Tnew^t)."
 
 # GET AN EXCLUSIVE LOCK ON THE FILE
-gsub '/' '%' "$file_or_error"
+gsub '/' '%' "$filename"
 lockfile="$REPLY"
-get-exclusive-lock-or-exit "$lockfile" "$LOCKBASE" ||
-	die "PID $(<$LOCKBASE/$lockfile) has locked ^U$1^u."
+get-exclusive-lock-or-exit "$lockfile" "$LOCKBASE"	|| {
+	remove-lockfile "$LOCKBASE" "$lockfile" &&
+		get-exclusive-lock-or-exit "$lockfile" "$LOCKBASE"
+	} || die "PID $(<$LOCKBASE/$lockfile) has locked ^U$1^u."
+
 print $$>"$LOCKBASE/$lockfile"
 # WE HAVE A LOCK
 

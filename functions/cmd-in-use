@@ -1,0 +1,48 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2020-12-03,19.43.25z/3214cb1>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^[^Ufgrep options^u^] ^Ucmd name^u
+#:   Check ^S$K^s, ^S$B^s, ^S$F^s, and ^S$HOST^s variants for ^Ucmd name^u
+
+function cmd-in-use {(
+	local cmd eopts f link alt
+	: ${NL:?} ${TAB:?} "${1:?Missing required parameter _cmd_name_}"
+	IFS="$NL"
+	# pop cmd from args.
+	cmd=$*; eopts=${cmd%$NL*}; cmd=${cmd##*$NL}
+	# find other names for cmd_name, POSSIBLE FALSE POSITIVES
+	for f in ${LOCALBIN:?}/* ${USRBIN:?}/* ${HOME:?}/bin/*; do
+		[[ -h $f ]]|| continue
+		link=$(readlink -fn $f)
+		link=${link##*/}
+		f=${f##*/}
+		# the soft link points to the cmd
+		[[ $link == $cmd ]]&&	alt="${alt:-}$NL$f"
+		# the cmd IS a soft link, so include the file pointed to
+		[[ $f == $cmd ]]&&		alt="${alt:-}$NL$link"
+	done
+	cmd="$cmd$alt"
+
+	[[ -n $DEBUG ]]&& {
+		desparkle "$cmd"
+		notify "looking for:" ^I^N$REPLY^n^i
+	  }
+
+	builtin cd ${KDOTDIR:?}
+	set --								\
+		bin/*							\
+		functions/*						\
+		{csongor,yt,uberbaud}/{B,F}/*	\
+		{.,csongor,yt,uberbaud}/kshrc
+	set -- $(for f; do
+				[[ -f $f ]]||				continue
+				for link in $cmd; do
+					[[ $f == */$link ]]&&	continue 2
+				done
+				[[ $f == *\* ]]&&			continue
+				print -r -- "$f"
+			done);
+	fgrep -w $eopts "[[:<:]]$cmd[[:>:]]" "$@"
+)}
+
+# Copyright © 2020 by Tom Davis <tom@greyshirt.net>.

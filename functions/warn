@@ -3,17 +3,11 @@
 #: FUNCTION ^Umsg line1^u ^[^Umsg line…N^u^]
 #:   Output a warning to ^SSTDERR^s.
 
+needs message
 function warn {
-	(($#))|| set '^GNo message provided^g'
-	local ln1="$1"; shift
-	if (($#)); then
-		printf '  ^Wwarning^w: %s\n' "$ln1"
-		printf '           %s\n' "$@"
-	else
-		printf '  ^Wwarning^w: %s\n' "$ln1"
-	fi | sparkle
+	message '  ^Wwarning^w:' '          ' "$@"
 	false # we got here with a non-zero $?, lets leave that way too
-  } >&2
+  }
 
 
 # vim: ft=ksh ts=4

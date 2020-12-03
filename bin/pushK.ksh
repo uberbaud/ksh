@@ -87,7 +87,7 @@ branch="$(git rev-parse --abbrev-ref HEAD 2>/dev/null)"
 
 git checkout master		|| die '^Bcheckout master^b'
 git merge $HOST			|| die "^Bmerge $HOST^b"
-git commit -all			|| die "^Bmaster^b commit -a"
+git commit --all		|| die "^Bmaster^b commit -a"
 git push				|| die '^Bpush^b'
 git checkout $HOST		|| die "^Bcheckout $HOST^b"
 

@@ -43,6 +43,16 @@ function warnOrDie { #{{{1
 					'warnOrDie is [1m${warnOrDie}[22m.';		;;
 	esac
 } # }}}1
+function + { # {{{1
+	local cmd= o
+	for o; do
+		[[ $o == msg ]]&& break
+		cmd="${cmd:+$cmd }$1"
+		shift
+	done
+	h1 "$cmd"
+	git $cmd || die "${2:-^B$cmd^b}"
+} # }}}1
 (($#))&& die 'Unexpected arguments. Expected ^Bnone^b.'
 
 needs git h1
@@ -54,11 +64,9 @@ alias FAIL='{ warn "FAILED"; exit 1; }'
 
 branch="$(git rev-parse --abbrev-ref HEAD 2>/dev/null)"
 [[ $branch == master ]]|| {
-	changed=false
 
-	# update the index
 	# checks to see if merges or updates are needed
-	git update-index -q --ignore-submodules --refresh
+	#git update-index --refresh -q
 
 	# add untracked and unignored files, if any
 	set -A untracked -- $(git ls-files --exclude-standard --others)
@@ -81,24 +89,12 @@ branch="$(git rev-parse --abbrev-ref HEAD 2>/dev/null)"
 		warn "Uncommitted changes"
 		git diff-index --cached --name-status -r --ignore-submodules HEAD |
 			sed 's/^/        /' >&2
-		warn 'Committing'
-		git commit -av || FAIL
+		+ commit -av
 	  }
   }
 
-function + {
-	local cmd= o
-	for o; do
-		[[ $o == msg ]]&& break
-		cmd="${cmd:+$cmd }$1"
-		shift
-	done
-	h1 "$cmd"
-	git $cmd || die "${2:-^B$cmd^b}"
-}
-
 + checkout master --quiet
-+ merge $HOST
++ merge $HOST --quiet
 [[ -n $(git status --short) ]]&&
 	+ commit --all		msg 'did not commit ^Bmaster^b'
 + push

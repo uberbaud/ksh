@@ -81,7 +81,6 @@ else
 	tail -n 127 $KHIST>$fhist
 	print "$histmark" >>$fhist
 	HISTFILE="$fhist"
-	notify "HISTFILE=$fhist"
 fi
 
 # paths

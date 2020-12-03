@@ -48,8 +48,6 @@ function warnOrDie { #{{{1
 i-can-haz-inet	|| die 'No internet' "$REPLY"
 cd ${KDOTDIR:?}	|| die 'Could not ^Tcd^t to ^S$KDOTDIR^s.'
 
-bin/update-help-completions.ksh
-
 alias FAIL='{ warn "FAILED"; exit 1; }'
 
 branch="$(git rev-parse --abbrev-ref HEAD 2>/dev/null)"
@@ -57,6 +55,7 @@ branch="$(git rev-parse --abbrev-ref HEAD 2>/dev/null)"
 	changed=false
 
 	# update the index
+	# checks to see if merges or updates are needed
 	git update-index -q --ignore-submodules --refresh
 
 	# add untracked and unignored files, if any
@@ -85,10 +84,22 @@ branch="$(git rev-parse --abbrev-ref HEAD 2>/dev/null)"
 	  }
   }
 
-git checkout master		|| die '^Bcheckout master^b'
-git merge $HOST			|| die "^Bmerge $HOST^b"
-git commit --all		|| die "^Bmaster^b commit -a"
-git push				|| die '^Bpush^b'
-git checkout $HOST		|| die "^Bcheckout $HOST^b"
+function + {
+	local cmd= o
+	for o; do
+		[[ $o == msg ]]&& break
+		cmd="${cmd:+$cmd }$1"
+		shift
+	done
+	notify "$cmd"
+	git $cmd || die "${2:-^B$cmd^b}"
+}
+
++ checkout master
++ merge $HOST
+[[ -n $(git status --short) ]]&&
+	+ commit --all		msg 'did not commit ^Bmaster^b'
++ push
++ checkout $HOST
 
 # Copyright (C) 2017 by Tom Davis <tom@greyshirt.net>.

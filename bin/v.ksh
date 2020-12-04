@@ -75,7 +75,8 @@ function clear-dead-edit { # {{{1
 	return 0
 } # }}}1
 function safe-to-edit { #{{{1
-	local F="$1" ovpid
+	local F ovpid
+	F="${1:?Programmer error. Missing parameter.}"
 	gsub % %% "$F"
 	gsub / %  "$REPLY"
 	LOCKNAME="$REPLY"
@@ -102,57 +103,46 @@ function check-flags-for-writability { # {{{1
 	((flags&SAPPND))&&	flagstr="$flagstr,sappnd"
 	die "File is flagged ^B${flagstr#,}^b. It is not writable."
 } # }}}1
+function verify-file-is-editable { # {{{1
+	local ftype
+	[[ -f $f_fullpath ]]||	die "^B$1^b is ^Bnot^b a file."
+	[[ $f_fullpath == *,v ]]&&
+		warnOrDie "Seems to be an ^BRCS archive^b file."
+	ftype="$(/usr/bin/file -b "$f_fullpath")"
+
+	[[ $ftype == *text* || $ftype == *XML* ]]||
+		warnOrDie "Does not seem to be a text file."
+} # }}}1
 
 # TODO: test 'checked-out'ness with something like	
 #       [[ -n $(rlog -L -l bobslunch.rem) ]]		
 
-needs $ED
-EDBIN="${ED##*/}"
-(($#))|| exec "$ED"
+needs $ED ci co rcsdiff trackfile
 
-function main {
+(($#))|| exec "$ED" # We don't have a file, so short circut all the rest.
 
-typeset -- f_fullpath errmsg
-if [[ -a $1 ]]; then
-	f_fullpath="$( readlink -fn -- "$1")"
-	errmsg='Could not follow link.'
-elif [[ $1 == =* ]]; then
-	f_fullpath="$(command -v "${1#=}")"
-	if [[ -z $f_fullpath ]]; then
-		die 'No such command nor function.'
-	elif [[ $f_fullpath == /* ]]; then
-		f_fullpath="$(readlink -fn -- "$f_fullpath")"
-		errmsg='Could not follow command'\''s link.'
-	else
-		f_fullpath="$(find-function "${1#=}")"
-		errmsg='Could not find function.'
-	fi
-else
-	die "No such file ^B${1}^b."
-fi
 
-[[ -n $f_fullpath ]]||	die "$errmsg"
-[[ -f $f_fullpath ]]||	die "^B$1^b is ^Bnot^b a file."
-check-flags-for-writability "$f_fullpath"
-[[ $f_fullpath == *,v ]]&& warnOrDie "Seems to be an ^BRCS archive^b file."
-typeset -- ftype="$( /usr/bin/file -b "$f_fullpath")"
-[[ $ftype == *text* || $ftype == *XML* ]]||
-						warnOrDie "Does not seem to be a text file."
+[[ -a $1 ]]|| die "No such file ^B$1^b."
+f_fullpath="$(readlink -fn -- "$1" 2>/dev/null)" ||
+	die "Could not ^Treadlink^t ^B$1^b."
 shift
 
-safe-to-edit "$f_fullpath" || die "${reply[@]}"
+verify-file-is-editable "$f_fullpath"
+check-flags-for-writability "$f_fullpath"
+safe-to-edit "$f_fullpath"
 
-typeset hasmsg=false rcsmsg=''
+hasmsg=false
+rcsmsg=''
 (($#))&& { hasmsg=true; rcsmsg="$*"; }
 
 # because we've `readlink`ed the arg, it's guaranteed to have at least 
 # one (1) forward slash ('/') as (and at) the root.
-typeset -- f_path="${f_fullpath%/*}"
-typeset -- f_name="${f_fullpath##*/}"
+f_path="${f_fullpath%/*}"
+f_name="${f_fullpath##*/}"
 
 cd "$f_path" || die "Could not ^Tcd^t to ^B${f_path}^b."
 
-typeset -- has_rcs=false
+has_rcs=false
 [[ -d RCS && -f RCS/"$f_name,v" ]] && {
 	has_rcs=true
 	rcsdiff -q ./"$f_name" ||
@@ -171,33 +161,35 @@ typeset -- has_rcs=false
 # algorithms, more than twice as fast as sha224 or sha256, and nearly
 # twice as fast as the 64 bit SHAs (384, 512/256, 512). But it's even
 # faster than md5, or the traditional cksum algorithm.
-CKSUM_BEFORE="$(cksum -qa sha1b "$f_fullpath")"
-$ED "$f_fullpath"
-CKSUM_AFTER="$(cksum -qa sha1b "$f_fullpath")"
-[[ $CKSUM_BEFORE != $CKSUM_AFTER ]]&& {
-	trackfile "$f_fullpath"
-	[[ -f .LAST_UPDATED ]]&& date -u +"$ISO_DATE" >.LAST_UPDATED
-  }
 
-if [[ -d RCS ]]; then
-	new-array rcsopts
-	+rcsopts -q -u
-	if $has_rcs; then
-		$hasmsg && +rcsopts -m"$rcsmsg"
-		rcsdiff -q ./"$f_name"
-		ci "${rcsopts[@]}" -j ./"$f_name"
-	else
-		# without the dash at the beginning of rcsmsg, the message would 
-		# be taken from a file named in $rcsmsg
-		$hasmsg && +rcsopts -t-"$rcsmsg"
-		ci "${rcsopts[@]}" -i ./"$f_name"
+function main {
+
+	CKSUM_BEFORE="$(cksum -qa sha1b "$f_fullpath")"
+	$ED "$f_fullpath"
+	CKSUM_AFTER="$(cksum -qa sha1b "$f_fullpath")"
+	[[ $CKSUM_BEFORE != $CKSUM_AFTER ]]&& {
+		trackfile "$f_fullpath"
+		[[ -f .LAST_UPDATED ]]&& date -u +"$ISO_DATE" >.LAST_UPDATED
+	  }
+
+	if [[ -d RCS ]]; then
+		new-array rcsopts
+		+rcsopts -q -u
+		if $has_rcs; then
+			$hasmsg && +rcsopts -m"$rcsmsg"
+			rcsdiff -q ./"$f_name"
+			ci "${rcsopts[@]}" -j ./"$f_name"
+		else
+			# without the dash at the beginning of rcsmsg, the message would 
+			# be taken from a file named in $rcsmsg
+			$hasmsg && +rcsopts -t-"$rcsmsg"
+			ci "${rcsopts[@]}" -i ./"$f_name"
+		fi
+	elif $hasmsg; then
+		warn 'No ^SRCS/^s.'
 	fi
-elif $hasmsg; then
-	warn 'No ^SRCS/^s.'
-fi
 
-[[ -n ${LOCKNAME:-} ]]&& release-exclusive-lock "$LOCKNAME" $V_CACHE
-
+	[[ -n ${LOCKNAME:-} ]]&& release-exclusive-lock "$LOCKNAME" $V_CACHE
 }
 
 main "$@"; exit 0

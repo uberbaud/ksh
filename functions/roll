@@ -1,0 +1,19 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2020-12-04,13.36.31z/5654045>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Uword1^u ^Uword2^u ^S…^s
+#:   Make the last parameter first ^= ^Sreply[*]^s
+
+function roll {
+	integer i=1
+	unset reply
+	(($#))|| return 1
+	eval reply[0]=\$$#
+	until (($#==1)); do
+		reply[i++]=$1
+		shift
+	done
+	true # leave on a good note
+}
+
+# Copyright © 2020 by Tom Davis <tom@greyshirt.net>.

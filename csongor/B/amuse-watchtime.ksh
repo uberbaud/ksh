@@ -44,8 +44,7 @@ function warnOrDie { #{{{1
 	esac
 } # }}}1
 
-CONTINUE=true
-function hSig		{ CONTINUE=false;		}
+function hSig		{ kill $WATCH_PID; }
 function hCleanUp	{ : >watchtime-pid;		}
 needs amuse:env watch-file
 amuse:env
@@ -58,10 +57,12 @@ add-exit-action hCleanUp
 # wrap script guts in a function so edits to this script file don't 
 # affect running instances of the script.
 function main {
-	while $CONTINUE; do
+	while :; do
 		[[ -s ui-pid ]]&&
 			kill -USR2 $(<ui-pid)
-		watch-file timeplayed || break
+		watch-file timeplayed &
+		WATCH_PID=$!
+		wait $WATCH_PID || break
 	done
 }
 

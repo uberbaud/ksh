@@ -35,7 +35,6 @@ MMH_BIN_PATH=/usr/local/mmh/bin
 
 # misc
 export CALENDAR_DIR=$xdgcfg/calendar
-export CSONGOR_XTERM_WINDOW_BG='#FFFFFF' CSONGOR_XTERM_WINDOW_FG='#000000'
 export CVSROOT='anoncvs@anoncvs4.usa.openbsd.org:/cvs'
 export GNUPGHOME=$xdgdata/gnupg
 export GPG_AGENT=$SYSLOCAL/bin/gpg-agent

@@ -2,7 +2,7 @@
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
 #: FUNCTION ^Uword1^u ^[^Uword…N^u^]
-#:   Print items one per line enclosed in markers.
+#:   Print arguments in columns
 
 function pc { printf '%s\n' "$@" | column; }
 

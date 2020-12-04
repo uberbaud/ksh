@@ -7,18 +7,9 @@
 
 function f-clear {
 	local IFS=' '
-	# short circut if FD[2] isn't a terminal
-	[[ -t 2 ]]|| { tput clear; "$@"; return; }
 	print -u2 '\033[H\033[2J\033[3J\033[H\c'
-	((!$#)) || {
-		local banner="$*"
-		((${#banner}<(COLUMNS-6)))|| {
-			local -L $((COLUMNS-7)) t="$banner"
-			banner="$t…"
-		  }
-		printf "\e[1;44;37m%${COLUMNS}s\r ─ %s ─\e[0m\n" '' "$banner" >&2
-		"$@"
-	}
+	((!$#)) || h1 "$@" >/dev/tty
+	"$@"
 }
 
 # Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

@@ -227,6 +227,7 @@ unset p i
 
 alias cd='_u="$-"; set -u; f-cd'
 alias cls='clear colorls $LS_OPTIONS'
+alias clear='f-clear '
 alias doas='as-root '
 alias hush='>/dev/null 2>&1 '
 alias k='fc -s'

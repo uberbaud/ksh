@@ -4,13 +4,9 @@
 #: FUNCTION ^Umsg word1^u ^[^Umsg word…N^u^]
 #:   Prints a banner with given text.
 
+needs hN
 function h1 {
-	if [[ -t 1 ]]; then
-		[[ -n ${COLUMNS:-} ]]|| export COLUMNS=$(tput columns)
-		printf "\e[1;44;37m%${COLUMNS}s\r ─ %s ─\e[0m\n" '' "$*"
-	else
-		printf "===[[ %s ]]===\n" "$*"
-	fi
+	hN '1;44;38;5;15' '===[[' ']]===' "$@"
 }
 
 # Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

@@ -9,7 +9,11 @@ function cmd-in-use {(
 	: ${NL:?} ${TAB:?} "${1:?Missing required parameter _cmd_name_}"
 	IFS="$NL"
 	# pop cmd from args.
-	cmd=$*; eopts=${cmd%$NL*}; cmd=${cmd##*$NL}
+	cmd=$*
+	(($#>1))&& {
+		eopts=${cmd%$NL*}
+		cmd=${cmd##*$NL}
+	  }
 	# find other names for cmd_name, POSSIBLE FALSE POSITIVES
 	for f in ${LOCALBIN:?}/* ${USRBIN:?}/* ${HOME:?}/bin/*; do
 		[[ -h $f ]]|| continue
@@ -42,7 +46,7 @@ function cmd-in-use {(
 				[[ $f == *\* ]]&&			continue
 				print -r -- "$f"
 			done);
-	fgrep -w $eopts "[[:<:]]$cmd[[:>:]]" "$@"
+	fgrep -w $eopts "$cmd" "$@"
 )}
 
 # Copyright © 2020 by Tom Davis <tom@greyshirt.net>.

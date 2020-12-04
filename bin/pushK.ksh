@@ -43,11 +43,10 @@ function warnOrDie { #{{{1
 					'warnOrDie is [1m${warnOrDie}[22m.';		;;
 	esac
 } # }}}1
-function _GIT { # {{{1
-	local cmd= o hlevel lnum
-	lnum=$1
-	hlevel=$2
-	shift 2
+function GIT { # {{{1
+	local cmd= o hlevel
+	hlevel=$1
+	shift
 	[[ $hlevel == [12] ]]||
 		die "GIT parameter #2 is not a level indicator" "^S$lnum^s: ^U$*^u"
 	for o; do
@@ -58,7 +57,6 @@ function _GIT { # {{{1
 	h1 "$cmd"
 	git $cmd || die "${2:-^B$cmd^b}"
 } # }}}1
-alias GIT='_GIT $LINENO'
 
 (($#))&& die 'Unexpected arguments. Expected ^Bnone^b.'
 
@@ -67,13 +65,13 @@ needs git h1 i-can-haz-inet
 i-can-haz-inet	|| die 'No internet' "$REPLY"
 cd ${KDOTDIR:?}	|| die 'Could not ^Tcd^t to ^S$KDOTDIR^s.'
 
-alias FAIL='{ warn "FAILED"; exit 1; }'
-
 branch="$(git rev-parse --abbrev-ref HEAD 2>/dev/null)"
 [[ $branch == master ]]&& die 'On branch ^Emaster^e!!!'
 
 function commit-everything {
-	h1 "Committing on ^S$1^s"
+	local branch
+	branch=$1
+	h1 "Committing on <$branch>"
 	# add untracked and unignored files, if any
 	set -- $(git ls-files --exclude-standard --others)
 	(($#))&&
@@ -85,7 +83,7 @@ function commit-everything {
 
 	# check for uncommitted changes in the index
 	git diff-index --cached --quiet HEAD ||
-		GIT 2 commit -av	 msg "did not commit ^B$1^b"
+		GIT 2 commit -av	 msg "did not commit ^B$branch^b"
 }
 
 commit-everything $HOST

@@ -1,0 +1,48 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2020-12-04,15.51.31z/5ab240a>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Ualias name^u
+#:   Try to get to the root command.
+#:   ^GNote: If an alias ends with a space, the next word will also be
+#:       expanded as an alias, and an alias followed by an alias is also 
+#:       a kind of complex command, so returning such an alias may not
+#:       be what you want.
+
+needs f-which
+function resolve-alias {
+	local ref seen IFS anum
+	IFS=' '
+	ref="${1:?}"
+	shift
+	seen="$*"
+	newref="$(command -v $ref)" ||
+		die "Could not resolve ^B$ref^b." \
+			"followed:${seen:+ $seen} $ref"
+	if [[ $newref == alias\ * ]]; then
+		newref="${newref##alias "$ref"=?(\')}"
+		newref="${newref%% *}"
+		[[ " $seen " == *" $newref "* ]]&&
+			die "There may by a cyclical alias issue."	\
+				"followed:${seen:+ $seen} $ref"			\
+				"and ^B$ref^b is an alias for ^B$newref^b."
+		if [[ $newref == $ref ]]; then
+			IFS='
+' # IFS is NL
+			set -- $(f-which -a $ref)
+			IFS=' '
+			[[ -n $2 ]]||
+				die "Could not resolve alias ^B$ref^b" \
+					"${seen+:followed: ^B$seen^b}"
+		elif [[ $newref == *[\;\&\|]* ]]; then
+			die "alias ^B$newref^b is a compound command." \
+				"followed: ^B$ref $newref${seen+ $seen}^b"
+		else
+			resolve-alias $newref $seen $ref
+			return
+		fi
+	fi
+	# we found a resolution
+	print -r -- "$newref"
+}
+
+# Copyright © 2020 by Tom Davis <tom@greyshirt.net>.

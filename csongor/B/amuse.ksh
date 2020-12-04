@@ -4,8 +4,16 @@
 
 set -o nounset;: ${FPATH:?Run from within KSH}
 
+ACCEPTCMD=true
 ACTION=Start
-
+AMUSE_SCRIPT_PATH=$KDOTDIR/csongor/B
+SYSTEMS_ARE_GO=true
+awk_status_pgm="$(</dev/stdin)" <<-\
+	\===AWK===
+	$2 == "/bin/ksh" && $3 ~ "/amuse-.*.ksh$" {
+		print $1"\t"$3
+		}
+	===AWK===
 # Usage {{{1
 typeset -- this_pgm="${0##*/}"
 function usage {
@@ -13,11 +21,15 @@ function usage {
 	PGM="$REPLY"
 	sparkle >&2 <<-\
 	===SPARKLE===
-	^F{4}Usage^f: ^T$PGM^t ^[^T-c^t^|^T-k^t^|^T-r^t^]
+	^F{4}Usage^f: ^T$PGM^t ^[^T-c^t^|^T-k^t^|^T-r^t^|^Ucommand^u^]
 	         Starter for ^Samuse^s.
 	           ^T-c^t  Clean up ^S\$AMUSE_RUN_DIR^s.
 	           ^T-k^t  Kill any running instances.
 	           ^T-r^t  Restart (stop then start).
+	           ^T-s^t  Show running instances.
+	         Or you can use one of the ^Ucommand^u words:
+	           ^Tstart^t, ^Tstop^t, ^Tkill^t, ^Trestart^t, or ^Tcleanup^t.
+	               ^GNote: ^Bkill^b is an alias for ^Bstop^b.^g
 	       ^T$PGM -h^t
 	         Show this help message.
 	===SPARKLE===
@@ -28,11 +40,12 @@ function bad_programmer {	# {{{2
 	die 'Programmer error:'	\
 		"  No getopts action defined for [1m-$1[22m."
   };	# }}}2
-while getopts ':ckrh' Option; do
+while getopts ':ckrsh' Option; do
 	case $Option in
-		c)	ACTION=CleanUp;										;;
-		k)	ACTION=Stop;										;;
-		r)	ACTION=Restart;										;;
+		c)	ACTION=CleanUp; ACCEPTCMD=false;					;;
+		k)	ACTION=Stop;	ACCEPTCMD=false;					;;
+		r)	ACTION=Restart;	ACCEPTCMD=false;					;;
+		s)	ACTION=Status;	ACCEPTCMD=false;					;;
 		h)	usage;												;;
 		\?)	die "Invalid option: ^B-$OPTARG^b.";				;;
 		\:)	die "Option ^B-$OPTARG^b requires an argument.";	;;
@@ -43,160 +56,168 @@ done
 shift $((OPTIND-1))
 # ready to process non '-' prefixed arguments
 # /options }}}1
-function start-ui { #{{{1
-	[[ -s ui-pid ]]&& {
-		local PROCNAME
-		# ui-pid is set, but is it really running?
-		PROCNAME="$(ps -ocommand= -p $(<ui-pid) 2>/dev/null)" && {
-			[[ $PROCNAME == */amuse-ui.ksh ]]&&
-				return 1 # ui-pid points to a running amuse-ui
-
-			# bad PID, or PID points to something else, so CLEAR IT
-			print 'Clearing ui-pid'
-			: >ui-pid
-		  }
+function get-running-info { # {{{1
+	integer i=0
+	unset status_pids status_names
+	set -- $(pgrep -lf B/amuse| awk "$awk_status_pgm")
+	while (($#)); do
+		status_pids[i]=$1
+		status_names[i]=${2##*/}
+		shift 2
+		((i++))
+	done
+	status_num=$i
+	return 0
+} # }}}1
+function check-status { # {{{
+	SERVER_IS_RUNNING=false
+	UI_IS_RUNNING=false
+	WATCH_TIME_IS_RUNNING=false
+	get-running-info
+	((status_num))|| return 0
+	integer i=0
+	while ((i<status_num)); do
+		case ${status_names[i]} in
+			amuse-server*)		SERVER_IS_RUNNING=true;			;;
+			amuse-ui*)			UI_IS_RUNNING=true;				;;
+			amuse-watchtime*)	WATCH_TIME_IS_RUNNING=true;		;;
+			*) die						\
+				'Programmer error:'		\
+				"status_name is ^B${status_names[i]}"
+				;;
+		esac
+		((i++))
+	done
+} # }}}
+function start-in-background { # {{{1
+	local scriptname scriptpath isrunning
+	$SYSTEMS_ARE_GO || return 1
+	roll "$@"; set -- "${reply[@]}"
+	scriptname=$1
+	scriptpath="$AMUSE_SCRIPT_PATH/$scriptname.ksh"
+	shift
+	notify "Starting: $scriptname"
+	nohup >~/log/$scriptname.log 2>&1 "$@" $scriptpath &
+	isrunning=$(ps -ocommand= -p $!)
+	[[ -n $isrunning ]]|| {
+		SYSTEMS_ARE_GO=false
+		warn "Could not start ^S$1^s."
 	  }
-
-	print 'Starting: amuse-ui'
-	nohup >/dev/null 2>&1					\
-		/usr/local/bin/st					\
-		-c amuse-ui							\
-		-T amuse							\
-		-e ~/.config/ksh/bin/amuse-ui.ksh	\
-		&
-
+} # }}}
+function clean-ui { # {{{1
+	print 'Clearing ui-pid'
+	: >ui-pid
+} # }}}1
+function start-ui { # {{{1
+	[[ -s ui-pid ]]&& clean-ui
+	set -- /usr/local/bin/st -c amuse-ui -T amuse
+	start-in-background "$@" amuse-ui & # options first, server name last
 } #}}}1
+function clean-server { # {{{1
+	print 'Clearing server-pid and sigpipe'
+	: >server-pid
+	rm -f sigpipe
+} # }}}1
 function start-server { #{{{1
-	[[ -s server-pid ]]&& {
-		local PROCNAME
-		# server-pid is set, but is it really running?
-		PROCNAME="$(ps -ocommand= -p $(<server-pid) 2>/dev/null)" && {
-			[[ $PROCNAME == */amuse-server.ksh ]]&&
-				return 1 # server-pid points to a running amuse-server
-
-			# bad PID, or PID points to something else,
-			# --- so clear everything ---
-			print 'Clearing server-pid and sigpipe'
-			: >server-pid
-			rm -f sigpipe
-		  }
-	  }
-	print 'Starting: amuse-server'
-	nohup >~/log/amuse-server.log 2>&1		\
-		~/.config/ksh/bin/amuse-server.ksh	&
+	[[ -s server-pid ]]&& clean-server
+	start-in-background amuse-server
 } #}}}
-function start-watchtime { #{{{1
-	[[ -s watchtime-pid ]]&& {
-		local PROCNAME
-		# watchtime-pid is set, but is it really running?
-		PROCNAME="$(ps -ocommand= -p $(<watchtime-pid) 2>/dev/null)" && {
-			[[ $PROCNAME == */amuse-watchtime.ksh ]]&&
-				return 1 # ui-pid points to a running amuse-ui
-
-			# bad PID, or PID points to something else, so CLEAR IT
-			print 'Clearing watchtime-pid'
-			: >watchtime-pid
-		  }
-	  }
-
-	print 'Starting: amuse-watchtime'
-	nohup >~/log/amuse-watchtime.log 2>&1	\
-	~/.config/ksh/bin/amuse-watchtime.ksh	&
-
-} #}}}1
+function clean-watchtime { # {{{1
+	print 'Clearing watchtime-pid'
+	: >watchtime-pid
+} # }}}1
+function start-watchtime { # {{{1
+	[[ -s watchtime-pid ]]&& clean-watchtime
+	start-in-background amuse-watchtime
+} # }}}1
+function clean-if-not-clean { # {{{1
+	local isrunning name
+	isrunning=$1
+	name=$2
+	if ! $isrunning; then
+		notify "Cleaning ^B$name^b"
+		clean-$name
+	fi
+} # }}}1
 function CleanUp { # {{{1
-	local server=false ui=false player=false watchtime=false S
-	# Server
-	[[ -s server-pid ]]&& {
-		server=true
-		S=$(ps -o command= $(<server-pid) 2>/dev/null)
-		[[ -z $S ]]&& server=false
-	  }
-	if $server; then
-		notify '@muse ^Bserver^b is running' 'Skipping.'
-	else
-		notify '@muse ^Bserver^b is not running' 'cleaning up.'
-		: >final >server-pid
-		[[ -e sigpipe ]]&& rm sigpipe
-		[[ -s paused-at ]]||
-			: >playing
-	fi
+	# short circut
+	[[ -s ui-pid || -s server-pid || -s watchtime-pid ]]|| return 0
 
-	# Player
-	[[ -s player-pid ]]&& {
-		player=true
-		S=$(ps -o command= $(<player-pid) 2>/dev/null)
-		[[ -z $S ]]&& player=false
-	  }
-	if $player; then
-		notify '@muse ^Bplayer^b is running' 'Skipping.'
-	else
-		notify '@muse ^Bplayer^b is not running' 'cleaning up.'
-		: >player-pid
-		[[ -s paused-at ]]||
-			: >playing >timeplayed
-	fi
+	check-status
+	clean-if-not-clean $SERVER_IS_RUNNING		server
+	clean-if-not-clean $UI_IS_RUNNING			ui
+	clean-if-not-clean $WATCH_TIME_IS_RUNNING	watchtime
 
-	# UI
-	[[ -s ui-pid ]]&& {
-		ui=true
-		S=$(ps -o command= $(<ui-pid) 2>/dev/null)
-		[[ -z $S ]]&& ui=false
-	  }
-	if $ui; then
-		notify '@muse ^Bui^b is running' 'Skipping.'
-	else
-		notify '@muse ^Bui^b is not running' 'cleaning up.'
-		: >ui-pid
-	fi
-
-	# WATCHTIME
-	[[ -s watchtime-pid ]]&& {
-		watchtime=true
-		S=$(ps -o command= $(<watchtime-pid) 2>/dev/null)
-		[[ -z $S ]]&& watchtime=false
-	  }
-	if $watchtime; then
-		notify '@muse ^Bwatchtime^b is running' 'Skipping.'
-	else
-		notify '@muse ^Bwatchtime^b is not running' 'cleaning up.'
-		: >watchtime-pid
-	fi
 } #}}}1
+function start-if-not-started { # {{{1
+	local isrunning name
+	isrunning=$1
+	name=$2
+	if $isrunning; then
+		warn "^B$name^b is already running"
+	else
+		start-$name
+	fi
+} # }}}1
 function Start { #{{{1
 	local BUF
 
 	BUF="$(head -n 3 played.lst)"
 	>played.lst print -- "$BUF"
 
-	start-ui
-	start-server
-	start-watchtime
+	check-status
+	start-if-not-started $SERVER_IS_RUNNING			server
+	start-if-not-started $UI_IS_RUNNING				ui
+	start-if-not-started $WATCH_TIME_IS_RUNNING		watchtime
 
 } #}}}1
 function Stop { #{{{1
-	local p F N
-	for p in server ui watchtime; do
-		F="$p-pid"
-		N="amuse-$p"
-		if [[ -s $F ]]; then
-			2>&1 print "Stopping: $N"
-			kill -TERM $(<$F)
-		else
-			2>&1 print "Not running: $N"
-		fi
+	local p i
+	for s in TERM WAIT KILL; do
+		get-running-info
+		p=$status_num
+		((p))|| break
+		[[ $s == WAIT ]]&& { sleep 0.5; continue;}
+		i=0
+		while ((i<p)); do
+			2>&1 print "Stopping: ($s) ${status_names[i]}"
+			kill -$s ${status_pids[i]}
+			((i++))
+		done
 	done
 } #}}}1
 function Restart { Stop; Start; }
+function Status { # {{{1
+	local i procnum
+	typeset -L7 pid
+	get-running-info
+	procnum=$status_num
+	i=0; while ((i<procnum)); do
+		pid=${status_pids[i]}
+		print -ru2 -- "  $pid ${status_names[i]}"
+		((i++))
+	done
+} # }}}
+$ACCEPTCMD && (($#)) && { # {{{
+	typeset -l option=$1
+	case $option in
+		start|open)			ACTION=Start;				;;
+		cleanup)			ACTION=CleanUp;				;;
+		stop|kill|close)	ACTION=Stop;				;;
+		restart)			ACTION=Restart;				;;
+		status)				ACTION=Status;				;;
+		*)			die "Unknown command ^B$option^b"
+						"Must be one of: ^Tstart stop restart cleanup^t"
+					;;
+	esac
+	shift
+} # }}}
+(($#))&& die 'Too many arguments. Expected only one (1).'
 
-needs amuse:env
+needs amuse:env roll
 amuse:env
 cd "${AMUSE_RUN_DIR:?}" || die 'Could not ^Tcd^t to ^S$AMUSE_RUN_DIR^s.'
 
-#typeset -f -t start-ui start-server start-watchtime	\
-#	CleanUp Start Stop Restart
-#set -x
-
-$ACTION; exit
+$ACTION; $SYSTEMS_ARE_GO || Stop; exit
 
 # Copyright (C) 2019 by Tom Davis <tom@greyshirt.net>.

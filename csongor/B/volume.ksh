@@ -73,12 +73,12 @@ function set-volume		{ # {{{1
 function set-as-percent	{ set-volume $(dc -e "3k ${1%\%} 100/p");	}
 function adjust-volume { # {{{1
 	local op=$1
-	set -- $(sndioctl -n output.level output.mute)
-	(($2))&& { # don't adjust if we're muted, just unmute
+	set -- $(sndioctl -n output.mute)
+	(($1))&& { # don't adjust if we're muted, just unmute
 		sndioctl -q output.mute=0
 		return
 	  }
-	set-volume $(dc -e "5k $1 $vstep $op p")
+	set-volume $op$vstep
 } # }}}1
 function bad-volume-fmt { # {{{1
 	desparkle "$1"

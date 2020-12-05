@@ -55,7 +55,7 @@ SYSDATA=$xdgdata/sysdata
 
 	[[ -d $KU ]]|| mkdir $KU
 	export FPATH=$F
-	KHIST=$KDOTDIR/share/history
+	KHIST=$KU/history
   }
 
 # special history file stuff

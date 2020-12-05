@@ -52,7 +52,7 @@ export dskWIDGIT=7
 export dskXAPP=6
 export me=$HOME/work/clients/me
 export CSONGOR_XTERM_WINDOW_BG='#FFFFFF'
-export CSONGOR_XTERM_WINDOW_BG='#FFFFFF'
+export CSONGOR_XTERM_WINDOW_FG='#000000'
 
 export TZ=EST5EDT
 

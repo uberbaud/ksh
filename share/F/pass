@@ -1,0 +1,25 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2020-11-24,11.35.02z/5346ae6>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Gpass-* arguments, or^g ^[^T-E^t^|^T-L^t^]
+#:   Wrapper for ^Tpass-gen^t, ^Tpass-show^t, ^Tpass-ed^t, and ^Tpass-find^t.
+#:   If it's one (1) argument which is NOT ^T-h^t, use ^Spass-show^s, else use ^Spass-gen^s.
+#:   Alternately:
+#:     ^T-E^t ^Uhostglob^u  use ^Spass-ed^s (edit).
+#:     ^T-L^t ^Uhostglob^u  use ^Spass-find^s (lists).
+#:   Scripts are located in ^U^S$KDOTDIR^s/bin^u
+
+needs ${KDOTDIR:?}/bin/pass-{gen,show}.ksh
+function pass {
+	local which=gen
+	(($#==1)) && which=show
+	case ${1:-} in
+		-E)	which=ed; shift;					;;
+		-L)	which=find; shift;					;;
+		-h) which=gen;							;;
+	esac
+
+	$KDOTDIR/bin/pass-$which.ksh "$@"
+}
+
+# Copyright © 2020 by Tom Davis <tom@greyshirt.net>.

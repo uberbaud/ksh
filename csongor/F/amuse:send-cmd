@@ -1,16 +1,1 @@
-# <@(#)tag:csongor.greyshirt.net,2018-01-09:tw/19.58.56z/79bdfd>
-# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
-
-#: FUNCTION ^T^Ucommand^u^t ^[^Uparameters^u^]
-#:   Sends a command to the amuse player if it is running.
-
-needs amuse:env
-function amuse:send-cmd {
-	amuse:env
-	local fifo
-	: ${1:?Missing required argument.}
-	fifo="${AMUSE_RUN_DIR:?}"/sigpipe
-	[[ -e $fifo ]]|| die 'The ^Bamuse-server^b is not running.'
-	[[ -p $fifo ]]|| die 'Weirdly, ^Bsigfile^b is not a ^Ififo^i.'
-	 >$fifo print -r -- "$*"
-}
+/home/tw/.config/ksh/share/F/amuse:send-cmd

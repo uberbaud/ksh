@@ -15,9 +15,10 @@ export TERM
 
 export SYSLOCAL=/usr/local
 export URI_AUTHORITY='greyshirt.net'
+
+# parse ENV to find out where we are
+[[ -d "${ENV%/*}" ]]&& KDOTDIR="${ENV%/*}"
 export KDOTDIR
-[[ -d "${ENV%/*}" ]]&&
-	KDOTDIR="${ENV%/*}"
 
 # XDG paths
 if [[ -d ${XDG_CONFIG_HOME:-~/.config} ]]; then
@@ -35,9 +36,9 @@ else
 	XDG_DATA_HOME=$HOME/.local
 	XDG_CACHE_HOME=$HOME/.local/cache
 
-	mkdir -p $XDG_CONFIG_HOME	>/dev/null 2>&1
-	mkdir -p $XDG_DATA_HOME		>/dev/null 2>&1
-	mkdir -p $XDG_CACHE_HOME	>/dev/null 2>&1
+	[[ -d $XDG_CONFIG_HOME ]]|| mkdir -p $XDG_CONFIG_HOME
+	[[ -d $XDG_DATA_HOME   ]]|| mkdir -p $XDG_DATA_HOME
+	[[ -d $XDG_CACHE_HOME  ]]|| mkdir -p $XDG_CACHE_HOME
 fi
 xdgdata=$XDG_DATA_HOME
 xdgcfg=$XDG_CONFIG_HOME
@@ -46,16 +47,16 @@ SYSDATA=$xdgdata/sysdata
 [[ -d $SYSDATA ]]&& export SYSDATA || unset SYSDATA
 
 [[ -n $KDOTDIR ]]&& {
-	K=$KDOTDIR			; KU=$KDOTDIR/$HOST
-	F=$K/functions		; [[ -d $KU/F ]]&& FU=$KU/F
-	B=$K/bin			; [[ -d $KU/B ]]&& BU=$KU/B
-	H=$K/help
+	
+	K=$KDOTDIR;			KU=$KDOTDIR/$HOST;		KS=$KDOTDIR/share
+						F=$KU/F;				FS=$KS/F
+						B=$KU/B					BS=$KS/B
+												H=$KS/H
 
 	[[ -d $KU ]]|| mkdir $KU
-	export FPATH=$F${FU+:$FU}
-	KHIST=$KDOTDIR/H/history
+	export FPATH=$F
+	KHIST=$KDOTDIR/share/history
   }
-
 
 # special history file stuff
 histcache=$xdgcache/history
@@ -63,7 +64,7 @@ histcache=$xdgcache/history
 fhist=$(mktemp $histcache/ksh-hist.XXXXXXXXXXXX)
 if (($?)); then
 	print '  \033[38;5;172mwarning\033[0m: Using common history.'
-	fhist=${KHIST:-/tmp}
+	fhist=${KHIST:-/tmp/history}
 else
 	histmark="# OLDHISTORY $(date -u +'%Y-%m-%d %H:%M:%S Z')"
 	T="$(cat)" <<-===
@@ -109,22 +110,20 @@ export PSQLRC=$xdgcfg/pg/psqlrc
 export USR_PLIB=$xdgdata/lib/perl5
 export PERL5LIB=$USR_PLIB
 # ^ add? -> # ${PERLBREW_LIB:+:$PERLBREW_LIB}
+export PERLBREW_BIN=$PERLBREW_CURRENT/bin
 export PERL_MB_OPT="--install_base $USR_PLIB"
 export PERL_MM_OPT="INSTALL_BASE=$USR_PLIB"
 
 
 ####### SET PATH
-[[ -d $HOME/bin ]]&&
-	[[ :$PATH: == *:$HOME/bin:*		]]|| PATH="$HOME/bin:$PATH";
-
-#[[ :$PATH: == *:$RAKUDO_BIN:*		]]|| PATH="$RAKUDO_BIN:$PATH"
-PERLBREW_BIN=$PERLBREW_CURRENT/bin
-[[ :$PATH: == *:$PERLBREW_BIN:*		]]|| PATH="$PERLBREW_BIN:$PATH"
-[[ :$PATH: == *:$MMH_BIN_PATH:*		]]|| PATH="$MMH_BIN_PATH:$PATH"
-[[ :$PATH: == *:$LOCALBIN:*			]]|| PATH="$LOCALBIN:$PATH"
-[[ :$PATH: == *:$USRBIN:*			]]|| PATH="$USRBIN:$PATH"
-[[ :$PATH: == *:/usr/games:*		]]|| PATH="$PATH:/usr/games"
-[[ :$PATH: == *:${JDK_PATH:-///}:*	]]|| PATH="$PATH:$JDK_PATH"
+function wantpath { [[ -d $1 && ! :$PATH: == *:$1:* ]]; }
+wantpath $HOME/bin && PATH="$HOME/bin:$PATH";
+wantpath $PERLBREW_BIN	&& PATH="$PERLBREW_BIN:$PATH"
+wantpath $MMH_BIN_PATH	&& PATH="$MMH_BIN_PATH:$PATH"
+wantpath $LOCALBIN		&& PATH="$LOCALBIN:$PATH"
+wantpath $USRBIN		&& PATH="$USRBIN:$PATH"
+wantpath /usr/games		&& PATH="$PATH:/usr/games"
+wantpath $JDK_PATH		&& PATH="$PATH:$JDK_PATH"
 
 # input, locale, and such
 set -o vi -o vi-tabcomplete
@@ -209,21 +208,24 @@ export POD_TO_TEXT_ANSI=1
 TAB='	'
 NL='
 '
+############[ BEGIN FPATH SPECIALNESS ]###################################
+ifs=$IFS; IFS=:; set -- $FPATH; IFS=$o
+
 # For functions whose name conflicts with an executable in PATH, ksh 
 # prefers the executable. To avoid this and allow explicit calls to the 
 # functions or the executables, we name those functions with the 'f-' 
 # prefix and then alias those to the name without the 'f-'. Everybody 
 # wins.
-for p in $F ${FU:-}; do
-	for i in $p/f-*; { i="${i#$p/}"; alias "${i#f-}=$i"; }
-done
-# FPATH functions are implicitly autoloaded, but the completion 
+for p { for i in $p/f-*; { i="${i#$p/}"; alias "${i#f-}=$i"; } }
+
+# FPATH functions are implicitly autoloaded, BUT the completion 
 # mechanism doesn't know about them unless we explicitly autoload them
-IFS=:
-for p in $FPATH; { for i in $p/*; { typeset -fu "${i##*/}"; } }
-IFS=" $TAB$NL"
+for p { for i in $p/*; { typeset -fu "${i##*/}"; } }
+
 # clean up
-unset p i
+unset o p i
+set --
+############[ END FPATH SPECIALNESS ]#####################################
 
 alias cd='_u="$-"; set -u; f-cd'
 alias cls='clear colorls $LS_OPTIONS'
@@ -238,7 +240,7 @@ alias noglob='set -f;noglob '; function noglob { set +f; ("$@"); }
 alias prn="printf '  \e[35m｢\e[39m%s\e[35m｣\e[39m\n'"
 
 [[ -n $KDOTDIR ]]&& {
-	KCOMPLETE=$KDOTDIR/completions
+	KCOMPLETE=$KDOTDIR/share/C
 	: run in sub-shell for exceptions sake; (
 		makeout=$KCOMPLETE/make.out
 		get-exclusive-lock completion-make

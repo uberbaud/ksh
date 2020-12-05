@@ -1,0 +1,14 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2019-11-18,00.18.50z/34f8490>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Upath^u
+#:   Set PERL5LIB to $PERL5LIB:${1:-PWD}
+
+function set-perl5lib {
+	local want="${1:-PWD}"
+	[[ :$PERL5LIB: == *:$want:* ]]||
+		PERL5LIB="${PERL5LIB:+"$PERL5LIB":}${1:-"$PWD"}"
+	export PERL5LIB="${PERL5LIB#:}"
+}
+
+# Copyright © 2019 by Tom Davis <tom@greyshirt.net>.

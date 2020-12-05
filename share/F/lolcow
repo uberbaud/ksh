@@ -1,0 +1,13 @@
+# <@(#)tag:csongor.greyshirt.net,2017-08-06:tw/19.14.37z/e7f13e>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^G(same arguments/^SSTDIN^s behavior as ^Bcowsay^b)^g
+#:   ^Tcowsay^t through ^Tlolcat^t
+
+function lolcow {
+	needs cowsay lolcat
+	cowsay "$@" | lolcat
+}
+
+
+# Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

@@ -1,13 +1,1 @@
-# <@(#)tag:csongor.greyshirt.net,2017-08-26:tw/23.53.55z/43d58b4>
-# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
-
-#: FUNCTION
-#:   Wrapper for bible-mark.ksh. use ^T-h^t for help.
-
-function f-b {
-	h1 bible-mark "$@"
-	${XDG_DATA_HOME:?}/bible/bible-mark.ksh "$@"|
-		LESS='-RXFcM' /usr/bin/less
-}
-
-# Copyright © 2017 by Tom Davis <tom@greyshirt.net>.
+/home/tw/.config/ksh/share/F/f-b

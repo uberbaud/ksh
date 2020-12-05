@@ -1,14 +1,1 @@
-# <@(#)tag:csongor.greyshirt.net,2017-08-08:tw/18.25.01z/224d8a0>
-# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
-
-#: FUNCTION ^G(no arguments)^g
-#:   Set terminal to csongor colors.
-
-function csongor-colors {
-	local bg="${CSONGOR_XTERM_WINDOW_BG:?}"
-	local fg="${CSONGOR_XTERM_WINDOW_FG:?}"
-	set-colors-bg-fg "$bg" "$fg"
-}
-
-
-# Copyright © 2017 by Tom Davis <tom@greyshirt.net>.
+/home/tw/.config/ksh/share/F/csongor-colors

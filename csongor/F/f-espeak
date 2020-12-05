@@ -1,13 +1,1 @@
-# <@(#)tag:tw.csongor.greyshirt.net,2020-10-12,10.09.11z/3600942>
-# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
-
-#: FUNCTION ^G...^g
-#:   Set some defaults for ^Tespeak^t
-
-needs with-defaults
-function f-espeak {
-	local cfg=${XDG_CONFIG_HOME:-~/.config}/etc/espeak.rc
-	with-defaults $cfg /usr/local/bin/espeak "$@"
-}
-
-# Copyright © 2020 by Tom Davis <tom@greyshirt.net>.
+/home/tw/.config/ksh/share/F/f-espeak

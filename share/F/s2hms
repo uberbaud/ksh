@@ -14,7 +14,7 @@ function s2hms {
 		m=$((m%60))
 	  }
 	typeset -Z 2 M=$m S=$s
-	print -n "$H$M:$S$f"
+	print -n -- "$H$M:$S$f"
 }
 
 # Copyright © 2020 by Tom Davis <tom@greyshirt.net>.

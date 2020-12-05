@@ -11,6 +11,7 @@ set -o nounset;: ${FPATH:?Run from within KSH}
 # or an integer range of 0-31, so that's what we're using
 # AND $(dc -e '5k 4 128/p') -> .03125
 vstep='0.03125'
+sndiorc=${XDG_CONFIG_HOME}/etc/sndioctl.rc
 
 # Usage {{{1
 typeset -- this_pgm="${0##*/}"
@@ -38,7 +39,7 @@ function bad_programmer {	# {{{2
 	die 'Programmer error:'	\
 		"  No getopts action defined for [1m-$1[22m."
   };	# }}}2
-while getopts ':mh' Option; do
+while getopts ':mrth' Option; do
 	case $Option in
 		m)	set mute;											;;
 		t)	set toggle-mute;									;;
@@ -90,9 +91,20 @@ function bad-volume-fmt { # {{{1
 } # }}}1
 
 
+
 # wrap script guts in a function so edits to this script file don't 
 # affect running instances of the script.
 function main {
+	local volnow volset
+	volnow=$(sndioctl output.level)
+	volset=$(<$sndiorc)
+	[[ $volnow == $volset ]]|| {
+		warn "Volume is ^B$volnow^b, but"	\
+			 "should be ^B$volset^b."		\
+			 "Updating."
+		sndioctl $volset
+	  }
+
 	case "${1:-}" in
 		0.+([0-9])?(%))				set-volume		$1;		;;
 		1?(.*(0)))					set-volume		1;		;;
@@ -101,11 +113,15 @@ function main {
 		+|-)						adjust-volume	$1;		;;
 		'')							set-volume		'';		;;
 		m*)							mute;					;;
+		r*)							reset;					;;
 		t*)							toggle-mute;			;;
 		*)							bad-volume-fmt	$1;		;;
 	esac
+
+	sndioctl output.level >$sndiorc
 }
 
+[[ -w $sndiorc ]]|| chmod u+w $sndiorc
 main "$@"; exit
 
 

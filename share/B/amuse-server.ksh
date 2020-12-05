@@ -39,7 +39,7 @@ done
 shift $((OPTIND-1))
 # ready to process non '-' prefixed arguments
 # /options }}}1
-needs add-exit-action amuse:env fpop play-one-ogg SQL
+needs amuse:env fpop play-one-ogg SQL
 
 amuse:env	# Sets AMUSE_COMMANDS, AMUSE_RUN_DIR, AMUSE_DATA_HOME, and
 			# creates function is-valid-amuse-cmd
@@ -50,7 +50,7 @@ alias DONT-start-another-song='return 1'
 CONTINUE=true
 function kill-player { #{{{1
 	[[ -s player-pid ]]|| return
-	kill -HUP $(<player-pid) # -pid sends to group, including watch-file
+	kill -HUP $(<player-pid) # -pid sends to group
 	wait $FN_PLAY_PID
 	: >final	# final, we're stopping immediately, not finishing
 				# the song, which is the purpose of final
@@ -62,6 +62,7 @@ function hCleanUp	{ #{{{1
 	kill-player
 	: >final
 	: >server-pid
+	: >player-pid
 } #}}}1
 function file-from-id { # {{{1
 	local F P
@@ -141,6 +142,8 @@ function docmd-pause { #{{{1
 } #}}}1
 function docmd-play { #{{{1
 	: >final
+	[[ -s player-pid && -z $(ps -p $(<player-pid) -ocommand=) ]]&&
+		: >player-pid
 	please-START-another-song
 } #}}}1
 function stop-song { #{{{1
@@ -225,17 +228,25 @@ function evloop { # {{{1
 # do everything in the AMUSE RUN DIRECTORY
 builtin cd "${AMUSE_RUN_DIR:?}" ||
 	fullstop 'Could not `cd` to "$AMUSE_RUN_DIR".'
-[[ -a sigpipe ]]&& fullstop 'Server already running.'
+
+[[ -s server-pid && -n $(ps -p $(<server-pid) -ocommand=) ]]&&
+	fullstop 'amuse-server is already running'
+	
+[[ -a sigpipe ]]&&
+	rm -f sigpipe
 
 mkfifo sigpipe || fullstop 'Is server already running?'
 print -- $$ >server-pid
+: >final
+: >player-pid
+
 
 SQLSEP='	'
 SQL "ATTACH '$AMUSE_DATA_HOME/amuse.db3' AS amuse;"
 
 trap hQuit		TERM QUIT
 trap ''			HUP INT TSTP USR1 USR2
-add-exit-action hCleanUp
+trap hCleanUp	EXIT
 
 #_________________________________________________________________________
 sig no-op		# prime the fifo so it is opened (no fatal error

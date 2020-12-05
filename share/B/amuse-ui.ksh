@@ -25,6 +25,8 @@ sFinalPaused='❚▶▍'
 # Additional status states
 sAgain='🔂'
 statusBarSize=all
+DHMS='00:00'
+DSEC=0
 
 # Subscripts
 SubScript[0]='₀'
@@ -197,7 +199,7 @@ function update-screen { # {{{1
 	done <played.lst
 	IFS="$TAB" read -r id song DURATION <playing
 	DSEC=${DURATION%?}
-	DHMS=$(s2hms $DSEC)
+	DHMS=$(s2hms ${DSEC:-0})
 	BUFFER[rowPLAYING-1]="$song"
 	i=$((rowPLAYING-1))
 	while ((++i<LINES)); do
@@ -244,29 +246,41 @@ function hTerm		{ CONTINUE=false;						}
 function hWinch		{ get-size;								}
 function hUpdate	{ UpdateAll=true;						}
 function hTimer		{ UpdateAll=false;						}
+# ----------8<-----[ BEGIN amuse-watchtime.ksh ]-----8<----------
+function hwtSig		{ KEEP_WATCHING=false; }
+function watchtime	{ # {{{1
+	trap hwtSig HUP INT TSTP TERM QUIT
+	trap ''		USR1 USR2
 
-needs amuse:env
+	KEEP_WATCHING=true;
+	while $KEEP_WATCHING; do
+		[[ -s ui-pid ]]&& kill -USR2 $$
+		watch-file timeplayed &
+		WATCH_PID=$!
+		wait $WATCH_PID || break
+	done
+
+} # }}}1
+# ----------->8-----[ END amuse-watchtime.ksh ]----->8-----------
+
+needs amuse:env watch-file
+amuse:env
 
 trap hTerm		INT HUP TERM QUIT
 trap hWinch		WINCH
 trap hUpdate	USR1
 trap hTimer		USR2
-add-exit-action CleanUp
+trap CleanUp	EXIT
 
-amuse:env
 cd "${AMUSE_RUN_DIR:?}" || die 'Could not ^Tcd^t to ^S$AMUSE_RUN_DIR^s.'
 
 >ui-pid print -- $$
 main_shell_pid=$$
 
 PS4='${0##*/}/$LINENO: '
-#typeset -f -t get-size print-played print-dsong print-remaining		\
-#	update-time-all update-time-noplayed update-time-remainin		\
-#	update-time-notime update-time-none update-time update-status	\
-#	update-screen main-loop											\
-#	hWinch hUpdate hTimer
+exec 2>~/log/${this_pgm%.ksh}.log
 
-exec 2>~/log/$this_pgm.log
+watchtime >&2 &
 main-loop; exit
 
 # Copyright (C) 2019 by Tom Davis <tom@greyshirt.net>.

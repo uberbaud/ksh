@@ -1,0 +1,12 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2019-12-21,16.17.03z/3cdfbff>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^[^Upath string^u^]
+#:   Shows the components of a ^Upath string^u. Defaults to ^S$PATH^s
+
+function path {
+	local IFS=:
+	printf "  %s\n" ${1:-$PATH}
+}
+
+# Copyright © 2019 by Tom Davis <tom@greyshirt.net>.

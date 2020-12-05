@@ -1,0 +1,15 @@
+# <@(#)tag:csongor.greyshirt.net,2017-08-06:tw/19.17.30z/3bac1dc>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Uexpression^u
+#:  Like math but from a cow's point of view.
+
+needs cowsay bc lolcat
+function cowmath {
+	MSG='Moo?'
+	(($#))&& MSG="$* = $(print -- "$*"|bc)"
+	cowsay -- "$MSG" | lolcat
+}
+
+
+# Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

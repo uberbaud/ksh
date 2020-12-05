@@ -1,0 +1,14 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2019-12-03,05.42.36z/2ed50a0>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^G(no arguments)^g
+#:   Edit the ^Ssongs.lst^s.
+
+needs amuse:env
+function amuse:edit {
+	amuse:env
+	${VISUAL:-${EDITOR:-vi}} "${AMUSE_RUN_DIR:?}"/song.lst
+	kill -USR1 $(<"${AMUSE_RUN_DIR:?}"/ui-pid)
+}
+
+# Copyright © 2019 by Tom Davis <tom@greyshirt.net>.

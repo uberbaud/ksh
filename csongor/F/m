@@ -1,14 +1,1 @@
-# <@(#)tag:csongor.greyshirt.net,2018-10-16:tw/01.05.24z/1cd73d2>
-# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
-
-#: FUNCTION ^G(no arguments)^g
-#:   A wrapper around all m-*
-
-needs matching-commands
-function m {
-	(($#))|| { matching-commands m-\*; return; }
-	[[ $1 == +([0-9]) ]]&& set -- part "$@"
-	m-"$@"
-}
-
-# Copyright © 2018 by Tom Davis <tom@greyshirt.net>.
+/home/tw/.config/ksh/share/F/m

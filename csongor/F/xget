@@ -1,12 +1,1 @@
-# <@(#)tag:csongor.greyshirt.net,2017-08-16:tw/20.45.42z/35074a2>
-# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
-
-#: FUNCTION ^[^Ufile…^u^]
-#:   Copy ^SSTDIN^s or ^Ufile^us to clipboard
-
-function xget {
-	: ${DISPLAY:?Can\'t save without X11}
-	xclip -selection clipboard -in "$@"
-}
-
-# Copyright © 2017 by Tom Davis <tom@greyshirt.net>.
+/home/tw/.config/ksh/share/F/xget

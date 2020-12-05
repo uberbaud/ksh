@@ -1,0 +1,13 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2020-11-13,22.19.16z/136b264>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^G(no arguments)^g
+#:   List available ^Nscheme^ns.
+
+function scheme {
+	notify 'Installed ^Nscheme^ns include:' \
+			'^Nchibi-scheme^n (r7)'			\
+			'^Ngsi^n (r5)'
+}
+
+# Copyright © 2020 by Tom Davis <tom@greyshirt.net>.

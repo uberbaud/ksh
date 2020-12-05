@@ -66,7 +66,7 @@ alias mathcow="noglob cowmath"
 # askfirst all commands that use ssh
 for i in ssh scp sftp rsync;	{ alias "$i=ssh-askfirst $i"; }
 # Make fully qualified known hosts into aliases for sshing to that host
-for i in $(grep '\.' $K/completions/ssh); do
+for i in $(grep '\.' $KU/C/ssh); do
 	alias "$i=ssh $i"
 done
 alias i-can-haz-inet='i-can-haz-inet;E=$?;print -r -- "  $REPLY";(return $E)&&:'

@@ -1,13 +1,1 @@
-# <@(#)tag:tw.csongor.greyshirt.net,2020-10-20,19.44.39z/1b49fb3>
-# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
-
-#: FUNCTION ^G(no arguments)^g
-#:   Returns the total count of messages in +inbox
-
-function m-msgcount {
-	set -- $(mhpath +inbox)/*
-	[[ $1 == */\* ]]&& shift
-	print $#
-}
-
-# Copyright © 2020 by Tom Davis <tom@greyshirt.net>.
+/home/tw/.config/ksh/share/F/m-msgcount

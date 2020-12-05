@@ -1,0 +1,11 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2020-10-19,22.18.21z/29934c4>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^G^Uxxdiff options^u^g
+#:   Wrapper
+
+function f-xxdiff {
+	/usr/local/bin/xxdiff "$@" &
+}
+
+# Copyright © 2020 by Tom Davis <tom@greyshirt.net>.

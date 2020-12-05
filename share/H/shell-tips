@@ -1,0 +1,5 @@
+^BShell Tips^b
+
+    Test if array ^NMYARRAY^n exists safely with ^Nnounset^u
+        ((^$^{^t^NMYARRAY^n^S[*]^s^B+^b^N1^n^}))
+

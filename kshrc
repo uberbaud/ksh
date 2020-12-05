@@ -4,6 +4,7 @@
 
 # we are NOT sourcing /etc/ksh.kshrc because it does way too much stuff we 
 # don't need. But these come from there.
+export SHORTPATH=${SHORTPATH:-$PATH}
 export UID=${UID:-$(id -u)}
 export USER=${USER:-$(id -un)}
 export LOGNAME=$USER
@@ -116,14 +117,26 @@ export PERL_MM_OPT="INSTALL_BASE=$USR_PLIB"
 
 
 ####### SET PATH
-function wantpath { [[ -d $1 && ! :$PATH: == *:$1:* ]]; }
-wantpath $HOME/bin && PATH="$HOME/bin:$PATH";
-wantpath $PERLBREW_BIN	&& PATH="$PERLBREW_BIN:$PATH"
-wantpath $MMH_BIN_PATH	&& PATH="$MMH_BIN_PATH:$PATH"
-wantpath $LOCALBIN		&& PATH="$LOCALBIN:$PATH"
-wantpath $USRBIN		&& PATH="$USRBIN:$PATH"
-wantpath /usr/games		&& PATH="$PATH:/usr/games"
-wantpath $JDK_PATH		&& PATH="$PATH:$JDK_PATH"
+function wantpath { # {{{1
+	[[ -d $1 && :$PATH: != *:$1:* ]]|| return
+	if [[ $2 == P* ]]; then
+		PATH="$1:$PATH"
+	elif [[ $2 == A* ]]; then
+		PATH="$PATH:$1"
+	else
+		warn "Bad ^SPATH^s placement: $2."	\
+			'Expected ^TAPPEND^t or ^TPREPEND^t.'
+	fi
+} # }}}1
+# PREPEND, so in reverse order
+wantpath "$PERLBREW_BIN"	PREPEND
+wantpath "$MMH_BIN_PATH"	PREPEND
+wantpath "$LOCALBIN"		PREPEND
+wantpath "$HOME"/bin		PREPEND
+wantpath "$USRBIN"			PREPEND
+# APPEND, so in order
+wantpath /usr/games			APPEND
+wantpath "$JDK_PATH"		APPEND
 
 # input, locale, and such
 set -o vi -o vi-tabcomplete
@@ -209,7 +222,7 @@ TAB='	'
 NL='
 '
 ############[ BEGIN FPATH SPECIALNESS ]###################################
-ifs=$IFS; IFS=:; set -- $FPATH; IFS=$o
+ifs=$IFS; IFS=:; set -- $FPATH; IFS=$ifs
 
 # For functions whose name conflicts with an executable in PATH, ksh 
 # prefers the executable. To avoid this and allow explicit calls to the 

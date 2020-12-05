@@ -25,7 +25,7 @@ function _show_function_help {
 }
 
 function f-help {
-	local helpdir=${KDOTDIR:?}/help
+	local helpdir=${KDOTDIR:?}/share/H
 	(($#))|| {(
 		cd $helpdir || die "No help directory ^B$helpdir^b."
 		print 'Help is available for functions in \033[34m$FPATH\033[39m as well as:'

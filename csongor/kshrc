@@ -51,6 +51,8 @@ export dskBROWSER=1
 export dskWIDGIT=7
 export dskXAPP=6
 export me=$HOME/work/clients/me
+export CSONGOR_XTERM_WINDOW_BG='#FFFFFF'
+export CSONGOR_XTERM_WINDOW_BG='#FFFFFF'
 
 export TZ=EST5EDT
 

@@ -8,7 +8,7 @@ needs desparkle die h1 new-array notify splitstr warn
 
 new-array name dotf exec cmds haz
 
-GITUP=$KDOTDIR/bin/gitup.ksh
+GITUP=$KDOTDIR/$HOST/B/gitup.ksh
 [[ -x $GITUP ]]||
 	die 'No ^S$B^s^T/gitup.ksh^t so using git pull.'
 

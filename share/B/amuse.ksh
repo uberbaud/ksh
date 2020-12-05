@@ -96,7 +96,7 @@ function start-in-background { # {{{1
 	scriptname=$1
 	scriptpath="$AMUSE_SCRIPT_PATH/$scriptname.ksh"
 	shift
-	notify "Starting: $scriptname"
+	notify "^F{2}Starting^f: $scriptname"
 	nohup >~/log/$scriptname.log 2>&1 "$@" $scriptpath &
 	isrunning=$(ps -ocommand= -p $!)
 	[[ -n $isrunning ]]|| {
@@ -168,7 +168,7 @@ function Start { #{{{1
 	check-status
 	start-if-not-started $SERVER_IS_RUNNING			server
 	start-if-not-started $UI_IS_RUNNING				ui
-	start-if-not-started $WATCH_TIME_IS_RUNNING		watchtime
+#	start-if-not-started $WATCH_TIME_IS_RUNNING		watchtime
 
 } #}}}1
 function Stop { #{{{1
@@ -180,13 +180,13 @@ function Stop { #{{{1
 		[[ $s == WAIT ]]&& { sleep 0.5; continue;}
 		i=0
 		while ((i<p)); do
-			2>&1 print "Stopping: ($s) ${status_names[i]}"
+			notify "^F{9}Stopping^f: ($s) ${status_names[i]}"
 			kill -$s ${status_pids[i]}
 			((i++))
 		done
 	done
 } #}}}1
-function Restart { Stop; Start; }
+function Restart { Stop; sleep 0.5; Start; sleep 0.5; }
 function Status { # {{{1
 	local i procnum
 	typeset -L7 pid

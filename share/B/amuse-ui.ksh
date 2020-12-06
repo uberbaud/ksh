@@ -6,7 +6,7 @@ set -o nounset;: ${FPATH:?Run from within KSH}
 
 TAB='	'
 CONTINUE=true
-UpdateAll=true;
+UpdateAll=false;
 # Colors
 colorBG='48;5;31'
 colorPlayed="\\033[0;$colorBG;38;5;249m"
@@ -227,9 +227,9 @@ function update-screen { # {{{1
 	update-status
 } # }}}1
 function main-loop { #{{{1
-	#$KDOTDIR/bin/amuse-watchtime.ksh &
 	get-size
 	set-alternate-screen
+	update-screen
 	while $CONTINUE; do
 		if $UpdateAll; then
 			update-screen

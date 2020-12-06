@@ -9,7 +9,7 @@
 #:     ^T-L^t ^Uhostglob^u  use ^Spass-find^s (lists).
 #:   Scripts are located in ^U^S$KDOTDIR^s/bin^u
 
-needs ${KDOTDIR:?}/bin/pass-{gen,show}.ksh
+needs ${KDOTDIR:?}/$HOST/B/pass-{gen,show}.ksh
 function pass {
 	local which=gen
 	(($#==1)) && which=show
@@ -19,7 +19,7 @@ function pass {
 		-h) which=gen;							;;
 	esac
 
-	$KDOTDIR/bin/pass-$which.ksh "$@"
+	$KDOTDIR/$HOST/B/pass-$which.ksh "$@"
 }
 
 # Copyright © 2020 by Tom Davis <tom@greyshirt.net>.

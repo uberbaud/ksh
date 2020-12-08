@@ -1,8 +1,0 @@
-# vim: ft=ksh ts=4
-function strip-kdot {
-	: ${1:?}
-	eval set -- "$1" "\$$1"
-	[[ $2 == ${KDOTDIR%/}/* ]]&& {
-		eval $1='./${2#$KDOTDIR/}'
-	  }
-}

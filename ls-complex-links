@@ -1,0 +1,13 @@
+# vim: ft=ksh ts=4
+function ls-complex-links {
+	for h in $(find . -type l); do
+		sl=$(readlink $h);		strip-kdot sl
+		[[ $sl == */* ]]||
+			sl=${h%/*}/$sl
+		rl=$(readlink -f $h);	strip-kdot rl
+		[[ $sl == $rl ]]||
+			warn	"       name: $h"			\
+					"   links to: $sl"			\
+					"resolves to: $rl"
+	done 2>&1
+}

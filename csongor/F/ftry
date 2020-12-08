@@ -6,10 +6,10 @@
 #:     ^T-x^t sets 
 
 function ftry {
-	local trace=false
-	[[ ${1:-} == -x ]]&& { trace=true; shift; }
+	local trace=
+	[[ ${1:-} == -x ]]&& { trace=t; shift; }
     unset -f "$1"
-	typeset -ft "$1"
+	typeset -fu$trace "$1"
     "$@"
 }
 

@@ -1,1 +1,1 @@
-/home/tw/.config/ksh/share/B/mkhelp.ksh
+/home/tw/.config/ksh/share/BS/mkhelp.ksh

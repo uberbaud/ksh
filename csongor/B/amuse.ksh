@@ -1,1 +1,1 @@
-/home/tw/.config/ksh/share/B/amuse.ksh
+/home/tw/.config/ksh/share/BS/amuse.ksh

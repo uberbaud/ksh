@@ -1,1 +1,1 @@
-/home/tw/.config/ksh/share/B/m-get.ksh
+/home/tw/.config/ksh/share/BS/m-get.ksh

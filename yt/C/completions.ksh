@@ -1,1 +1,1 @@
-/home/tw/.config/ksh/share/C/completions.ksh
+/home/tw/.config/ksh/share/CS/completions.ksh

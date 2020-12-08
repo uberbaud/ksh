@@ -1,1 +1,1 @@
-/home/tw/.config/ksh/share/B/m-part.ksh
+/home/tw/.config/ksh/share/BS/m-part.ksh

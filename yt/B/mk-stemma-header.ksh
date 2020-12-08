@@ -1,1 +1,1 @@
-/home/tw/.config/ksh/share/B/mk-stemma-header.ksh
+/home/tw/.config/ksh/share/BS/mk-stemma-header.ksh

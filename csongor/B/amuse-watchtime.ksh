@@ -1,1 +1,1 @@
-/home/tw/.config/ksh/share/B/amuse-watchtime.ksh
+/home/tw/.config/ksh/share/BS/amuse-watchtime.ksh

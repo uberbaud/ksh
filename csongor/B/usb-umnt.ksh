@@ -1,1 +1,1 @@
-/home/tw/.config/ksh/share/B/usb-umnt.ksh
+/home/tw/.config/ksh/share/BS/usb-umnt.ksh

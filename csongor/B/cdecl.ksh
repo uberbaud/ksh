@@ -1,1 +1,1 @@
-/home/tw/.config/ksh/share/B/cdecl.ksh
+/home/tw/.config/ksh/share/BS/cdecl.ksh

@@ -1,1 +1,1 @@
-/home/tw/.config/ksh/share/B/amusify.ksh
+/home/tw/.config/ksh/share/BS/amusify.ksh

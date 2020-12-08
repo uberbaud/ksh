@@ -1,1 +1,1 @@
-/home/tw/.config/ksh/share/B/grep-docstore.ksh
+/home/tw/.config/ksh/share/BS/grep-docstore.ksh

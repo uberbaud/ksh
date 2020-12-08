@@ -1,1 +1,1 @@
-/home/tw/.config/ksh/share/B/usb-mnt.ksh
+/home/tw/.config/ksh/share/BS/usb-mnt.ksh

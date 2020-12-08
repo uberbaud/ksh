@@ -1,1 +1,1 @@
-/home/tw/.config/ksh/share/B/suv.ksh
+/home/tw/.config/ksh/share/BS/suv.ksh

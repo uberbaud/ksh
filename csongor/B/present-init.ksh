@@ -1,1 +1,1 @@
-/home/tw/.config/ksh/share/B/present-init.ksh
+/home/tw/.config/ksh/share/BS/present-init.ksh

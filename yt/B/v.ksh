@@ -1,1 +1,1 @@
-/home/tw/.config/ksh/share/B/v.ksh
+/home/tw/.config/ksh/share/BS/v.ksh

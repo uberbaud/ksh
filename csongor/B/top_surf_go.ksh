@@ -1,1 +1,1 @@
-/home/tw/.config/ksh/share/B/top_surf_go.ksh
+/home/tw/.config/ksh/share/BS/top_surf_go.ksh

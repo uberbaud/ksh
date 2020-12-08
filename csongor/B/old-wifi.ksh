@@ -1,1 +1,1 @@
-/home/tw/.config/ksh/share/B/old-wifi.ksh
+/home/tw/.config/ksh/share/BS/old-wifi.ksh

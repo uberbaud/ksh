@@ -50,9 +50,9 @@ SYSDATA=$xdgdata/sysdata
 [[ -n $KDOTDIR ]]&& {
 	
 	K=$KDOTDIR;			KU=$KDOTDIR/$HOST;		KS=$KDOTDIR/share
-						F=$KU/F;				FS=$KS/F
-						B=$KU/B					BS=$KS/B
-												H=$KS/H
+						F=$KU/F;				FS=$KS/FS
+						B=$KU/B					BS=$KS/BS
+												H=$KS/HS
 
 	[[ -d $KU ]]|| mkdir $KU
 	export FPATH=$F
@@ -246,7 +246,7 @@ alias clear='f-clear '
 alias doas='as-root '
 alias hush='>/dev/null 2>&1 '
 alias k='fc -s'
-alias ls='/usr/local/bin/colorls $LS_OPTIONS'
+#alias ls='/usr/local/bin/colorls $LS_OPTIONS'
 alias no2='2>/dev/null '
 alias noerr='2>/dev/null '
 alias noglob='set -f;noglob '; function noglob { set +f; ("$@"); }

@@ -84,8 +84,8 @@ VISED=/usr/local/bin/vis
 LOGPS1='\n'\
 '%:KSH:% \D{%Y.%m.%d.%H.%M.%S.%z} \w\n'\
 '\[\e[33m\]['\
-'\[\e[32m\]$( local E=$?; ((E))|| printf "ok" )'\
-'\[\e[48;5;224;31m\]$( local E=$?; ((E))&& printf " %d " $E )'\
+'\[\e[32m\]$( local E=$?; ((E))|| print "ok" )'\
+'\[\e[48;5;224;31m\]$( local E=$?; ((E))&& print " $E " )'\
 '\[\e[0;33m\]]'\
 '\[\\e[0;34m\]\$'\
 '\[\e[0m\] '
@@ -101,20 +101,20 @@ export PS1=\
 '\[\e[32m\]\h '\
 '\[\e[34m\]\W'\
 '\[\e[33m\]]'\
-'\[\e[48;5;224;31m\]$( local E=$?; ((E))&& printf "[%d]" $E )'\
+'\[\e[48;5;224;31m\]$( local E=$?; ((E))&& print "[$E]" )'\
 '\[\e[0m\]\$ '
 
 E=''; R=''
-ps4a="$E[44;37m"
-ps4b="$E[44;33m"
-ps4c="$E[0m"
-PS4W=14
-#    |....+....0....|
-ps4p='              ' # the width of PS4W
+ps4a="$E[47;38;5;8m"
+ps4b="$E[47;33m"
+ps4c="$E[0;8m│$E[0m$E[K"
+PS4W=16
+#    |....+....0....+.|
+ps4p='                ' # the width of PS4W
 export PS4=\
 "$ps4a$ps4p$R"\
 '${0##*/}'\
 "$ps4b $E[\$(($PS4W-\${#LINENO}))G \$LINENO "\
-"$ps4c "
+"$ps4c"
 
 true

@@ -253,7 +253,7 @@ alias noglob='set -f;noglob '; function noglob { set +f; ("$@"); }
 alias prn="printf '  \e[35m｢\e[39m%s\e[35m｣\e[39m\n'"
 
 [[ -n $KDOTDIR ]]&& {
-	KCOMPLETE=$KDOTDIR/share/CS
+	KCOMPLETE=$KU/C
 	: run in sub-shell for exceptions sake; (
 		makeout=$KCOMPLETE/make.out
 		get-exclusive-lock completion-make

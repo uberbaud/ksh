@@ -1,0 +1,30 @@
+# <@(#)tag:csongor.greyshirt.net,2017-08-06:tw/18.02.34z/1a209b1>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^[^T-f^t^]
+#:   Empties the current directory, then removes it.
+#:    ^T-f^t  does it without asking.
+
+function clearout {
+	local askperm=true
+	(($#))&& {
+		[[ "$*" == '-f' ]]||
+			die 'Unexpected parameters.'			\
+				'Empties and removes directory.'	\
+				'  [1m-f[22m to skip permission.'
+		askperm=false
+	  }
+
+	local P="${PWD##*/}"
+	$askperm && {
+		h1 "Clean out ${PWD}?"
+		find . -type f | column
+		yes-or-no "Empty and remove [1m$P[22m" || return 1
+	  }
+	cd ..
+	warn "Cleaning out and removing [1m$P[22m."
+	/bin/rm -rf ./"$P"
+}
+
+
+# Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

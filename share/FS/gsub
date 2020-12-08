@@ -1,0 +1,24 @@
+# <@(#)tag:csongor.greyshirt.net,2017-08-08:tw/01.55.09z/1c2b604>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Uold^u ^Unew^u ^Utext^u ^[^Uvarname^u^] ^= ^Bvarname^b or ^BREPLY^b
+#:   Replaces ^Uold^u occurences in ^Utext^u with ^Unew^u.
+#:   The result is placed in ^S${4:-REPLY}^s.
+
+function gsub {
+	: ${1:?parameter 'old' cannot be empty}
+	eval ${4:-REPLY}=
+	set -- "${4:-REPLY}" "$(
+		unset p old new text
+		p='';old="$1";new="${2:-}";text="${3:-}"
+		while [[ $text == *"$old"* ]]; do
+			p="$p${text%%"$old"*}$new"
+			text="${text#*"$old"}"
+		done
+		print -r -- "$p$text"
+	  )" || return $?
+
+	eval $1=\$2
+}
+
+# Copyright © 2017,2020 by Tom Davis <tom@greyshirt.net>.

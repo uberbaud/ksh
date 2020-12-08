@@ -1,0 +1,30 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2019-11-26,20.54.54z/b0198c>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^[^[^UFILE.^u^]^UEXT^u^]
+#:   Edit ^SSTDIN^s, print saved to ^SSTDOUT^s.
+#:     gives the temporary file the name ${FILE:-pipedit}.${EXT:-tmp}
+
+function pipedit {
+	local TmpDir File RC
+	if [[ -z ${1:-} ]]; then
+		File=pipedit.tmp
+	elif [[ $1 == *.* ]]; then
+		File="$1"
+	else
+		File=pipedit."$1"
+	fi
+	TmpDir="$(mktemp -td pipedit-XXXXXXXXX)" ||
+		die 'Could not ^Tmktemp^t directory'
+	cat >"$TmpDir/$File"
+	exec 4<>/dev/tty
+	${VISUAL:-${EDITOR:-vi}} "$TmpDir/$File" <&4 >&4 2>&4
+	exec 4>&-
+	RC=$?
+	(($RC))|| cat "$TmpDir/$File"
+	/bin/rm "$TmpDir/$File"
+	rmdir "$TmpDir"
+	(($RC))&& die '^F$EDITOR^f exited with an error.'
+}
+
+# Copyright © 2019 by Tom Davis <tom@greyshirt.net>.

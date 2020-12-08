@@ -66,7 +66,7 @@ $(TARGET): $(GENERATE) $(SHARED) Makefile
 	@sed -e 's/ $$//' <tmp.tr                    >>$@
 	@printf '\n'                                 >>$@
 	@rm tmp.sort tmp.tr
-	@echo $f            >$(GIT_IGN)
+	@echo $f           >>$(GIT_IGN)
 .endfor
 	@echo $@           >>$(GIT_IGN)
 	@echo make.out     >>$(GIT_IGN)

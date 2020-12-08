@@ -16,6 +16,6 @@ function amuse:send-cmd {
 		>$fifo print -r -- "$*" &
 		cpid=$!
 		sleep 0.05
-		[[ -n $(ps -ocommand= -p $cpid) ]]&& kill $cpid
+		[[ -z $(ps -ocommand= -p $cpid) ]]|| kill $cpid
 	) >~/log/amuse:send-cmd.log 2>&1
 }

@@ -1,1 +1,1 @@
-/home/tw/.config/ksh/share/B/lolcat.ksh
+/home/tw/.config/ksh/share/BS/lolcat.ksh

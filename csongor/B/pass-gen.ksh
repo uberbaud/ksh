@@ -1,1 +1,1 @@
-/home/tw/.config/ksh/share/B/pass-gen.ksh
+/home/tw/.config/ksh/share/BS/pass-gen.ksh

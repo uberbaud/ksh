@@ -1,1 +1,1 @@
-/home/tw/.config/ksh/share/B/presentation-notes.ksh
+/home/tw/.config/ksh/share/BS/presentation-notes.ksh

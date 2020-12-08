@@ -1,1 +1,1 @@
-/home/tw/.config/ksh/share/B/ls-notes.ksh
+/home/tw/.config/ksh/share/BS/ls-notes.ksh

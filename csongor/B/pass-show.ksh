@@ -1,1 +1,1 @@
-/home/tw/.config/ksh/share/B/pass-show.ksh
+/home/tw/.config/ksh/share/BS/pass-show.ksh

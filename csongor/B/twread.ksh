@@ -1,1 +1,1 @@
-/home/tw/.config/ksh/share/B/twread.ksh
+/home/tw/.config/ksh/share/BS/twread.ksh

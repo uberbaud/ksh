@@ -1,1 +1,1 @@
-/home/tw/.config/ksh/share/B/savetracks.ksh
+/home/tw/.config/ksh/share/BS/savetracks.ksh

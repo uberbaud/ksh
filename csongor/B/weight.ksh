@@ -1,1 +1,1 @@
-/home/tw/.config/ksh/share/B/weight.ksh
+/home/tw/.config/ksh/share/BS/weight.ksh

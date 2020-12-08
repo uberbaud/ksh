@@ -1,1 +1,1 @@
-/home/tw/.config/ksh/share/B/presentation-make.ksh
+/home/tw/.config/ksh/share/BS/presentation-make.ksh

@@ -1,1 +1,1 @@
-/home/tw/.config/ksh/share/B/upit.ksh
+/home/tw/.config/ksh/share/BS/upit.ksh

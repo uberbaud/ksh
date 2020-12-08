@@ -3,11 +3,42 @@
 
 TARGET      = completions.ksh
 # things make builds (don't git)
-OBJECTS     = git_1 help scp ssh rcctl_2 sysctl
+GENERATE   != sed -E -e '/^\#/d' $(.CURDIR)/GENERATE
 # things hand crafted (git them)
-DEPENDS     = chflags fossil_1 inc kill_1 mediainfo mget perlbrew pkg_1
-DEPENDS    += poco rcctl_1 sndioctl xfontsel xinput_1 xinput_2
+SHARED     != sed -E -e '/^\#/d' $(.CURDIR)/SHARED
+
 GIT_IGN     = .gitignore
+
+# ========================================================================
+# === DON'T DO ANYTHING IN SOME CASES ====================================
+# ========================================================================
+LINKFROM    = $(KDOTDIR)/share/CS
+FORHOST     = $(.CURDIR:H:T)
+################################################### IF ##########
+.if $(FORHOST) == share
+all clean $(TARGET) $(GENERATE) $(SHARED):
+	@echo '  Attempted to run in /share/'
+
+.PHONY: all clean
+################################################### ELIF ########
+.elif $(HOST) != $(FORHOST)
+all $(TARGET) $(GENERATE) $(SHARED):
+	@echo '  Attempted to run on the wrong host'
+	@echo '  <$(HOST)> is not <$(FORHOST)>'
+
+clean:
+	@echo '  <$(HOST)> is not <$(FORHOST)>'
+	@echo '  try: make forceclean'
+
+forceclean:
+	rm -f $(TARGET)
+	rm -f $(GENERATE)
+	rm -f $(SHARED)
+
+.PHONY: all clean forceclean
+################################################### ELSE ########
+.else
+# ========================================================================
 
 .poison empty OSREV
 .poison empty KDOTDIR
@@ -15,26 +46,30 @@ GIT_IGN     = .gitignore
 
 all: $(TARGET)
 
+
 clean:
 	rm -f $(TARGET)
-	rm -f $(OBJECTS)
+	rm -f $(GENERATE)
+	rm -f $(SHARED)
 
-$(TARGET): $(OBJECTS) $(DEPENDS)
+$(SHARED):
+	@echo $@
+	@ln -fs $(LINKFROM)/$@ $@
+
+$(TARGET): $(GENERATE) $(SHARED) Makefile
 	@printf '# vim: ft=ksh ts=4 nowrap\n\n'      >$@
-.for f in $(OBJECTS) $(DEPENDS)
+.for f in $(GENERATE) $(SHARED)
 	@printf 'set -A complete_$f -- '             >>$@
 	@sort <$f >tmp.sort
 	@tr '\n' ' ' <tmp.sort >tmp.tr
 	@sed -e 's/ $$//' <tmp.tr                    >>$@
 	@printf '\n'                                 >>$@
 	@rm tmp.sort tmp.tr
-.endfor
-	@echo '.*'       >$(GIT_IGN)
-	@echo $@        >>$(GIT_IGN)
-	@echo make.out  >>$(GIT_IGN)
-.for f in $(OBJECTS)
 	@echo $f   >>$(GIT_IGN)
 .endfor
+	@echo '.gitignore'  >$(GIT_IGN)
+	@echo $@           >>$(GIT_IGN)
+	@echo make.out     >>$(GIT_IGN)
 
 GIT_CONFIG=/home/tw/.config/git/config
 GIT_ALIAS_PGM='/\[alias\]/ {p=1} p && /\[[a-z]/ {exit} p && / = / {print $$1}'
@@ -85,3 +120,5 @@ $(PKG_LOG):
 	@touch $(PKG_LOG)
 
 .PHONY: all clean
+# ========================================================================
+.endif # WHOLE FILE

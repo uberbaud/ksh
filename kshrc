@@ -257,7 +257,7 @@ alias prn="printf '  \e[35m｢\e[39m%s\e[35m｣\e[39m\n'"
 	: run in sub-shell for exceptions sake; (
 		makeout=$KCOMPLETE/make.out
 		get-exclusive-lock completion-make
-		make -C $KCOMPLETE >$KCOMPLETE/make.out
+		make -k -C $KCOMPLETE >$KCOMPLETE/make.out
 		[[ -s $makeout ]]&& {
 			notify 'Recompiled completion modules:'
 			COLUMNS=${COLUMNS:-$(tput col)}

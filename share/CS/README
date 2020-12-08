@@ -1,0 +1,18 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2020-12-08,19.21.17z/424dc5>
+
+make (Makefile) gets build information from two (2) files:
+
+    GENERATE
+        targets to be built
+
+    SHARED
+        targets to be soft linked from $KDOTDIR/share/CS
+
+In addition to editing these files to include completions you want, in
+the case of GENERATE, you will also have to edit Makefile and add the
+target and build instructions.
+
+The Makefile tests the directory it's being run in and will exit without
+doing anything if the machine it is being run on $(HOST) does not match
+the directory it is being run in ($KDOTDIR/$HOST/*). All edits MUST
+conform to this.

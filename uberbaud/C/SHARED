@@ -1,0 +1,6 @@
+# files listed here will be linked from $KDOTDIR/share/C
+chflags
+inc
+kill_1
+pkg_1
+rcctl_1

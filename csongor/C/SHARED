@@ -1,0 +1,15 @@
+# files listed here will be linked from $KDOTDIR/share/C
+chflags
+fossil_1
+inc
+kill_1
+mediainfo
+mget
+perlbrew
+pkg_1
+poco
+rcctl_1
+sndioctl
+xfontsel
+xinput_1
+xinput_2

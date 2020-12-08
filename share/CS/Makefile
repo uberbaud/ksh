@@ -58,6 +58,7 @@ $(SHARED):
 
 $(TARGET): $(GENERATE) $(SHARED) Makefile
 	@printf '# vim: ft=ksh ts=4 nowrap\n\n'      >$@
+	@echo '.gitignore'  >$(GIT_IGN)
 .for f in $(GENERATE) $(SHARED)
 	@printf 'set -A complete_$f -- '             >>$@
 	@sort <$f >tmp.sort
@@ -65,9 +66,8 @@ $(TARGET): $(GENERATE) $(SHARED) Makefile
 	@sed -e 's/ $$//' <tmp.tr                    >>$@
 	@printf '\n'                                 >>$@
 	@rm tmp.sort tmp.tr
-	@echo $f   >>$(GIT_IGN)
+	@echo $f            >$(GIT_IGN)
 .endfor
-	@echo '.gitignore'  >$(GIT_IGN)
 	@echo $@           >>$(GIT_IGN)
 	@echo make.out     >>$(GIT_IGN)
 

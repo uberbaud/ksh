@@ -4,9 +4,9 @@
 
 set -o nounset;: ${FPATH:?Run from within KSH} ${KDOTDIR:?}
 
-BASED=$KDOTDIR/share
-CmplHelp=$BASED/CS/help
-HelpDir=$BASED/HS
+BASED=$KDOTDIR/$HOST
+CmplHelp=$BASED/C/help
+HelpDir=$BASED/H
 
 # Usage {{{1
 typeset -- this_pgm="${0##*/}"
@@ -48,21 +48,24 @@ function warnOrDie { #{{{1
 	esac
 } # }}}1
 
-
 TEMPF=$CmplHelp.tmp
 
 o=$IFS; set -- $FPATH; IFS=$o
-for p in $HelpDir "$@"; do printf "%s\n" "$p"/*; done \
-	| sed -e 's+.*/++' -e '/\*$/d'					\
-	| sort											\
-	| uniq											\
-	> $TEMPF
+for p in $HelpDir "$@"; do printf "%s\n" "$p"/*; done	\
+	| sed -e 's+.*/++' -e '/\*$/d'						\
+	| sort												\
+	| uniq												\
+	>$TEMPF
 
-cmp -s $CmplHelp $TEMPF || { 
-	cat $TEMPF >$CmplHelp
-	print help # for Makefile output
-  }
-
-rm $TEMPF
+if [[ -f $CmplHelp ]]; then
+	cmp -s $CmplHelp $TEMPF || { 
+		cat $TEMPF >$CmplHelp
+		print help # for Makefile output
+	  }
+	rm $TEMPF
+else # $CmplHelp doesn't exist
+	mv $TEMPF $CmplHelp
+	print +help # for Makefile output
+fi
 
 # Copyright (C) 2017 by Tom Davis <tom@greyshirt.net>.

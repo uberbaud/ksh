@@ -1,0 +1,16 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2020-12-07,18.09.05z/4bf2274>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^[^T-x^t^] ^Ufunction^u ^[^Uargs…^u^]
+#:   ^Tunset -f ^t^$^N1^n^T; "^t^$^N@^n^T";^t
+#:     ^T-x^t sets 
+
+function ftry {
+	local trace=
+	[[ ${1:-} == -x ]]&& { trace=t; shift; }
+    unset -f "$1"
+	typeset -fu$trace "$1"
+    "$@"
+}
+
+# Copyright © 2020 by Tom Davis <tom@greyshirt.net>.

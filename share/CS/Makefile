@@ -44,9 +44,9 @@ git_1: $(GIT_CONFIG)
 	@git --help |awk '/^   [a-z]/ {print $$1}'>>$@
 	@awk $(GIT_ALIAS_PGM) $(GIT_CONFIG) >>$@
 
-HELP_UPBIN=$(KDOTDIR)/share/B/update-help-completions.ksh
-HELP_FCHG=$(KDOTDIR)/share/F/.LAST_UPDATED
-HELP_HCHG=$(KDOTDIR)/share/H/.LAST_UPDATED
+HELP_UPBIN=$(KDOTDIR)/share/BS/update-help-completions.ksh
+HELP_FCHG=$(KDOTDIR)/share/FS/.LAST_UPDATED
+HELP_HCHG=$(KDOTDIR)/share/HS/.LAST_UPDATED
 help: $(HELP_FCHG) $(HELP_HCHG)
 	@$(HELP_UPBIN)
 

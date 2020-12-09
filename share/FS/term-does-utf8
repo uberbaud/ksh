@@ -6,7 +6,7 @@
 
 needs get-row-col
 function term-does-utf8 {
-	[[ -z $TERM_DOES_UTF8 ]]&& {
+	[[ -z ${TERM_DOES_UTF8:-} ]]&& {
 		local start finish moved
 		start=$(get-row-col)
 		print -n '\033[8m\0302\0251\033[28m' # hidden COPYRIGHT SIGN: ©

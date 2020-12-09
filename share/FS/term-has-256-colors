@@ -1,0 +1,19 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2020-12-09,20.24.08z/195fd5f>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^G(no arguments)^g
+#:   Test terminal as best we can.
+#:   Uses and sets ^S$HAS_256_COLORS^s (1 or 0)
+
+needs tput
+function term-has-256-colors {
+	[[ -z ${HAS_256_COLORS:-} ]]&& {
+		local tcolors
+		tcolors=$(tput colors 2>/dev/null)
+		[[ -z $tcolors && $TERM == *256* ]]&& tcolors=256
+		HAS_256_COLORS=$((${tcolors:-0}>255))
+	  }
+	(($HAS_256_COLORS))
+}
+
+# Copyright © 2020 by Tom Davis <tom@greyshirt.net>.

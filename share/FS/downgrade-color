@@ -1,0 +1,65 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2020-12-09,18.09.59z/1cc79ab>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Uansi string (no ^G^^[^g^T[^t, nor trailing ^Tm^t.
+#:   Converts an ansi color string to 8bit terminal color
+
+function downgrade-color {
+	local IFS dwn sep ANSI fb r g b x wantcmp
+	IFS=\;
+	set -- $*
+	IFS=' 	
+' # << capture newline
+	dwn=
+	sep=
+	while (($#)); do
+		if [[ $1 == [34]8 ]]; then
+			x=0; r=0; g=0; b=0
+			fb=${1%8}
+			wantcmp=false
+			r=0 g=0 b=0
+			if [[ $2 == 2 ]]; then
+				r=$3; g=$4; b=$5
+				wantcmp=true
+				shift 5
+			elif [[ $2 == 5 ]]; then
+				if (($3<8)); then
+					dwn="$dwn$sep${fb}$3"
+				elif (($3<16)); then
+					dwn="$dwn$sep${fb}$(($3-8))"
+				elif (($3<232)); then
+					# color palette
+					x=$(($3-16))
+					b=$((x%6))
+					x=$((x/6))
+					g=$((x%6))
+					r=$((x/6))
+					wantcmp=true
+				elif (($3<240)); then
+					dwn="$dwn$sep${fb}0"
+				else
+					dwn="$dwn$sep${fb}7"
+				fi
+				shift 3
+			else
+				die "Bad number: $1;$2;$3;$4;$5"
+			fi
+			$wantcmp && {
+				R=0; G=0; B=0
+				((x=(x=(r>g?r:g))>b?x:b))
+				((x=x/2))
+				((r>x))&& R=1
+				((g>x))&& G=2
+				((b>x))&& B=4
+				dwn="$dwn$sep${fb}$((R+G+B))"
+			  }
+		else
+			dwn="$dwn$sep$1"
+			shift
+		fi
+		sep=\;
+	done
+	print $dwn
+}
+
+# Copyright © 2020 by Tom Davis <tom@greyshirt.net>.

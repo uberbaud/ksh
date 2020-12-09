@@ -14,8 +14,23 @@
 #:     ^B^^^^^b ^= ^B^^^b ^G(a doubled caret becomes a single caret)^g
 
 
+needs term-does-utf8 term-has-256-colors
 function sparkle {
-	set +vx
+	local sG sN sW cA
+	if term-has-256-colors; then
+		sG='37'
+		sN='34'
+		sW='1;33'
+	else
+		sG='38;5;248'
+		sN='38;5;12'
+		sW='38;5;172'
+	fi
+	if term-does-utf8; then
+		cA='⇒'
+	else
+		cA=$(print -n \\0273)	# » in Latin1
+	fi
 	# start by changing ^^ to GROUP SEPARATOR \x1e
 	sed	-E											\
 		-e 's/\^\^//g'							\
@@ -27,7 +42,7 @@ function sparkle {
 		-e 's/\^e/[39m/g'							\
 		-e 's/\^F\{([0-9]+)\}/[38;5;\1m/g'		\
 		-e 's/\^f/[39m/g'							\
-		-e 's/\^G/[38;5;248m/g'					\
+		-e 's/\^G/['"${sG}"'m/g'					\
 		-e 's/\^g/[39m/g'							\
 		-e 's/\^H/[8m/g'							\
 		-e 's/\^h/[28m/g'							\
@@ -35,7 +50,7 @@ function sparkle {
 		-e 's/\^i/[23m/g'							\
 		-e 's/\^K\{([0-9]+)\}/[48;5;\1m/g'		\
 		-e 's/\^k/[49m/g'							\
-		-e 's/\^N/[38;5;12m/g'					\
+		-e 's/\^N/['"${sN}"'m/g'					\
 		-e 's/\^n/[39m/g'							\
 		-e 's/\^R/[7m/g'							\
 		-e 's/\^r/[27m/g'							\
@@ -45,9 +60,9 @@ function sparkle {
 		-e 's/\^t/[39m/g'							\
 		-e 's/\^U/[4m/g'							\
 		-e 's/\^u/[24m/g'							\
-		-e 's/\^W/[38;5;172m/g'					\
+		-e 's/\^W/['"$sW"'m/g'					\
 		-e 's/\^w/[39m/g'							\
-		-e 's/\^=/[35m⇒[39m/g'					\
+		-e 's/\^=/[35m'"$cA"'[39m/g'			\
 		-e 's/\^([[:punct:]])/[35m\1[39m/g'		\
 		-e 's//^/g'
 	printf '\e[0m' # failsafe: remove any unexpected attributes

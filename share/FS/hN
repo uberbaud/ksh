@@ -9,6 +9,7 @@
 #:     ^Uprefix^u, and ^Usuffix^u will only be used if ^Sstdout^s is ^Bnot^b
 #:               a terminal.
 
+needs term-has-256-colors
 function hN {
 	local IFS=' ' attr prefix suffix text
 	attr=${1:?Missing required ANSI escape attribute}
@@ -30,7 +31,10 @@ function hN {
 			typeset -L$((COLUMNS-7)) chopped=$text
 			text=$chopped'…'
 		  }
-		print -- "\033[0;${attr}m$setline ─ $text ─\033[0m"
+		local H='─'
+		term-has-256-colors	|| attr=$(downgrade-color "$attr")
+		term-does-utf8		|| H='-'
+		print -- "\033[0;${attr}m$setline $H $text $H\033[0m"
 	else
 		suffix=${suffix:+ $suffix}
 		local decoration="$prefix $suffix"

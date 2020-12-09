@@ -29,3 +29,8 @@
 
     ^T\e[s^t     Save the cursor position
     ^T\e[u^t     Return the cursor to the saved position
+
+    ^BColors^b
+
+    ^T\e[38;2;^t^Sr^s^T;^t^Sb^s^T;^t^Sg^s^Tm^t     Use ^ITrue Color^i. ^Srgb^s are in decimal.
+    ^T\e[38;5;^t^Sn^s^Tm^t         Use ^I256 color^i: ^Sn^s is an index into the color palette.

@@ -59,6 +59,9 @@ SYSDATA=$xdgdata/sysdata
 	KHIST=$KU/history
   }
 
+####### IMPORT LOCAL BITS
+[[ -f $KU/kshrc ]]&& . $KU/kshrc
+
 # special history file stuff
 histcache=$xdgcache/history
 [[ -d $histcache ]]|| mkdir -p $histcache
@@ -102,10 +105,9 @@ export TEMPLATES_FOLDER=$xdgdata/templates
 export TMPDIR=$xdgcache/temp
 export USRBIN=$HOME/bin/ksh
 export PERL_UNICODE=AS
+export PERLDOC='-MPod::Perldoc::ToTerm'
+export PERLDOC_SRC_PAGER=$VISUAL
 export PSQLRC=$xdgcfg/pg/psqlrc
-
-####### IMPORT LOCAL BITS
-[[ -f $KU/kshrc ]]&& . $KU/kshrc
 
 # have cpanm install things where we want them
 export USR_PLIB=$xdgdata/lib/perl5
@@ -137,6 +139,7 @@ wantpath "$USRBIN"			PREPEND
 # APPEND, so in order
 wantpath /usr/games			APPEND
 wantpath "$JDK_PATH"		APPEND
+wantpath $ROFFTOOLS_PATH	APPEND
 
 # input, locale, and such
 set -o vi -o vi-tabcomplete
@@ -256,7 +259,8 @@ alias prn="printf '  \e[35m｢\e[39m%s\e[35m｣\e[39m\n'"
 	KCOMPLETE=$KU/C
 	: run in sub-shell for exceptions sake; (
 		makeout=$KCOMPLETE/make.out
-		get-exclusive-lock completion-make
+		get-exclusive-lock-or-exit completion-make ||
+			warn 'using old completions'
 		make -k -C $KCOMPLETE >$KCOMPLETE/make.out
 		[[ -s $makeout ]]&& {
 			notify 'Recompiled completion modules:'

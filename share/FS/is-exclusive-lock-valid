@@ -1,0 +1,18 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2020-12-09,21.50.24z/640bc8>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Ulock file^u
+#:   Test that the process listed in the ^Ulock file^u is still running.
+#:   ^GNote: Unlike the other exclusive lock functions, this one takes^g
+#:         ^Gthe lock file name.^g
+
+function is-exclusive-lock-valid {
+	local fInfo fPid pInfo
+	fInfo=$(<${1:?})
+	fInfo=${fInfo##+( )}
+	fPid=${fInfo%% *}
+	pInfo=$(ps -opid=,lstart= -p $fPid)
+	[[ $pInfo == $fInfo ]]
+}
+
+# Copyright © 2020 by Tom Davis <tom@greyshirt.net>.

@@ -225,7 +225,7 @@ else
 	std-die
 fi
 
-needs figlet
+needs figlet has-256-colors
 
 showme='  '\
 '\033[0m    \033[48;5;%dm            '\
@@ -233,9 +233,14 @@ showme='  '\
 '\033[0m     : %s\n'
 splitstr NL "$(figlet "${rgb[4]}")" fig
 
+Latin='\0303\0211\0303\0247\0303\0276\0303\0260'
+has-256-colors || Latin='\0311\0347\0376\0360'
+Alpha="ABCDefgh$(print -- "$Latin")"
+
+
 typeset -L 33 RGB="${rgb[0]:-*} ${rgb[1]:-*} ${rgb[2]:-*}"
 printf '%40s %s\n' "$RGB"                           "${fig[0]}"
-printf "$showme" ${rgb[4]} ${rgb[4]} 'ABCDefghÉçþð' "${fig[1]}"
+printf "$showme" ${rgb[4]} ${rgb[4]} "$Alpha"		"${fig[1]}"
 printf "$showme" ${rgb[4]} ${rgb[4]} '_0123456789-' "${fig[2]}"
 printf "$showme" ${rgb[4]} ${rgb[4]} '!@#$%^&*([{|' "${fig[3]}"
 printf '%17s %22s %s\n' "${rgb[4]} ${rgb[3]}" ':'   "${fig[4]}"

@@ -12,9 +12,13 @@
 #:     4) return.
 #:   Returns the name of the lock file in ^SREPLY^s
 
-needs watch-file generate-exclusive-lock-name
+needs watch-file generate-exclusive-lock-name is-exclusive-lock-valid
 function get-exclusive-lock {
-	local L U
+	local L U lnRC imexit=true
+	lnRC=0
+	imexit=false
+
+	[[ ${1:-} == exit-dont-wait ]]&& { imexit=true; shift; }
 
 	generate-exclusive-lock-name "$@" || return 1
 	L="$REPLY"; REPLY=''
@@ -22,14 +26,23 @@ function get-exclusive-lock {
 	U="$(mktemp "${L%/*}"/excl-lock.XXXXXXXXXXX)" || {
 		warn 'Could not create a temporary file.'; return 1
 	  }
+	ps -opid=,lstart= -p $$ >$U
 
-	while ! ln "$U" "$L" 2>/dev/null; do
-		watch-file "$L" 2>/dev/null
-	done
+	[[ -f $L ]]&&
+		{ is-exclusive-lock-valid "$L" || rm -f "$L"; }
+
+	if $imexit; then
+		ln "$U" "$L" 2>/dev/null
+		lnRC=$?
+	else
+		while ! ln "$U" "$L" 2>/dev/null; do
+			watch-file "$L" 2>/dev/null
+		done
+	fi
 
 	/bin/rm "$U"
 	REPLY="$L"
-	return 0
+	return $lnRC
 }
 
 # Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

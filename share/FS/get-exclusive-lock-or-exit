@@ -7,23 +7,8 @@
 #:   Exits with 0 on success and >0 on failure.
 #:   Returns the name of the lock file in ^SREPLY^s
 
-needs generate-exclusive-lock-name
 function get-exclusive-lock-or-exit {
-	local L U lnRC
-
-	generate-exclusive-lock-name "$@" || return 1
-	L="$REPLY"; REPLY=''
-
-	U="$(mktemp "${L%/*}"/excl-lock.XXXXXXXXXXX)" || {
-		warn 'Could not create a temporary file.'; return 1
-	  }
-
-	ln "$U" "$L" 2>/dev/null;
-	lnRC=$?
-
-	/bin/rm "$U"
-	REPLY="$L"
-	return $lnRC
+	get-exclusive-lock exit-dont-wait "$@"
 }
 
 # Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

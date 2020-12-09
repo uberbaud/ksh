@@ -16,6 +16,7 @@ export GOPATH=$xdgdata/go
 export JDK_PATH=/usr/local/jdk-1.8.0/bin
 export TCLLIBPATH=$xdgdata/tcl
 export RLWRAP_HOME=$xdgcfg/rlwrap
+export ROFFTOOLS_PATH=/usr/local/heirloom-doctools/bin
 
 # default apps
 export BROWSER="$(<$xdgcfg/etc/browser)"

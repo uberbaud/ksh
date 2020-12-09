@@ -5,14 +5,25 @@
 #:   Print any unfinished tasks from ^STODO^s file, possibly filtering.
 #:     ^T-H^t  Print ^N== TODO ==^n header
 
+needs term-does-utf8
 function ls-todos {
 	[[ -f TODO ]]|| return 0
-	local TODO="$(<TODO)" Sep="$NL@ " Head Body ShowIt=false
-	TODO="${TODO#${Sep#$NL}}"
-	splitstr "$Sep" "$TODO" todo
+	: ${NL:?}
+	local Body Head Lines N Sep ShowIt TODO filetype tabstop textwidth todo
+	ShowIt=false
+	Sep="@ "
+	TODO="$(<TODO)"
+	TODO="${TODO#$Sep}"
+	splitstr "$NL$Sep" "$TODO" todo
 	: Pipe to sparkle; {
+		local ln first last s1 sF sN sL
+		if term-does-utf8; then
+			sB='━━'; s1='⊂'; sF='┌'; sN='│'; sL='└'
+		else
+			sB='=='; s1='-'; sF='/'; sN='|'; sL='\'
+		fi
 		[[ ${1:-} == -H ]]&& {
-			print -- "  ^N== TODO ==^n"
+			print -r -- "  ^N$sB TODO $sB^n"
 			shift
 		  }
 		Sep=''
@@ -31,9 +42,23 @@ function ls-todos {
 				ShowIt=true
 			fi
 			$ShowIt && {
-				gsub "$NL" "$NL    " "$Body"
-				print -- "$Sep$Body"
-				Sep="  ^N----^n$NL"
+				splitstr "$NL" "$Body" Lines
+				if ((${#Lines[*]}==1)); then
+					print -r -- "  ^N$s1^n ${Lines[0]##@(    |   |  | )}"
+				else
+					lndx=$((${#Lines[*]}-1))
+					first=${Lines[0]##@(    |   |  | )}
+					last=${Lines[lndx]##@(    |   |  | )}
+					unset Lines[0] Lines[lndx]
+					print -r -- "  ^N$sF^n $first"
+					for ln in "${Lines[@]}"; do
+						ln=${ln##@(    |   |  | )}
+						print -r -- "  ^N$sN^n $ln"
+					done
+					print -r -- "  ^N$sL^n $last"
+				fi
+				#print -r -- "$Sep$Body"
+				#Sep="  ^N----^n$NL"
 				ShowIt=false
 			  }
 		done

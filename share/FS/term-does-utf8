@@ -1,0 +1,22 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2020-12-09,20.49.35z/56588ba>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^G(no arguments)^g
+#:   Tests as best we can
+
+needs get-row-col
+function term-does-utf8 {
+	[[ -z $TERM_DOES_UTF8 ]]&& {
+		local start finish moved
+		start=$(get-row-col)
+		print -n '\033[8m\0302\0251\033[28m' # hidden COPYRIGHT SIGN: ©
+		finish=$(get-row-col)
+		set -- $start $finish
+		moved=$(($4-$2))
+		print -n "\033[${moved}D"
+		TERM_DOES_UTF8=$((moved==1))
+	  }
+	(($TERM_DOES_UTF8))
+}
+
+# Copyright © 2020 by Tom Davis <tom@greyshirt.net>.

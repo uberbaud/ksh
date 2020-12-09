@@ -20,6 +20,7 @@ csongor-colors
 desparkle
 die
 dir-is-empty
+downgrade-color
 f-b
 f-bc
 f-cd
@@ -60,6 +61,7 @@ hN
 histmark
 i-can-haz-inet
 in-ancestor-path
+is-exclusive-lock-valid
 is-known-host
 list-known-hosts
 log
@@ -123,10 +125,13 @@ ssh-askfirst
 ssh-clonedir
 t
 tdump
+term-does-utf8
+term-has-256-colors
 today
 todo
 trackfile
 unset-alternate-screen
+utf8-to-octal
 utf8codes
 vtmp
 warn

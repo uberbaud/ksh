@@ -42,7 +42,7 @@ shift $(($OPTIND - 1))
 # ready to process non '-' prefixed arguments
 # /options }}}1
 
-KB=$KDOTDIR/bin/
+KB=$KDOTDIR/share/BS
 needs $KB/synrdir.ksh
 docstore=$HOME/hold/DOCSTORE
 [[ -a $docstore ]]|| die "^B$docstore^b does not exist."

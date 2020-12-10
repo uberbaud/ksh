@@ -56,6 +56,7 @@ function warnOrDie { #{{{1
 	esac
 } # }}}1
 function already-in-edit { # {{{1
+	set -- $(<$1)
 	warn "File is already being edited (pid=^B$1^b)"
 	needs flash-parent-window-of-pid
 	flash-parent-window-of-pid "$1"
@@ -64,31 +65,16 @@ function already-in-edit { # {{{1
 		warn "Edit window is on desktop ^B$rc^b"
 	die "Quitting."
 } # }}}1
-function clear-dead-edit { # {{{1
-	local ovpid=$1 lockfile="$2" ovcmd
-	ovcmd=$(/bin/ps -o command= -p $ovpid)
-	# if there's really an edit session, return 1 (we didn't clear a
-	# dead edit).
-	[[ ${ovcmd:-} == /bin/ksh\ /home/tw/bin/ksh/v\ * ]]&& return 1
-	# otherwise, the lockfile is bogus, so clear it
-	rm "$lockfile"
-	return 0
-} # }}}1
 function safe-to-edit { #{{{1
-	local F ovpid
+	local F
 	F="${1:?Programmer error. Missing parameter.}"
 	gsub % %% "$F"
 	gsub / %  "$REPLY"
 	LOCKNAME="$REPLY"
 	V_CACHE="$XDG_CACHE_HOME/v"
 	[[ -d $V_CACHE ]]|| mkdir -p $V_CACHE
-	while ! get-exclusive-lock-or-exit "$LOCKNAME" $V_CACHE; do
-		ovpid=$(<$REPLY)
-		clear-dead-edit $ovpid $REPLY ||
-			already-in-edit $ovpid
-	done
-	LOCKFILE="$REPLY"
-	print $$>$LOCKFILE
+	get-exclusive-lock-or-exit "$LOCKNAME" $V_CACHE ||
+		already-in-edit "$REPLY"
 }
 function check-flags-for-writability { # {{{1
 	local UCHG=16#2 UAPPND=16#4 SCHG=16#20000 SAPPND=16#40000

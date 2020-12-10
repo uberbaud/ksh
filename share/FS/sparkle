@@ -18,13 +18,13 @@ needs term-does-utf8 term-has-256-colors
 function sparkle {
 	local sG sN sW cA
 	if term-has-256-colors; then
-		sG='37'
-		sN='34'
-		sW='1;33'
-	else
 		sG='38;5;248'
 		sN='38;5;12'
 		sW='38;5;172'
+	else
+		sG='37'
+		sN='34'
+		sW='1;33'
 	fi
 	if term-does-utf8; then
 		cA='⇒'

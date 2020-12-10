@@ -10,10 +10,12 @@ function term-does-utf8 {
 		local start finish moved
 		start=$(get-row-col)
 		print -n '\033[8m\0302\0251\033[28m' # hidden COPYRIGHT SIGN: ©
+		sleep 0.03	# The terminal is a bit asynchonous, so give it some
+					# time to catch up with the movement we made.
 		finish=$(get-row-col)
 		set -- $start $finish
+		print -n "\033[${1};${2}H"
 		moved=$(($4-$2))
-		print -n "\033[${moved}D"
 		TERM_DOES_UTF8=$((moved==1))
 	  }
 	(($TERM_DOES_UTF8))

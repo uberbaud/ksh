@@ -20,7 +20,7 @@ function ls-todos {
 		if term-does-utf8; then
 			sB='━━'; s1='⊂'; sF='┌'; sN='│'; sL='└'
 		else
-			sB='=='; s1='-'; sF='/'; sN='|'; sL='\'
+			sB='=='; s1='='; sF='/'; sN='|'; sL='\'
 		fi
 		[[ ${1:-} == -H ]]&& {
 			print -r -- "  ^N$sB TODO $sB^n"

@@ -6,16 +6,23 @@
 #:   executables in ^S$PATH^s.
 
 function needs {
-	local badlist=''
-	for x { [[ -n "$(whence "$x")" ]] || badlist="$badlist $x"; }
-	[[ -z $badlist ]]|| {
-		E=$(print \\033)
-		if [[ -t 2 ]]; then
-		 "  Failed: Missing needed commands: $REPLY"
-		else
-		 "  $E[0;31mFailed$E[0m: Missing needed commands: $E[1m$REPLY$E[0m"
-		fi
-	  }
+	local badlist='' F B N E
+	if [[ -t 2 ]]; then
+		E=$(print \\033); F="  $E[0;31mFailed$E[0m"; B="$E[1m"; N="$E[0m"
+	else
+		F="  Failed"; B=''; N=''
+	fi
+	if command -v whence >/dev/null; then
+		for x { [[ -n "$(whence "$x")" ]] || badlist="$badlist $x"; }
+		[[ -z $badlist ]]|| {
+			badlist="${badlist##+( )}"
+			print -ru2 "$F: Missing needed commands: $B$badlist$N"
+			kill $$
+		  }
+	else
+		print -ru2 "$F: needs cannot determine ${B}ANY${N} availability."
+		kill $$
+	fi
 }
 
 

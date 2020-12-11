@@ -7,7 +7,7 @@
 needs get-row-col
 function term-does-utf8 {
 	[[ -z ${TERM_DOES_UTF8:-} ]]&& {
-		local start finish moved
+		local start finish delta
 		start=$(get-row-col)
 		print -n '\033[8m\0302\0251\033[28m' # hidden COPYRIGHT SIGN: ©
 		sleep 0.03	# The terminal is a bit asynchonous, so give it some
@@ -15,9 +15,9 @@ function term-does-utf8 {
 		finish=$(get-row-col)
 		set -- $start $finish
 		print -n "\033[${1};${2}H"
-		moved=$(($4-$2))
-		TERM_DOES_UTF8=$((moved==1))
-	  }
+		delta=$(($4-$2))
+		TERM_DOES_UTF8=$((delta==1))
+	  } >/dev/tty
 	(($TERM_DOES_UTF8))
 }
 

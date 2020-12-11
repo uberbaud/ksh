@@ -9,8 +9,12 @@ function needs {
 	local badlist=''
 	for x { [[ -n "$(whence "$x")" ]] || badlist="$badlist $x"; }
 	[[ -z $badlist ]]|| {
-		desparkle "$badlist"
-		die "Missing needed commands: ^B$REPLY^b"
+		E=$(print \\033)
+		if [[ -t 2 ]]; then
+		 "  Failed: Missing needed commands: $REPLY"
+		else
+		 "  $E[0;31mFailed$E[0m: Missing needed commands: $E[1m$REPLY$E[0m"
+		fi
 	  }
 }
 

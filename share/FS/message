@@ -4,6 +4,7 @@
 #: FUNCTION ^G(no arguments)^g
 #:   Generalized bit for notify, warn, and die.
 
+needs sparkle
 function message {
 	local prefix_first prefix_others s
 	prefix_first=${1:?Missing prefix_first}

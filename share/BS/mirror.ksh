@@ -11,8 +11,8 @@ function usage {
 	PGM="$REPLY"
 	sparkle >&2 <<-\
 	===SPARKLE===
-	^F{4}Usage^f: ^T$PGM^t
-	         Mirror files or directories to another machine
+	^F{4}Usage^f: ^T$PGM^t ^Ufile/dir^u ^U…^u ^Umachine^u
+	         Mirror files or directories to another ^Umachine^u
 	       ^T$PGM -h^t
 	         Show this help message.
 	===SPARKLE===
@@ -62,6 +62,7 @@ function sendem {
 	local fullpath
 	for p; do
 		fullpath="$(readlink -fn "$p")"
+		notify "scp -r \"$fullpath\" $AWAY:\"$fullpath\""
 		scp -r "$fullpath" $AWAY:"$fullpath"
 	done
 }

@@ -195,6 +195,9 @@ function set-232-colors { # {{{1
 	HEX="#${palX[r]}${palX[g]}${palX[b]}"
 	set -A rgb -- "$r" "$g" "$b" "$HEX" "$1"
 } # }}}1
+needs figlet term-does-utf8 term-has-256-colors
+term-has-256-colors ||
+	warn 'This terminal does not support 256 colors.'
 
 x3=[0-9a-fA-F][0-9a-fA-F][0-9a-fA-F]
 if (($#==1)); then
@@ -225,8 +228,6 @@ else
 	std-die
 fi
 
-needs figlet has-256-colors
-
 showme='  '\
 '\033[0m    \033[48;5;%dm            '\
 '\033[0m    \033[38;5;%dm%s'\
@@ -234,7 +235,7 @@ showme='  '\
 splitstr NL "$(figlet "${rgb[4]}")" fig
 
 Latin='\0303\0211\0303\0247\0303\0276\0303\0260'
-has-256-colors || Latin='\0311\0347\0376\0360'
+term-does-utf8 || Latin='\0311\0347\0376\0360'
 Alpha="ABCDefgh$(print -- "$Latin")"
 
 

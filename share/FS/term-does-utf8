@@ -1,24 +1,30 @@
 # <@(#)tag:tw.csongor.greyshirt.net,2020-12-09,20.49.35z/56588ba>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^G(no arguments)^g
-#:   Tests as best we can
+#: FUNCTION ^[^T-f^t^]
+#:   Determine whether ^$^NTERM^n supports UTF-8. By default it will use
+#:   ^$^NLC_CTYPE^n. If ^$^NLC_CTYPE^n is set to ^*^T.UTF-8^t, then we
+#:   return ^Itrue^i, otherwise ^Ifalse^i.
+#:
+#:   ^T-f^t  Test the terminal directly.
+#:
+#: FUNCTION exports ^$^STERM_DOES_UTF8^s and prefers that to ^NLC_CTYPE^n.
+#:
 
 needs get-row-col
 function term-does-utf8 {
-	if [[ ${1:-} == -f ]]; then
-		[[ -z ${TERM_DOES_UTF8:-} ]]&& {
-			local start finish delta
-			start=$(get-row-col)
-			print -n '\033[8m\0302\0251\033[28m' # hidden COPYRIGHT SIGN: ©
-			sleep 0.03	# The terminal is a bit asynchonous, so give it some
-						# time to catch up with the movement we made.
-			finish=$(get-row-col)
-			set -- $start $finish
-			print -n "\033[${1};${2}H"
-			delta=$(($4-$2))
-			TERM_DOES_UTF8=$((delta==1))
-		  } >/dev/tty
+	if [[ ${1:-} == -f ]]; then {
+		local start finish delta
+		start=$(get-row-col)
+		print -n '\033[8m\0302\0251\033[28m' # hidden COPYRIGHT SIGN: ©
+		sleep 0.03	# The terminal is a bit asynchonous, so give it some
+					# time to catch up with the movement we made.
+		finish=$(get-row-col)
+		set -- $start $finish
+		print -n "\033[${1};${2}H"
+		delta=$(($4-$2))
+		TERM_DOES_UTF8=$((delta==1))
+	  } >/dev/tty
 	elif [[ -n ${TERM_DOES_UTF8:-} ]]; then
 		: just use the preset value
 	elif [[ ${LC_CTYPE:-} == *UTF-8 ]]; then
@@ -26,6 +32,7 @@ function term-does-utf8 {
 	else
 		TERM_DOES_UTF8=0
 	fi
+	export TERM_DOES_UTF8
 	(($TERM_DOES_UTF8))
 }
 

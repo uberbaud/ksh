@@ -96,9 +96,7 @@ function reset-volume { #{{{1
 	volnow=$(sndioctl output.level)
 	volset=$(<$sndiorc)
 	[[ $volnow == $volset ]]|| {
-		warn "Volume is ^B$volnow^b, but"	\
-			 "should be ^B$volset^b."		\
-			 "Updating."
+		notify "Updating volume from ^B$volnow^b to ^B$volset^b."
 		sndioctl -q $volset
 	  }
 } #}}}1

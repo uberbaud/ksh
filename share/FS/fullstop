@@ -1,7 +1,7 @@
 # <@(#)tag:csongor.greyshirt.net,2017-08-06:tw/17.55.13z/43fa587>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^Umsg word1^u ^[^Umsg word…N^u^]
+#: FUNCTION ^Umsg_word1^u ^[^Umsg_word…N^u^]
 #:   Like die but with no sparkle.
 
 function fullstop {

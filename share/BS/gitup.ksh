@@ -11,8 +11,8 @@ function usage {
 	PGM="$REPLY"
 	sparkle >&2 <<-\
 	===SPARKLE===
-	^F{4}Usage^f: ^T${PGM}^t ^Uupdate type^u
-	         Where ^Uupdate type^u is one of ^Bsimple^b or ^Bmodules^b.
+	^F{4}Usage^f: ^T${PGM}^t ^Uupdate_type^u
+	         Where ^Uupdate_type^u is one of ^Bsimple^b or ^Bmodules^b.
 	         1. ^Tgit checkout master^t if not on master,
 	         2. ^Tgit pull^t or ^Tgit submodule update --remote^t,
 	         3. ^Tgit checkout^t ^Uprevious^u if needed, and finally

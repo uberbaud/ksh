@@ -12,12 +12,12 @@ function usage {
 	sparkle >&2 <<-\
 	===SPARKLE===
 	^F{4}Usage^f: ^T$PGM^t ^[^Uoptions^u^] ^[^Uprefix^u ^[^Usuffix^u^]^]
-	         Make a ^Uwhat^u and ^URFC4151 tag^u compatible stemma
+	         Make a ^Uwhat^u and ^URFC4151_tag^u compatible stemma
 	             ^I<marker+tag:user.machine.domain,date,timez/uniqrand>^i
 	             ^T-U^t ^Uuser^u          defaults to ^T\$(id -n)^t
-	             ^T-M^t ^Umachine name^u  defaults to ^T\${\$(uname -m)%.*}^t
+	             ^T-M^t ^Umachine_name^u  defaults to ^T\${\$(uname -m)%.*}^t
 	             ^T-H^t ^Udomain^u        defaults to ^T\${URI_AUTHORITY-\${EMAIL#*@}}^t
-	             ^T-D^t ^Uiso date^u      defaults to ^T\$(date -u +%Y-%m-%d)^t
+	             ^T-D^t ^Uiso_date^u      defaults to ^T\$(date -u +%Y-%m-%d)^t
 	             ^T-T^t ^Utimez^u         defaults to ^T\$(date -u +%H.%M.%Sz)^t
 	         It is an error to specify a date or time but not both.
 	       ^T$PGM -h^t

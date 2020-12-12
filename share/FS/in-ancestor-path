@@ -1,8 +1,8 @@
 # <@(#)tag:tw.csongor.greyshirt.net,2020-12-07,12.58.23z/4e92bbc>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^Ulooking for^u
-#:   Is ^Ulooking for^u in this, or any of the ancestor directories
+#: FUNCTION ^Ulooking_for^u
+#:   Is ^Ulooking_for^u in this, or any of the ancestor directories
 #:   of ^$^{^N2^n^S:-$^s^NPWD^n^}
 
 function in-ancestor-path {

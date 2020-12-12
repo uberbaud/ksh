@@ -1,7 +1,7 @@
 # <@(#)tag:csongor.greyshirt.net,2017-08-24:tw/17.39.08z/1db27a1>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^Ufunction name^u  ^= ^SSTDOUT^s
+#: FUNCTION ^Ufunction_name^u  ^= ^SSTDOUT^s
 #:   Does for functions what which does for commands.
 
 function find-function {

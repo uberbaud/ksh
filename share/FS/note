@@ -1,7 +1,7 @@
 # <@(#)tag:csongor.greyshirt.net,2017-08-15:tw/07.58.21z/2951f07>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^[^Unote text^u^]
+#: FUNCTION ^[^Unote_text^u^]
 #:   Jot a quick note.
 #:   Stores notes to ^B^S$PWD^s/NOTES^b and links in ^B^S$SYSDATA^s/notes^b.
 #:   ^GList notes with^g ^Tls-notes^t.

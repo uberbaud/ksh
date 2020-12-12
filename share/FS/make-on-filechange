@@ -1,14 +1,14 @@
 # <@(#)tag:csongor.greyshirt.net,2017-12-14:tw/16.51.02z/ee3198>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^Usource file^u ^[^Uexecute file^u ^Uargs…^u^]
+#: FUNCTION ^Usource_file^u ^[^Uexecute_file^u ^Uargs…^u^]
 #:   Watch a single file and run ^Tmake^t when it changes.
 #:   Executes ^S${^s^F{12}source^f^G%^g^S^F{12}.*^f^S}^s or ^S$2^s if given
 
 needs watch-file
 function make-on-filechange {
 	local src exe; integer i=0 rc
-	(($#))|| die 'Expected at least a ^Usource file^u parameter.'
+	(($#))|| die 'Expected at least a ^Usource_file^u parameter.'
 
 	src="$1"
 	exe="${2:-"${src%.*}"}"

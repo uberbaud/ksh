@@ -1,7 +1,7 @@
 # <@(#)tag:tw.csongor.greyshirt.net,2020-09-12,00.25.59z/354958e>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^Usong id^u
+#: FUNCTION ^Usong_id^u
 #:   Does a database lookup.
 
 needs amuse:env grep notify sqlite3

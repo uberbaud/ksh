@@ -1,7 +1,7 @@
 # <@(#)tag:csongor.greyshirt.net,2017-10-13:tw/01.47.44z/8c58de>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
 
-#: FUNCTION ^[^USQL statement(s)^u^] ^= sqlreply
+#: FUNCTION ^[^USQL_statement(s)^u^] ^= sqlreply
 #:   Co-processicize sqlite3 and sugar the interaction. If no SQL statement
 #:     is given on the command line, reads it from ^Sstdin^s.
 #:   Starts the co-process if it isn't already going.

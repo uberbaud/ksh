@@ -1,7 +1,7 @@
 # <@(#)tag:tw.csongor.greyshirt.net,2020-12-04,15.51.31z/5ab240a>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^Ualias name^u
+#: FUNCTION ^Ualias_name^u
 #:   Try to get to the root command.
 #:   ^GNote: If an alias ends with a space, the next word will also be
 #:       expanded as an alias, and an alias followed by an alias is also 

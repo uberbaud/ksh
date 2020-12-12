@@ -6,7 +6,7 @@
 #:     ^B^^B bold^b           ^T^^C^t ^Ghidden^g            ^E^^E error^e
 #:     ^G^^G grey^g           ^T^^H^t ^Ghidden^g            ^I^^I italic^i
 #:     ^N^^N notice^n         ^R^^R reverse^r           ^S^^S special^s
-#:     ^T^^T tty^t            ^U^^U underline^u         ^W^^W warning^w
+#:     ^T^^T tty^t            ^U^^U_underline^u         ^W^^W warning^w
 #:     ^T^^F{^t^U0-255^u^T}^t ^Gforeground^g      ^T^^=^t ^=
 #:     ^T^^K{^t^U0-255^u^T}^t ^Gbackground^g      ^^[:punct:] ^= ^T^^S^t^Upunct^u^T^^s^t
 #:    Other than ^Ucaret+punctuation^u, a capital letter is the start code

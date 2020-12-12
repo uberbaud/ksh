@@ -1,19 +1,19 @@
 # <@(#)tag:tw.csongor.greyshirt.net,2019-11-19,18.43.13z/426820>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^[^T-n^t^] ^[^Upresentation directory^u^|^Upresentation file^u^]
+#: FUNCTION ^[^T-n^t^] ^[^Upresentation_directory^u^|^Upresentation_file^u^]
 #:     ^T-n^t  Do not try to connect to external display. You can also set
 #:         NO_EXT_DISPLAY to that effect.
 #:       1) Connects to external display (or dies),
 #:       2) Opens ^Bbrowser^b and ^Bterminal^b in external display,
 #:       3) Creates functions for handling slides (use ^Th^t for help),
-#:     If ^Upresentation directory^u is given, the ^Upresentation file^u is
+#:     If ^Upresentation_directory^u is given, the ^Upresentation_file^u is
 #:       ^Bpresentation.mdp^b.
-#:     If ^Upresentation file^u is given, the ^Upresentation directory^u is
+#:     If ^Upresentation_file^u is given, the ^Upresentation_directory^u is
 #:       the directory the file is in.
-#:     If neither is given, the ^Upresentation directory^u is ^S$PWD^s, and
-#:       the ^Upresentation file^u is ^Bpresentation.mdp^b.
-#: FUNCTION expects ^Shtml^s and ^Snotes^s directories in ^Upresentation directory^u.
+#:     If neither is given, the ^Upresentation_directory^u is ^S$PWD^s, and
+#:       the ^Upresentation_file^u is ^Bpresentation.mdp^b.
+#: FUNCTION expects ^Shtml^s and ^Snotes^s directories in ^Upresentation_directory^u.
 #:
 
 function setURL {
@@ -72,7 +72,7 @@ function Kill {
 function h {
 	sparkle <<-\
 	==SPARKLE==
-	^Tg^t ^Uslide number^u  go to given slide
+	^Tg^t ^Uslide_number^u  go to given slide
 	^Tn^t    next slide
 	^Tp^t    previous slide
 	^Tr^t    reload current slide

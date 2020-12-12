@@ -1,8 +1,8 @@
 # <@(#)tag:tw.csongor.greyshirt.net,2020-12-09,21.50.24z/640bc8>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^Ulock file^u
-#:   Test that the process listed in the ^Ulock file^u is still running.
+#: FUNCTION ^Ulock_file^u
+#:   Test that the process listed in the ^Ulock_file^u is still running.
 #:   ^GNote: Unlike the other exclusive lock functions, this one takes^g
 #:         ^Gthe lock file name.^g
 

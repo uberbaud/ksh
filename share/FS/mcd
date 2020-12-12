@@ -1,7 +1,7 @@
 # <@(#)tag:csongor.greyshirt.net,2017-08-11:tw/19.05.36z/4b3dca2>
 
-#: FUNCTION ^[^T-R^t^] ^Unew directory^u
-#:   ^Tmkdir -p^t ^Unew path^u, and then ^Tcd^t there.
+#: FUNCTION ^[^T-R^t^] ^Unew_directory^u
+#:   ^Tmkdir -p^t ^Unew_path^u, and then ^Tcd^t there.
 #:       ^T-R^t    Create a subdirectory ^BRCS^b in the new directory.
 
 function mcd {

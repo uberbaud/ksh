@@ -1,8 +1,8 @@
 # <@(#)tag:csongor.greyshirt.net,2017-08-01:tw/02.50.25z/5a8966>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^[^Ufile name^u^]
-#:   Read something, a given ^Ufile name^u or a file whose name is
+#: FUNCTION ^[^Ufile_name^u^]
+#:   Read something, a given ^Ufile_name^u or a file whose name is
 #:   vaguely ^Ireadme^i-like.
 
 function f-r {

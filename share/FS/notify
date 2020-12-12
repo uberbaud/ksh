@@ -1,7 +1,7 @@
 # <@(#)tag:csongor.greyshirt.net,2017-08-07:tw/19.56.33z/4827ff8>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^Umsg line1^u ^[^Umsg line…N^u^]
+#: FUNCTION ^Umsg_line1^u ^[^Umsg_line…N^u^]
 #:   Output a notice to ^SSTDERR^s.
 
 needs message

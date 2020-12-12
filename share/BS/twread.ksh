@@ -11,7 +11,7 @@ function usage {
 	PGM="$REPLY"
 	sparkle >&2 <<-\
 	===SPARKLE===
-	^F{4}Usage^f: ^T${PGM}^t ^Ufile name^u
+	^F{4}Usage^f: ^T${PGM}^t ^Ufile_name^u
 	         X11 reader
 	       ^T${PGM} -h^t
 	         Show this help message.
@@ -36,7 +36,7 @@ shift $(($OPTIND - 1))
 # ready to process non '-' prefixed arguments
 # /options }}}1
 
-(($#))||	die 'Missing required parameter, ^Ufile name^u.'
+(($#))||	die 'Missing required parameter, ^Ufile_name^u.'
 (($#>1))&&	die 'Too many parameters. Expected one (1).'
 
 needs xmessage

@@ -1,7 +1,7 @@
 # <@(#)tag:tw.csongor.greyshirt.net,2019-11-28,04.09.59z/5ea19>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^Ufile name^u ^= ^SSTDOUT^s
+#: FUNCTION ^Ufile_name^u ^= ^SSTDOUT^s
 #:   Remove and return the first line from a given file.
 
 needs sed

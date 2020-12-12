@@ -1,7 +1,7 @@
 # <@(#)tag:csongor.greyshirt.net,2017-11-16:tw/01.23.31z/459aa8f>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^Uc file^u ^[^S…^s ^Uc fileN^u^]
+#: FUNCTION ^Uc_file^u ^[^S…^s ^Uc_fileN^u^]
 #:   List functions implemented in a file as functions declarations.
 
 function ls-cfuncs {

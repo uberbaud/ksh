@@ -1,7 +1,7 @@
 # <@(#)tag:csongor.greyshirt.net,2017-08-09:tw/20.43.56z/5bf74d7>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^[^Ucount^u^] ^[^Ufile list^u^|^Udirectory^u^] ^[^Ucount^u^]
+#: FUNCTION ^[^Ucount^u^] ^[^Ufile_list^u^|^Udirectory^u^] ^[^Ucount^u^]
 #:   Show the newest ^Ucount^u file(s) from the ^Ulist^u, or from ^Udirectory/^S*^s^u, or
 #:   from the current directory if no file list or directory is given.
 #:   (^Inewest^i is based on the modification date.)

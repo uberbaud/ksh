@@ -1,8 +1,8 @@
 # <@(#)tag:tw.csongor.greyshirt.net,2020-12-03,19.43.25z/3214cb1>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^[^Ufgrep options^u^] ^Ucmd name^u
-#:   Check ^S$K^s, ^S$B^s, ^S$F^s, and ^S$HOST^s variants for ^Ucmd name^u
+#: FUNCTION ^[^Ufgrep_options^u^] ^Ucmd_name^u
+#:   Check ^S$K^s, ^S$B^s, ^S$F^s, and ^S$HOST^s variants for ^Ucmd_name^u
 
 function cmd-in-use {(
 	local cmd eopts f link alt

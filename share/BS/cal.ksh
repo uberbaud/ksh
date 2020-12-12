@@ -18,7 +18,7 @@ function usage {
 	PGM="$REPLY"
 	sparkle >&2 <<-\
 	===SPARKLE===
-	^F{4}Usage^f: ^T${PGM}^t ^[^T-w^t^|^T-y^t^] ^[^T-A^t ^Unum^u^] ^[^T-B^t ^Unum^u^] ^[^Uyear^u^] ^[^Umonth name^u^] ^[^Uday^u^]
+	^F{4}Usage^f: ^T${PGM}^t ^[^T-w^t^|^T-y^t^] ^[^T-A^t ^Unum^u^] ^[^T-B^t ^Unum^u^] ^[^Uyear^u^] ^[^Umonth_name^u^] ^[^Uday^u^]
 	         Wrapper and pretty formatter for ^Tcal^t and ^Tcalendar^t
 	         ^T-w^t      Display week numbers too.
 	         ^T-y^t      Display whole year (no ^Tcalendar^t output).

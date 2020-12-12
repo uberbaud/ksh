@@ -1,7 +1,7 @@
 # <@(#)tag:tw.csongor.greyshirt.net,2020-12-04,14.34.08z/3bbe5f3>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^[^Uv.ksh options^u^] ^[^Ufile name^u^]
+#: FUNCTION ^[^Uv.ksh_options^u^] ^[^Ufile_name^u^]
 #:   Wrapper to allow alias processing.
 
 needs find-function resolve-alias

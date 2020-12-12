@@ -3,7 +3,7 @@
     ^BINT_MAX^b
         ^T#include <sys/limits.h>^t
 
-    ^BPass a ^Ufile descriptor^u via ^Usocket^u^b
+    ^BPass a ^Ufile_descriptor^u via ^Usocket^u^b
         Example code in ^BCMSG_DATA(3)^b
 
     ^BGet the ^Tsizeof^t a structure for malloc^b

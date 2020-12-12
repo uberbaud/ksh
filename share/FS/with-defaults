@@ -1,8 +1,8 @@
 # <@(#)tag:tw.csongor.greyshirt.net,2020-10-12,10.27.05z/99a153>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^Udefaults file^u ^Ucommand^u
-#:   Process a defaults file and run ^Tcommand^T ^S$(<^s^Udefaults file^u^)
+#: FUNCTION ^Udefaults_file^u ^Ucommand^u
+#:   Process a defaults file and run ^Tcommand^T ^S$(<^s^Udefaults_file^u^)
 
 function with-defaults {
 	local cmd file options A B C

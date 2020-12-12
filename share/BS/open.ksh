@@ -13,7 +13,7 @@ function usage {
 	PGM="$REPLY"
 	sparkle >&2 <<-\
 	===SPARKLE===
-	^F{4}Usage^f: ^T${PGM}^t ^[^T-n^t^] ^Ufile^u ^[^Ufile2 ...^u^]
+	^F{4}Usage^f: ^T${PGM}^t ^[^T-n^t^] ^Ufile^u ^[^Ufile2_...^u^]
 	         Open files with an appropriate app.
 	           ^T-n^t  Show open commands, but don't do it.
 	       ^T${PGM} -h^t

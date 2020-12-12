@@ -1,7 +1,7 @@
 # <@(#)tag:csongor.greyshirt.net,2017-08-16:tw/14.58.30z/4e107c>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
 
-#: FUNCTION ^Tssh^t^|^Tscp^t^|^Tsftp^t^|^Trsync^t ^[^Uuser^u^T@^t^]^Uhost^u ^[^Uargs …^u^]
+#: FUNCTION ^Tssh^t^|^Tscp^t^|^Tsftp^t^|^Trsync^t ^[^Uuser^u^T@^t^]^Uhost^u ^[^Uargs_…^u^]
 #:   Use ssh agent and possibly a bit more.
 
 function ssh-askfirst {

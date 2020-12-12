@@ -18,16 +18,16 @@
           on-disk database.
 
         ^Bflags^b
-            ^UOne of:^u
+            ^UOne_of:^u
             ^ISQLITE_OPEN_READONLY^i
             ^ISQLITE_OPEN_READWRITE^i
             ^ISQLITE_OPEN_READWRITE^i^|^ISQLITE_OPEN_CREATE^i
 
-            ^UOptionally with one of:^u
+            ^UOptionally_with_one_of:^u
             ^ISQLITE_OPEN_SHAREDCACHE^i
             ^ISQLITE_OPEN_PRIVATECACHE^i
 
-            ^UOptionally with any of:^u
+            ^UOptionally_with_any_of:^u
             ^ISQLITE_OPEN_URI^i ^G# URIs may contain parameters in the query bit.^g
             ^ISQLITE_OPEN_FULLMUTEX^i
 
@@ -118,7 +118,7 @@
     ^U^TExtract Data Values^t^u
         Columns are numbered from zero (0).
 
-        ^UGet data values^u
+        ^UGet_data_values^u
         ^Iconst void *^i          ^Bsqlite3_column_blob^b(^Isqlite3_stmt *^i, ^Iint^i ^Ncol^n);
         ^Idouble^i                ^Bsqlite3_column_double^b(^Isqlite3_stmt *^i, ^Iint^i ^Ncol^n);
         ^Iint^i                   ^Bsqlite3_column_int^b(^Isqlite3_stmt *^i, ^Iint^i ^Ncol^n);
@@ -126,10 +126,10 @@
         ^Iconst unsigned char *^i ^Bsqlite3_column_text^b(^Isqlite3_stmt *^i, ^Iint^i ^Ncol^n);
         ^Iconst void *^i          ^Bsqlite3_column_text16^b(^Isqlite3_stmt *^i, ^Iint^i ^Ncol^n);
 
-        ^UGet unprotected data type^u
+        ^UGet_unprotected_data_type^u
         ^Isqlite3_value *^i       ^Bsqlite3_column_value^b(^Isqlite3_stmt *^i, ^Iint^i ^Ncol^n);
 
-        ^UGet information^u
+        ^UGet_information^u
         ^Iint^i ^Bsqlite3_column_bytes^b(^Isqlite3_stmt *^i, ^Iint^i ^Ncol^n); ^G# size of blob^g
         ^Iint^i ^Bsqlite3_column_bytes16^b(^Isqlite3_stmt *^i, ^Iint^i ^Ncol^n); ^G# size of UTF16^g
         ^Iint^i ^Bsqlite3_column_type^b(^Isqlite3_stmt *^i, ^Iint^i ^Ncol^n); ^G# DEFALUT data type^g

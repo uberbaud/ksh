@@ -15,8 +15,8 @@
 #:   lists manually installed packages in a format which can be used by
 #:   ^Tpkg_add -l^t to do a best effort with flavors but not hampered by
 #:   version.
-#: FUNCTION ^Tweb^t ^Uglobs …^u
-#: FUNCTION ^Twww^t ^Uglobs …^u
+#: FUNCTION ^Tweb^t ^Uglobs_…^u
+#: FUNCTION ^Twww^t ^Uglobs_…^u
 #:   Shows the html information page using ^Bw3m^b.
 
 function pkg {

@@ -1,10 +1,10 @@
 # <@(#)tag:csongor.greyshirt.net,2017-12-17:tw/02.21.08z/752d2d>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^Ulock name^u ^[^Ulock path^u^]
+#: FUNCTION ^Ulock_name^u ^[^Ulock_path^u^]
 #:   Releases lock created by ^Tget-exclusive-lock^t
 #:   ^WNOTE^w It is an error to release a non-existing lock.
-#:   The ^Ulock path^u MUST be the same as in the ^Tget-exclusive-lock^t^S*^s call.
+#:   The ^Ulock_path^u MUST be the same as in the ^Tget-exclusive-lock^t^S*^s call.
 
 needs generate-exclusive-lock-name
 function release-exclusive-lock {

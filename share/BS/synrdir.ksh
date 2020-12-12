@@ -15,9 +15,9 @@ function usage {
 	PGM="$REPLY"
 	sparkle >&2 <<-\
 	===SPARKLE===
-	^F{4}Usage^f: ^T${PGM}^t ^[-L ^Uloglevel^u^] ^[^Uuser^u^T@^t^]^Uhost^u^T:^t^Uremote dir^u ^Ulocal dir^u
+	^F{4}Usage^f: ^T${PGM}^t ^[-L ^Uloglevel^u^] ^[^Uuser^u^T@^t^]^Uhost^u^T:^t^Uremote_dir^u ^Ulocal_dir^u
 	         Sync two directories over ssh
-	           ^Ulocal dir^u defaults to \$PWD
+	           ^Ulocal_dir^u defaults to \$PWD
 	         ^T-k^t Keep tempory files.
 	         ^T-L^t ^Uloglevel^u
 	             Where loglevel is one of
@@ -54,7 +54,7 @@ while getopts ':hR:L:k' Option; do
 				none)	VERBOSITY_LEVEL=$LOGNONE;	;;
 				normal)	VERBOSITY_LEVEL=$LOGNORM;	;;
 				all)	VERBOSITY_LEVEL=$LOGDBUG;	;;
-				*)	die "Bad ^Ulog level^u, expected one of $LOGLEVELS"; ;;
+				*)	die "Bad ^Ulog_level^u, expected one of $LOGLEVELS"; ;;
 			esac
 			;;
 		k)	keep=true;											;;
@@ -267,7 +267,7 @@ $i_am_the_local && { # {{{1
 	(($#))||	die 'Missing required argument ^Uhost:path^u.'
 	(($#>2))&&	die 'Unexpected arguments.'
 	[[ $1 == *:* ]]||
-		die 'Missing ^Uhost^u or ^Uremote directory^u (no colon in arg1).'
+		die 'Missing ^Uhost^u or ^Uremote_directory^u (no colon in arg1).'
 
 	remote_host="${1%%:*}"
 	remote_dir="${1#*:}"

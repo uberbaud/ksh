@@ -1,7 +1,7 @@
 # <@(#)tag:csongor.greyshirt.net,2017-11-13:tw/23.03.02z/890a5c>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^Uname^u ^Uusage/help message^u
+#: FUNCTION ^Uname^u ^Uusage/help_message^u
 #:   (re)Saves an already ^Idefined^i function given by ^Uname^u.
 #:   Saves to the last path in ^S$FPATH^s if there is no definition file
 #:     already, or overwrites the first match in ^S$FPATH^s if one exists.

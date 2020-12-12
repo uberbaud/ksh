@@ -1,7 +1,7 @@
 # <@(#)tag:csongor.greyshirt.net,2017-08-07:tw/15.12.10z/32cf8b6>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^Utime^u ^[^Umessage ...^u^]
+#: FUNCTION ^Utime^u ^[^Umessage_...^u^]
 #:   Show an X11 messagebox at specified time, where time is either
 #:     a fixed time ^UH^u^T:^t^UMM^u, or
 #:     an interval ^[^UH^u^Th^t^]^UM^u^[^Tm^t^]

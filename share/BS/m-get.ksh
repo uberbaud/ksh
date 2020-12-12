@@ -11,7 +11,7 @@ function usage {
 	PGM="$REPLY"
 	sparkle >&2 <<-\
 	===SPARKLE===
-	^F{4}Usage^f: ^T${PGM}^t ^[^Uacct list^u^]
+	^F{4}Usage^f: ^T${PGM}^t ^[^Uacct_list^u^]
 	         Download (fetchmail), import into MMH (inc), and do some
 	         processing.
 	       ^T${PGM} -l^t

@@ -1,7 +1,7 @@
 # <@(#)tag:tw.csongor.greyshirt.net,2019-12-08,01.51.37z/461e133>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^Ufunction name^u ^[^Tas^t ^Unew name^] ^UFunction description^u
+#: FUNCTION ^Ufunction_name^u ^[^Tas^t ^Unew name^] ^UFunction_description^u
 #:   Saves the named function as a file to the first path in ^S$FPATH^s.
 
 function fsave {

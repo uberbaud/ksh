@@ -1,7 +1,7 @@
 # <@(#)tag:csongor.greyshirt.net,2017-07-31:tw/18.04.18z/2c0784e>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^Ufile name^u
+#: FUNCTION ^Ufile_name^u
 #:   Notes that a file should be synced. Ignores requests for files
 #:   whose full path name includes the string ^U^Isecret^i^u or which are
 #:   in ^S$XDG_CACHE_HOME^s, ^S$TMPDIR^s, or ^S/tmp^s.

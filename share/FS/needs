@@ -1,7 +1,7 @@
 # <@(#)tag:csongor.greyshirt.net,2017-08-01:tw/21.43.54z/45fee7a>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^Ucmd name1^u ^[^Ucmd name…N^u^u^]
+#: FUNCTION ^Ucmd_name1^u ^[^Ucmd_name…N^u^u^]
 #:   Dies if any of the named commands aren't functions or
 #:   executables in ^S$PATH^s.
 

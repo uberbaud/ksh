@@ -13,7 +13,7 @@ function usage {
 	PGM="$REPLY"
 	sparkle >&2 <<-\
 	===SPARKLE===
-	^F{4}Usage^f: ^T$PGM^t ^[^Ulist of google drives^u^]
+	^F{4}Usage^f: ^T$PGM^t ^[^Ulist_of_google_drives^u^]
 	         Sync given Google Drives.
 	           If no list of drives is given, all drives are synced.
 	           Drives are those in ^S$GDRIVE^s.

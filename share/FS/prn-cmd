@@ -2,7 +2,7 @@
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
 #: FUNCTION ^G(no arguments)^g
-#:   ^BPrint^b ^Ucommand^u ^Uargs underlined^u
+#:   ^BPrint^b ^Ucommand^u ^Uargs_underlined^u
 
 function prn-cmd {
 	local U='[4m' u='[24m'

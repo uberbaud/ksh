@@ -1,7 +1,7 @@
 # <@(#)tag:tw.csongor.greyshirt.net,2020-11-10,21.58.43z/54743ce>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^Uhost name^u
+#: FUNCTION ^Uhost_name^u
 #:   Checks whether we know this host
 
 needs list-known-hosts

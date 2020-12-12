@@ -20,14 +20,14 @@ function usage {
 	PGM="$REPLY"
 	sparkle >&2 <<-\
 	===SPARKLE===
-	^F{4}Usage^f: ^T$PGM^t ^[^Upresentation path^u^|^Upresentation file^u^]
-	         Create html slides and sparkle notes from ^Upresentation file^u.
+	^F{4}Usage^f: ^T$PGM^t ^[^Upresentation_path^u^|^Upresentation_file^u^]
+	         Create html slides and sparkle notes from ^Upresentation_file^u.
 
-	         If ^Upresentation file^u is not given ^S$SRC^s is looked
-	         for in ^Upresentation path^u or in ^S\$PWD^s.
+	         If ^Upresentation_file^u is not given ^S$SRC^s is looked
+	         for in ^Upresentation_path^u or in ^S\$PWD^s.
 
 	         ^BPRESENTATION FILE FORMAT^b
-	           The ^Upresentation file^u is a single file with ^S/$dSEPARATOR/^s separated
+	           The ^Upresentation_file^u is a single file with ^S/$dSEPARATOR/^s separated
 	           slides.
 
 	           Slides are written in ^Smarkdown^s with embedded notes.

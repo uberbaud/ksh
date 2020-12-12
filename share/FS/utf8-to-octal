@@ -1,7 +1,7 @@
 # <@(#)tag:tw.csongor.greyshirt.net,2020-12-09,16.32.47z/1f506a5>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^Uutf8 char^u ^S…^s
+#: FUNCTION ^Uutf8_char^u ^S…^s
 #:   Convert args to octal, one per line
 
 function utf8-to-octal {

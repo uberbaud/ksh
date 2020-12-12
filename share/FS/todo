@@ -1,8 +1,8 @@
 # <@(#)tag:csongor.greyshirt.net,2017-08-06:tw/14.22.04z/42efb0e>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^[^Udescription text^u^]
-#:   Add new todo item with ^Udescription text^u or open a window to edit 
+#: FUNCTION ^[^Udescription_text^u^]
+#:   Add new todo item with ^Udescription_text^u or open a window to edit 
 #:   the description text if none is given. Uses file ^S./TODO^s.
 
 function todo {

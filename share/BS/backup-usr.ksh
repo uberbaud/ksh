@@ -31,7 +31,7 @@ function usage {
 	sparkle >&2 <<-\
 	===SPARKLE===
 	^F{4}Usage^f: ^T$PGM^t
-	         Performs an ^Trsync^t backup to ^S/vol/^Udisk name^u/backups/^U\$HOST^u^s
+	         Performs an ^Trsync^t backup to ^S/vol/^Udisk_name^u/backups/^U\$HOST^u^s
 	         currently: ^S$backbaseD^s.
 	         ^T-C^t  Only ^Bcheck^b that backup device ^S$diskid^s is plugged in.
 	         ^T-c^t  Only ^Bcheck^b that the backup device is mounted
@@ -40,7 +40,7 @@ function usage {
 	             don't perform backup.
 	         ^T-q^t  Suppress availabilty failure messages.
 	           ^GUses configuration file ^S$fconfig^s^g
-	           ^Gwith one line formated ^Udisk name^u:^Udisk id^u.^g
+	           ^Gwith one line formated ^Udisk_name^u:^Udisk_id^u.^g
 	       ^T$PGM -h^t
 	         Show this help message.
 	===SPARKLE===

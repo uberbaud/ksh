@@ -1,4 +1,4 @@
-^B^URAGEL CHEAT SHEET^u^b
+^B^URAGEL_CHEAT_SHEET^u^b
 
 ^BCONSTRUCTION STATE MACHINES^b
 
@@ -142,7 +142,7 @@
 
 ^BACTIONS^b
 
-    ^B^UUser Actions^u^b
+    ^B^UUser_Actions^u^b
 
     ^BTwo ways of using action^b
 
@@ -151,14 +151,14 @@
     2. ^Taction A { printf("action lower"); }^t
        ^Tmain := ( lower* >A) . ' ';^t
 
-    ^B^UTransition Actions^u^b
+    ^B^UTransition_Actions^u^b
 
     Entering Action         ^Texpr > action^t
     Finishing Action        ^Texpr @ action^t
     All Transition Action   ^Texpr $ action^t
     Leaving Actions         ^Texpr % action^t
 
-    ^B^UState Actions^u^b
+    ^B^UState_Actions^u^b
 
     ^BThe different classes of states are:^b
     the start state                     ^T>^t
@@ -175,7 +175,7 @@
     error actions (err)                 ^T!^t
     local error actions (lerr)          ^T^^^t
 
-    ^B^UTo-State Actions^u^b
+    ^B^UTo-State_Actions^u^b
     the start state                     ^T>~action   >to(name)   >to{...}^t
     any state except the start state    ^T<~action   <to(name)   <to{...}^t
     all states                          ^T$~action   $to(name)   $to{...}^t
@@ -183,7 +183,7 @@
     any state except final states       ^T@~action   @to(name)   @to{...}^t
     any except start and final (middle) ^T<>~action  <>to(name)  <>to{...}^t
 
-    ^B^UFrom-State Actions^u^b
+    ^B^UFrom-State_Actions^u^b
     the start state                 ^T>*action  >from(name)  >from{...}^t
     any state but the start state   ^T<*action  <from(name)  <from{...}^t
     all states                      ^T$*action  $from(name)  $from{...}^t
@@ -191,7 +191,7 @@
     any state but final states      ^T@*action  @from(name)  @from{...}^t
     any but start or final (middle) ^T<>*action <>from(name) <>from{...}^t
 
-    ^B^UEOF Actions^u^b
+    ^B^UEOF_Actions^u^b
     the start state                 ^T>/action   >eof(name)  >eof{...}^t
     any state but the start state   ^T</action   <eof(name)  <eof{...}^t
     all states                      ^T$/action   $eof(name)  $eof{...}^t
@@ -199,7 +199,7 @@
     any state but final states      ^T@/action   @eof(name)  @eof{...}^t
     any but start or final (middle) ^T<>/action  <>eof(name) <>eof{...}^t
 
-    ^B^UGlobal Error Actions^u^b
+    ^B^UGlobal_Error_Actions^u^b
     the start state                 ^T>!action   >err(name)  >err{...}^t
     any state but the start state   ^T<!action   <err(name)  <err{...}^t
     all states                      ^T$!action   $err(name)  $err{...}^t
@@ -207,7 +207,7 @@
     any state but final states      ^T@!action   @err(name)  @err{...}^t
     any but start or final (middle) ^T<>!action  <>err(name) <>err{...}^t
 
-    ^B^ULocal Error Actions^u^b
+    ^B^ULocal_Error_Actions^u^b
     the start state                 ^T>^^action   >lerr(name)  >lerr{...}^t
     any state but the start state   ^T<^^action   <lerr(name)  <lerr{...}^t
     all states                      ^T$^^action   $lerr(name)  $lerr{...}^t

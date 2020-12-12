@@ -23,7 +23,7 @@ function usage {
 	^F{4}Usage^f: ^T$PGM^t ^[^IPassword Options^i^] ^[^IOutput Options^i^] ^[^IRetention Options^i^]
 	         Generates passwords using ^B/dev/urandom^b
 	       ^BPassword Options^b
-	           ^[^T-n^t ^Umin len^u^] ^[^T-x^t ^Umax len^u^] ^[^T-a^t ^Ualphabet^u^] ^[^T-s^t ^Usymbols^u^] ^[^T-c^t ^Uhow many^u^]
+	           ^[^T-n^t ^Umin_len^u^] ^[^T-x^t ^Umax_len^u^] ^[^T-a^t ^Ualphabet^u^] ^[^T-s^t ^Usymbols^u^] ^[^T-c^t ^Uhow_many^u^]
 	         The ^Balphabet^b argument can be:
 	             ^US^u, ^Us^u, ^UP^u, or ^Up^u for symbols/punctuation^I*^i
 	             ^UN^u, ^Un^u, ^UD^u, or ^Ud^u for numerals/digits
@@ -31,12 +31,12 @@ function usage {
 	             ^UL^u, or ^Ul^u for lowercase letters
 	           Upper case indicates the class is ^Irequired^i, lower it's ^Ioptional^i.
 	           ^Bdefaults^b:
-	             ^Umin len^u=^B$defaultMin^b, ^Umax len^u=^B$defaultMax^b ^Ualphabet^u=^B$defaultAlphabet^b ^Uhow many^u=^B$count^b ^Usymbols^u=^I$symbols^i
+	             ^Umin_len^u=^B$defaultMin^b, ^Umax_len^u=^B$defaultMax^b ^Ualphabet^u=^B$defaultAlphabet^b ^Uhow_many^u=^B$count^b ^Usymbols^u=^I$symbols^i
 	       ^BOutput Options^b
 	           ^T-q^t  Quiet, list generated passwords to ^Bstdout^b, nothing else.
 	           ^T-v^t  Verbose, give some additional information.
 	       ^BRetention Options^b
-	           ^[^T-r^t^] ^[^T-e^t ^Uemail address^u^] ^[^T-u^t ^Uuser name^u^] ^[^T-O^t ^Uid-type:id^u^] ^[^Udomain^u^]
+	           ^[^T-r^t^] ^[^T-e^t ^Uemail_address^u^] ^[^T-u^t ^Uuser_name^u^] ^[^T-O^t ^Uid-type:id^u^] ^[^Udomain^u^]
 	           ^T-r^t  Updates (resets) existing password and any id info.
 	       ^T$PGM -h^t
 	         Show this help message.
@@ -148,7 +148,7 @@ $alphabetIsSet || set-alphabet "$defaultAlphabet"
 
 ((minLen <= maxLen))|| die '^Uminimum^u MUST be less than ^Bmaximum^b.'
 ((reqLen<=maxLen))||
-	die 'There are more ^Brequired^b characters than ^Umax len^u allows.'
+	die 'There are more ^Brequired^b characters than ^Umax_len^u allows.'
 ((reqLen<minLen))|| minLen=$reqLen
 
 # /options }}}1
@@ -165,7 +165,7 @@ if $infoIsSet; then
 elif $updatePassword; then
 	[[ -n $domain ]]|| die '^Udomain^u is required to ^Bupdate^b password.'
 elif [[ -n $domain ]]; then
-	die '^Uemail addr^u, ^Uuser name^u, or some other ^Uid^u must be supplied' \
+	die '^Uemail_addr^u, ^Uuser_name^u, or some other ^Uid^u must be supplied' \
 		'when saving to ^Udomain^u.pwd'
 fi
 

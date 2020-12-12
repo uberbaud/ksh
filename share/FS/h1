@@ -1,7 +1,7 @@
 # <@(#)tag:csongor.greyshirt.net,2017-08-06:tw/18.07.37z/3b1cef7>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^Umsg word1^u ^[^Umsg word…N^u^]
+#: FUNCTION ^Umsg_word1^u ^[^Umsg_word…N^u^]
 #:   Prints a banner with given text.
 
 needs hN

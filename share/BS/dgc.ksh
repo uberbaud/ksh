@@ -11,7 +11,7 @@ function usage {
 	PGM="$REPLY"
 	sparkle >&2 <<-\
 	===SPARKLE===
-	^F{4}Usage^f: ^T$PGM^t ^[-D ^Ukey^u^T=^t^Uval^u^] ^Udgidl file^u
+	^F{4}Usage^f: ^T$PGM^t ^[-D ^Ukey^u^T=^t^Uval^u^] ^Udgidl_file^u
 	         DataGlue substitute (does nothing).
 	           ^T-D^t  sets a ^Itext macro^i.
 	       ^T$PGM -h^t

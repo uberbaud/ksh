@@ -1,8 +1,8 @@
 # <@(#)tag:csongor.greyshirt.net,2018-02-11:tw/03.58.00z/18c8403>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^Uutf8 string^u ^[^Uchars^u^]
-#:   Remove ^Uchars^u from the end of the ^Uutf8 string^u.
+#: FUNCTION ^Uutf8_string^u ^[^Uchars^u^]
+#:   Remove ^Uchars^u from the end of the ^Uutf8_string^u.
 #:   ^Uchars^u defaults to one (1).
 
 function chomp {

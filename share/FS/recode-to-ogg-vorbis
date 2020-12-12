@@ -1,8 +1,8 @@
 # <@(#)tag:csongor.greyshirt.net,2018-01-10:tw/23.46.46z/5896bc8>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^Uaudio file^u
-#:	 ffmpeg ^Uaudio file^u → ^Uaudio.oga^u
+#: FUNCTION ^Uaudio_file^u
+#:	 ffmpeg ^Uaudio_file^u → ^Uaudio.oga^u
 #:	 logs to ~/
 
 needs ffmpeg new-array

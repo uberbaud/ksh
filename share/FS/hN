@@ -1,7 +1,7 @@
 # <@(#)tag:tw.csongor.greyshirt.net,2020-12-04,00.27.37z/45d64c2>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^UANSI^u ^Uprefix^u ^Usuffix^u ^Ubanner text^u
+#: FUNCTION ^UANSI^u ^Uprefix^u ^Usuffix^u ^Ubanner_text^u
 #:   innards for h1 h2 etc
 #:     ^UANSI^u  should not include the CSI prefix ^G^^[^g^T[^t, nor the
 #:               trailing ^Tm^t. It should be the bare string, such as

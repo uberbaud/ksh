@@ -13,7 +13,7 @@ PGM="$REPLY"
 function usage {
 	sparkle >&2 <<-\
 	===SPARKLE===
-	^F{4}Usage^f: ^T$PGM^t ^[^T-f^t^] ^Ufile^u ^[^Ucheckin message^u^]
+	^F{4}Usage^f: ^T$PGM^t ^[^T-f^t^] ^Ufile^u ^[^Ucheckin_message^u^]
 	         Edit a copy of a file in ^B~/hold^b, then overwrite the original
 	         with the copy. (More secure than ^Tdoas vim ^Ufile^u^t).
 	         ^T-f^t    Force an edit, even if ^Isystem^i and ^Iarchive^i

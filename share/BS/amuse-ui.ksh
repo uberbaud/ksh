@@ -247,7 +247,7 @@ function hWinch		{ get-size;								}
 function hUpdate	{ UpdateAll=true;						}
 function hTimer		{ UpdateAll=false;						}
 # ----------8<-----[ BEGIN amuse-watchtime.ksh ]-----8<----------
-function hwtSig		{ KEEP_WATCHING=false; }
+function hwtSig		{ KEEP_WATCHING=false;  }
 function watchtime	{ # {{{1
 	trap hwtSig HUP INT TSTP TERM QUIT
 	trap ''		USR1 USR2
@@ -259,6 +259,7 @@ function watchtime	{ # {{{1
 		WATCH_PID=$!
 		wait $WATCH_PID || break
 	done
+	kill $WATCH_PID 2>/dev/null;
 
 } # }}}1
 # ----------->8-----[ END amuse-watchtime.ksh ]----->8-----------

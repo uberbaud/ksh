@@ -43,7 +43,9 @@ function f-help {
 	if [[ -n $funcfile ]]; then
 		_show_function_help "$funcfile" "$1"
 	elif   [[ -f $helpdir/$1 ]]; then
-		local pager=${PAGER:-less}
+		local pager SPARKLE_FORCE_COLOR
+		[[ -t 1 ]]&& SPARKLE_FORCE_COLOR=true
+		pager=${PAGER:-less}
 		(($(wc -l<$helpdir/$1)<LINES))&& pager=cat
 		sparkle < $helpdir/$1 | $pager
 	else

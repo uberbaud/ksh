@@ -84,10 +84,17 @@ AWKPGM="$(</dev/stdin)" <<-\
 	===AWK===
 
 function main {
-	local s=1
+	local s=1 pager SPARKLE_FORCE_COLOR
 	$WANT_DATES && s=0
 
-	awk -v skipdate=$s "$AWKPGM" "${notes[@]}"|sparkle|less -iMSx4 -FXc
+	if [[ -t 1 ]]; then
+		pager="less -iMSx4 -FXc"
+		SPARKLE_FORCE_COLOR=true
+	else
+		pager=cat
+	fi
+
+	awk -v skipdate=$s "$AWKPGM" "${notes[@]}"|sparkle|$pager
 	((x))&& warn "Bad links:" "${badlinks[@]}"
 }
 main; exit 0

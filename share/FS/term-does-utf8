@@ -6,18 +6,26 @@
 
 needs get-row-col
 function term-does-utf8 {
-	[[ -z ${TERM_DOES_UTF8:-} ]]&& {
-		local start finish delta
-		start=$(get-row-col)
-		print -n '\033[8m\0302\0251\033[28m' # hidden COPYRIGHT SIGN: ©
-		sleep 0.03	# The terminal is a bit asynchonous, so give it some
-					# time to catch up with the movement we made.
-		finish=$(get-row-col)
-		set -- $start $finish
-		print -n "\033[${1};${2}H"
-		delta=$(($4-$2))
-		TERM_DOES_UTF8=$((delta==1))
-	  } >/dev/tty
+	if [[ ${1:-} == -f ]]; then
+		[[ -z ${TERM_DOES_UTF8:-} ]]&& {
+			local start finish delta
+			start=$(get-row-col)
+			print -n '\033[8m\0302\0251\033[28m' # hidden COPYRIGHT SIGN: ©
+			sleep 0.03	# The terminal is a bit asynchonous, so give it some
+						# time to catch up with the movement we made.
+			finish=$(get-row-col)
+			set -- $start $finish
+			print -n "\033[${1};${2}H"
+			delta=$(($4-$2))
+			TERM_DOES_UTF8=$((delta==1))
+		  } >/dev/tty
+	elif [[ -n ${TERM_DOES_UTF8:-} ]]; then
+		: just use the preset value
+	elif [[ ${LC_CTYPE:-} == *UTF-8 ]]; then
+		TERM_DOES_UTF8=1
+	else
+		TERM_DOES_UTF8=0
+	fi
 	(($TERM_DOES_UTF8))
 }
 

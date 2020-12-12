@@ -146,10 +146,12 @@ set -o vi -o vi-tabcomplete
 set -o braceexpand -o ignoreeof -o physical
 
 export INPUTRC=$xdgcfg/init/input.rc
-export LANG=en_US.UTF-8
-for v in ALL COLLATE CTYPE MESSAGES MONETARY NUMERIC TIME; do
-	export LC_$v=$LANG
-done
+[[ -n ${LC_CTYPE:-} ]]&& {
+	export LANG=$LC_CTYPE
+	for v in ALL COLLATE MESSAGES MONETARY NUMERIC TIME; do
+		export LC_$v=$LANG
+	done
+  }
 
 # init files and paths
 export BC_ENV_ARG=$xdgcfg/etc/bc.rc

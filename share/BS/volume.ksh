@@ -26,6 +26,7 @@ function usage {
 	           ^T-m^t^|^Tmute^t^*         mute on
 	           ^T-t^t^|^Ttoggle-mute^t^*  toggle mute
 	               ^*^/ everything after the initial ^Tm^t or ^Tt^t is ignored
+	           ^T-r^t^|^Treload^t^*       reload ^Bsndiod^b
 
 	         If no argument is given, ^T$PGM^t prints the current volume.
 
@@ -43,6 +44,7 @@ while getopts ':mrth' Option; do
 	case $Option in
 		m)	set mute;											;;
 		t)	set toggle-mute;									;;
+		r)	set reload;											;;
 		h)	usage;												;;
 		\?)	die "Invalid option: ^B-$OPTARG^b.";				;;
 		\:)	die "Option ^B-$OPTARG^b requires an argument.";	;;
@@ -89,12 +91,7 @@ function bad-volume-fmt { # {{{1
 		'         ^Ipercentage^i: ^T0^t−^T100^t, or'			\
 		'         ^Iadjustment^i: ^T+^t or ^T-^t'
 } # }}}1
-
-
-
-# wrap script guts in a function so edits to this script file don't 
-# affect running instances of the script.
-function main {
+function reset-volume { #{{{1
 	local volnow volset
 	volnow=$(sndioctl output.level)
 	volset=$(<$sndiorc)
@@ -102,8 +99,18 @@ function main {
 		warn "Volume is ^B$volnow^b, but"	\
 			 "should be ^B$volset^b."		\
 			 "Updating."
-		sndioctl $volset
+		sndioctl -q $volset
 	  }
+} #}}}1
+function reload	 { #{{{1
+	doas rcctl reload sndiod
+	reset-volume
+} #}}}1
+
+# wrap script guts in a function so edits to this script file don't 
+# affect running instances of the script.
+function main {
+	reset-volume
 
 	case "${1:-}" in
 		0.+([0-9])?(%))				set-volume		$1;		;;
@@ -113,7 +120,7 @@ function main {
 		+|-)						adjust-volume	$1;		;;
 		'')							set-volume		'';		;;
 		m*)							mute;					;;
-		r*)							reset;					;;
+		r*)							reload;					;;
 		t*)							toggle-mute;			;;
 		*)							bad-volume-fmt	$1;		;;
 	esac

@@ -9,6 +9,8 @@ function f-v {
 	local o opts i=0 cmdexp filexp edit
 	edit=v
 
+	(($#))|| { $edit && return; }
+
 	for o; do
 		[[ $1 == -* ]]|| break
 		opts[i++]=$1
@@ -17,7 +19,7 @@ function f-v {
 
 	(($#))|| "$edit" "${opts[@]}" # No file, so short circut everything.
 
-	filexp=${1:-}
+	filexp=$1
 	shift
 	[[ $filexp == =* && ! -f $filexp ]]&& {
 		filexp="${filexp#=}"

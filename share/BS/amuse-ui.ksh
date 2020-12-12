@@ -28,6 +28,8 @@ statusBarSize=all
 DHMS='00:00'
 DSEC=0
 
+NEED_GET_SIZE=true
+
 # Subscripts
 SubScript[0]='₀'
 SubScript[1]='₁'
@@ -73,8 +75,12 @@ shift $((OPTIND-1))
 # /options }}}1
 function get-size { #{{{1
 	local x
-	LINES=$(tput lines)
-	COLUMNS=$(tput columns)
+	NEED_GET_SIZE=false # we're getting it
+	# tput lines/columns doesn't seem to return the correct values, so…
+	print -n '\033[999;999H' # move to bottom right corner
+	set -- $(get-row-col)
+	LINES=$1
+	COLUMNS=$2
 	lastRowPLAYED=$(((LINES-2)/4))
 	rowPLAYING=$((lastRowPLAYED+1))
 	rowSTATUS=$LINES
@@ -190,6 +196,17 @@ function update-status { # {{{1
 	update-time
 } # }}}1
 function update-screen { # {{{1
+#PS4='${0##*/}|$LINENO| '
+	print -u2 -- " ==========================="
+	print -u2 -- "   NEED_GET_SIZE(B): $NEED_GET_SIZE"
+	$NEED_GET_SIZE && get-size
+	print -u2 -- "   NEED_GET_SIZE(A): $NEED_GET_SIZE"
+	print -u2 -- "              LINES: $LINES"
+	print -u2 -- "            COLUMNS: $COLUMNS"
+	print -u2 -- "      lastRowPLAYED: $lastRowPLAYED"
+	print -u2 -- "         rowPLAYING: $rowPLAYING"
+	print -u2 -- "          rowSTATUS: $rowSTATUS"
+
 	local i id song dtenths
 	i=$lastRowPLAYED
 	while ((i)); do
@@ -227,7 +244,6 @@ function update-screen { # {{{1
 	update-status
 } # }}}1
 function main-loop { #{{{1
-	get-size
 	set-alternate-screen
 	update-screen
 	while $CONTINUE; do
@@ -243,14 +259,14 @@ function main-loop { #{{{1
 } #}}}1
 function CleanUp	{ unset-alternate-screen; : >ui-pid;	}
 function hTerm		{ CONTINUE=false;						}
-function hWinch		{ get-size;								}
+function hWinch		{ NEED_GET_SIZE=true; UpdateAll=true;	}
 function hUpdate	{ UpdateAll=true;						}
 function hTimer		{ UpdateAll=false;						}
 # ----------8<-----[ BEGIN amuse-watchtime.ksh ]-----8<----------
 function hwtSig		{ KEEP_WATCHING=false;  }
 function watchtime	{ # {{{1
 	trap hwtSig HUP INT TSTP TERM QUIT
-	trap ''		USR1 USR2
+	trap ''		USR1 USR2 WINCH
 
 	KEEP_WATCHING=true;
 	while $KEEP_WATCHING; do

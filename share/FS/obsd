@@ -68,6 +68,7 @@ function obsd {
 
 	local OUTPUT linecount
 	OUTPUT="$(
+		SPARKLE_FORCE_COLOR=1;
 		show +inbox obsd -form mhl.body								|
 		sed -E -e "$spesc" -e "$ok" -e "$eok" -e "$rby" -e "$blnk"	|
 		awk -v MAXFILES=$MAXFILES "$filter"			|

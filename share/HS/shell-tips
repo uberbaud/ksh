@@ -1,5 +1,14 @@
 ^BShell Tips^b
 
-    Test if array ^NMYARRAY^n exists safely with ^Nnounset^u
-        ((^$^{^t^NMYARRAY^n^S[*]^s^B+^b^N1^n^}))
+    Test if array ^NMYARRAY^n exists safely with ^Nnounset^n
+        ^B((^$^{^b^NMYARRAY^n^S[*]^s^B+^b^N1^n^}^B))^b
+
+    The following characters are ^BNOT^b legal in function names:
+
+        ^" quotation mark       ^' apostrophe       ^` grave accent
+        ^( left parenthesis     ^| bar              ^) right parenthesis
+        ^# number sign          ^$ dollar sign      ^; semicolon
+        ^< less than            ^S=^s equal            ^> greater than
+        ^& ampersand            ^* asterisk         ^? question mark
+        ^[ bracket left         ^\ backslash
 

@@ -94,9 +94,9 @@ function start-in-background { # {{{1
 	$SYSTEMS_ARE_GO || return 1
 	roll "$@"; set -- "${reply[@]}"
 	scriptname=$1
+	notify "^F{2}Starting^f: $scriptname"
 	scriptpath="$AMUSE_SCRIPT_PATH/$scriptname.ksh"
 	shift
-	notify "^F{2}Starting^f: $scriptname"
 	nohup >~/log/$scriptname.log 2>&1 "$@" $scriptpath &
 	isrunning=$(ps -ocommand= -p $!)
 	[[ -n $isrunning ]]|| {
@@ -111,7 +111,7 @@ function clean-ui { # {{{1
 function start-ui { # {{{1
 	[[ -s ui-pid ]]&& clean-ui
 	set -- /usr/local/bin/st -c amuse-ui -T amuse
-	start-in-background "$@" amuse-ui & # options first, server name last
+	start-in-background "$@" amuse-ui	# options first, server name last
 } #}}}1
 function clean-server { # {{{1
 	print 'Clearing server-pid and sigpipe'

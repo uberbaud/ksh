@@ -6,7 +6,7 @@
 #:   executables in ^S$PATH^s.
 
 function needs {
-	local badlist F B N E x
+	local badlist F B N E x fullfill
 	badlist=''
 	if [[ -t 2 ]]; then
 		E=$(print \\033); F="  $E[0;31mFailed$E[0m"; B="$E[1m"; N="$E[0m"
@@ -14,7 +14,13 @@ function needs {
 		F="  Failed"; B=''; N=''
 	fi
 	if command -v whence >/dev/null; then
-		for x { [[ -n "$(whence -- "$x")" ]] || badlist="$badlist $x"; }
+		fullfill=localize-shared 
+		command -v $fullfill >/dev/null ||
+			fullfill=false
+		for x; do
+			[[ -n "$(whence -- "$x")" ]]&& continue
+			$fullfill "$x" || badlist="$badlist $x";
+		done
 		[[ -z $badlist ]]|| {
 			badlist="${badlist##+( )}"
 			print -ru2 "$F: Missing needed commands: $B$badlist$N"

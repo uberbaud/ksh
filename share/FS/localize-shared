@@ -1,0 +1,31 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2020-12-21,00.25.13z/4e45779>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^G(no arguments)^g
+#:   Create links for files in $BS or $FS but not in $B, $F, or $USRBIN
+
+function localize-shared {
+	local rc=0 BS FS B F
+	: ${1:?} ${USRBIN:?} ${KDOTDIR:?} ${HOST:?}
+	BS=$KDOTDIR/share/BS
+	FS=$KDOTDIR/share/FS
+	B=$KDOTDIR/$HOST/B
+	F=$KDOTDIR/$HOST/F
+
+	REPLY=''
+	if [[ -f $FS/$1 ]]; then
+		ln -fs "$FS/$1" "$F/$1"							|| rc=1
+	elif [[ $1 == *.ksh && -f $BS/$1 ]]; then
+		ln -fs "$BS/$1" "$B/$1"							|| rc=1
+	elif [[ -f $BS/${1%.ksh}.ksh ]]; then
+		# probably not necessary, but it shouldn't hurt
+		ln -fs "$BS/${1%.ksh}.ksh" "$B/${1%.ksh}.ksh"	|| rc=1
+		ln -fs "$BS/${1%.ksh}.ksh" "$USRBIN/${1%.ksh}"	|| rc=1
+	else
+		REPLY='Could not find shared command file.'
+		rc=1
+	fi
+	return $rc
+}
+
+# Copyright © 2020 by Tom Davis <tom@greyshirt.net>.

@@ -65,6 +65,7 @@ in-ancestor-path
 is-exclusive-lock-valid
 is-known-host
 list-known-hosts
+localize-shared
 log
 log-stderr
 lolcow

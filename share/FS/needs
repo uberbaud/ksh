@@ -15,8 +15,10 @@ function needs {
 	fi
 	if command -v whence >/dev/null; then
 		fullfill=localize-shared 
-		command -v $fullfill >/dev/null ||
+		command -v $fullfill >/dev/null || {
+			print -ru2 "${B}warning$N: cannot ${B}localize-shared$N."
 			fullfill=false
+		  }
 		for x; do
 			[[ -n "$(whence -- "$x")" ]]&& continue
 			$fullfill "$x" || badlist="$badlist $x";

@@ -6,14 +6,15 @@
 #:   executables in ^S$PATH^s.
 
 function needs {
-	local badlist='' F B N E
+	local badlist F B N E x
+	badlist=''
 	if [[ -t 2 ]]; then
 		E=$(print \\033); F="  $E[0;31mFailed$E[0m"; B="$E[1m"; N="$E[0m"
 	else
 		F="  Failed"; B=''; N=''
 	fi
 	if command -v whence >/dev/null; then
-		for x { [[ -n "$(whence "$x")" ]] || badlist="$badlist $x"; }
+		for x { [[ -n "$(whence -- "$x")" ]] || badlist="$badlist $x"; }
 		[[ -z $badlist ]]|| {
 			badlist="${badlist##+( )}"
 			print -ru2 "$F: Missing needed commands: $B$badlist$N"

@@ -1,0 +1,15 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2020-12-20,21.15.40z/b6de60>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^G(no arguments)^g
+#:   Shows local branches linked to remote repositories.
+
+function git-remote-links {
+	local fmt
+	fmt="%(refname:short)%09%(upstream:short)"	# show this, but only
+	fmt="%(if)%(upstream)%(then)$fmt%(end)"		# if there is an upstream
+    git for-each-ref --format="$fmt" refs/heads |
+		sed -E -e "/^\$/d" 
+} 
+
+# Copyright © 2020 by Tom Davis <tom@greyshirt.net>.

@@ -15,7 +15,6 @@
 #:    ^GNote: sparkle only sparkles to a tty. That can be overridden^g
 #:          ^Gby setting ^S$SPARKLE_FORCE_COLOR^s to any value.^g
 
-
 needs term-does-utf8 term-has-256-colors
 function sparkle {
 	local sG sN sW cA

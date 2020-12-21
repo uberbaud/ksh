@@ -5,7 +5,6 @@
 set -o nounset;: ${FPATH:?Run from within KSH}
 
 which=full
-list=false
 action=append
 
 # Usage {{{1
@@ -32,7 +31,7 @@ function bad_programmer {	# {{{2
   };	# }}}2
 while getopts ':lprh' Option; do
 	case $Option in
-		l)	action=list;											;;
+		l)	action=list;										;;
 		p)	action=prepend;										;;
 		r)	which=raw; action=list;								;;
 		h)	usage;												;;
@@ -91,11 +90,19 @@ function show-full {
 	sql-reply ''
 }
 
+function @play {
+	$KDOTDIR/share/BS/volume.ksh >/dev/null
+	amuse:send-cmd play
+}
+
+
+Play=@play
 PipeEdit='| pipedit song.lst'
 case $action in
 	list)
 		[[ -t 1 ]]&& Action='| less -FLSwX'
 		PipeEdit=
+		Play=:
 		;;
 	append)
 		Action=">>$ARD/song.lst"
@@ -117,6 +124,6 @@ function main {
 	done
 }
 
-eval "main \"\$@\" ${PipeEdit:-} ${Action:-}";amuse:send-cmd play; exit
+eval "main \"\$@\" ${PipeEdit:-} ${Action:-}";$Play; exit
 
 # Copyright (C) 2019 by Tom Davis <tom@greyshirt.net>.

@@ -1,8 +1,10 @@
 #!/bin/ksh
-# <@(#)tag:csongor.greyshirt.net,2019-01-21:tw/06.25.20z/1191ef>
+# <@(#)tag:tw.csongor.greyshirt.net,2020-12-13,00.03.04z/414e624>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
 
 set -o nounset;: ${FPATH:?Run from within KSH}
+USER_AGENT='UberbaudMusicbrainzClient/0.1 +http://uberbaud.net'
+MBRNZ='https://musicbrainz.org/ws/2'
 
 # Usage {{{1
 typeset -- this_pgm="${0##*/}"
@@ -12,7 +14,7 @@ function usage {
 	sparkle >&2 <<-\
 	===SPARKLE===
 	^F{4}Usage^f: ^T$PGM^t
-	         Show the password record for a domain.
+	         Query the MusicBrainz music database.
 	       ^T$PGM -h^t
 	         Show this help message.
 	===SPARKLE===
@@ -44,25 +46,21 @@ function warnOrDie { #{{{1
 	esac
 } # }}}1
 
-secrets="${XDG_DATA_HOME:?}"/secrets
-[[ -d $secrets ]]|| die 'No secrets directory.'
+function url-encode {
+	perl	\
+		-E '$_=shift; s/[^[:alnum:]_~.-]/"%" . unpack("H*",$&)/ge;say'	\
+		"${1:?}"
+}
 
-domain="$(pass-find "$@")" ||
-	die 'Did not find any matching domains.'
-notify "$domain"
+# wrap script guts in a function so edits to this script file don't 
+# affect running instances of the script.
+function main {
+	(($#))|| die 'Missing parameters'
+#	print -r -- \
+	curl --user-agent "${USER_AGENT:?}" \
+		"$MBRNZ/recording?query=$(url-encode "$*")&fmt=json"
+}
 
-pwrec="$secrets/$domain.pwd"
+main "$@"; exit
 
-cat "$pwrec" >&2 || exit 1
-
-awkpgm="$(</dev/stdin)" <<-\
-	\==AWKPGM==
-	BEGIN		{ FS=":[ \t]+" }
-	/^p(wd)?: /	{ print $2; nextfile }
-	==AWKPGM==
-
-password="$(awk "$awkpgm" "$pwrec")"
-print -n "$password" | xclip -selection clipboard -in
-notify 'Your ^Bpassword^b has been copied to the ^Bclipboard^b.'
-
-# Copyright (C) 2019 by Tom Davis <tom@greyshirt.net>.
+# Copyright (C) 2020 by Tom Davis <tom@greyshirt.net>.

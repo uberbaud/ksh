@@ -56,6 +56,9 @@ needs awk less sparkle
 [[ -d $REPO ]]|| exit 0		#empty
 cd $REPO || die 'Could not ^Tcd^t into ^B$REPO^b.'
 
+TAB='	'
+NL='
+' # < ^ capture newline
 IFS='
 '
 set -- $(/bin/ls *"$SUFFIX" 2>/dev/null|sort -n)
@@ -94,7 +97,8 @@ function main {
 		pager=cat
 	fi
 
-	awk -v skipdate=$s "$AWKPGM" "${notes[@]}"|sparkle #|$pager
+	IFS=" ${TAB:?}${NL:?}"
+	awk -v skipdate=$s "$AWKPGM" "${notes[@]}"|sparkle|$pager
 	((x))&& warn "Bad links:" "${badlinks[@]}"
 }
 main; exit 0

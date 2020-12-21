@@ -94,7 +94,7 @@ function main {
 		pager=cat
 	fi
 
-	awk -v skipdate=$s "$AWKPGM" "${notes[@]}"|sparkle|$pager
+	awk -v skipdate=$s "$AWKPGM" "${notes[@]}"|sparkle #|$pager
 	((x))&& warn "Bad links:" "${badlinks[@]}"
 }
 main; exit 0

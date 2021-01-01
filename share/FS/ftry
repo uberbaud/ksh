@@ -3,7 +3,7 @@
 
 #: FUNCTION ^[^T-x^t^] ^Ufunction^u ^[^Uargs…^u^]
 #:   ^Tunset -f ^t^$^N1^n^T; "^t^$^N@^n^T";^t
-#:     ^T-x^t sets 
+#:     ^T-x^t sets ^Strace^s on function.
 
 function ftry {
 	local trace=

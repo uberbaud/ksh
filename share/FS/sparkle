@@ -21,7 +21,7 @@ function sparkle {
 	if [[ -t 1 || -n ${SPARKLE_FORCE_COLOR:-} ]]; then
 		if term-has-256-colors; then
 			sG='38;5;248'
-			sN='38;5;12'
+			sN='38;5;75'
 			sW='38;5;172'
 		else
 			sG='37'

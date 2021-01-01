@@ -6,14 +6,16 @@
 
 needs amuse:env amuse:send-cmd
 function amuse:create-cmd-wrappers {
-	local cmd name
+	local cmd name self
 	amuse:env
+	self='amuse:create-cmd-wrappers'
 	# Create wrapper @funcs for raw amuse commands
 	for cmd in ${AMUSE_COMMANDS:?}; do
 		eval "function @$cmd { amuse:send-cmd $cmd; }"
 	done
 	# Create wrapper @funcs for amuse functions
 	for cmd in $F/amuse:*; do
+		[[ $cmd == $self ]]&& continue
 		cmd="${cmd#$F/}"
 		name="${cmd#amuse:}"
 		eval "function @$name { $cmd \"\$@\"; }"

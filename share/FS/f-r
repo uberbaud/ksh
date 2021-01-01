@@ -22,6 +22,9 @@ function f-r {
 	if [[ $lext == @(m?(?(ar)k)d?(?(o)?(w)n)?(t?(e)xt)|rmd) ]]; then
 		needs markdown-to-html w3m
 		markdown-to-html "$readme" | w3m -T text/html
+	elif [[ $lext == htm?(l) ]]; then
+		needs w3m
+		w3m -T text/html "$readme"
 	else
 		needs nvim
 		typeset opts='set nolist norelativenumber nonumber colorcolumn='

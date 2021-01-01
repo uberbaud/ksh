@@ -16,12 +16,14 @@ function usage {
 	         Print useful bits from C source files
 	           Filter options:
 	             ^T-e^t  enums (includeing ^Stypedef^sed)
-	             ^T-f^t  function prototypes
+	             ^T-f^t  non-static function definitions
+	             ^T-p^t  non-static function prototypes
 	             ^T-m^t  macro definitions
 	             ^T-s^t  structures (including ^Stypedef^sed)
 	             ^T-u^t  unions (including ^Stypedef^sed)
 	             ^T-t^t  typedefs (excluding ^Senums^s and ^Sstructures^s)
-	             ^T-F^t  static function prototypes
+	             ^T-f^t  static function definitions
+	             ^T-P^t  static function prototypes
 	           Other options:
 	             ^T-q^t  Do not print filenames.
 	             ^T-r^t  Print ^Bclang-format^b output, do not filter.
@@ -35,26 +37,25 @@ function bad_programmer {	# {{{2
 	die 'Programmer error:'	\
 		"  No getopts action defined for [1m-$1[22m."
   };	# }}}2
-wENUMS=false
-wFUNCS=false
-wMACROS=false
-wSTRUCTS=false
-wUNIONS=false
-wTYPEDEFS=false
-wFEXTS=false
 QUIET=false
 RAWOUT=false
-while getopts ':efmsFtuqrh' Option; do
+
+wFnDefs=false; wStFnDefs=false; wStFnProts=false; wFnProts=false
+wENUMS=false; wMACROS=false; wSTRUCTS=false; wTYPEDEFS=false; wUNIONS=false
+
+while getopts ':FPefmpqrstuh' Option; do
 	case $Option in
+		F)	wStFnDefs=true;										;;
+		P)	wStFnProts=true;									;;
 		e)	wENUMS=true;										;;
-		f)	wFEXTS=true;										;;
+		f)	wFnDefs=true;										;;
 		m)	wMACROS=true;										;;
-		s)	wSTRUCTS=true;										;;
-		u)	wUNIONS=true;										;;
-		t)	wTYPEDEFS=true;										;;
-		F)	wFUNCS=true;										;;
+		p)	wFnProts=true;										;;
 		q)	QUIET=true;											;;
 		r)	RAWOUT=true;										;;
+		s)	wSTRUCTS=true;										;;
+		t)	wTYPEDEFS=true;										;;
+		u)	wUNIONS=true;										;;
 		h)	usage;												;;
 		\?)	die "Invalid option: ^B-$OPTARG^b.";				;;
 		\:)	die "Option ^B-$OPTARG^b requires an argument.";	;;
@@ -73,124 +74,169 @@ function warnOrDie { #{{{1
 					'warnOrDie is [1m${warnOrDie}[22m.';		;;
 	esac
 } # }}}1
-function get-source-text { # {{{1
-	local style
-	style="$(</dev/stdin)" <<-\
-		\===
-		BasedOnStyle: LLVM,
-		ColumnLimit: 9999,
-		AllowShortBlocksOnASingleLine: false,
-		BreakBeforeBraces: Custom,
-		BraceWrapping: {
-				AfterClass: false,
-				AfterControlStatement: false,
-				AfterEnum: false,
-				AfterFunction: false,
-				AfterNamespace: false,
-				AfterStruct: false,
-				AfterUnion: false,
-				AfterExternBlock: false,
-				BeforeCatch: true,
-				BeforeElse: true,
-			}
-		AlignEscapedNewlines: Left,
-		AllowShortBlocksOnASingleLine: false,
-		AllowShortFunctionsOnASingleLine: false,
-		IndentPPDirectives: None,
-		StatementMacros: [ DBG_CHKPNT, Q_UNUSED, QT_REQUIRE_VERSION ],
-		UseTab: Never,
-		IndentWidth: 1,
-		===
-	for f; do
-		clang-format -style="{$style}" "$f"	|
-			sed -e "s/^/$f	/"
+function debug-show-filters { # {{{1
+	E=$(print \\033)
+	print -nu2 -- ' \033[34m>>>\033[39m sed'
+	for f in "${filters[@]}"; do
+		if [[ $f == -* ]]; then
+			f="$E[35m$f$E[39m"
+		else
+			f="'$E[4m$f$E[24m'"
+		fi
+		print -rnu2 -- " $f"
 	done
+	print -u2
+} # }}}1
+# fmt_bare {{{1
+fmt_bare="$(</dev/stdin)" <<-\
+	\===
+	BasedOnStyle: LLVM,
+	ColumnLimit: 9999,
+	BreakBeforeBraces: Custom,
+	BraceWrapping: {
+			AfterClass: false,
+			AfterControlStatement: false,
+			AfterEnum: false,
+			AfterFunction: false,
+			AfterNamespace: false,
+			AfterStruct: false,
+			AfterUnion: false,
+			AfterExternBlock: false,
+			BeforeCatch: true,
+			BeforeElse: true,
+		}
+	AlignEscapedNewlines: Left,
+	AllowShortBlocksOnASingleLine: false,
+	AllowShortFunctionsOnASingleLine: false,
+	IndentPPDirectives: None,
+	StatementMacros: [ DBG_CHKPNT, Q_UNUSED, QT_REQUIRE_VERSION ],
+	UseTab: Never,
+	IndentWidth: 1,
+	===
+# }}}1
+# fmt_pretty {{{1
+fmt_pretty="$(</dev/stdin)" <<-\
+	\===
+	BasedOnStyle: LLVM,
+	ColumnLimit: 80,
+	BreakBeforeBraces: Custom,
+	BraceWrapping: {
+			AfterClass: false,
+			AfterControlStatement: false,
+			AfterEnum: false,
+			AfterFunction: false,
+			AfterNamespace: false,
+			AfterStruct: false,
+			AfterUnion: false,
+			AfterExternBlock: false,
+			BeforeCatch: true,
+			BeforeElse: true,
+		}
+	AlignAfterOpenBracket: AlwaysBreak,
+	AlignEscapedNewlines: Left,
+	AlignConsecutiveMacros: true,
+	AlignTrailingComments: false,
+	AllowAllArgumentsOnNextLine: true,
+	AllowAllParametersOfDeclarationOnNextLine: true,
+	AllowShortBlocksOnASingleLine: Always,
+	AllowShortFunctionsOnASingleLine: All,
+	AlwaysBreakAfterReturnType: None,
+	SpaceBeforeParens: ControlStatements,
+	SpaceInEmptyBlock: false,
+	SpaceInEmptyParentheses: false,
+	SpacesInConditionalStatement: true,
+	SpacesInParentheses: false,
+	IndentPPDirectives: None,
+	UseTab: Never,
+	IndentWidth: 4,
+	===
+# }}}1
+function process-one-file { # {{{1
+	ADD_FILE=''
+	$QUIET || ADD_FILE="s/^/$f	/"
+
+	sed -E -e '/^#[[:space:]]*include/d' "$f"	|
+		clang-cpp								|
+		clang-format -style="{$fmt_bare}"		|
+		sed "${filters[@]}"						|
+		clang-format -style="{$fmt_pretty}"		|
+		sed -E -e "$ADD_FILE"
+
 } # }}}1
 
 needs clang-format nl sed
 $RAWOUT||
-$wENUMS||$wFUNCS||$wFEXTS||$wMACROS||$wSTRUCTS||$wUNIONS||$wTYPEDEFS||
-	die 'No filter(s) specified.'
-
+	$wENUMS||$wFnProts||$wFnDefs||$wMACROS||$wSTRUCTS||$wUNIONS||
+	$wTYPEDEFS||$wStFnProts||$wStFnDefs||$wStFnProts||
+		die 'No filter(s) specified.'
 (($#))|| set -- *.[ch]
 
-
-if $QUIET; then
-	PRNLN='function prnln(F,L,X) { printf "%s%s,L,X }'
+new-array filters
+# filters set up # {{{1
+if $RAWOUT; then
+	$wENUMS			&& die 'Conflicting flags, ^Braw^b and ^Bfilters^b.'
+	$wFnProts		&& die 'Conflicting flags, ^Braw^b and ^Bfilters^b.'
+	$wFnDefs		&& die 'Conflicting flags, ^Braw^b and ^Bfilters^b.'
+	$wMACROS		&& die 'Conflicting flags, ^Braw^b and ^Bfilters^b.'
+	$wSTRUCTS		&& die 'Conflicting flags, ^Braw^b and ^Bfilters^b.'
+	$wUNIONS		&& die 'Conflicting flags, ^Braw^b and ^Bfilters^b.'
+	$wTYPEDEFS		&& die 'Conflicting flags, ^Braw^b and ^Bfilters^b.'
+	$wStFnProts		&& die 'Conflicting flags, ^Braw^b and ^Bfilters^b.'
+	$wStFnDefs		&& die 'Conflicting flags, ^Braw^b and ^Bfilters^b.'
+	$wStFnProts		&& die 'Conflicting flags, ^Braw^b and ^Bfilters^b.'
+	+filters -E
 else
-	PRNLN='function prnln(F,L,X) { printf "%s:%s%s",F,L,X }'
+	+filters -n -E
+
+	if $wStFnProts || $wFnProts || $wFnDefs || $wStFnDefs; then
+		# remove matching conditionals
+		+filters -e '/[[:<:]](switch|if|while|for)[[:space:]]*\(/d'
+		# remove matching assignments
+		+filters -e '/=/d'
+	fi
+
+	# filter in FUNCTION PROTOCOLS
+	if $wStFnProts && $wFnProts; then
+		+filters -e '/\);$/p'
+	elif $wStFnProts; then
+		+filters -e '/static.*\);$/p'
+	elif $wFnProts; then
+		+filters -e '/static.*\);$/d'
+		+filters -e '/\);$/p'
+	fi
+
+	# filter in FUNCTION DEFINITIONS
+
+	# We're going to pass the results through `clang-format` again, SO
+	# we need to make everything syntatically correct C. Since we're
+	# discarding the function body, we need to transform function
+	# definitions into prototypes, but if we just replace the brace with
+	# a semicolon we won't be able to tell definitions from prototypes,
+	# but if we just tack on an empty body the output might not be as
+	# useful for creating headers and such, SO we'll just comment them
+	# out.
+	def2prot='{s@ {$@; //{@;p;}'
+	if $wFnDefs && $wStFnDefs; then
+		+filters -e '/\(.*\) {$/'"$def2prot"
+	elif $wStFnDefs; then
+		+filters -e '/static.*\(.*\) {$/'"$def2prot"
+	elif $wFnDefs; then
+		+filters -e '/static.*\) {$/d'
+		+filters -e '/\(.*\) {$/'"$def2prot"
+	fi
+
+
+	$wENUMS			&& not-implemented enums
+	$wMACROS		&& not-implemented macros
+	$wSTRUCTS		&& not-implemented structs
+	$wTYPEDEFS		&& not-implemented typedefs
+	$wUNIONS		&& not-implemented unions
 fi
+# }}}1
 
-fMACROS="$(</dev/stdin)" <<-\
-	\==AWK==
-		$2 ~ /^#define/ {
-			prnln($1,$2)
-			while ($2 ~ /\\$/) {
-				if (getline != 1) break
-				printf "%s", $2
-			}
-			pnl()
-		}
-	==AWK==
-fSTRUCTS="$(</dev/stdin)" <<-\
-	\==AWK==
-		$2 ~ /^(typedef )?struct [A-Za-z_][A-Za-z0-9_]* {/ {
-			prnln($1,$2)
-			while ($2 !~ /^}.*;$/) {
-				if (getline != 1) break
-				printf "%s", $2
-			}
-			pnl()
-		}
-	==AWK==
-
-fFUNCS='$2 ~ /static.*\) {$/ {sfunc=1;prnfn($1,$2);pnl();next}'
-fskipFUNCS='$2 ~ /static.*\) {$/ {sfunc=1}'
-fFEXTS='$2 ~ /\) {$/ && !sfunc {prnfn($1,$2);pnl();next}'
-
-function not-implemented { # {{{1
-	x=$(</dev/stdin) <<-\
-	==AWK==
-	END {
-		print "\\033[31m$1 filter not implemented.\\033[38m" >"/dev/stderr"
-	}
-	==AWK==
-	print -- "$x"
-} # }}}1
-fENUMS=$(not-implemented enums)
-fUNIONS=$(not-implemented union)
-fTYPEDEFS=$(not-implemented typedef)
-
-# wrap script guts in a function so edits to this script file don't 
-# affect running instances of the script.
 function main {
-	$wENUMS			|| fENUMS=
-	$wFEXTS			|| { fFEXTS=; fskipFUNCS=; }
-	$wFUNCS			|| fFUNCS="$fskipFUNCS"
-	$wMACROS		|| fMACROS=
-	$wSTRUCTS		|| fSTRUCTS=
-	$wUNIONS		|| fUNIONS=
-	$wTYPEDEFS		|| fTYPEDEFS=
-	AWK_PGM=$(</dev/stdin) <<-\
-		===AWK===
-			$PRNLN
-			function pnl() {print ""}
-			function prnfn(F,N) { sub(/ {\$/,"",N); prnln(F,N,";"); }
-			\$2 ~ /^ / {next}
-			{sfunc=0}
-			$fENUMS
-			$fFUNCS
-			$fFEXTS
-			$fMACROS
-			$fSTRUCTS
-			$fUNIONS
-			$fTYPEDEFS
-		===AWK===
-	$RAWOUT && AWK_PGM="$PRNLN {prnln(\$1,\$2);print \"\"}"
-
-	#print -- "$AWK_PGM"
-
-	get-source-text "$@" | awk -F'\t' "$AWK_PGM"
+	for f { process-one-file "$f"; }
+	[[ -n ${DEBUG:-} ]]&& debug-show-filters
 }
 
 main "$@"; exit

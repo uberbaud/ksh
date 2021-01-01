@@ -18,6 +18,8 @@ colorTDSong='\033[38;5;18m'
 colorTRemaining='\033[38;5;254m'
 # Playing States
 sPlaying='▶▶'
+sRandom='▶☈'
+#sRandom='▶🎲'
 sStopped='▆▆'
 sPaused='❚❚'
 sFinal='▶▍'
@@ -174,7 +176,11 @@ function update-status { # {{{1
 	elif [[ -s paused-at ]]; then
 		status=$sPaused
 	elif [[ -s playing ]]; then
-		status=$sPlaying
+		if [[ -s songs ]]; then
+			status=$sPlaying
+		else
+			status=$sRandom
+		fi
 	else
 		status=$sStopped
 	fi
@@ -247,7 +253,7 @@ function main-loop { #{{{1
 	set-alternate-screen
 	update-screen
 	while $CONTINUE; do
-		if $UpdateAll; then
+		if $UpdateAll || ((DURATION==0)); then
 			update-screen
 		else
 			update-time

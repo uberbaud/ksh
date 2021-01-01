@@ -144,7 +144,7 @@ function play-one-song { #{{{1
 		: # we're kind of done
 	else
 		# Grab the song from the list
-		fpop song.lst >playing || get-random-song >playing || return 1
+		{ fpop song.lst || get-random-song; } >playing || return 1
 		startpos=
 	fi
 	read amuse_id the_rest <playing

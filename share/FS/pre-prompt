@@ -7,7 +7,7 @@
 pre-prompt() {
 	local setwarns=''
 	# window title
-	print -nu2 "\033]0;$HOSTNAME ($PWD)\007"
+	print -nu2 "\033]0;$HOSTNAME/$PWD\007"
 	forceline
 	[[ $- == *f* ]]&& setwarns="$setwarns,NOGLOB"
 	[[ $- == *u* ]]&& setwarns="$setwarns,NOUNSET"

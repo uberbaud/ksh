@@ -131,6 +131,7 @@ msgCount=$(m-msgcount)
 new-array scanout
 new-array groups
 
+group qutebrw   --list-id 'qutebrowser\.lists\.qutebrowser\.org'
 group drgfly    --list-id 'users\.dragonflybsd\.org'
 group obugs     --list-id 'bugs\.openbsd\.org'
 group otech     --list-id 'tech\.openbsd\.org'

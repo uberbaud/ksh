@@ -94,9 +94,12 @@ function bad-volume-fmt { # {{{1
 function reset-volume { #{{{1
 	local volnow volset
 	volnow=$(sndioctl output.level)
+	[[ -s $sndiorc ]]||
+		return # we don't have a saved volume for this device
+
 	volset=$(<$sndiorc)
 	[[ $volnow == $volset ]]|| {
-		notify "Updating volume from ^B$volnow^b to ^B$volset^b."
+		notify "Resetting volume to ^B$volset^b ^G(from ^B$volnow^b)^g."
 		sndioctl -q $volset
 	  }
 } #}}}1
@@ -104,10 +107,7 @@ function reload	 { #{{{1
 	doas rcctl reload sndiod
 	reset-volume
 } #}}}1
-
-# wrap script guts in a function so edits to this script file don't 
-# affect running instances of the script.
-function main {
+function main { # {{{1
 	reset-volume
 
 	case "${1:-}" in
@@ -124,10 +124,25 @@ function main {
 	esac
 
 	sndioctl output.level >$sndiorc
-}
+} # }}}1
+
+needs amuse:env
+amuse:env
+fAudDev=${AMUSE_RUN_DIR:?}/audiodevice
+[[ -z ${AUDIODEVICE:-} && -s $fAudDev ]]&&
+	export AUDIODEVICE=$(<$fAudDev)
+
+# give each snd@machine/device its own rc file
+[[ ${AUDIODEVICE:-} == *@* ]]&& {
+	h=${AUDIODEVICE#*@}
+	d=${AUDIODEVICE#*/}
+	h=${h%/*}
+	[[ -n $h ]]&&
+		sndiorc=${sndiorc%.rc}.$h.$d.rc
+  }
+
 
 [[ -w $sndiorc ]]|| chmod u+w $sndiorc
 main "$@"; exit
-
 
 # Copyright (C) 2020 by Tom Davis <tom@greyshirt.net>.

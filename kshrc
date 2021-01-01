@@ -260,9 +260,12 @@ alias prn="printf '  \e[35m｢\e[39m%s\e[35m｣\e[39m\n'"
 [[ -n $KDOTDIR ]]&& {
 	KCOMPLETE=$KU/C
 	: run in sub-shell for exceptions sake; (
+		wantRelease=true
 		makeout=$KCOMPLETE/make.out
-		get-exclusive-lock-or-exit completion-make ||
+		get-exclusive-lock-or-exit completion-make || {
+			wantRelease=false
 			warn 'using old completions'
+		  }
 		make -k -C $KCOMPLETE >$KCOMPLETE/make.out
 		[[ -s $makeout ]]&& {
 			notify 'Recompiled completion modules:'
@@ -270,7 +273,8 @@ alias prn="printf '  \e[35m｢\e[39m%s\e[35m｣\e[39m\n'"
 			column -c $((COLUMNS-8)) $makeout|expand|sed -e 's/^/    /'
 		  }
 		rm $makeout
-		release-exclusive-lock completion-make
+		$wantRelease &&
+			release-exclusive-lock completion-make
 	)
 	. $KCOMPLETE/completions.ksh
   }

@@ -82,7 +82,16 @@ function move-played-to-history { # {{{
 function play-file { # {{{1
 	local action=played PlayedBuf PlayingBuf
 	print -- 0 >timeplayed
-	play-one-ogg "$1" ${2:-} >paused-at 2>~/log/amuse-player.log 3>timeplayed &
+	unset AUDIODEVICE
+	[[ -s audiodevice ]]&&
+		export AUDIODEVICE=$(<audiodevice)
+	#======================================[ heavy lifter ]===============#
+	play-one-ogg "$1" ${2:-}			\
+		1>paused-at						\
+		2>~/log/amuse-player.log		\
+		3>timeplayed					\
+		&
+	#=====================================================================#
 	print $! >player-pid
 	wait $! || action=paused
 	: >player-pid
@@ -90,6 +99,28 @@ function play-file { # {{{1
 		move-played-to-history
 	print $action >sigpipe
 } # }}}1
+function get-random-song  { #{{{1
+	local song id
+	[[ -s random ]]|| return 1
+	SQL <<-==SQLITE==
+		SELECT
+			id,
+			performer || '|' || album || '|' || track || '|' || song,
+			dtenths
+		  FROM vsongs
+		 WHERE id IN (
+	 		SELECT id
+			  FROM amuse.files
+			 ORDER BY random()
+			 LIMIT 1
+			)
+		;
+	==SQLITE==
+	(($?))&& return 1			# would be Programmer's Fault, never expected
+	song=${sqlreply[0]:-}
+	[[ -n $song ]]|| return 1	# should never happen, but just in case.
+	print -r -- "$song"
+} #}}}1
 function play-one-song { #{{{1
 	local N amuse_id song startpos
 	[[ -s player-pid ]]&& return 1
@@ -113,7 +144,7 @@ function play-one-song { #{{{1
 		: # we're kind of done
 	else
 		# Grab the song from the list
-		fpop song.lst >playing || return 1
+		fpop song.lst >playing || get-random-song >playing || return 1
 		startpos=
 	fi
 	read amuse_id the_rest <playing

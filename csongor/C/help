@@ -21,6 +21,7 @@ desparkle
 die
 dir-is-empty
 downgrade-color
+dwm-keys
 f-b
 f-bc
 f-cd
@@ -119,6 +120,7 @@ set-alternate-screen
 set-colors-bg-fg
 set-perl5lib
 showvar
+shquote
 sparkle
 splitstr
 sql-fields
@@ -136,6 +138,7 @@ unset-alternate-screen
 utf8-to-octal
 utf8codes
 vtmp
+wait-before-leaving
 warn
 with-defaults
 x11-windowid-for-pid

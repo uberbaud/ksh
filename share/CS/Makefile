@@ -72,12 +72,9 @@ $(TARGET): $(GENERATE) $(SHARED) Makefile
 	@echo make.out     >>$(GIT_IGN)
 
 GIT_CONFIG=/home/tw/.config/git/config
-GIT_ALIAS_PGM='/\[alias\]/ {p=1} p && /\[[a-z]/ {exit} p && / = / {print $$1}'
 git_1: $(GIT_CONFIG)
 	@echo $@
-	@: >$@
-	@git --help |awk '/^   [a-z]/ {print $$1}'>>$@
-	@awk $(GIT_ALIAS_PGM) $(GIT_CONFIG) >>$@
+	@git help --all |awk '/^   [a-z-]+ / {print $$1}' >$@
 
 HELP_UPBIN=$(KDOTDIR)/share/BS/update-help-completions.ksh
 HELP_FCHG=$(KDOTDIR)/share/FS/.LAST_UPDATED

@@ -77,20 +77,18 @@ sync					# if the battery runs out while we're hibernating
 	apm $apmarg
   }
 
-# pause here untile we've unlocked the screen
+# pause here until we've unlocked the screen
 wait $xlock_pid
 
 # reset anything that needs resetting
-[[ -n $COMPTON ]]&&
-	compton -b --config $XDG_CONFIG_HOME/x11/compton.conf
+#[[ -n $COMPTON ]]&&
+#	compton -b --config $XDG_CONFIG_HOME/x11/compton.conf
 
 $BATUX >>$HOME/log/battery-monitor
 
 log timesheet xlock end || Warn $REPLY
 
 # RESET SOME DEVICES, just in case, because you know, sometimes.
-doas ifconfig iwm0 up
-doas rcctl reload sndiod
 
 # CLEAN UP
 release-exclusive-lock $LOCK

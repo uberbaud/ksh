@@ -1,0 +1,22 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2020-12-29,00.36.33z/2e4f741>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Ucommand^u ^Uarg1^u ^S[…^s ^UargN^u^]
+#:   Wrapper around ^Ucommand^u and then waits for a keypress.
+#:   Leave without prompting ^IIF^i
+#:     1. The command exited without error,
+#:     2. ^SSHORTWAIT^s was set, and
+#:     3. ^S$SHORTWAIT^s ^T<=^t ^S$SECONDS^s
+
+function wait-before-leaving {
+	local rc
+	"$@"
+	rc=$?
+	[[ ($rc -eq 0) && (-n ${SHORTWAIT:-}) && ($SHORTWAIT -le $SECONDS) ]]&&
+		return
+	((rc))&& warn "Exited with code ^E$rc^e."
+	print '  ^WPress a key to exit.^w'|sparkle >&2
+	readkeys | read
+}
+
+# Copyright © 2020 by Tom Davis <tom@greyshirt.net>.

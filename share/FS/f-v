@@ -4,12 +4,18 @@
 #: FUNCTION ^[^Uv.ksh_options^u^] ^[^Ufile_name^u^]
 #:   Wrapper to allow alias processing.
 
-needs find-function resolve-alias
+needs find-function resolve-alias shquote
 function f-v {
-	local o opts i=0 cmdexp filexp edit
-	edit=v
+	local o opts i=0 cmdexp filexp edit ecmd xterm
+	edit=$HOME/bin/ksh/v
+	wait=wait-before-leaving
+	set -A xterm -- nohup ${XTERM:-st} -e ksh -c
 
-	(($#))|| { $edit && return; }
+	# NO parameters, so short circuit all the others
+	(($#))|| {
+		(SHORTWAIT=1 "${xterm[@]}" "$wait $edit" &) >/dev/null 2>&1
+		return
+	}
 
 	for o; do
 		[[ $1 == -* ]]|| break
@@ -17,10 +23,10 @@ function f-v {
 		shift
 	done
 
-	(($#))|| "$edit" "${opts[@]}" # No file, so short circut everything.
+	(($#))|| { "$edit" "${opts[@]}" && return; }
 
 	filexp=$1
-	shift
+	(($#))&& shift
 	[[ $filexp == =* && ! -f $filexp ]]&& {
 		filexp="${filexp#=}"
 		cmdexp=$(command -v "$filexp") ||
@@ -37,7 +43,15 @@ function f-v {
 		[[ $filexp != /* ]]&&
 			filexp=$(find-function "$filexp")
 	  }
-	"$edit" "${opts[@]}" "$filexp" "$@"
+	set -- "$edit" "${opts[@]}" "$filexp" "$@"
+	if [[ -n ${WINDOWID:-} ]]; then
+		i=0
+		ecmd[i++]=$wait
+		for a { shquote "$a"; ecmd[i++]=$REPLY; }
+		(SHORTWAIT=1 "${xterm[@]}" "${ecmd[*]}" &) >/dev/null 2>&1
+	else
+		"$@"
+	fi
 }
 
 # Copyright © 2020 by Tom Davis <tom@greyshirt.net>.

@@ -42,8 +42,7 @@ function Warn { print -u2 "$pgm: $*"; }
 	shift; (($#))&&
 		Warn "Unexpected parameters: $*"
 } # }}}1
-BATUX=${LOCALBIN=${HOME:?}/.local/bin}/set-bg-per-battery.sh
-needs apm get-exclusive-lock-or-exit release-exclusive-lock log xlock $BATUX
+needs apm get-exclusive-lock-or-exit release-exclusive-lock log xlock
 
 LOCK=twScreenLock
 get-exclusive-lock-or-exit $LOCK
@@ -83,8 +82,6 @@ wait $xlock_pid
 # reset anything that needs resetting
 #[[ -n $COMPTON ]]&&
 #	compton -b --config $XDG_CONFIG_HOME/x11/compton.conf
-
-$BATUX >>$HOME/log/battery-monitor
 
 log timesheet xlock end || Warn $REPLY
 

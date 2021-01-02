@@ -176,7 +176,7 @@ function update-status { # {{{1
 	elif [[ -s paused-at ]]; then
 		status=$sPaused
 	elif [[ -s playing ]]; then
-		if [[ -s songs ]]; then
+		if [[ -s song.lst ]]; then
 			status=$sPlaying
 		else
 			status=$sRandom

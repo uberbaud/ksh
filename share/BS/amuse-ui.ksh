@@ -263,30 +263,17 @@ function main-loop { #{{{1
 	done
 	kill -TERM %sleep  >/dev/null 2>&1
 } #}}}1
-function CleanUp	{ unset-alternate-screen; : >ui-pid;	}
+function CleanUp	{ # {{{1
+	unset-alternate-screen
+	rm subs-playing/$$
+	rm subs-time/$$
+} # }}}1
 function hTerm		{ CONTINUE=false;						}
 function hWinch		{ NEED_GET_SIZE=true; UpdateAll=true;	}
 function hUpdate	{ UpdateAll=true;						}
 function hTimer		{ UpdateAll=false;						}
-# ----------8<-----[ BEGIN amuse-watchtime.ksh ]-----8<----------
-function hwtSig		{ KEEP_WATCHING=false;  }
-function watchtime	{ # {{{1
-	trap hwtSig HUP INT TSTP TERM QUIT
-	trap ''		USR1 USR2 WINCH
 
-	KEEP_WATCHING=true;
-	while $KEEP_WATCHING; do
-		[[ -s ui-pid ]]&& kill -USR2 $$
-		watch-file timeplayed &
-		WATCH_PID=$!
-		wait $WATCH_PID || break
-	done
-	kill $WATCH_PID 2>/dev/null;
-
-} # }}}1
-# ----------->8-----[ END amuse-watchtime.ksh ]----->8-----------
-
-needs amuse:env watch-file
+needs amuse:env
 amuse:env
 
 trap hTerm		INT HUP TERM QUIT
@@ -296,14 +283,13 @@ trap hTimer		USR2
 trap CleanUp	EXIT
 
 cd "${AMUSE_RUN_DIR:?}" || die 'Could not ^Tcd^t to ^S$AMUSE_RUN_DIR^s.'
+# register the signals we want for changes to
+print USR1 >subs-playing/$$		# general status
+print USR2 >subs-time/$$		# time played
 
->ui-pid print -- $$
-main_shell_pid=$$
-
-PS4='${0##*/}/$LINENO: '
+#PS4='${0##*/}/$LINENO: '
 exec 2>~/log/${this_pgm%.ksh}.log
 
-watchtime >&2 &
 main-loop; exit
 
 # Copyright (C) 2019 by Tom Davis <tom@greyshirt.net>.

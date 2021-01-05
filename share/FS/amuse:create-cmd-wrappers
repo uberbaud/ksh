@@ -15,8 +15,8 @@ function amuse:create-cmd-wrappers {
 	done
 	# Create wrapper @funcs for amuse functions
 	for cmd in $F/amuse:*; do
-		[[ $cmd == $self ]]&& continue
 		cmd="${cmd#$F/}"
+		[[ $cmd == $self ]]&& continue
 		name="${cmd#amuse:}"
 		eval "function @$name { $cmd \"\$@\"; }"
 	done

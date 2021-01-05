@@ -16,9 +16,10 @@ function usage {
 	===SPARKLE===
 	^F{4}Usage^f: ^T$PGM^t ^[^T-r^t^|^T-l^t^] ^UsqlPattern^u
 	         Show or edit list of songs matching ^%^UsqlPattern^u^%.
-	         ^T-p^t  prepend to ^Ssong.lst^s (defaults to ^Sappend^s).
-	         ^T-l^t  list, do not edit.
-	         ^T-r^t  raw vtags output (implies ^T-l^t).
+	           ^T-p^t  prepend to ^Ssong.lst^s (defaults to ^Sappend^s).
+	           ^T-l^t  list, do not edit.
+	           ^T-r^t  raw vtags output (implies ^T-l^t).
+	         If no search term is given, the ^Icurrent^i song list is printed.
 	       ^T$PGM -h^t
 	         Show this help message.
 	===SPARKLE===
@@ -53,11 +54,20 @@ function warnOrDie { #{{{1
 	esac
 } # }}}1
 
-(($#))|| die 'Missing required search pattern'
-
-needs amuse:env sql-reply
-
+needs awk amuse:env sql-reply
 amuse:env
+(($#))|| {
+	SONGS="$AMUSE_RUN_DIR"/song.lst
+	if [[ -s $SONGS ]]; then
+		awk -F\\t '{print $2}' "$SONGS"
+	elif [[ $(<$AMUSE_RUN_DIR/random) == true ]]; then
+		print '  ^Srandom^s' |sparkle >&2
+	else
+		print '  ^Gempty^g'  |sparkle >&2
+	fi
+	exit
+  }
+
 ARD="${AMUSE_RUN_DIR:?}"
 SQL "ATTACH '${AMUSE_DATA_HOME:?}/amuse.db3' AS amuse;"
 
@@ -94,7 +104,6 @@ function @play {
 	$KDOTDIR/share/BS/volume.ksh >/dev/null
 	amuse:send-cmd play
 }
-
 
 Play=@play
 PipeEdit='| pipedit song.lst'

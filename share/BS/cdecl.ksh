@@ -152,9 +152,11 @@ fmt_pretty="$(</dev/stdin)" <<-\
 	===
 # }}}1
 function process-one-file { # {{{1
+	local s
 	ADD_FILE=''
-	$QUIET || ADD_FILE="s/^/$f	/"
-
+	gsub '\' '\\' "$f" s
+	gsub '/' '\/' "$s" s
+	$QUIET || ADD_FILE="s/^/$s	/"
 	sed -E -e '/^#[[:space:]]*include/d' "$f"	|
 		clang-cpp								|
 		clang-format -style="{$fmt_bare}"		|

@@ -212,6 +212,16 @@ function docmd-no-op { #{{{1
 function is-valid-cmd { # {{{1
 	[[ $1 == @(played|paused|no-op) ]] || is-valid-amuse-cmd "$1"
 } # }}}1
+function notify-subscribers { # {{{1
+	local file pid signal subtype
+	subtype=$1
+	for file in subs-$subtype/+([0-9]); do
+		[[ -f $file ]]|| continue
+		pid=${file##*/}
+		signal=$(<$file)
+		kill -$signal $pid 2>/dev/null || rm $file
+	done
+} # }}}1
 function handle-cmd { # {{{1
 	local PLAYING
 	typeset -l cmd="${1:-}"
@@ -236,10 +246,10 @@ function handle-cmd { # {{{1
 	$PLAYING || [[ $cmd == play?(ed) ]]|| return
 
 	docmd-$cmd && {
-		[[ -s ui-pid ]]&& kill -USR1 -$(<ui-pid)
+		notify-subscribers playing
 		play-one-song
 	  }
-	[[ -s ui-pid ]]&& kill -USR1 -$(<ui-pid)
+	notify-subscribers playing
 } # }}}1
 function evloop { # {{{1
 	local cmd
@@ -255,6 +265,23 @@ function evloop { # {{{1
 	done
 	true
 } # }}}1
+# ----------8<-----[ BEGIN amuse-watchtime.ksh ]-----8<----------
+function hwtSig		{ KEEP_WATCHING=false;  }
+function watchtime	{ # {{{1
+	trap hwtSig HUP INT TSTP TERM QUIT
+	trap ''		USR1 USR2 WINCH
+
+	KEEP_WATCHING=true;
+	while $KEEP_WATCHING; do
+		notify-subscribers time
+		watch-file timeplayed &
+		WATCH_PID=$!
+		wait $WATCH_PID || break
+	done
+	kill $WATCH_PID 2>/dev/null;
+
+} # }}}1
+# ----------->8-----[ END amuse-watchtime.ksh ]----->8-----------
 
 # do everything in the AMUSE RUN DIRECTORY
 builtin cd "${AMUSE_RUN_DIR:?}" ||
@@ -279,6 +306,7 @@ trap hQuit		TERM QUIT
 trap ''			HUP INT TSTP USR1 USR2
 trap hCleanUp	EXIT
 
+watchtime >&2 &
 #_________________________________________________________________________
 sig no-op		# prime the fifo so it is opened (no fatal error
 				# bypassing SIGEXIT) and give the loop something to do

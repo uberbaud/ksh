@@ -50,7 +50,6 @@ done
 shift $((OPTIND-1))
 # ready to process non '-' prefixed arguments
 # /options }}}1
-needs lpr
 function boolvar { # {{{1
 	local B=true O=$1
 	[[ $O == no?(t)?(-)* ]]&& { B=false; O="${O##no?(t)?(-)}"; }
@@ -98,7 +97,8 @@ function isopt { # {{{1
 			;;
 	esac
 } # }}}1
-
+LPR=/usr/local/bin/lpr
+needs $LPR
 while (($#)) && isopt "$1"; do shift; done
 
 if $DUPLEX; then
@@ -115,7 +115,7 @@ $REVERSE	&& +opts -o outputorder=reverse
 opts-not-empty && set -- "${opts[@]}" "$@"
 
 print -u2 lpr "$@"
-lpr "$@"
+$LPR "$@"
 
 
 # Copyright (C) 2018 by Tom Davis <tom@greyshirt.net>.

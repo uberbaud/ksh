@@ -11,7 +11,7 @@
     ^T%%{^t
         ^Tmachine foo;^t
         ^Tmain :=^t
-            ^T( ’foo’ | ’bar’ )^t
+            ^T( 'foo' | 'bar' )^t
             ^T0 @{ res = 1; };^t
     ^T}%%^t
 
@@ -42,20 +42,20 @@
 
     ^BBasic Machines^b
 
-    ^T’hello’^t         Concatenation Literal
+    ^T'hello'^t         Concatenation Literal
     ^T"hello"^t         Identical to the single quoted version
     ^T[hello]^t         Produces a union of characters
-    ^T’’^t, ^T""^t, and ^T[]^t
+    ^T''^t, ^T""^t, and ^T[]^t
                     Zero Length Machine
     ^T42^t              Numerical Literal
     ^T/simple_regex/^t  Regular Expression. This notation also supports 
                     the ^Ti^t trailing option. Use it to produce case-
                     insensitive machines, as in ^T/GET/i^t.
-    ^T’a’ .. ’z’^t      Range
+    ^T'a' .. 'z'^t      Range
     ^Tvarname^t         Lookup the machine definition assigned to the 
                     variable name given and use an instance of it.
 
-    ^BBuiltin Machine^b
+    ^BBuiltin Machines^b
 
     ^Tany^t       Any character in the alphabet.
     ^Tascii^t     Ascii characters. ^F{4}0..127^f

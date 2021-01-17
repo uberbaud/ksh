@@ -22,7 +22,7 @@ function usage {
 	             ^T-s^t  structures (including ^Stypedef^sed)
 	             ^T-u^t  unions (including ^Stypedef^sed)
 	             ^T-t^t  typedefs (excluding ^Senums^s and ^Sstructures^s)
-	             ^T-f^t  static function definitions
+	             ^T-F^t  static function definitions
 	             ^T-P^t  static function prototypes
 	           Other options:
 	             ^T-q^t  Do not print filenames.
@@ -151,6 +151,9 @@ fmt_pretty="$(</dev/stdin)" <<-\
 	IndentWidth: 4,
 	===
 # }}}1
+function not-implemented { # {{{1
+	die "^B$1^b is not implemented."
+} # }}}1
 function process-one-file { # {{{1
 	local s
 	ADD_FILE=''
@@ -159,6 +162,7 @@ function process-one-file { # {{{1
 	$QUIET || ADD_FILE="s/^/$s	/"
 	sed -E -e '/^#[[:space:]]*include/d' "$f"	|
 		clang-cpp								|
+		tr '\n' ' '								|
 		clang-format -style="{$fmt_bare}"		|
 		sed "${filters[@]}"						|
 		clang-format -style="{$fmt_pretty}"		|
@@ -226,7 +230,6 @@ else
 		+filters -e '/static.*\) {$/d'
 		+filters -e '/\(.*\) {$/'"$def2prot"
 	fi
-
 
 	$wENUMS			&& not-implemented enums
 	$wMACROS		&& not-implemented macros

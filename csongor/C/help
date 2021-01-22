@@ -7,6 +7,7 @@ amuse:edit
 amuse:env
 amuse:file-from-id
 amuse:playing
+amuse:random
 amuse:send-cmd
 ansi-attr
 as-root

@@ -1,0 +1,20 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2021-01-22,10.35.34z/59af161>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^[^Ton^t^|^Toff^t^]
+#:   Set random play ^Bon^b or ^Boff^b, or show current status.
+
+needs amuse:env
+function amuse:random {
+	amuse:env
+	builtin cd "${AMUSE_RUN_DIR:?}" ||
+		die 'Could not ^Tcd^t to ^B$AMUSE_RUN_DIR^b.'
+	case ${1:-show} in
+		1|yes|on|true)	print true >random;						;;
+		0|no|off|false)	print false >random;					;;
+		show)			print "  $(<random)";					;;
+		*) warn 'Unknown options. See ^Thelp amuse:random^t.';  ;;
+	esac
+}
+
+# Copyright © 2021 by Tom Davis <tom@greyshirt.net>.

@@ -23,8 +23,8 @@
         ^Tif ( argc > 1 ) {^t
             ^Tchar *p = argv[1];^t
             ^Tchar *pe = p + strlen(p) + 1;^t
-            ^T%% write init;^t
-            ^T%% write exec;^t
+            ^T%% write init;^t ^G// outputs variable declarations^g
+            ^T%% write exec;^t ^G// outputs state machine code^g
         ^T}^t
         ^Tprintf("result = %i\n", res );^t
         ^Treturn 0;^t

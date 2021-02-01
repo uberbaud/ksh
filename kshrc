@@ -89,13 +89,13 @@ else
 fi
 
 # paths
-export CPATH=$xdgdata/c
 export HISTCONTROL=ignoredups:ignorespace
 export HISTFILE=$fhist
 export HISTSIZE=8191
-export LD_LIBRARY_PATH=$CPATH/lib
-export USR_CLIB=$CPATH/lib
-export USR_INCL=$CPATH/api
+#export USR_C_BASE=$xdgdata/c
+#export LD_LIBRARY_PATH=$USR_C_BASE/lib
+#export USR_CLIB=$USR_C_BASE/lib
+#export USR_INCL=$USR_C_BASE/api
 export LOCALBIN=$xdgdata/bin
 # LUA wants SEMICOLON separated PATTERNS, empty item is default
 export LUA_PATH_5_3="$xdgdata/lua/5.3/?.lua;$xdgdata/lua/5.3/?/init.lua;;"
@@ -251,7 +251,11 @@ alias clear='f-clear '
 alias doas='as-root '
 alias hush='>/dev/null 2>&1 '
 alias k='fc -s'
-#alias ls='/usr/local/bin/colorls $LS_OPTIONS'
+if [[ -x /usr/local/bin/colorls ]]; then
+	alias ls='/usr/local/bin/colorls $LS_OPTIONS'
+else
+	alias ls='/bin/ls $LS_OPTIONS'
+fi
 alias no2='2>/dev/null '
 alias noerr='2>/dev/null '
 alias noglob='set -f;noglob '; function noglob { set +f; ("$@"); }

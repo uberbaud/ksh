@@ -7,6 +7,8 @@ export IAM=tw:tom
 HOLD_SYSBASE=~/hold/$(uname -r)
 [[ -d $HOLD_SYSBASE ]]|| mkdir -p $HOLD_SYSBASE
 # paths
+export CPATH=$xdgdata/c/api
+export LDFLAGS="-L$xdgdata/c/lib -ltw"
 export PERL_CPANM_HOME=$xdgdata/cpanm
 export PERLBREW_ROOT=$xdgdata/perlbrew
 export PERLBREW_HOME=$xdgcache/perlbrew
@@ -53,7 +55,7 @@ export dskBROWSER=1
 export dskWIDGIT=7
 export dskXAPP=6
 export me=$HOME/work/clients/me
-export XTERM=st
+export X11TERM=st
 export CSONGOR_XTERM_WINDOW_BG='#626262'
 export CSONGOR_XTERM_WINDOW_FG='#dadada'
 

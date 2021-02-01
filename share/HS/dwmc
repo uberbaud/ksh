@@ -1,0 +1,18 @@
+^Bdwmc^b
+
+Provides a command line interface to ^Sdwm^s.
+
+  ^UNo Parameters^u
+    ^Tsetlayout^t       ^Tviewall^t         ^Ttogglefloating^t  ^Tkillclient^t
+    ^Tview^t            ^Ttogglebar^t       ^Tzoom^t            ^Tquit^t
+
+  ^UUnsigned Integer Parameter^u
+    ^Tview^t
+
+  ^UInteger Parameter^u
+    ^Tviewex^t         ^Ttagex^t          ^Tsetlayoutex^t    ^Tincnmaster^t     ^Ttagmon^t
+    ^Ttoggleviewex^t   ^Ttoggletagex^t    ^Tfocusstack^t     ^Tfocusmon^t
+
+  ^UFloat Parameter^u
+    ^Tsetmfact^t
+

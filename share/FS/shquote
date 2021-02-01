@@ -1,6 +1,6 @@
 # <@(#)tag:tw.csongor.greyshirt.net,2020-12-28,23.03.12z/1f42168> vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^G(no arguments)^g
+#: FUNCTION ^Ustring^u
 #:   Quote a string against shell expansion ^= REPLY
 
 needs gsub

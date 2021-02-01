@@ -6,7 +6,7 @@ set -o nounset;: ${FPATH:?Run from within KSH} ${KDOTDIR:?}
 
 BASED=$KDOTDIR/$HOST
 CmplHelp=$BASED/C/help
-HelpDir=$BASED/H
+HelpDir=$KDOTDIR/share/HS
 
 # Usage {{{1
 typeset -- this_pgm="${0##*/}"

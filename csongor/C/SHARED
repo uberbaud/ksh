@@ -1,5 +1,6 @@
 # files listed here will be linked from $KDOTDIR/share/C
 chflags
+dwmc_1
 fossil_1
 inc
 kill_1
@@ -10,6 +11,8 @@ pkg_1
 poco
 rcctl_1
 sndioctl
+xev_1
+xev_2
 xfontsel
 xinput_1
 xinput_2

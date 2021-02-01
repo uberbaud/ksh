@@ -6,7 +6,7 @@
 #:   Stores notes to ^B^S$PWD^s/NOTES^b and links in ^B^S$SYSDATA^s/notes^b.
 #:   ^GList notes with^g ^Tls-notes^t.
 
-needs xclip
+needs xclip $BS/v.ksh
 function note {(
 	local NOTES="$PWD"/NOTES OLDPWD="$PWD" setnoglob=false
 	local noterepo=${SYSDATA:?}/notes
@@ -53,7 +53,7 @@ exit
 	done
 	(($#))|| {
 		SHA384="$(cksum -qa sha384b "$seqnote")"
-		v $seqnote '.'
+		$BS/v.ksh $seqnote '.'
 		[[ $SHA384 == "$(cksum -qa sha384b "$seqnote")" ]]&& {
 			# no changes, so delete everything.
 			warn "Discarding empty note."

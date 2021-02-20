@@ -131,15 +131,16 @@ function wantpath { # {{{1
 	fi
 } # }}}1
 # PREPEND, so in reverse order
-wantpath "$PERLBREW_BIN"	PREPEND
-wantpath "$MMH_BIN_PATH"	PREPEND
-wantpath "$LOCALBIN"		PREPEND
-wantpath "$HOME"/bin		PREPEND
-wantpath "$USRBIN"			PREPEND
+wantpath "$PERLBREW_BIN"		PREPEND
+wantpath "$MMH_BIN_PATH"		PREPEND
+wantpath "$LOCALBIN"			PREPEND
+wantpath "$HOME"/bin			PREPEND
+wantpath "$USRBIN"				PREPEND
 # APPEND, so in order
-wantpath /usr/games			APPEND
-wantpath "$JDK_PATH"		APPEND
-wantpath $ROFFTOOLS_PATH	APPEND
+wantpath /usr/games				APPEND
+wantpath "$PERLBREW_ROOT/bin"	APPEND
+wantpath "$JDK_PATH"			APPEND
+wantpath $ROFFTOOLS_PATH		APPEND
 
 # input, locale, and such
 set -o vi -o vi-tabcomplete

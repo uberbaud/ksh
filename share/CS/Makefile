@@ -76,6 +76,10 @@ git_1: $(GIT_CONFIG)
 	@echo $@
 	@git help --all |awk '/^   [a-z-]+ / {print $$1}' >$@
 
+got_1:
+	@echo $@
+	@got -h 2>&1|awk -F': ' '/^commands: / {gsub(" ","\n",$$2);print $$2}' >$@
+
 HELP_UPBIN=$(KDOTDIR)/share/BS/update-help-completions.ksh
 HELP_FCHG=$(KDOTDIR)/share/FS/.LAST_UPDATED
 HELP_HCHG=$(KDOTDIR)/share/HS/.LAST_UPDATED

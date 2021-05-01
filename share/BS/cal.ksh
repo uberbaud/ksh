@@ -156,7 +156,7 @@ for ln in "${calevs[@]}"; do
 	unset tuple[0]; set -A tuple -- ${tuple[*]}
 	ev="${tuple[*]}"
 	if [[ $ev == *BIRTHDAY ]]; then
-		H='[48;5;225m'; E='[48;5;128;38;5;226m 🎂 [0m'
+		H='[38;5;241;48;5;225m'; E='[48;5;128;38;5;226m 🎂 [0m'
 		ev="${ev%BIRTHDAY} "
 	else
 		H=''; E=''

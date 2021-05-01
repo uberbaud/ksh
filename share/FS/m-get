@@ -1,0 +1,12 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2021-02-25,23.16.34z/52e7d59>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^G(no arguments)^g
+#:   Wrapper around $BS/m-get
+
+function m-get {
+	builtin cd ${XDG_CACHE_HOME:?}/mail
+	/home/tw/bin/ksh/m-get "$@"
+}
+
+# Copyright © 2021 by Tom Davis <tom@greyshirt.net>.

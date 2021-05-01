@@ -47,39 +47,35 @@ function warnOrDie { #{{{1
 	esac
 } # }}}1
 
+TAB='	'
+fDATA=$SYSDATA/recurring
+[[ -f $fDATA ]]|| die "Could not find ^B^S\$SYSDATA^s/recurring^b."
+
 print
 if $ALT; then
-	sparkle <<-\
-	==SPARKLE==
-		    Amazon
-		    PayPal (OpenBSD,WikiMedia,Guardian)
-		    Google Payments
-		
-		    CSM
-		    Hulu
-		    Spectrum
-		    GitHub
-		    GoDaddy
-		
-		    Walgreens
-		
-		    UNC Public Television
-		    FP
-		    Libertarian Party
-	==SPARKLE==
+	while IFS=$TAB read date payto from amt; do
+		[[ ${date:-#} == \#* ]]&& continue
+		[[ $from == @(wells|) ]]&& print $payto
+		[[ $from == @(paypal) ]]&& {
+			PAYPAL="${PAYPAL:-},${payto%%+([[:space:]])}"
+		  }
+	done <$fDATA
+	[[ -n $PAYPAL ]] && PAYPAL=" (${PAYPAL#,})";
+	print "PayPal$PAYPAL"
 else
 	# AWKPGM {{{1
 	AWKPGM="$(</dev/stdin)" <<-\
 	\==AWK==
 		BEGIN { FS="\t";i=0 }
-		NF == 2 { a[i]=$2; i++ }
+		/^(#|--|$)/ {next}
 		{
-			total+=$3;
+			total+=$4;
 			sub( / +$/, "", $2 );
 			if ($1 == "*")	{ printf( "     *  " ) }
 			else			{ printf( "    %0.2d  ", $1 ) }
 			printf( "%-24s", $2 );
-			if (NF == 3) { printf( "    %8.2f", $3 ) }
+			if (NF == 4) { printf( "    %8.2f", $4 ) }
+			else         { a[i]=$2; i++ }
 			printf("\n");
 		  }
 		END {
@@ -100,20 +96,7 @@ else
 
 	#data format
 	# dom TAB Creditor OPT-SPACE [TAB RECUR-AMT]
-	awk "$AWKPGM" <<-\
-	==DATA==
-		04	WikiMedia               	3.00
-		09	Duke Energy
-		10	Chase
-		10	Guardian                	3.00
-		18	Hulu                    	7.99
-		18	OpenBSD Foundation      	10.00
-		18	UNC Public Television   	5.00
-		22	Spectrum                	65.99
-		28	GitHub                  	7.00
-		28	CSM                     	11.00
-		*	FP (28-01)              	2.39
-	==DATA==
+	awk "$AWKPGM" $fDATA
 fi
 
 # Copyright (C) 2018 by Tom Davis <tom@greyshirt.net>.

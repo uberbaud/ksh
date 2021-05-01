@@ -9,7 +9,7 @@ needs term-does-utf8
 function ls-todos {
 	[[ -f TODO ]]|| return 0
 	: ${NL:?}
-	local Body Head Lines N Sep ShowIt TODO filetype tabstop textwidth todo
+	local Body Head Lines Sep ShowIt TODO H
 	ShowIt=false
 	Sep="@ "
 	TODO="$(<TODO)"
@@ -22,10 +22,7 @@ function ls-todos {
 		else
 			sB='=='; s1='='; sF='/'; sN='|'; sL='\'
 		fi
-		[[ ${1:-} == -H ]]&& {
-			print -r -- "  ^N$sB TODO $sB^n"
-			shift
-		  }
+		[[ ${1:-} == -H ]]&& { H="  ^N$sB TODO $sB^n\n"; shift; }
 		Sep=''
 		for Task in "${todo[@]}"; do
 			Head="${Task%%$NL*}"
@@ -42,6 +39,7 @@ function ls-todos {
 				ShowIt=true
 			fi
 			$ShowIt && {
+				print -n -- "${H:-}"; H=
 				splitstr "$NL" "$Body" Lines
 				if ((${#Lines[*]}==1)); then
 					print -r -- "  ^N$s1^n ${Lines[0]##@(    |   |  | )}"
@@ -63,7 +61,7 @@ function ls-todos {
 			  }
 		done
 	  } | sparkle
-	unset todo REPLY
+	unset REPLY
 }
 
 

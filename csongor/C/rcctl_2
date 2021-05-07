@@ -8,6 +8,7 @@ cron
 cups_browsed
 cupsd
 dhcpd
+dhcpleased
 dhcrelay
 dhcrelay6
 dvmrpd
@@ -50,6 +51,7 @@ rarpd
 rbootd
 rc.subr
 relayd
+resolvd
 ripd
 route6d
 rsyncd

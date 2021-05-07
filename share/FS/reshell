@@ -3,7 +3,7 @@
 
 #: FUNCTION ^[^T-fn^t^] ^[^T-e^t ^Uenvfile^u^] ^U/path/shell^u
 #:   Give a clean shell experience.
-#:     ^T-e^t  Use ^Uenvfile^u instead of .config/^Ushell^u.
+#:     ^T-e^t  Use ^Uenvfile^u instead of config/^Ushell^u.
 #:     ^T-f^t  Force even if it's not recognized shell.
 #:     ^T-n^t  Don't set or export ^SENV^s.
 
@@ -44,7 +44,7 @@ function reshell {
 	REPLY=''
 
 	$doenv && {
-		ENV="${useenv:-"${XDG_CONFIG_HOME:-$HOME/.config}/${s##*/}/env"}"
+		ENV="${useenv:-"${XDG_CONFIG_HOME:-$HOME/config}/${s##*/}/env"}"
 		[[ -f $ENV ]]&& {
 			ENV=$(readlink -fn $ENV)
 			if [[ -f $ENV ]]; then

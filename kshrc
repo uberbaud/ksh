@@ -22,8 +22,8 @@ export URI_AUTHORITY='greyshirt.net'
 export KDOTDIR
 
 # XDG paths
-if [[ -d ${XDG_CONFIG_HOME:-~/.config} ]]; then
-	XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-~/.config}
+if [[ -d ${XDG_CONFIG_HOME:-~/config} ]]; then
+	XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-~/config}
 	if [[ -f $XDG_CONFIG_HOME/user-dirs.dirs ]]; then
 		. $XDG_CONFIG_HOME/user-dirs.dirs
 	fi
@@ -33,9 +33,9 @@ if [[ -d ${XDG_CONFIG_HOME:-~/.config} ]]; then
 		KDOTDIR=$XDG_CONFIG_HOME/ksh
 
 else
-	XDG_CONFIG_HOME=$HOME/.config
-	XDG_DATA_HOME=$HOME/.local
-	XDG_CACHE_HOME=$HOME/.local/cache
+	XDG_CONFIG_HOME=$HOME/config
+	XDG_DATA_HOME=$HOME/local
+	XDG_CACHE_HOME=$HOME/local/cache
 
 	[[ -d $XDG_CONFIG_HOME ]]|| mkdir -p $XDG_CONFIG_HOME
 	[[ -d $XDG_DATA_HOME   ]]|| mkdir -p $XDG_DATA_HOME
@@ -162,7 +162,7 @@ export HGRCPATH=$xdgcfg/hg
 # ==== DEFAULT APPS
 # handle whether  EDITOR or VISUAL was set in $HOST.kshrc
 [[ -z ${VISUAL:-${EDITOR:-}} ]]&& {
-	L=/usr/local/bin; S=/usr/bin; U=$HOME/.local/bin
+	L=/usr/local/bin; S=/usr/bin; U=$HOME/local/bin
 	for VISUAL in $L/nvim $L/vim $U/vis $L/vis $L/vise $S/vi; do
 		[[ -x $VISUAL ]]&& break
 	done

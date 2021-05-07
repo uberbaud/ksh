@@ -114,7 +114,7 @@ function handle-cmd { # {{{
 
 needs dmenu dwm_dmenu_completion grep sort
 starts=''
-for n in ${XDG_CONFIG_HOME:-~/.config}/start/*.ini; do
+for n in ${XDG_CONFIG_HOME:-~/config}/start/*.ini; do
 	n=${n##*/}
 	n=${n%.ini}
 	starts="$starts $n"

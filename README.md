@@ -15,17 +15,17 @@ Note: I use **xdg** directories and try to keep dot files out of my
 home directory and everything herein is designed around that concept.  
 If you haven't previously set up your own **xdg** directories and 
 corresponding variables, you will probably want, at least,
-  * XDG_CONFIG_HOME -> ~/.config
-  * XDG_DATA_HOME   -> ~/.local
+  * XDG_CONFIG_HOME -> ~/config
+  * XDG_DATA_HOME   -> ~/local
 
 I'm just starting out with this and so it's all very experimental.  
 You're on your own if you want to use these files yourself.
 
 I'm using OpenBSD, and on OpenBSD you need to modify `/etc/profile` to 
-set `ENV=$HOME/.config/ksh/kshrc`. I put mine behind a test, so
+set `ENV=$HOME/config/ksh/kshrc`. I put mine behind a test, so
 
 ---
-    [[ -n "$KSH_VERSION" ]]&& export ENV=$HOME/.config/ksh/kshrc
+    [[ -n "$KSH_VERSION" ]]&& export ENV=$HOME/config/ksh/kshrc
 ---
 
 In which case, clone this repository to `$XDG_CONFIG_HOME/ksh`.

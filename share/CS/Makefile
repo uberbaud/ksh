@@ -71,7 +71,7 @@ $(TARGET): $(GENERATE) $(SHARED) Makefile
 	@echo $@           >>$(GIT_IGN)
 	@echo make.out     >>$(GIT_IGN)
 
-GIT_CONFIG=/home/tw/.config/git/config
+GIT_CONFIG=/home/tw/config/git/config
 git_1: $(GIT_CONFIG)
 	@echo $@
 	@git help --all |awk '/^   [a-z-]+ / {print $$1}' >$@

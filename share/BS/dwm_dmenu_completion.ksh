@@ -16,7 +16,7 @@ cmdcache=$1; shift
 
 (($#))|| { print -r -- "$(<$cmdcache)"; exit; }
 
-scriptpath=${XDG_CONFIG_HOME:-~/.config}/dwm/dy-scripts
+scriptpath=${XDG_CONFIG_HOME:-~/config}/dwm/dy-scripts
 cmd=$scriptpath/$1.ksh
 [[ -x $cmd ]]&& $cmd "$@"
 

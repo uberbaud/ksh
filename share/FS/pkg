@@ -24,7 +24,7 @@ function pkg {
 	(($#))|| set help
 	typeset osv="$(uname -r)" record=false cmd="$1"; shift
 	typeset bin=/usr/sbin/pkg_$cmd
-	typeset pkghome=$HOME/.local/pkg-info/v$osv
+	typeset pkghome=$HOME/local/pkg-info/v$osv
 	case $cmd in
 		add)		as-root $bin -i "$@"; record=true;					;;
 		check)		as-root $bin "$@";									;;

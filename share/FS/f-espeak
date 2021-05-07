@@ -6,7 +6,7 @@
 
 needs with-defaults
 function f-espeak {
-	local cfg=${XDG_CONFIG_HOME:-~/.config}/etc/espeak.rc
+	local cfg=${XDG_CONFIG_HOME:-~/config}/etc/espeak.rc
 	with-defaults $cfg /usr/local/bin/espeak "$@"
 }
 

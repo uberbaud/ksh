@@ -1,1 +1,1 @@
-/home/tw/.config/ksh/share/BS/weather.ksh
+/home/tw/config/ksh/share/BS/weather.ksh

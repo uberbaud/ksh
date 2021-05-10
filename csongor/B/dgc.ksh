@@ -1,1 +1,1 @@
-/home/tw/.config/ksh/share/BS/dgc.ksh
+/home/tw/config/ksh/share/BS/dgc.ksh

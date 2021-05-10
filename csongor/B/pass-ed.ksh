@@ -1,1 +1,1 @@
-/home/tw/.config/ksh/share/BS/pass-ed.ksh
+/home/tw/config/ksh/share/BS/pass-ed.ksh

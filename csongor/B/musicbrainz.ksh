@@ -1,1 +1,1 @@
-/home/tw/.config/ksh/share/BS/musicbrainz.ksh
+/home/tw/config/ksh/share/BS/musicbrainz.ksh

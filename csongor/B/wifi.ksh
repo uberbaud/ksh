@@ -1,1 +1,1 @@
-/home/tw/.config/ksh/share/BS/wifi.ksh
+/home/tw/config/ksh/share/BS/wifi.ksh

@@ -1,1 +1,1 @@
-/home/tw/.config/ksh/share/BS/open.ksh
+/home/tw/config/ksh/share/BS/open.ksh

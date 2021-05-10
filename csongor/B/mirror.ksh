@@ -1,1 +1,1 @@
-/home/tw/.config/ksh/share/BS/mirror.ksh
+/home/tw/config/ksh/share/BS/mirror.ksh

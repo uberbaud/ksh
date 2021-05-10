@@ -1,1 +1,1 @@
-/home/tw/.config/ksh/share/BS/m-done.ksh
+/home/tw/config/ksh/share/BS/m-done.ksh

@@ -1,1 +1,1 @@
-/home/tw/.config/ksh/share/BS/rgb.ksh
+/home/tw/config/ksh/share/BS/rgb.ksh

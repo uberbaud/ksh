@@ -1,1 +1,1 @@
-/home/tw/.config/ksh/share/BS/cal.ksh
+/home/tw/config/ksh/share/BS/cal.ksh

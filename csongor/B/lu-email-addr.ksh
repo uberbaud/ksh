@@ -1,1 +1,1 @@
-/home/tw/.config/ksh/share/BS/lu-email-addr.ksh
+/home/tw/config/ksh/share/BS/lu-email-addr.ksh

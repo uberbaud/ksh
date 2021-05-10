@@ -1,1 +1,1 @@
-/home/tw/.config/ksh/share/BS/volume.ksh
+/home/tw/config/ksh/share/BS/volume.ksh

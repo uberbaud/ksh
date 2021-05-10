@@ -1,1 +1,1 @@
-/home/tw/.config/ksh/share/BS/todone.ksh
+/home/tw/config/ksh/share/BS/todone.ksh

@@ -1,1 +1,1 @@
-/home/tw/.config/ksh/share/BS/pass-find.ksh
+/home/tw/config/ksh/share/BS/pass-find.ksh

@@ -1,1 +1,1 @@
-/home/tw/.config/ksh/share/BS/cite.ksh
+/home/tw/config/ksh/share/BS/cite.ksh

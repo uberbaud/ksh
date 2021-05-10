@@ -1,1 +1,1 @@
-/home/tw/.config/ksh/share/BS/ls-surf.ksh
+/home/tw/config/ksh/share/BS/ls-surf.ksh

@@ -1,1 +1,1 @@
-/home/tw/.config/ksh/share/BS/pushK.ksh
+/home/tw/config/ksh/share/BS/pushK.ksh

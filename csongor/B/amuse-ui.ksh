@@ -1,1 +1,1 @@
-/home/tw/.config/ksh/share/BS/amuse-ui.ksh
+/home/tw/config/ksh/share/BS/amuse-ui.ksh

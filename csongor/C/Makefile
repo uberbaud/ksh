@@ -1,1 +1,1 @@
-/home/tw/.config/ksh/share/CS/Makefile
+/home/tw/config/ksh/share/CS/Makefile

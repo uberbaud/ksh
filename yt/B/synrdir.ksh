@@ -1,1 +1,1 @@
-/home/tw/.config/ksh/share/BS/synrdir.ksh
+/home/tw/config/ksh/share/BS/synrdir.ksh

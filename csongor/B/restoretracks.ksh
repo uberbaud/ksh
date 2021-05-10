@@ -1,1 +1,1 @@
-/home/tw/.config/ksh/share/BS/restoretracks.ksh
+/home/tw/config/ksh/share/BS/restoretracks.ksh

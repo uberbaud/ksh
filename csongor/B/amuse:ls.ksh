@@ -1,1 +1,1 @@
-/home/tw/.config/ksh/share/BS/amuse:ls.ksh
+/home/tw/config/ksh/share/BS/amuse:ls.ksh

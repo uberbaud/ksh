@@ -20,6 +20,7 @@ grep
 gui
 init
 log
+maintenance
 merge
 mv
 notes
@@ -100,6 +101,7 @@ diff-files
 diff-index
 diff-tree
 for-each-ref
+for-each-repo
 get-tar-commit-id
 ls-files
 ls-remote

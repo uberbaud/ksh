@@ -70,6 +70,7 @@ function reshell {
 
 	# when we're done, let the user know
 	printf "\e[1;43;37m%${COLUMNS}s\r = %s =\e[0m\n" '' "$SHELL" # banner
+	$HOST-colors
 }
 
 # Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

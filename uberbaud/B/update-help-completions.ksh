@@ -1,1 +1,1 @@
-/home/tw/.config/ksh/share/BS/update-help-completions.ksh
+/home/tw/config/ksh/share/BS/update-help-completions.ksh

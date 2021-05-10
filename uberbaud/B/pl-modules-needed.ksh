@@ -1,1 +1,1 @@
-/home/tw/.config/ksh/share/BS/pl-modules-needed.ksh
+/home/tw/config/ksh/share/BS/pl-modules-needed.ksh

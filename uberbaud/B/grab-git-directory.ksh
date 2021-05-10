@@ -1,1 +1,1 @@
-/home/tw/.config/ksh/share/BS/grab-git-directory.ksh
+/home/tw/config/ksh/share/BS/grab-git-directory.ksh

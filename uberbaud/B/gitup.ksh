@@ -1,1 +1,1 @@
-/home/tw/.config/ksh/share/BS/gitup.ksh
+/home/tw/config/ksh/share/BS/gitup.ksh

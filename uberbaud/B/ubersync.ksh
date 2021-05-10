@@ -1,1 +1,1 @@
-/home/tw/.config/ksh/share/BS/ubersync.ksh
+/home/tw/config/ksh/share/BS/ubersync.ksh

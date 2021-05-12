@@ -3,9 +3,9 @@
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
 
 set -o nounset
-[[ -n $FPATH ]]|| {
+[[ -n ${FPATH:-} ]]|| {
 	. /etc/profile
-	[[ -n $HOST ]]|| {
+	[[ -n ${HOST:-} ]]|| {
 		HOSTNAME=${HOSTNAME:-$(uname -n)}
 		HOST=${HOSTNAME%%.*}
 	  }

@@ -2,13 +2,15 @@
 # <@(#)tag:csongor.greyshirt.net,2017-08-08:tw/19.26.18z/1101710>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
 
+set -o nounset
 [[ -n $FPATH ]]|| {
 	. /etc/profile
+	[[ -n $HOST ]]|| {
+		HOSTNAME=${HOSTNAME:-$(uname -n)}
+		HOST=${HOSTNAME%%.*}
+	  }
+	FPATH=${XDG_CONFIG_HOME:?}/ksh/$HOST/F
   }
-env
-
-set -o nounset;: ${FPATH:?Run from within KSH}
-: ${KDOTDIR:?}
 
 # Usage {{{1
 typeset -- this_pgm="${0##*/}"

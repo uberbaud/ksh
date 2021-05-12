@@ -2,6 +2,11 @@
 # <@(#)tag:csongor.greyshirt.net,2017-08-08:tw/19.26.18z/1101710>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
 
+[[ -n $FPATH ]]|| {
+	. /etc/profile
+  }
+env
+
 set -o nounset;: ${FPATH:?Run from within KSH}
 : ${KDOTDIR:?}
 

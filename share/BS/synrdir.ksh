@@ -233,12 +233,19 @@ function fileagent { # {{{1
 	ssh-add -l >/dev/null || die 'Bad passphrase or such.'
 	ssh "$1" "bin/$this_pgm -R '$HOSTNAME'" |&
 } # }}}1
+function r-savetracks { # {{{1
+	local SAVETRACKS
+	SAVETRACKS="${MYNAME%/*}/savetracks.ksh"
+	print '===================='
+	print '= local savetracks ='
+	($SAVETRACKS)
+	print '===================='
+} # }}}1
 
 $i_am_the_remote && { # {{{1
 	exec 3>"$LOGFILE"
 	r-request-is hello || exit 1
-	SAVETRACKS="${MYNAME%/*}/savetracks.ksh"
-	($SAVETRACKS) 1>&3 2>&3
+	r-savetracks 1>&3 2>&3
 	r-reply ready
 
 	r-request-is cksum || r-fail
@@ -254,6 +261,7 @@ $i_am_the_remote && { # {{{1
 			quit)		r-reply 'quitting'; break;		;;
 		esac
 	done
+
 	# any clean-up
 	exit 0
 } # }}}1

@@ -29,10 +29,10 @@ function bad_programmer {	# {{{2
 	die 'Programmer error:'	\
 		"  No getopts action defined for [1m-$1[22m."
   };	# }}}2
-list_accts=false
+want_accts_list=false
 while getopts ':lh' Option; do
 	case $Option in
-		l)	list_accts=true;										;;
+		l)	want_accts_list=true;									;;
 		h)	usage;													;;
 		\?)	die "Invalid option: [1m-$OPTARG[22m.";				;;
 		\:)	die "Option [1m-$OPTARG[22m requires an argument.";	;;
@@ -43,65 +43,47 @@ done
 shift $(($OPTIND - 1))
 # ready to process non '-' prefixed arguments
 # /options }}}1
-function warnOrDie { #{{{1
-	case $warnOrDie in
-		die)  die "$@" 'Use [1m-f22m to force an edit.';		;;
-		warn) warn "$@";											;;
-		*)    die '[1mProgrammer error[22m:' \
-					'warnOrDie is [1m${warnOrDie}[22m.';		;;
-	esac
-} # }}}1
-
-function list-accts {
+function list-accts { # {{{1
+	local g
 	for g in *; { [[ -d $g ]]&& print "    $g"; }
 	exit
-}
-
-function sync-drive {
+} # }}}1
+function sync-drive { # {{{1
 	grive "$@" && return 0
 	warn "There were problems syncing ^S$1^s."
 	return 1
-}
-
-function one-drive {
+} # }}}1
+function do-one-drive { # {{{1
+	local D dispD
 	D="$GDRIVE/$1"
 	desparkle "$1"
 	dispD="$REPLY"
-	[[ -d $D ]]|| {
-		warn "No such account directory ^S$dispD^s."
-		return 1
-	  }
+	[[ -d $D ]]|| die "No such account directory ^S$dispD^s."
+	cd "$D" || die "Could not ^Tcd^t to ^S$dispD^s."
 
-	cd "$D" || {
-		warn "Could not ^Tcd^t to ^S$dispD^s."
-		return 1
-	  }
 	if [[ -f .grive ]]; then
 		notify "Syncing ^S$dispD^s."
 		sync-drive
 	else
+		local ID='235587356455-5vcpjvn7nnocpbb3g31n2h9ouvv920bi.apps.googleusercontent.com'
 		notify	"Syncing ^Bnew drive^b ^S$dispD^s."
-		warn	'Before going to listed url, ^Blog in^b to account at'
-				'    ^Shttps://accounts.google.com/ServiceLogin^s'
-				'with user name'
+		warn	'Before going to listed url, ^Blog in^b to account at'	\
+				'    ^Shttps://accounts.google.com/ServiceLogin^s'		\
+				'with user name'										\
 				"    ^S$dispD^s"
 		sync-drive --auth
 	fi
-}
+} # }}}1
 
-function main {
-	[[ -d $GDRIVE ]]|| die "No such directory ^B$GDRIVE^b (^S\$GDRIVE^s)."
-	cd "$GDRIVE" || die "Could not ^Tcd^t to ^B$GDRIVE^b."
-	$list_accts && list-accts
-	needs grive
+needs grive
+[[ -d $GDRIVE ]]|| die "No such directory ^B$GDRIVE^b (^S\$GDRIVE^s)."
+cd "$GDRIVE" || die "Could not ^Tcd^t to ^B$GDRIVE^b."
 
-	(($#))|| set -- *
-	for d; do
-		[[ -d $GDRIVE/$d ]]|| continue
-		one-drive "$d"
-	done
-}
+$want_accts_list && list-accts
 
-main "$@"; exit $?
+(($#))|| set -- *
+
+errs=0
+for d { (do-one-drive "$d")|| ((errs++)) }; exit $errs
 
 # Copyright (C) 2017 by Tom Davis <tom@greyshirt.net>.

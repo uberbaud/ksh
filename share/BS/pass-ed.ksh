@@ -11,8 +11,9 @@ function usage {
 	PGM="$REPLY"
 	sparkle >&2 <<-\
 	===SPARKLE===
-	^F{4}Usage^f: ^T$PGM^t
-	         Edit the password record for a domain.
+	^F{4}Usage^f: ^T$PGM^t ^Udomain^u
+	         Edit the password record for a matching domain or unique
+	         substring of a domain.
 	       ^T$PGM -h^t
 	         Show this help message.
 	===SPARKLE===

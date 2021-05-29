@@ -66,7 +66,7 @@ runPath=${XDG_DATA_HOME:?}/run/weather
 	mkdir -p $runPath
 [[ -d $runPath ]]||
 	die 'No such directory ^B$XDG_DATA_HOME/run/weather^b.'
-cd $runPath ||
+builtin cd $runPath ||
 	die 'No such directory ^B$XDG_DATA_HOME/run/weather^b.'
 
 splitstr x "$(xrandr|awk '/\*/ {print $1}')" geometry

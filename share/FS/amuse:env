@@ -6,13 +6,27 @@
 #:   creates ^Sis-valid-amuse-cmd^s
 
 function amuse:env {
-	: "${XDG_DATA_HOME:?-}"
+	local errno=0 errmsg='' p s; : "${XDG_DATA_HOME:?-}"
+
 	AMUSE_COMMANDS='again final pause play restart skip stop'
-	AMUSE_RUN_DIR=$XDG_DATA_HOME/run/amuse
 	AMUSE_DATA_HOME=$XDG_DATA_HOME/amuse
+	AMUSE_RUN_DIR=$XDG_DATA_HOME/run/amuse
+	[[ -d $AMUSE_RUN_DIR ]]|| mkdir -p "$AMUSE_RUN_DIR" || {
+		errno=1
+		errmsg='Could not `mkdir` $AMUSE_RUN_DIR'
+		unset AMUSE_RUN_DIR
+	  }
+	[[ -n ${AMUSE_RUN_DIR:-} ]]&& for p in playing time; do
+		s=$AMUSE_RUN_DIR/subs-$p
+		[[ -d $s ]]&& continue
+		mkdir -p $s ||
+			errmsg="${errmsg:+$errmsg }No $subs-$p"
+	done
 	gsub \  \| "$AMUSE_COMMANDS"
 	eval "function is-valid-amuse-cmd { [[ \${1:-} == @($REPLY) ]]; }"
-	REPLY=
+
+	REPLY=${errmsg:-}
+	return $errno
 }
 
 # Copyright © 2019 by Tom Davis <tom@greyshirt.net>.

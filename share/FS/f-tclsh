@@ -24,7 +24,7 @@ function f-tclsh {
 				"Using ^Ttclsh$TCL_USE_VERSION^t (TCL_USE_VERSION)"
 	fi
 	force=true; (($#))&& force=false
-	FORCE_RLWRAP=$force cond-rlwrap tclsh$tclsh_version
+	FORCE_RLWRAP=$force cond-rlwrap tclsh$tclsh_version "$@"
 }
 
 # Copyright © 2020 by Tom Davis <tom@greyshirt.net>.

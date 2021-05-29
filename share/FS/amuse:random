@@ -6,13 +6,18 @@
 
 needs amuse:env
 function amuse:random {
-	amuse:env
-	builtin cd "${AMUSE_RUN_DIR:?}" ||
-		die 'Could not ^Tcd^t to ^B$AMUSE_RUN_DIR^b.'
+	local F
+	amuse:env || die "$REPLY"
+	F=$AMUSE_RUN_DIR/random
 	case ${1:-show} in
-		1|yes|on|true)	print true >random;						;;
-		0|no|off|false)	print false >random;					;;
-		show)			print "  $(<random)";					;;
+		1|yes|on|true)	print true >$F;							;;
+		0|no|off|false)	: >$F;									;;
+		show)			if [[ -s $F ]]; then
+							print "  on"
+						else
+							print "  off"
+						fi
+						;;
 		*) warn 'Unknown options. See ^Thelp amuse:random^t.';  ;;
 	esac
 }

@@ -5,6 +5,7 @@ SQLify
 add-exit-action
 alias
 amuse:create-cmd-wrappers
+amuse:device
 amuse:edit
 amuse:env
 amuse:file-from-id

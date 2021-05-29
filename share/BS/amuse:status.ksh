@@ -55,11 +55,12 @@ function show-file { # {{{1
 	print -- "  $2: \033[36m$(<$1)\033[0m"
 } # }}}1
 function show-list { # {{{1
-	local text 
+	local count s=s
 	is-empty $1 "$2" && return
-	text=$(wc -l <$1)
-	text=${text##+( )}
-	print -- "  $2: \033[38;5;248m($text songs)\033[0m"
+	count=$(wc -l <$1)
+	count=${count##+( )}
+	((count==1))&& s=
+	print -- "  $2: \033[38;5;248m($count song$s)\033[0m"
 } # }}}1
 function show-playing { # {{{1
 	local dur id idlen info infolen mark
@@ -86,6 +87,27 @@ function show-extra { #{{{1
 	fType=$1
 	[[ $2 == \* ]]&& fType='Executable File'
 	print -- "  $fLeft: \033[31mUNEXPECTED\033[0m $fType"
+} # }}}1
+function show-audiodev { # {{{1
+	local example N M G E R p
+	N='\033[1;36m'
+	M='\033[0;34m'
+	G='\033[0;38;5;248m'
+	E='\033[38;5;217m'
+	R='\033[0m'
+	U='\033[4m'
+	u='\033[24m'
+	example="# ${U}type$u[@${U}hostname$u][,${U}servnum$u]/${U}devnum$u[.${U}option$u]"
+	if [[ -s $1 ]]; then
+		REPLY=$(<$1)
+		# highlight the required bits of punctuation
+		for p in @ , /; do
+			gsub "$p" "$M$p$N" "$REPLY"
+		done
+		print -- "  $2: $N$REPLY$R"
+	else
+		print -- "  $2: $E- $G$example$R"
+	fi
 } # }}}1
 function found { # {{{1
 	typeset -i i=-1
@@ -119,7 +141,7 @@ set -A expected --	audiodevice final paused-at played.lst player-pid	\
 for f; do
 	fLeft=$f
 	case $f in
-		audiodevice)	show-file		$f "$fLeft";		;;
+		audiodevice)	show-audiodev	$f "$fLeft";		;;
 		final)			show-file		$f "$fLeft";		;;
 		paused-at)		show-file		$f "$fLeft";		;;
 		played.lst)		show-list		$f "$fLeft";		;;

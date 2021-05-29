@@ -40,9 +40,10 @@ shift $((OPTIND-1))
 # ready to process non '-' prefixed arguments
 # /options }}}1
 needs amuse:env fpop play-one-ogg SQL
-
-amuse:env	# Sets AMUSE_COMMANDS, AMUSE_RUN_DIR, AMUSE_DATA_HOME, and
-			# creates function is-valid-amuse-cmd
+# Set AMUSE_COMMANDS, AMUSE_RUN_DIR, AMUSE_DATA_HOME, and
+# create function is-valid-amuse-cmd
+amuse:env || fullstop "$REPLY"
+: "${AMUSE_DATA_HOME:?}" "${AMUSE_RUN_DIR:?}"
 
 alias please-START-another-song='return 0'
 alias DONT-start-another-song='return 1'
@@ -284,7 +285,7 @@ function watchtime	{ # {{{1
 # ----------->8-----[ END amuse-watchtime.ksh ]----->8-----------
 
 # do everything in the AMUSE RUN DIRECTORY
-builtin cd "${AMUSE_RUN_DIR:?}" ||
+builtin cd "$AMUSE_RUN_DIR" ||
 	fullstop 'Could not `cd` to "$AMUSE_RUN_DIR".'
 
 [[ -s server-pid && -n $(ps -p $(<server-pid) -ocommand=) ]]&&
@@ -297,7 +298,7 @@ mkfifo sigpipe || fullstop 'Is server already running?'
 print -- $$ >server-pid
 : >final
 : >player-pid
-
+touch random # don't change it, just make sure it exists
 
 SQLSEP='	'
 SQL "ATTACH '$AMUSE_DATA_HOME/amuse.db3' AS amuse;"

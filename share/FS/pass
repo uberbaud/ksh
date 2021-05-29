@@ -1,12 +1,19 @@
 # <@(#)tag:tw.csongor.greyshirt.net,2020-11-24,11.35.02z/5346ae6>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^Gpass-* arguments, or^g ^[^T-E^t^|^T-L^t^]
-#:   Wrapper for ^Tpass-gen^t, ^Tpass-show^t, ^Tpass-ed^t, and ^Tpass-find^t.
-#:   If it's one (1) argument which is NOT ^T-h^t, use ^Spass-show^s, else use ^Spass-gen^s.
-#:   Alternately:
-#:     ^T-E^t ^Uhostglob^u  use ^Spass-ed^s (edit).
-#:     ^T-L^t ^Uhostglob^u  use ^Spass-find^s (lists).
+#: FUNCTION ^[^U...^u^]
+#:   Wrapper for ^Tpass-gen^t, ^Tpass-show^t, ^Tpass-ed^t, ^Tpass-find^t, and ^Tpass-mail^t.
+#:
+#:   If the first flag is:
+#:     ^T-E^t use ^Tpass-ed^t (edit password for an existing ^Udomain^u),
+#:     ^T-L^t use ^Tpass-find^t (lists matching password ^Udomains^u),
+#:     ^T-M^t use ^Tpass-mail^t (lists ^[matching^] mail accounts),
+#:   or
+#:     if there is only one parameter and it isn't ^T-h^t,
+#:     use ^Tpass-show^t (show record for matching ^Udomain^u),
+#:   otherwise,
+#:     use ^Tpass-gen^t (generate a password for ^Udomain^u).
+#:
 #:   Scripts are located in ^U^S$KDOTDIR^s/bin^u
 
 needs ${KDOTDIR:?}/$HOST/B/pass-{gen,show}.ksh
@@ -16,7 +23,15 @@ function pass {
 	case ${1:-} in
 		-E)	which=ed; shift;					;;
 		-L)	which=find; shift;					;;
-		-h) which=gen;							;;
+		-M)	which=mail; shift;					;;
+		-h)	which=gen
+			sparkle <<-\
+			==SPARKLE==
+			^B^NCALLED FROM^n ^Tpass^t function^b
+			    ^IUse ^Thelp pass^t for help on ^Tpass^t wrapper.^i
+			    ^BShowing message for ^Tpass-gen -h^t.^b
+			==SPARKLE==
+			;;
 	esac
 
 	$KDOTDIR/$HOST/B/pass-$which.ksh "$@"

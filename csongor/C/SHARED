@@ -1,6 +1,7 @@
 # files listed here will be linked from $KDOTDIR/share/C
 chflags
 dwmc_1
+getent_1
 fossil_1
 inc
 kill_1

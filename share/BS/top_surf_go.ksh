@@ -13,7 +13,7 @@ function usage {
 	PGM="$REPLY"
 	sparkle >&2 <<-\
 	===SPARKLE===
-	^F{4}Usage^f: ^T$PGM^t ^[^Uurl^u]
+	^F{4}Usage^f: ^T$PGM^t ^[^Uurl^u^]
 	         Send the topmost surf to ^Uurl^u or homepage, if no ^Uurl^u given.
 	       ^T$PGM -h^t
 	         Show this help message.

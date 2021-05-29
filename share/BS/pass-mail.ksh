@@ -1,5 +1,5 @@
 #!/bin/ksh
-# <@(#)tag:csongor.greyshirt.net,2019-01-20:tw/20.01.57z/1765632>
+# <@(#)tag:tw.csongor.greyshirt.net,2021-05-23,04.21.29z/366f748>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
 
 set -o nounset;: ${FPATH:?Run from within KSH}
@@ -11,9 +11,9 @@ function usage {
 	PGM="$REPLY"
 	sparkle >&2 <<-\
 	===SPARKLE===
-	^F{4}Usage^f: ^T$PGM^t ^Udomain^u
-	         Find an existing password for a matching domain or unique
-	         substring of a domain.
+	^F{4}Usage^f: ^T$PGM^t ^Uregex^u
+	         List matching mail accounts and passwords for an account or
+	         an ^Tawk^t ^Uregex^u of one or more accounts.
 	       ^T$PGM -h^t
 	         Show this help message.
 	===SPARKLE===
@@ -44,19 +44,27 @@ function warnOrDie { #{{{1
 					'warnOrDie is [1m${warnOrDie}[22m.';		;;
 	esac
 } # }}}1
+(($# > 1))&& die 'Too many arguments. Expected at most one (1).'
+ACCT=${1:-.}
 
-(($#))|| die 'Expected one argument ^Uhostglob^u.'
-(($#==1))||	die 'Too many arguments. Expected ^Uhostglob^u.'
+secrets=${XDG_DATA_HOME:?}/secrets
+[[ -d $secrets ]]|| die 'No secrets directory'
 
-secrets="${XDG_DATA_HOME:?}"/secrets
-[[ -d $secrets ]]|| die 'No secrets directory.'
-cd $secrets || die 'Could not ^Tcd^t to ^Bsecrets^b.'
+mailaccts=$secrets/mail-accounts
+[[ -f $mailaccts ]]|| die 'Could not find ^Smail-accounts^s file.'
+[[ -r $mailaccts ]]|| die 'Can not read ^Smail-accounts^s file.'
 
-set -- *"$1"*.pwd
-[[ "$*" == \**\*.pwd ]]&& exit 1
+needs awk
 
-choice="$(umenu "$@")"|| exit 1
+AWKPGM=$(</dev/stdin) <<-\
+	==AWK==
+	/^[[;]/				{ next }			# skip comments and headers
+	/^[[:space:]]*$/	{ next }			# skip blank lines
+	/^\*/				{ sub( /./, "" ) }	# remove mark
+	# otherwise
+	/$ACCT/				{ print }
+	==AWK==
 
-print -- "${choice%.pwd}"
+awk "$AWKPGM" "$mailaccts"; exit
 
-# Copyright (C) 2019 by Tom Davis <tom@greyshirt.net>.
+# Copyright (C) 2021 by Tom Davis <tom@greyshirt.net>.

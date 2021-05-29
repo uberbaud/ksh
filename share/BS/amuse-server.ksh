@@ -298,7 +298,8 @@ mkfifo sigpipe || fullstop 'Is server already running?'
 print -- $$ >server-pid
 : >final
 : >player-pid
-touch random # don't change it, just make sure it exists
+touch random		# don't change it, just make sure it exists
+touch audiodevice	# don't change it, just make sure it exists
 
 SQLSEP='	'
 SQL "ATTACH '$AMUSE_DATA_HOME/amuse.db3' AS amuse;"

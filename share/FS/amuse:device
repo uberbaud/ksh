@@ -1,0 +1,36 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2021-05-29,02.26.12z/2a63256>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^G(no arguments)^g
+#:   Set the output audiodevice
+
+function amuse:device {
+	local F H T
+	REPLY=
+	amuse:env || die "$REPLY"
+	F=$AMUSE_RUN_DIR/audiodevice
+	if (($#==0)); then
+		REPLY=$(<$F)
+		if [[ -n $REPLY ]]; then
+			for p in @ , /; do
+				gsub "$p" "^$p" "$REPLY"
+			done
+			[[ $REPLY == */*.* ]]&&
+				$REPLY=${REPLY%.*}^.${REPLY##*.}
+			notify "$REPLY"
+		else
+			notify "^GUsing default:^g ^F{6}snd^f^G/^g^F{6}0^f."
+		fi
+	elif (($#>1)); then
+		die 'Too many flags. Expected zero (0) or one (1).'
+	elif [[ -z $1 ]]; then
+		: >$F
+	elif [[ $1 != @(snd|midithru|midi)?(@+([a-z0-9-])*(.+([a-z0-9-])))?(,+([0-9]))/+([0-9])?(.+([a-z])) ]]; then
+		die 'Bad audiodevice descriptor.' \
+			'^Utype^u^[@^Uhostname^u^]^[,^Uservnum^u^]/^Udevnum^u^[.^Uoption^u^]'
+	else
+		print -- "$1" >$F
+	fi
+}
+
+# Copyright © 2021 by Tom Davis <tom@greyshirt.net>.

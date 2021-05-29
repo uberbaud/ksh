@@ -176,10 +176,10 @@ function update-status { # {{{1
 	elif [[ -s paused-at ]]; then
 		status=$sPaused
 	elif [[ -s playing ]]; then
-		if [[ -s song.lst ]]; then
-			status=$sPlaying
-		else
+		if [[ -s random ]]; then
 			status=$sRandom
+		else
+			status=$sPlaying
 		fi
 	else
 		status=$sStopped

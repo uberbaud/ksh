@@ -1,0 +1,23 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2021-05-30,17.48.49z/4b2b227>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Umsg-ln^u ^[^U…^u^]
+#:   Infrastructure for ^T-f^t (force) behavior.
+#:   Uses ^$^NwarnOrDie^n (set to ^Uwarn^u or ^Udie^u) to determine
+#:     which action to take. Adds the useful instruction
+#:     "${FORCE_MSG:-Use -f to force action.}"
+
+function warnOrDie {
+	case $warnOrDie in
+		die)	die "$@" \
+				"${FORCE_MSG:-Use ^T-f^t to force action.}"
+				;;
+		warn)	warn "$@"
+				;;
+		*)		die '^BProgrammer error^b:' \
+					"^SwarnOrDie^s is ^B${warnOrDie:-^b^G<empty>^g^B}^b."
+				;;
+	esac
+}
+
+# Copyright © 2021 by Tom Davis <tom@greyshirt.net>.

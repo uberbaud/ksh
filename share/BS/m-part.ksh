@@ -105,6 +105,7 @@ for f in *; do
 	fi
 	# fix all the Microsoft (et al.) broken html marked as xhtml
 	[[ $f == *.html ]]&& clean-html "$f"
+	chmod a+r "$f"
 	+parts "$f"
 done
 rm $mark

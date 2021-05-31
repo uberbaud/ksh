@@ -213,6 +213,7 @@ vtmp
 wait
 wait-before-leaving
 warn
+warnOrDie
 whence
 with-defaults
 x11-windowid-for-pid

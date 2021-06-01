@@ -3,16 +3,19 @@
 
 #: FUNCTION ^Ulock_file^u
 #:   Test that the process listed in the ^Ulock_file^u is still running.
+#:
+#:   ^G^ILOCKFILE format^i: ^Upid^u ^Udow^u ^Umon^u ^Uday^u ^UHH^u:^UMM^u:^USS^u ^Uyear^u^g
+#:     ^Gsame as^g ^Tps -opid=,lstart= -p^t ^$^F{4}PID^f
+#:
 #:   ^GNote: Unlike the other exclusive lock functions, this one takes^g
 #:         ^Gthe lock file name.^g
 
 function is-exclusive-lock-valid {
-	local fInfo fPid pInfo
-	fInfo=$(<${1:?})
-	fInfo=${fInfo##+( )}
-	fPid=${fInfo%% *}
-	pInfo=$(ps -opid=,lstart= -p $fPid)
-	[[ $pInfo == $fInfo ]]
+	local fInfo
+	fInfo=$(<${1:?})	# get contents of lock file
+	set -- $fInfo		# remove leading spaces, break into fields
+
+	[[ $fInfo == $(ps -opid=,lstart= -p $1) ]]
 }
 
 # Copyright © 2020 by Tom Davis <tom@greyshirt.net>.

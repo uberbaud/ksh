@@ -141,9 +141,8 @@ ffsopts='-t ffs -s -o rw,noexec,nodev,sync,softdep'
 fatopts="-t msdos -s -o rw,noexec,nosuid,-g=$USER,-u=$USER"
 cdopts="-t cd9660 -s -o rw,noexec,nosuid,-g"
 
+function as-root { "$@"; }
 function main {
-
-
 	splitstr , "$(sysctl -n hw.disknames)" disknames
 	for d in "${disknames[@]}"; do
 		[[ $d == sd0:* ]]&& continue

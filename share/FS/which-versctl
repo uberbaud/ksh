@@ -1,0 +1,42 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2021-07-18,16.35.36z/4dc0f0>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^[^Upath^u^]
+#:   Report which Version Control/Management System manages a given directory.
+#:   Sets ^SVCMS_BASE_DIR^s to the base directory 
+
+function which-versctl {
+	local P=$(readlink -f ${1:-$PWD})
+	typeset -l L
+	VCMS_BASE_DIR=
+	# handle per directory VCMSes
+	set -- $P/@(CVS|RCS)
+	[[ $1 == *\) ]]|| {
+		VCMS_BASE_DIR="${1%/*}"
+		L=${1##*/}
+#		print -r -- "$L" # THIS CONFUSES tree-sitter
+		print -r "$L"
+		return 0
+	  }
+
+	# handle parent directory dot VCMSes
+	while [[ -n $P ]]; do
+		# PATTERNS never match hidden files, so the dot MUST be outside
+		# the pattern.
+		set --														\
+			$P/.@(git|gitmodules|fslckout|svn|hg|bzr|darcs|rsyncup)	\
+			$P/@(_MTN)
+		while [[ $1 == *\) ]]; do shift; done	# skip patterns with no match
+		(($#))&& break
+		P=${P%/*}
+	done
+	[[ -n $P ]]|| return
+
+	VCMS_BASE_DIR="${1%/*}"
+	L=${1##*/?(.|_)}
+	[[ $L == fslckout ]]&&	L=fossil
+
+	print -r -- "$L"
+}
+
+# Copyright © 2021 by Tom Davis <tom@greyshirt.net>.

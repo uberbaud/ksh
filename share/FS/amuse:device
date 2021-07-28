@@ -4,8 +4,9 @@
 #: FUNCTION ^G(no arguments)^g
 #:   Set the output audiodevice
 
+needs amuse:{env,send-cmd}
 function amuse:device {
-	local F H T
+	local F
 	REPLY=
 	amuse:env || die "$REPLY"
 	F=$AMUSE_RUN_DIR/audiodevice
@@ -23,14 +24,17 @@ function amuse:device {
 		fi
 	elif (($#>1)); then
 		die 'Too many flags. Expected zero (0) or one (1).'
-	elif [[ -z $1 ]]; then
+	elif [[ -z $1 || $1 == $HOST ]]; then
 		: >$F
+	elif [[ $1 == yt?(.lan) ]]; then
+		print -- snd@yt.lan/0 >$F
 	elif [[ $1 != @(snd|midithru|midi)?(@+([a-z0-9-])*(.+([a-z0-9-])))?(,+([0-9]))/+([0-9])?(.+([a-z])) ]]; then
 		die 'Bad audiodevice descriptor.' \
 			'^Utype^u^[@^Uhostname^u^]^[,^Uservnum^u^]/^Udevnum^u^[.^Uoption^u^]'
 	else
 		print -- "$1" >$F
 	fi
+	amuse:send-cmd changed-audev
 }
 
 # Copyright © 2021 by Tom Davis <tom@greyshirt.net>.

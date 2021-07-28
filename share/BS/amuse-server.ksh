@@ -83,14 +83,11 @@ function move-played-to-history { # {{{
 function play-file { # {{{1
 	local action=played PlayedBuf PlayingBuf
 	print -- 0 >timeplayed
-	unset AUDIODEVICE
-	[[ -s audiodevice ]]&&
-		export AUDIODEVICE=$(<audiodevice)
 	#======================================[ heavy lifter ]===============#
-	play-one-ogg "$1" ${2:-}			\
-		1>paused-at						\
-		2>~/log/amuse-player.log		\
-		3>timeplayed					\
+	AUDIODEVICE=${vAUDEV:-snd/0} play-one-ogg "$1" ${2:-}	\
+		1>paused-at											\
+		2>~/log/amuse-player.log							\
+		3>timeplayed										\
 		&
 	#=====================================================================#
 	print $! >player-pid
@@ -122,7 +119,7 @@ function get-random-song  { #{{{1
 	[[ -n $song ]]|| return 1	# should never happen, but just in case.
 	print -r -- "$song"
 } #}}}1
-function play-one-song { #{{{1
+function play-next-song { #{{{1
 	local N amuse_id song startpos
 	[[ -s player-pid ]]&& return 1
 
@@ -210,8 +207,12 @@ function docmd-paused { #{{{1
 function docmd-no-op { #{{{1
 	DONT-start-another-song
 } #}}}1
+function docmd-changed-audev { # {{{1
+	vAUDEV=$(<audiodevice)
+	DONT-start-another-song
+} # }}}1
 function is-valid-cmd { # {{{1
-	[[ $1 == @(played|paused|no-op) ]] || is-valid-amuse-cmd "$1"
+	[[ $1 == @(played|paused|no-op|changed-audev) ]] || is-valid-amuse-cmd "$1"
 } # }}}1
 function notify-subscribers { # {{{1
 	local file pid signal subtype
@@ -248,7 +249,7 @@ function handle-cmd { # {{{1
 
 	docmd-$cmd && {
 		notify-subscribers playing
-		play-one-song
+		play-next-song
 	  }
 	notify-subscribers playing
 } # }}}1
@@ -300,6 +301,7 @@ print -- $$ >server-pid
 : >player-pid
 touch random		# don't change it, just make sure it exists
 touch audiodevice	# don't change it, just make sure it exists
+vAUDEV=$(<audiodevice)
 
 SQLSEP='	'
 SQL "ATTACH '$AMUSE_DATA_HOME/amuse.db3' AS amuse;"

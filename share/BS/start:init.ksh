@@ -14,6 +14,7 @@ APP_BASE=/home/apps
 GRPNAME=usrapp
 APP_CLASS=app
 START_SCRIPT=start-app.ksh
+logName='start-init-doas'
 NL='
 ' # end of NL assignment
 TAB='	'
@@ -97,8 +98,7 @@ function create-group-usrapp { # {{{1'
 function add-member-to-usrapp { # {{{1'
 	[[ $(getent group usrapp) == *[:,]$USRNAME*(,+([!;])) ]]&& return
 
-	# @ --
-	# @ h1 "Adding $USRNAME to $GRPNAME."
+	@ "# Adding member '$USRNAME' to group '$GRPNAME'."
 	@ usermod -G "$GRPNAME" "$USRNAME"
 } # }}}1
 function p3_copy_hold { # {{{1
@@ -158,6 +158,10 @@ function create-app-user { # {{{1
 	# with login class
 	opt[i++]=-L
 	opt[i++]=$APP_CLASS
+
+	# GECOS/comment field
+	opt[i++]=-c
+	opt[i++]="Start user for $APP"
 
 	# @ --
 	# @ h1 "Create user '$APP'."
@@ -249,6 +253,8 @@ function link-from-out-into-app-home { # {{{1'
 } # }}}1
 function CleanUp { # {{{1'
 	exec 3>&-
+	date +"=== $logName: %Y-%m-%d %H:%M:%S %z ==="	|
+		cat - "$fTEMP" >>~/log/$logName.log
 	rm "$fTEMP"
 } # }}}1
 

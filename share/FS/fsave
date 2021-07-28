@@ -5,17 +5,20 @@
 #:   Saves the named function as a file to the first path in ^S$FPATH^s.
 
 function fsave {
-	local fName fText
-	fName="${1:?Missing required function name}"; shift
-	fText="$(typeset -f $fName)" ||
+	local fName fText P
+	fName=${1:?Missing required function name}; shift
+	fText=$(typeset -f $fName) ||
 		die 'No such function'
-	fText="${fText%\}*}"
-	fText="${fText#*\{}"
+	fText=${fText%\}*}
+	fText=${fText#*\{}
+	# if we want to rename it.
 	[[ ${1:?Missing required function description} == [Aa][Ss] ]]&& {
-		fName="${2:?Missing required new function name}"
+		fName=${2:?Missing required new function name}
 		shift 2
 	  }
-	FBODY="$fText" new -t ksh -x function $F/$fName "$*"
+	: ${1:-Missing required function description}
+	P=${FPATH:-.}; P=${P%%:*}
+	FBODY="$fText" new -t ksh -x function $P/$fName "$*"
 }
 
 # Copyright © 2019 by Tom Davis <tom@greyshirt.net>.

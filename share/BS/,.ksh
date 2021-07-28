@@ -58,6 +58,11 @@ new-array opts
 +opts	-username	' '
 +opts	-password	' '
 +opts	-info		"'I can't die but once.' -- Harriet Tubman"
++opts	-bg			gray30	# only for the logon screen
+# don't go to black, keep the clocks showing!
++opts	-dpmsoff		0
++opts	-dpmsstandby	0
++opts	-dpmssuspend	0
 
 COMPTON=$(pgrep compton)
 [[ -n $COMPTON ]]&& kill $COMPTON

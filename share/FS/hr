@@ -1,0 +1,29 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2021-06-14,17.16.43z/4862fd>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^[^Uborder width^u^]
+#:   Prints a horizontal rule.
+#:   ^Uborder_width^u is the number of spaces preceding and trailing
+#:                the line
+
+function hr {
+	local i l b=${1:-3} m r=-
+	[[ $b == +([0-9]) ]]|| b=3
+	if ((COLUMNS > (b*2) )); then
+		[[ -t 1 ]]&& {
+			term-does-utf8 && r=─
+			m="\\033[36m"
+		  }
+		# add prefix spaces
+		i=b
+		while ((i--)); do l="$l "; done
+		# add colorfullness if stdout is a terminal
+		l="$l$m"
+		# add 
+		i=$((COLUMNS-(b*2)))
+		while ((i--)); do l=$l$r; done
+	fi
+	print -- "${l:-}"
+}
+
+# Copyright © 2021 by Tom Davis <tom@greyshirt.net>.

@@ -120,7 +120,7 @@ function found { # {{{1
 	done
 } # }}}1
 
-needs amuse:env
+needs amuse:env hr
 amuse:env || die "$REPLY"
 builtin cd "$AMUSE_RUN_DIR" ||
 	die "Could not ^Tcd^t to ^B$AMUSE_RUN_DIR^b."
@@ -141,19 +141,25 @@ set -A expected --	audiodevice final paused-at played.lst player-pid	\
 for f; do
 	fLeft=$f
 	case $f in
-		audiodevice)	show-audiodev	$f "$fLeft";		;;
-		final)			show-file		$f "$fLeft";		;;
-		paused-at)		show-file		$f "$fLeft";		;;
-		played.lst)		show-list		$f "$fLeft";		;;
-		player-pid)		show-file		$f "$fLeft";		;;
+		# generally most interesting
 		playing)		show-playing	$f "$fLeft";		;;
+		timeplayed)		show-file		$f "$fLeft";		;;
+		audiodevice)	show-audiodev	$f "$fLeft";		;;
+		song.lst)		show-list		$f "$fLeft";		;;
+		# second tier interesting
+		again)			show-file		$f "$fLeft";		;;
 		random)			show-file		$f "$fLeft";		;;
+		final)			show-file		$f "$fLeft";		;;
+		paused-at)		show-file		$f "$fLeft"; 		;;
+		# probably not interesting at all
+		played.lst)		show-list		$f "$fLeft"; 		;;
+		# system bits
+		player-pid)		show-file		$f "$fLeft";		;;
 		server-pid)		show-file		$f "$fLeft";		;;
 		sigpipe)		show-pipe		$f "$fLeft";		;;
-		song.lst)		show-list		$f "$fLeft";		;;
 		subs-playing)	show-subdir		$f "$fLeft";		;;
 		subs-time)		show-subdir		$f "$fLeft";		;;
-		timeplayed)		show-file		$f "$fLeft";		;;
+		# generally not interesting, except why are they here?
 		*.core)			rm -f "$f";							;;
 		*)				show-extra		$f "$fLeft";		;;
 	esac

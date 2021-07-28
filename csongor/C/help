@@ -33,6 +33,7 @@ continue
 count-down
 cowmath
 csongor-colors
+dark
 desparkle
 die
 dir-is-empty
@@ -68,6 +69,7 @@ f-which
 f-xxdiff
 false
 fc
+fedit
 fg
 find-function
 flash-parent-window-of-pid
@@ -92,6 +94,7 @@ hash
 hex
 histmark
 history
+hr
 i-can-haz-inet
 in-ancestor-path
 integer
@@ -215,6 +218,7 @@ wait-before-leaving
 warn
 warnOrDie
 whence
+which-versctl
 with-defaults
 x11-windowid-for-pid
 xat

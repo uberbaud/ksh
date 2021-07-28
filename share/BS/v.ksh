@@ -126,18 +126,7 @@ rcsmsg=''
 f_path="${f_fullpath%/*}"
 f_name="${f_fullpath##*/}"
 
-cd "$f_path" || die "Could not ^Tcd^t to ^B${f_path}^b."
-
-has_rcs=false
-[[ -d RCS && -f RCS/"$f_name,v" ]] && {
-	has_rcs=true
-	rcsdiff -q ./"$f_name" ||
-		warnOrDie 'RCS and checked out versions differ.'
-	# avoid "writable ./f_name exists; remove it? [ny](n):"
-	[[ -w ./"$f_name" ]]&& chmod a-w ./"$f_name"
-	co -q -l ./"$f_name" ||
-		die "Could not ^Tco -l^t ^B${f_name}^b."
-  }
+builtin cd "$f_path" || die "Could not ^Tcd^t to ^B${f_path}^b."
 
 # we could just use ./$f_name
 # BUT then the vim process would not have a command including the path, 
@@ -148,16 +137,37 @@ has_rcs=false
 # twice as fast as the 64 bit SHAs (384, 512/256, 512). But it's even
 # faster than md5, or the traditional cksum algorithm.
 
+function do-vcms-checkout { warn "^T$0^t is not implemented."; }
+function do-vcms-checkin  { warn "^T$0^t is not implemented."; }
+
 function main {
 
+	do-vcms-checkout "$f_name"
+	# -------8<----------------8<--------------8<----------------8<-------
+	has_rcs=false
+	[[ -d RCS && -f RCS/"$f_name,v" ]] && {
+		has_rcs=true
+		rcsdiff -q ./"$f_name" ||
+			warnOrDie 'RCS and checked out versions differ.'
+		# avoid "writable ./f_name exists; remove it? [ny](n):"
+		[[ -w ./"$f_name" ]]&& chmod a-w ./"$f_name"
+		co -q -l ./"$f_name" ||
+			die "Could not ^Tco -l^t ^B${f_name}^b."
+	  }
+	# ------->8---------------->8-------------->8---------------->8-------
+
 	CKSUM_BEFORE="$(cksum -qa sha1b "$f_fullpath")"
+
 	$ED "$f_fullpath"
+
 	CKSUM_AFTER="$(cksum -qa sha1b "$f_fullpath")"
 	[[ $CKSUM_BEFORE != $CKSUM_AFTER ]]&& {
 		trackfile "$f_fullpath"
 		[[ -f .LAST_UPDATED ]]&& date -u +"$ISO_DATE" >.LAST_UPDATED
 	  }
 
+	do-vcms-checkin "$f_name"
+	# -------8<----------------8<--------------8<----------------8<-------
 	if [[ -d RCS ]]; then
 		new-array rcsopts
 		+rcsopts -q -u
@@ -174,6 +184,7 @@ function main {
 	elif $hasmsg; then
 		warn 'No ^SRCS/^s.'
 	fi
+	# ------->8---------------->8-------------->8---------------->8-------
 
 	[[ -n ${LOCKNAME:-} ]]&& release-exclusive-lock "$LOCKNAME" $V_CACHE
 }

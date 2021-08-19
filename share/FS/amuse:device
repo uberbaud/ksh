@@ -1,40 +1,56 @@
 # <@(#)tag:tw.csongor.greyshirt.net,2021-05-29,02.26.12z/2a63256>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^G(no arguments)^g
-#:   Set the output audiodevice
+#: FUNCTION ^[^Usndiod device^u^] ^= ^SREPLY^s
+#:   Set the output audiodevice, or if no ^Usndiod device^u is given
+#:   list the currently set output audiodevice.
+#:
+#:   Note: ^Usndiod device^u may be given as ^Tyt^t, ^Tcsongor^t, or in the form
+#:         ^Tsnd^t^[^T@^t^Uhostname^u^]^[^T,^t^Uservnum^u^]^T/^t^Udevnum^u^[^T.^t^Uoption^u^]
 
 needs amuse:{env,send-cmd}
 function amuse:device {
-	local F
+	local F O N M D=snd/0
+	(($#>1))&& die 'Too many parameters. Expected zero (0) or one (1).'
+
 	REPLY=
 	amuse:env || die "$REPLY"
 	F=$AMUSE_RUN_DIR/audiodevice
+	[[ -s $F ]]&& O=$(<$F)
+
+	# List only, don't set
 	if (($#==0)); then
-		REPLY=$(<$F)
-		if [[ -n $REPLY ]]; then
-			for p in @ , /; do
-				gsub "$p" "^$p" "$REPLY"
-			done
-			[[ $REPLY == */*.* ]]&&
-				$REPLY=${REPLY%.*}^.${REPLY##*.}
-			notify "$REPLY"
-		else
-			notify "^GUsing default:^g ^F{6}snd^f^G/^g^F{6}0^f."
-		fi
-	elif (($#>1)); then
-		die 'Too many flags. Expected zero (0) or one (1).'
-	elif [[ -z $1 || $1 == $HOST ]]; then
-		: >$F
+		N=$O
+
+	# use DEFAULT device
+	elif [[ -z $1 || $1 == $HOST || $1 == *@$HOST.* || $1 == local* ]]; then
+		N=''
+
+	# use yt.lan
 	elif [[ $1 == yt?(.lan) ]]; then
-		print -- snd@yt.lan/0 >$F
+		N=snd@yt.lan/0
+
+	# OTHER, VERIFY sndiod audiodevice format
 	elif [[ $1 != @(snd|midithru|midi)?(@+([a-z0-9-])*(.+([a-z0-9-])))?(,+([0-9]))/+([0-9])?(.+([a-z])) ]]; then
 		die 'Bad audiodevice descriptor.' \
 			'^Utype^u^[@^Uhostname^u^]^[,^Uservnum^u^]/^Udevnum^u^[.^Uoption^u^]'
 	else
-		print -- "$1" >$F
+		N=$1
 	fi
-	amuse:send-cmd changed-audev
+
+	M=${N:-$D}
+	REPLY=$M
+
+	# Update only if necessary
+	[[ $O == $N ]]|| {
+		print -nr -- "$N" >$F
+		amuse:send-cmd changed-audev
+		M="${O:-$D}  ^N⇒^n  $M"
+	  }
+
+	for p in @ , /; do gsub "$p" "^$p" "$M" M; done
+	notify "$M"
+
 }
 
 # Copyright © 2021 by Tom Davis <tom@greyshirt.net>.

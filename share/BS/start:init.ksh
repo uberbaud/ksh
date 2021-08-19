@@ -8,6 +8,7 @@
 
 set -o errexit -o nounset;: ${FPATH:?Run from within KSH}
 
+AUTHOR='Tom Davis <tom@greyshirt.net>'
 CFG=$XDG_CONFIG_HOME/start
 SKEL_DIR=$CFG/home_template
 APP_BASE=/home/apps
@@ -81,10 +82,10 @@ function hold_ci { # {{{1
 function install-usrbin-start { # {{{1
 	local U
 	U=/usr/local/bin
-	[[ -f $U/start ]]|| return 0
+	[[ -f $U/start ]]&& return 0
 
 	[[ -f $CFG/start ]]||
-		die "No ^Tstart^t script for ^B$Ub."
+		die "No ^Tstart^t script for ^B$U^b."
 
 	@ install -o root -g bin -m 755 "$CFG/start" "$U"
 } # }}}1
@@ -192,15 +193,15 @@ function update-doas-conf { # {{{1'
 function set-usrhome-modes { # {{{1
 	@ chmod -R g+w $APP_HOME/{Public,bin,log,media}
 } # }}}1
-function copy-app-starter { # {{{1
-
-	[[ -f $USER_START ]]&&	return 0 # ~$APP/bin/$S already exists
-	[[ -d $CFG/$APP ]]||	return 1 # no specialized $S exists
-	[[ -f $CFG/$APP/$START_SCRIPT ]]||	return 1 # no specialized $S exists
-
-} # }}}1
 function mk-app-starter { # {{{1
-	cat <<-\
+	[[ -f $USER_START ]]&& return 0 # ~$APP/bin/$S already exists
+	[[ -d $CFG/$APP ]]|| mkdir -p $CFG/$APP/RCS || {
+			warn "Could not ^Tmkdir -p^t ^S$CFG/$APP/RCS^s"
+			return 1
+		  }
+	[[ -s "$1" ]]&& return 0 # specialized $S already exists
+
+	cat >"$1" <<-\
 		======
 		#!/bin/ksh
 		$(mk-stemma-header \#)
@@ -213,8 +214,14 @@ function mk-app-starter { # {{{1
 		done
 
 		exec $(which -a "$APP" | egrep ^/usr/) "\${opts[@]}"
-		# Copyright (C) $(date +%Y) by Tom Davis <tom@greyshirt.net>.
+		# Copyright (C) $(date +%Y) by $AUTHOR.
 		======
+
+	((!$?))&&
+		chmod a+rx "$1" &&
+		ci -u -i -t"-Start $APP as its own user in <$GRPNAME> group"  "$1" ||
+		return 1
+
 } # }}}1
 function create-app-starter { # {{{1
 	local F P S
@@ -223,32 +230,45 @@ function create-app-starter { # {{{1
 	mkdir -p "$P/RCS" || die "Cannot ^Tmkdir^t ^B$P^b."
 
 	F=$P/$START_SCRIPT
-	mk-app-starter >$F || die "Could not create ^Bstart-app.ksh^b."
-	chmod a+rx "$F"
+	mk-app-starter "$F" || die "Could not create ^Bstart-app.ksh^b."
 
 	# edit
 	(set +u +e; f-v "$F" "Starter app for $APP")
 
 } # }}}1
-function create-user-links { # {{{1'
+function create-user-links { # {{{1
 	local D
 
 	ln -sf "$KDOTDIR/share/BS/start.ksh" "$USRBIN/$APP"
 
 	D=$XDG_DOCUMENTS_DIR/$APP
-	if mkdir -p -m 0775 "$D"; then
-		warn "Could not ^Tmkdir^t ^B\$XDG_DOCUMENTS_DIR/$APP^b" ||:
-	else
-		chgrp "$GRPNAME" "$D"
-	fi
+	[[ -d $D ]]||
+		mkdir -p -m 0775 "$D" || {
+			warn "Could not ^Tmkdir^t ^B\$XDG_DOCUMENTS_DIR/$APP^b"
+			return 1
+		  }
+
+	[[ $(stat -f %Sg "$D") == $GRPNAME ]]||
+		chgrp -R $GRPNAME "$D" ||
+			warn "Could not ^Tchgrp -R^t ^B\$XDG_DOCUMENTS_DIR/$APP^b"
+
+	[[ $(stat -f %Lp "$D") == 775 ]]||
+		chmod -R 0755 "$D" ||
+			warn "Could not ^Tchmod -R^t ^B\$XDG_DOCUMENTS_DIR/$APP^b"
+
+	return 0	# if we got it created, let that be enough to continue for
+				# the moment, we'll sort it out later.
 } # }}}1
-function link-as-app { @ doas -u $APP ln -sf "$1" "$APP_HOME/$2"; }
+function link-as-app { # {{{1
+	[[ -a "$2" ]]&& return 0 # it exists, nothing to do
+	@ doas -u $APP ln -sf "$1" "$2"
+} # }}}1
 function link-from-out-into-app-home { # {{{1'
 
 	# links are being created to not yet existent files, but that's fine
-	link-as-app "$XDG_DOWNLOAD_DIR"			"Downloads"
-	link-as-app "$XDG_DOCUMENTS_DIR/$APP"	"Documents"
-	link-as-app "$CFG/$APP/$START_SCRIPT"	"bin/$USER_START"
+	link-as-app "$XDG_DOWNLOAD_DIR"			"$APP_HOME/Downloads"
+	link-as-app "$XDG_DOCUMENTS_DIR/$APP"	"$APP_HOME/Documents"
+	link-as-app "$CFG/$APP/$START_SCRIPT"	"$USER_START"
 
 } # }}}1
 function CleanUp { # {{{1'
@@ -298,7 +318,11 @@ create-home-app
 create-app-user
 set-usrhome-modes
 update-doas-conf
-link-from-out-into-app-home	# links can be created to non-existent files
+
+create-app-starter
+create-user-links
+
+link-from-out-into-app-home
 
 # run the file IF we added any commands
 [[ $(<$fTEMP) != $fTEXT ]]&& {
@@ -308,8 +332,5 @@ link-from-out-into-app-home	# links can be created to non-existent files
 	h1 'Finished being root'
   }
 
-builtin cd "$CFG"
-copy-app-starter || create-app-starter
-create-user-links 
 
 # Copyright (C) 2021 by Tom Davis <tom@greyshirt.net>.

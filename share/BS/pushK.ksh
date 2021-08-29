@@ -66,7 +66,7 @@ i-can-haz-inet	|| die 'No internet' "$REPLY"
 cd ${KDOTDIR:?}	|| die 'Could not ^Tcd^t to ^S$KDOTDIR^s.'
 
 branch="$(git rev-parse --abbrev-ref HEAD 2>/dev/null)"
-[[ $branch == master ]]&& die 'On branch ^Emaster^e!!!'
+[[ $branch == trunk ]]&& die 'On branch ^Etrunk^e!!!'
 
 function commit-everything {
 	local branch
@@ -87,9 +87,9 @@ function commit-everything {
 }
 
 commit-everything $HOST
-GIT 1 checkout master --quiet
+GIT 1 checkout trunk --quiet
 GIT 1 merge $HOST --quiet
-commit-everything master
+commit-everything trunk
 GIT 1 push
 GIT 1 checkout $HOST --quiet
 

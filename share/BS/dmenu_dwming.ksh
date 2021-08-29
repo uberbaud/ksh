@@ -6,6 +6,7 @@ exec 2>~/log/dmenu_dwming.log
 set -o nounset;: ${FPATH:?Run from within KSH}
 
 cmdcache=${XDG_CACHE_HOME:-"$HOME/.cache"}/wdm-dmenu-cmds
+BROWSER=$(<$XDG_CONFIG_HOME/etc/browser)
 
 NL='
 '
@@ -55,6 +56,13 @@ function websearch  { #{{{1
 } #}}}1
 function browse-the-web  { #{{{1
 	local scheme url
+	[[ $1 == @(chrome|surf) ]] && {
+		local x=$USRBIN/$1
+		shift
+		$x "$@"
+		return
+	  }
+
 	if [[ $1 == www* ]]; then
 		scheme=https
 		url=www.${1##www?(.)}$2
@@ -65,7 +73,7 @@ function browse-the-web  { #{{{1
 		url=${url##:?(//)}
 	fi
 
-	${BROWSER:-surf} "$scheme://$url"
+	${BROWSER:-$USRBIN/surf} "$scheme://$url"
 } #}}}1
 function handle-cmd { # {{{
 	local cmd
@@ -121,9 +129,9 @@ for n in ${XDG_CONFIG_HOME:-~/config}/start/*.ini; do
 done
 amuse=$(functions + | grep ^@)
 websearch='g a w amazon book cpan google imdb map synonyms translate wikipedia'
-x11='glxgears oclock showrgb xcalc xclock xmag xwd display'
+x11='display ghb glxgears oclock showrgb soffice xcalc xclock xmag xwd'
 others='amuse weather wordnet wnb'
-web='h s http https www'
+web='h s http https www chrome surf'
 special='task'
 
 dypgm=dwm_dmenu_completion

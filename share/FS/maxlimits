@@ -1,0 +1,14 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2021-08-29,03.11.36z/19a27b7>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^G(no arguments)^g
+#:   Set everything as high as they can go.
+
+function maxlimits {
+	for a in c d f l m n p s t; do
+		ulimit -$a $(ulimit -H -$a)
+	done
+	ulimit -a
+}
+
+# Copyright © 2021 by Tom Davis <tom@greyshirt.net>.

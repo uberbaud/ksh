@@ -48,6 +48,7 @@ function warnOrDie { #{{{1
 } # }}}1
 
 TAB='	'
+[[ -n ${SYSDATA:-} ]]|| die '^S$SYSDATA^s is not set.'
 fDATA=$SYSDATA/recurring
 [[ -f $fDATA ]]|| die "Could not find ^B^S\$SYSDATA^s/recurring^b."
 

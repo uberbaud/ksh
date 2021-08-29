@@ -4,10 +4,13 @@
 
 set -o nounset;: ${FPATH:?Run from within KSH}
 
+NL='
+' # ←↑ capture newline
 
 [[ $# -eq 0 || $1 == -h ]]&& { # {{{1
-	print -ru2 -- \
-		"${0##*/}: Handle -dy additionaly completion stages."
+	print -ru2 -- 											\
+		"${0##*/}: cmdcache script [args ...]$NL"			\
+		"    Handle -dy additionaly completion stages."
 	exit 0
 } # }}}1
 

@@ -1,18 +1,17 @@
 # <@(#)tag:tw.csongor.greyshirt.net,2021-07-18,16.35.36z/4dc0f0>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^[^Upath^u^]
+#: FUNCTION ^[^Upath^u^] ^= ^SVCMS_BASE_DIR^s
 #:   Report which Version Control/Management System manages a given directory.
 #:   Sets ^SVCMS_BASE_DIR^s to the base directory 
 
-function which-versctl {
-	local P=$(readlink -f "${1:-$PWD}")
+function versctl:which {
+	local P=$(readlink -f "${1:-$PWD}") verbose=false
 	typeset -l L
-	VCMS_BASE_DIR=
 	# handle per directory VCMSes
 	set -- "$P"/@(CVS|RCS|HEAD)
 	[[ $1 == *\) ]]|| {
-		VCMS_BASE_DIR="${1%/*}"
+		VCMS_BASE_DIR=${1%/*}
 		[[ $1 != */HEAD ]]&& {
 			L=${1##*/}
 			print -r -- "$L"
@@ -21,16 +20,18 @@ function which-versctl {
 		# handle bar git repositories
 		[[ $(wc -l <HEAD) -eq 1 ]]&& {
 			print git
+			VCMS_BASE_DIR=${VCMS_BASE_DIR%/.git}
 			return 0
 		  }
 	  }
 
 	# handle parent directory dot VCMSes
+	VCMS_BASE_DIR=
 	while [[ -n $P ]]; do
 		# PATTERNS never match hidden files, so the dot MUST be outside
 		# the pattern.
-		set --															\
-			"$P"/.@(git|gitmodules|fslckout|svn|hg|bzr|darcs|rsyncup)	\
+		set --																\
+			"$P"/.@(git|gitmodules|got|fslckout|svn|hg|bzr|darcs|rsyncup)	\
 			"$P"/@(_MTN)
 		while [[ $1 == *\) ]]; do shift; done	# skip patterns with no match
 		(($#))&& break
@@ -38,7 +39,7 @@ function which-versctl {
 	done
 	[[ -n $P ]]|| return
 
-	VCMS_BASE_DIR="${1%/*}"
+	VCMS_BASE_DIR=${1%/*}
 	L=${1##*/?(.|_)}
 	[[ $L == fslckout ]]&&	L=fossil
 

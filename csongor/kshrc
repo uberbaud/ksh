@@ -58,7 +58,7 @@ export me=$HOME/work/clients/me
 export X11TERM=st
 export CSONGOR_XTERM_WINDOW_BG='#626262'
 export CSONGOR_XTERM_WINDOW_FG='#dadada'
-export MANPAGER=manpager
+export MANPAGER='nvim +Man!'
 
 export TZ=EST5EDT
 

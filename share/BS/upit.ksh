@@ -8,12 +8,13 @@ needs desparkle die h1 new-array notify splitstr warn
 
 new-array name dotf exec cmds haz
 
-GITUP=$KDOTDIR/$HOST/B/gitup.ksh
+B=$KDOTDIR/$HOST/B
+GITUP=$B/gitup.ksh
 [[ -x $GITUP ]]||
 	die 'No ^S$B^s^T/gitup.ksh^t so using git pull.'
 
 function @ { # {{{1
-	local NAME="$1 ($3)" DOTF="$2" EXEC="$3"; shift 3
+	local NAME="$1 (${3#"$B"/})" DOTF="$2" EXEC="$3"; shift 3
 	+name "$NAME"
 	+dotf "$DOTF"
 	+exec "$EXEC"
@@ -24,6 +25,8 @@ function @ { # {{{1
 #   name          dotf          exec      SUBCOMMANDS (cmds)
 @   Git           .git          $GITUP    simple
 @   Git+Modules   .gitmodules   $GITUP    modules
+@   Got           .got          $GITUP    simple
+@   Git           HEAD          $GITUP    simple
 @   Fossil        .fslckout     fossil    pull +AND+ co --latest
 @   Subversion    .svn          svn       update
 @   Mercurial     .hg           hg        pull update

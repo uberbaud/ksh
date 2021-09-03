@@ -213,13 +213,13 @@ unset-alternate-screen
 utf8
 utf8-to-octal
 utf8codes
+versctl:which
 vtmp
 wait
 wait-before-leaving
 warn
 warnOrDie
 whence
-which-versctl
 with-defaults
 x11-windowid-for-pid
 xat

@@ -8,7 +8,7 @@ function git-remote-links {
 	local fmt
 	fmt="%(refname:short)%09%(upstream:short)"	# show this, but only
 	fmt="%(if)%(upstream)%(then)$fmt%(end)"		# if there is an upstream
-    git for-each-ref --format="$fmt" refs/heads |
+	\git for-each-ref --format="$fmt" refs/heads |
 		sed -E -e "/^\$/d" 
 } 
 

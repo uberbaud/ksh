@@ -13,10 +13,10 @@ function usage {
 	===SPARKLE===
 	^F{4}Usage^f: ^T${PGM}^t
 	         Tries to sanely update from git remotes.
-	         1. ^Tgit checkout master^t if not on master,
+	         1. ^Tgit checkout^t ^Strunk^s if not on ^Strunk^s,
 	         2. ^Tgit pull^t or ^Tgit submodule update --remote^t,
 	         3. ^Tgit checkout^t ^Uprevious^u if needed, and finally
-	         4. ^Tgit merge master^t.
+	         4. ^Tgit merge^t ^Strunk^s.
 	       ^T${PGM} -h^t
 	         Show this help message.
 	===SPARKLE===
@@ -40,31 +40,33 @@ shift $(($OPTIND - 1))
 # ready to process non '-' prefixed arguments
 # /options }}}1
 function get-local-to-remote-branch { # {{{1
-	local found remote master
+	local found remote trunk
 	# git-remote-links outputs "%(local)\t%(upstream)\n"*, so two (2) words
 	# per local-to-remote-branch
 	set -- $(git-remote-links)
-	# prefer master if available, otherwise balk
+	# prefer trunk if available, otherwise balk
 	if (($#>2)); then
 		found=false
 		while (($#)); do
-			master=$1; remote=$2; shift 2
-			[[ $master == master ]]&&	{ found=true; break; }
-			[[ $remote == */master ]]&&	{ found=true; break; }
+			trunk=$1; remote=$2; shift 2
+			[[ $trunk == @(main|master|trunk) ]]&&		{ found=true; break; }
+			[[ $remote == */@(main|master|trunk) ]]&&	{ found=true; break; }
 		done
 		$found || {
 			IFS="$NL"
 			warn 'Multiple local-to-remote branches found:' $(git-remote-links)
-			master=
+			trunk=
 		  }
 	else
-		master=$1
+		trunk=$1
 	fi
-	print -r -- "$master"
-	[[ -n $master ]]
+	print -r -- "$trunk"
+	[[ -n $trunk ]]
 } # }}}1
 function are-we-in-a-git-repository { # {{{
 	InGit=$(git rev-parse --is-inside-work-tree 2>/dev/null)
+	[[ $InGit == true ]]||
+		InGit=$(git rev-parse --is-bare-repository 2>/dev/null)
 	[[ $InGit == true ]]
 } # }}}1
 function git-current-branch { # {{{1
@@ -87,11 +89,11 @@ are-we-in-a-git-repository		 || die 'Not a ^BGIT^b repository.'
 worktree="$(git-top-level)"		 || die 'Could not resolve work tree.'
 builtin cd "$worktree"			 || die "Could not ^Tcd^t to ^B$worktree^b."
 
-master=$(get-local-to-remote-branch) ||
+trunk=$(get-local-to-remote-branch) ||
 									die 'Cannot resolve link branch.'
 branch=$(git-current-branch)
-[[ $branch == $master ]]|| {
-	GIT checkout "$master"		 || die "Could not ^Tcheckout^t ^B$master^b."
+[[ $branch == $trunk ]]|| {
+	GIT checkout "$trunk"		 || die "Could not ^Tcheckout^t ^B$trunk^b."
   }
 
 before="$(git-current-ref)"
@@ -99,16 +101,16 @@ before="$(git-current-ref)"
 GIT pull || die "Couldn't ^Tpull^t."
 after="$(git-current-ref)"
 
-[[ $branch == $master ]]&& {
-	warn "On branch ^B$master^b (MAIN BRANCH)."
+[[ $branch == $trunk ]]&& {
+	warn "On branch ^B$trunk^b (MAIN BRANCH)."
 	exit 0
   }
 
 GIT checkout $branch
-[[ $before == "$after" ]]&& {
+[[ $before == $after ]]&& {
 	warn 'Unchanged, quitting.'
 	exit 1
   }
-GIT merge "$master"
+GIT merge "$trunk"
 
 # Copyright (C) 2017 by Tom Davis <tom@greyshirt.net>.

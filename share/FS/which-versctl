@@ -6,26 +6,32 @@
 #:   Sets ^SVCMS_BASE_DIR^s to the base directory 
 
 function which-versctl {
-	local P=$(readlink -f ${1:-$PWD})
+	local P=$(readlink -f "${1:-$PWD}")
 	typeset -l L
 	VCMS_BASE_DIR=
 	# handle per directory VCMSes
-	set -- $P/@(CVS|RCS)
+	set -- "$P"/@(CVS|RCS|HEAD)
 	[[ $1 == *\) ]]|| {
 		VCMS_BASE_DIR="${1%/*}"
-		L=${1##*/}
-#		print -r -- "$L" # THIS CONFUSES tree-sitter
-		print -r "$L"
-		return 0
+		[[ $1 != */HEAD ]]&& {
+			L=${1##*/}
+			print -r -- "$L"
+			return 0
+		  }
+		# handle bar git repositories
+		[[ $(wc -l <HEAD) -eq 1 ]]&& {
+			print git
+			return 0
+		  }
 	  }
 
 	# handle parent directory dot VCMSes
 	while [[ -n $P ]]; do
 		# PATTERNS never match hidden files, so the dot MUST be outside
 		# the pattern.
-		set --														\
-			$P/.@(git|gitmodules|fslckout|svn|hg|bzr|darcs|rsyncup)	\
-			$P/@(_MTN)
+		set --															\
+			"$P"/.@(git|gitmodules|fslckout|svn|hg|bzr|darcs|rsyncup)	\
+			"$P"/@(_MTN)
 		while [[ $1 == *\) ]]; do shift; done	# skip patterns with no match
 		(($#))&& break
 		P=${P%/*}

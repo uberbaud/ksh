@@ -100,7 +100,7 @@ GIT pull || die "Couldn't ^Tpull^t."
 after="$(git-current-ref)"
 
 [[ $branch == $master ]]&& {
-	warn "On branch ^B$master^b (MASTER)."
+	warn "On branch ^B$master^b (MAIN BRANCH)."
 	exit 0
   }
 

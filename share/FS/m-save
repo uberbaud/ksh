@@ -4,14 +4,21 @@
 #: FUNCTION ^[^U+folder^u^] ^Umsgs^u
 #:   Save file to ^Bsaves^b folder
 #:     same as: refile -src +inbox "$@" +saves
+#:     ^T-r^t  refile to ^Breceipts^b instead of ^Bsaves^b
 
 needs notify refile
 function m-save {
 	local saveto=+saves
+	[[ $1 == -r ]]&& {
+		saveto='+receipts'
+		shift
+	  }
 	[[ $1 == +* ]]&& {
 		saveto="$1"
 		shift
 	  }
+	[[ $1 == [+-]* ]]&& die "Bad opt ^S$1^s."
+
 	notify "refile -src +inbox $* $saveto"
 	refile -src +inbox "$@" $saveto
 }

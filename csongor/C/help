@@ -15,6 +15,7 @@ amuse:send-cmd
 ansi-attr
 ansi-escapes
 as-root
+ascii
 autoload
 bg
 binary

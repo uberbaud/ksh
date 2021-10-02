@@ -8,6 +8,8 @@ upper=ABCDEFGHIJKLMNOPQRSTUVWXYZ
 lower=abcdefghijklmnopqrstuvwxyz
 digit=0123456789
 punct='!"#$%&'\''()*+,-./:;<=>?@[\]^_`{|}~'
+mob_punct='~|&_./'
+mob_max=9
 
 defaultAlphabet=SNCL;	symbols=''
 integer defaultMin=13	defaultMax=19	minLen=-1	maxLen=-1	count=3
@@ -24,6 +26,7 @@ function usage {
 	         Generates passwords using ^B/dev/urandom^b
 	       ^BPassword Options^b
 	           ^[^T-n^t ^Umin_len^u^] ^[^T-x^t ^Umax_len^u^] ^[^T-a^t ^Ualphabet^u^] ^[^T-s^t ^Usymbols^u^] ^[^T-c^t ^Uhow_many^u^]
+	           ^[^T-m^t^] sets ^T-x ^B$mob_max^b -s '^B$mob_punct^b'^t
 	         The ^Balphabet^b argument can be:
 	             ^US^u, ^Us^u, ^UP^u, or ^Up^u for symbols/punctuation^I*^i
 	             ^UN^u, ^Un^u, ^UD^u, or ^Ud^u for numerals/digits
@@ -103,7 +106,7 @@ function add-custom-id { #{{{2
 	add-id "${1%%:*}" "${1#*:}"
 } #}}}2
 
-while getopts ':a:c:n:x:e:u:O:s:qrh' Option; do
+while getopts ':a:c:n:x:e:u:O:s:qmrh' Option; do
 	case $Option in
 		a)  set-alphabet "$OPTARG";									;;
 		c)  posint count "$OPTARG";									;;
@@ -114,6 +117,7 @@ while getopts ':a:c:n:x:e:u:O:s:qrh' Option; do
 		O)  add-custom-id "$OPTARG";								;;
 		s)  symbols="$OPTARG";										;;
 		q)  quiet=true;												;;
+		m)  posint maxLen $mob_max; symbols="$mob_punct";			;;
 		r)	updatePassword=true;									;;
 		h)	usage;													;;
 		\?)	die "Invalid option: [1m-$OPTARG[22m.";				;;

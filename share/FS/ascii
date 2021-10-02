@@ -1,0 +1,17 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2021-10-02,22.08.06z/566de99>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^G(no arguments)^g
+#:   print all ascii characters to STDOUT
+#:   ^Ghint:^g ^Tascii | tr -cd [:^t^Uclass^u^T:]^t
+#:         where ^Uclass^u is one of:
+#:             ^Nalnum   blank   digit   lower   punct   upper^n
+#:             ^Nalpha   cntrl   graph   print   space   xdigit^n
+
+function ascii {
+	local fASCII=${SYSDATA:?}/ascii.txt
+	[[ -f $fASCII ]]|| die "Missing file ^S$fASCII^s."
+	print -n -- "$(<$fASCII)"
+}
+
+# Copyright © 2021 by Tom Davis <tom@greyshirt.net>.

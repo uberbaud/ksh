@@ -2,11 +2,11 @@
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
 #: FUNCTION ^Uaudio_file^u
-#:	 ffmpeg ^Uaudio_file^u → ^Uaudio.oga^u
-#:	 logs to ~/
+#:	 ^Tffmpeg^t ^Uaudio_file^u → ^Uaudio.oga^u
+#:	 The new file will be in the same directory as the input file.
+#:	 logs to ^S~/log/recode-to-ogg-vorbis^s
 
 needs ffmpeg new-array
-
 function recode-to-ogg-vorbis {
 	: ${1:?}
 	local ain='' oga='' ainD=''
@@ -26,15 +26,13 @@ function recode-to-ogg-vorbis {
 	+ffopts -i "$ain"							# input file
 	+ffopts -vn -codec:a libvorbis -qscale:a 4	# conversion
 
-	exec 3>&2 2>> ~/log/recode-to-ogg-vorbis
-
-	# stdout
-	print -u1 ":>: $ainD"
-	# stderr
-	print -u2 ":>: $(date -u +"%Y-%m-%d %H:%M:%S Z") $ainD"
-	ffmpeg "${ffopts[@]}" "$oga"
-
-	exec 2>&3 3>&-
+	2>> ~/log/recode-to-ogg-vorbis (
+		# stdout
+		print -u1 ":>: $ainD"
+		# stderr
+		print -u2 ":>: $(date -u +"%Y-%m-%d %H:%M:%S Z") $ainD"
+		ffmpeg "${ffopts[@]}" "$oga"
+	  )
 
 	unset ffopts
 }

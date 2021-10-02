@@ -4,6 +4,7 @@
 
 set -o nounset;: ${FPATH:?Run from within KSH}
 
+REPODIR=~/repos
 # Usage {{{1
 typeset -- this_pgm="${0##*/}"
 function usage {
@@ -21,7 +22,7 @@ function usage {
 	         Show this help message.
 	===SPARKLE===
 	exit 0
-} # }}}
+} # }}}1
 # process -options {{{1
 function bad_programmer {	# {{{2
 	die 'Programmer error:'	\
@@ -40,7 +41,7 @@ shift $(($OPTIND - 1))
 # ready to process non '-' prefixed arguments
 # /options }}}1
 function get-local-to-remote-branch { # {{{1
-	local found remote trunk
+	local found remote branch
 	# git-remote-links outputs "%(local)\t%(upstream)\n"*, so two (2) words
 	# per local-to-remote-branch
 	set -- $(git-remote-links)
@@ -48,69 +49,143 @@ function get-local-to-remote-branch { # {{{1
 	if (($#>2)); then
 		found=false
 		while (($#)); do
-			trunk=$1; remote=$2; shift 2
-			[[ $trunk == @(main|master|trunk) ]]&&		{ found=true; break; }
+			branch=$1; remote=$2; shift 2
+			[[ $branch == @(main|master|trunk) ]]&&		{ found=true; break; }
 			[[ $remote == */@(main|master|trunk) ]]&&	{ found=true; break; }
 		done
 		$found || {
 			IFS="$NL"
 			warn 'Multiple local-to-remote branches found:' $(git-remote-links)
-			trunk=
+			branch=
 		  }
 	else
-		trunk=$1
+		branch=$1
 	fi
-	print -r -- "$trunk"
-	[[ -n $trunk ]]
-} # }}}1
-function are-we-in-a-git-repository { # {{{
-	InGit=$(git rev-parse --is-inside-work-tree 2>/dev/null)
-	[[ $InGit == true ]]||
-		InGit=$(git rev-parse --is-bare-repository 2>/dev/null)
-	[[ $InGit == true ]]
+	print -r -- "$branch"
+	[[ -n $branch ]]
 } # }}}1
 function git-current-branch { # {{{1
-	command git rev-parse --abbrev-ref HEAD 2>/dev/null
+	#command git rev-parse --abbrev-ref HEAD 2>/dev/null
+	command git branch --show-current 2>/dev/null
 } # }}}1
 function git-current-ref { #{{{1
 	command git describe --always --dirty
 } # }}}1
 function git-top-level { #{{{1
-	command git rev-parse --show-toplevel 2>/dev/null
+	command git rev-parse --path-format=absolute --show-toplevel 2>/dev/null
+} # }}}1
+function git-top-level-memoize { # {{{1
+	print "${TOPLEVEL:="$(git-top-level)"}"
 } # }}}1
 function GIT { notify "git $*"; command git "$@"; }
-NL='
-' # capture a newline
+function is-it-bare { # {{{1
+	local bool
+	bool=$(git rev-parse --is-bare-repository 2>/dev/null)
+	${bool:-false}
+} # }}}1
+function is-it-a-linked-worktree { # {{{1
+	# if it's not bare, but it is git, then the .git file
+	# system object will be a file pointing to the repository.
+	[[ -f $(git-top-level-memoize)/.git ]]
+} # }}}1
+function is-it-standard { # {{{1
+	local bool
+	bool=$(git rev-parse --is-inside-work-tree 2>/dev/null)
+	${bool:-false}
+} # }}}1
+function handle-standard { # {{{1
+	worktree="$(git-top-level-memoize)"		 || die 'Could not resolve work tree.'
+	builtin cd "$worktree"			 || die "Could not ^Tcd^t to ^B$worktree^b."
+
+	trunk=$(get-local-to-remote-branch) ||
+									die 'Cannot resolve link branch.'
+	branch=$(git-current-branch)
+	[[ $branch == $trunk ]]|| {
+		GIT checkout "$trunk"		 || die "Could not ^Tcheckout^t ^B$trunk^b."
+	  }
+
+	before="$(git-current-ref)"
+	[[ -f .gitmodules ]]&& GIT submodule update --remote
+	GIT pull || die "Couldn't ^Tpull^t."
+	after="$(git-current-ref)"
+
+	[[ $branch == $trunk ]]&& {
+		warn "On branch ^B$trunk^b (MAIN BRANCH)."
+		return 0
+	  }
+
+	GIT checkout "$branch"
+	[[ $before == $after ]]&& {
+		warn 'Unchanged, quitting.'
+		return 1
+	  }
+	GIT merge "$trunk"
+} # }}}1
+function convert-and-move-repo-to-bare { # {{{1
+	local awkpgm origin basedir newrepo branch
+
+	notify 'Converting to ^Ubare repo^u + ^Uworkingdir^u.'
+
+	awkpgm='/^origin\t[^[:space:]]+ \(fetch\)$/ {print $2}'
+	origin=$(git remote -v|awk "$awkpgm")
+	[[ -n origin ]]|| die 'Could not get ^Sorigin^s for this ^Brepo^b.'
+
+	origin=${origin##+([a-z]):+(/)} # remove schema and any prefix '/'s
+	newrepo=${origin##*/}		# just the last bit
+	basedir=${origin%/"$newrepo"}
+	[[ -n basedir ]]||
+		die "^Sorigin^s isn't in an expected format." "$origin"
+	basedir=$REPODIR/$basedir
+
+	[[ -d $basedir ]]||
+		mkdir -p "$basedir" || die "Could not ^Tmkdir^t ^S$basedir^s."
+
+	newrepo=$basedir/${newrepo%.git}.git
+
+	mv "$REPO" "$newrepo" || die "Could not ^Tmv^t ^S.git^s"
+
+	# mark it bare
+	git -C "$newrepo" config --bool core.bare true
+
+	# remove / ¿convert branches to worktrees?
+	set -- $(git config --local --list|awk -F\\. '/^branch\./ {print $2}'|uniq)
+	for branch; do
+		# keep 
+	done
+
+	# add 
+
+} # }}}1
+
+
+[[ -d $REPODIR ]]|| die "No such directory: ^B$REPODIR^b."
 
 needs git i-can-haz-inet git-remote-links
 
+NL='
+' # capture a newline
+
 i-can-haz-inet					 || die 'No internet' "$REPLY"
-are-we-in-a-git-repository		 || die 'Not a ^BGIT^b repository.'
-worktree="$(git-top-level)"		 || die 'Could not resolve work tree.'
-builtin cd "$worktree"			 || die "Could not ^Tcd^t to ^B$worktree^b."
 
-trunk=$(get-local-to-remote-branch) ||
-									die 'Cannot resolve link branch.'
-branch=$(git-current-branch)
-[[ $branch == $trunk ]]|| {
-	GIT checkout "$trunk"		 || die "Could not ^Tcheckout^t ^B$trunk^b."
-  }
+REPO=$(git rev-parse --path-format=absolute --git-common-dir) ||
+	die 'Not a ^Sgit^b repository.'
 
-before="$(git-current-ref)"
-[[ -f .gitmodules ]]&& GIT submodule update --remote
-GIT pull || die "Couldn't ^Tpull^t."
-after="$(git-current-ref)"
-
-[[ $branch == $trunk ]]&& {
-	warn "On branch ^B$trunk^b (MAIN BRANCH)."
-	exit 0
-  }
-
-GIT checkout $branch
-[[ $before == $after ]]&& {
-	warn 'Unchanged, quitting.'
-	exit 1
-  }
-GIT merge "$trunk"
+if is-it-bare; then
+	GIT fetch --all
+elif is-it-a-linked-worktree; then
+	GIT -C "$REPO" fetch --all	# -C is not necessary but here it's userdoc
+	GIT merge origin
+elif is-it-standard; then
+	# TODO: mv .git $REPODIR/$basename.git                          #
+    #       barify $REPODIR/$basename.git                           #
+	#       print -r -- "$WORKTREE_SKELETON" >.git                  #
+    #       add-this-dir-as-worktree                                #
+	#       GIT -C "$REPO" fetch --all                              #
+	#       GIT merge origin                                        #
+	handle-standard
+else
+	die 'Supposedly a git repository, but of an unknown type. Not:' \
+		'^Bstandard^b' '^Bbare^b' '^Bworktree^b'
+fi
 
 # Copyright (C) 2017 by Tom Davis <tom@greyshirt.net>.

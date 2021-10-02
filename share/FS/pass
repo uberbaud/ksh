@@ -19,7 +19,7 @@
 needs ${KDOTDIR:?}/$HOST/B/pass-{gen,show}.ksh
 function pass {
 	local which=gen
-	(($#==1)) && which=show
+	[[ $# -eq 1 && $1 != -* ]]&& which=show
 	case ${1:-} in
 		-E)	which=ed; shift;					;;
 		-L)	which=find; shift;					;;

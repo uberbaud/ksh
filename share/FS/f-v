@@ -23,6 +23,7 @@ function f-v {
 
 	filexp=$1
 	(($#))&& shift
+	# ZSH inspired =word -> $(which word)
 	[[ $filexp == =* && ! -f $filexp ]]&& {
 		filexp="${filexp#=}"
 		cmdexp=$(command -v "$filexp") ||
@@ -38,6 +39,13 @@ function f-v {
 		# path.
 		[[ $filexp != /* ]]&&
 			filexp=$(find-function "$filexp")
+	  }
+	# Perl modules in $USR_PLIB
+	[[ $filexp == *::* && -n ${USR_PLIB:-} ]]&& {
+		local F
+		gsub :: / "$filexp" F
+		F=$USR_PLIB/$F.pm
+		[[ -f $F ]]&& filexp=$F
 	  }
 	set -- trnsxtrm "$edit" "${opts[@]}" "$filexp" "$@"
 	# remove trnsxtrm if there's no WINDOWID

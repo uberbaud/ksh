@@ -226,7 +226,8 @@ function show-ids { #{{{1
 	for ln; do print -r -- "$ln"; done
 } #}}}1
 function new-file { #{{{1
-	local File="$1"
+	local File
+	File=$1; shift
 	notify "It is also saved in ^B$File^b."
 	show-ids "$@" | tee -a "$File"
 } #}}}1

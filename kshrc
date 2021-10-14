@@ -2,6 +2,7 @@
 # ksh profile
 # vim: ts=4 ft=ksh
 
+RC_HAS_RUN=true
 # we are NOT sourcing /etc/ksh.kshrc because it does way too much stuff we 
 # don't need. But these come from there.
 export SHORTPATH=${SHORTPATH:-$PATH}

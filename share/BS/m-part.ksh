@@ -80,7 +80,7 @@ function clean-html {( # {{{1
 )} # }}}1
 needs tidy
 
-work=${XDG_CACHE_HOME:?}/mail
+work=${XDG_PUBLICSHARE_DIR:?}/mail
 
 [[ -d $work ]]|| mkdir -p "$work" || die "Could not create ^S$work^s."
 cd "$work" || die "Could not ^Tcd^t to ^S$work^s."

@@ -72,7 +72,7 @@ function safe-to-edit { #{{{1
 	gsub / %  "$REPLY"
 	LOCKNAME="$REPLY"
 	V_CACHE="$XDG_CACHE_HOME/v"
-	[[ -d $V_CACHE ]]|| mkdir -p $V_CACHE
+	needs-path -or-die "$V_CACHE"
 	get-exclusive-lock-or-exit "$LOCKNAME" $V_CACHE ||
 		already-in-edit "$REPLY"
 }

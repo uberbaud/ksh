@@ -5,8 +5,9 @@
 #:   Choose (^Tomenu^t), possibly create, and ^Tcd^t to a subdirectory of play.
 #:     ^T!^t  Use exact ^Uname^u (don't attempt to match a fragment).
 
+needs needs-path
 function p {
-	[[ -d ~/play ]]|| mkdir ~/play
+	needs-path -or-die ~/play
 	builtin cd ~/play
 	(($#))|| return 0 # no directory given so we're done
 	(($#>2))&& fail 'Unexpected arguments. Wanted 1 or 2.'
@@ -52,7 +53,7 @@ function p {
 	fi
 
 	[[ -n $choice ]]|| return
-	[[ -d $choice ]]|| mkdir -p "$choice/RCS"
+	needs-path -or-warn "$choice/RCS"
 
 	cd "$choice"
 	fUSE=.created

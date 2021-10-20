@@ -4,6 +4,8 @@
 
 set -o nounset;: ${FPATH:?Run from within KSH}
 
+needs needs-path
+
 P=/home/tw/local/gnu-tools
 
 QUIET=false
@@ -60,7 +62,7 @@ $QUIET || {
 	print -- "$NORM"
   }
 
-[[ -d $P ]]|| mkdir -p "$P" || die "Could not create ^S$P^s."
+needs-path -or-die "$P"
 typeset -i founds
 for c in make {,s}diff diff3 {,e,f}grep; do
 	g=$(whence -p g$c) || {

@@ -69,7 +69,7 @@ shift $(($OPTIND - 1))
 # /options }}}1
 (($#))&& die 'Unexpected arguments.'
 
-needs awk egrep mount rsync usb-mnt
+needs awk egrep mount rsync usb-mnt needs-path
 
 rsync_opts="$(awk '{print $1}')" <<-\
 	===
@@ -146,10 +146,8 @@ function try-mounting { #{{{1
 function main { # {{{1
 	check-attached
 	check-mounted || try-mounting
-	[[ -d $backbase ]]|| {
-		warn "Creating missing host backup directory ^B$backbase^b."
-		mkdir -p "$backbase" || die "Could not ^Tmkdir^t ^B$backbase^b."
-	}
+
+	needs-path -or-die "$backbase"
 	$stop_after_mount && return
 
 	splitstr : "$(getent passwd $(id -un))"

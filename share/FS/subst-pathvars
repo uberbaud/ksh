@@ -1,0 +1,38 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2021-10-19,18.54.26z/48f24a>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^[^T-c^t^] ^[^Tset^t^]
+#:   Shorten path names by using variable names (eg $XDG_DATA_HOME) if possible.
+#:     ^T-c^t  Clear PATH_VARS to force a new run of ^Tlist-path-vars^t.
+#:
+#:   By default uses exported variables as reported by ^Tenv^t, but another
+#:     variable listing command can be given, such as ^Tset^t.
+#:
+#:   See also: ^Thelp list-path-vars^t.
+
+needs list-path-vars
+function subst-pathvars {
+	local f lcmd k v
+	while (($#>1)); do
+		case $1 in
+			-c)	PATH_VARS=;												;;
+			-s)	lcmd=set;												;;
+			-*)	die "^WBAD PROGRAMMER^w: Unknown flag ^S$1^s.";			;;
+			*)	die "^T$0^t expects at most one non-flag parameter.";	;;
+		esac
+		shift
+	done
+	PATH_VARS=${PATH_VARS:-$(list-path-vars ${lcmd-})}
+	f=$1
+	for k in $PATH_VARS; do
+		eval v="\$$k"
+		[[ $f == $v?(/*) ]]|| continue
+		f=\$$k${f#"$v"}
+		break
+	done
+	[[ $f == $HOME?(/*) ]]&&
+		f=\~${f#"$HOME"}
+	REPLY=$f
+}
+
+# Copyright © 2021 by Tom Davis <tom@greyshirt.net>.

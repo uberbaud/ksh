@@ -250,7 +250,7 @@ set --
 alias cd='_u="$-"; set -u; f-cd'
 alias cls='clear colorls $LS_OPTIONS'
 alias clear='f-clear '
-alias doas='as-root '
+alias doas='doas '
 alias hush='>/dev/null 2>&1 '
 alias k='fc -s'
 if [[ -x /usr/local/bin/colorls ]]; then

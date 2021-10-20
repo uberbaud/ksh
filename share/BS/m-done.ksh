@@ -113,7 +113,7 @@ else
     refile marked -nolink -src +inbox +deleted
 fi
 
-MAILTEMP="${XDG_CACHE_HOME:?}/mail"
+MAILTEMP="${XDG_PUBLICSHARE_DIR:?}/mail"
 set -A files2delete "$MAILTEMP"/*
 if [[ $files2delete != *\* ]]; then
     print -u2 ' [34m>>>[0;1m Cleaning[0m mail workshop.'

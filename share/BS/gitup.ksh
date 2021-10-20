@@ -4,7 +4,7 @@
 
 set -o nounset;: ${FPATH:?Run from within KSH}
 
-REPODIR=~/repos
+REPODIR=$XDG_DATA_HOME/repos
 # Usage {{{1
 typeset -- this_pgm="${0##*/}"
 function usage {
@@ -137,8 +137,7 @@ function convert-and-move-repo-to-bare { # {{{1
 		die "^Sorigin^s isn't in an expected format." "$origin"
 	basedir=$REPODIR/$basedir
 
-	[[ -d $basedir ]]||
-		mkdir -p "$basedir" || die "Could not ^Tmkdir^t ^S$basedir^s."
+	needs-path -or-die "$basedir"
 
 	newrepo=$basedir/${newrepo%.git}.git
 
@@ -160,7 +159,7 @@ function convert-and-move-repo-to-bare { # {{{1
 
 [[ -d $REPODIR ]]|| die "No such directory: ^B$REPODIR^b."
 
-needs git i-can-haz-inet git-remote-links
+needs git i-can-haz-inet git-remote-links needs-path
 
 NL='
 ' # capture a newline

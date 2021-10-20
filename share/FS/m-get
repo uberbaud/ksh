@@ -5,7 +5,7 @@
 #:   Wrapper around $BS/m-get
 
 function m-get {
-	builtin cd ${XDG_PUBLIC_SHARE_DIR:?}/mail
+	builtin cd ${XDG_PUBLICSHARE_DIR:?}/mail
 	/home/tw/bin/ksh/m-get "$@"
 }
 

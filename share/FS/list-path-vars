@@ -1,0 +1,26 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2021-10-19,18.27.12z/211d7c3>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^[^Uvar listing cmd^u^]
+#:   Lists varnames that contain a single path, ordered by 
+#:   path name longest to shortest.
+#:   ^Uvar listing cmd^u should output in the form
+#:       ^Bkey^b^T=^t^Bvalue^b
+#:   one variable definition per line. ^Tenv^t is the default, but
+#:   ^Tset^t would substitute nicely.
+
+function list-path-vars {
+	local TAB='	' n k v
+	(($#))|| set -- env
+	$1|while IFS== read k v; do
+		[[ $k == @(HOME|*PWD) ]]&&	continue
+		[[ $v == /* ]]||			continue
+		[[ $v == *:* ]]&&			continue
+		[[ -d $v ]]||				continue
+		[[ ${#k} -gt ${#v} ]]&&		continue
+		print -r -- "${#v}	$k"
+	  done | sort -nr |
+	  	while IFS=$TAB read n k; do print "$k"; done
+}
+
+# Copyright © 2021 by Tom Davis <tom@greyshirt.net>.

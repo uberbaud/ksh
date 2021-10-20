@@ -12,6 +12,7 @@ NL='
 # RECORD LAYOUT
 readonly ndxDate=0 ndxStart=1 ndxStop=2 ndxDur=3 ndxNote=4
 
+DRYRUN=false
 # Usage {{{1
 typeset -- this_pgm="${0##*/}"
 function usage {
@@ -19,7 +20,7 @@ function usage {
 	PGM="$REPLY"
 	sparkle >&2 <<-\
 	===SPARKLE===
-	^F{4}Usage^f: ^T$PGM^t ^Tstart^t^|^Tstop^t^|^Tsum^t^
+	^F{4}Usage^f: ^T$PGM start^t^|^Tstop^t^|^[^T-n^t^] ^Tsum^t^
 	         Keep a record of Panera out-of-schedule e-learning.
 	       ^T$PGM -h^t
 	         Show this help message.
@@ -31,8 +32,9 @@ function bad_programmer { # {{{2
 	die 'Programmer error:'	\
 		"  No getopts action defined for [1m-$1[22m."
 } # }}}2
-while getopts ':h' Option; do
+while getopts ':nh' Option; do
 	case $Option in
+		n)	DRYRUN=true;										;;
 		h)	usage;												;;
 		\?)	die "Invalid option: ^B-$OPTARG^b.";				;;
 		\:)	die "Option ^B-$OPTARG^b requires an argument.";	;;
@@ -75,23 +77,53 @@ function handle-stop { # {{{1
 	duration=$((stop-start))
 	((duration > 86400))&&
 		die '^Sstart^s record was more than 24 hours ago.' "line: $((i+1))"
-	comment="${F[ndxNote]:+"${F[ndxNote]}"/}$COMMENT"
+	comment=${F[ndxNote]:-}/${comment-}
+	comment=${comment#/} # Trim slash if F[ndxNote] was empty
+	comment=${comment%/} # Trim slash if COMMENT was empty
 	Lines[i]="${F[ndxDate]}$TAB$start$TAB$stop$TAB$duration$TAB$comment"
 	c=0
 	l=${#Lines[*]}
 	while ((c<l)); do print -r -- "${Lines[c]}"; ((c++)); done >$LOG
 } # }}}1
+function sum-out { print -r -- "--- $1"; }
+function make-hr { # {{{1
+	local n=80
+
+	[[ -t 1 ]]&& n=$(tput columns)
+	((n-=8))
+	print -n -- '    '
+	while ((n--)); do print -rn -- '─'; done
+} # }}}1
+function print-lines-after { # {{{1
+	local n total L ln D B E T N hr
+
+	n=$1
+	total=$2
+	L=${#Lines[*]}
+	hr=$(make-hr)
+
+	print -- "\n\t   When\t     Duration\tWhat\n$hr"
+	while ((++n<L)); do
+		ln=${Lines[n]}
+		isRECORD "$ln" && print -- "$ln"
+	done | while IFS="$TAB" read D B E T N; do
+		print -- "\t$D   $(s2hms $T)\t$N"
+	done
+	print -- "$hr\n\t     \033[1mTOTAL   $total\033[0m\n"
+} # }}}1
 function handle-sum { # {{{1
-	local c l A old new F
+	local c l A old new F mark
 	c=0
 	l=${#Lines[*]}
 	A=0
+	mark=0
 	while ((c<l)); do
 		L="${Lines[c]}"
 		case $L in
 			\#*) :; ;;
 			---*)
 				old=${L##+([!0-9:])}
+				mark=$((c+1))
 				new=$(s2hms $A)
 				[[ $old == $new ]]||
 					warn "Bad sum on line $c"
@@ -111,9 +143,11 @@ function handle-sum { # {{{1
 	done
 	# only append a SUM LINE if it isn't zero
 	if ((A)); then
-		print -r -- "--- $(s2hms $A)" | tee -a "$LOG"
+		hms=$(s2hms $A)
+		print-lines-after $mark $hms
+		! $DRYRUN && sum-out "$hms" >>$LOG
 	else
-		print -r -- "--- $old (previous sum)"
+		notify "$old (previous sum)"
 	fi
 } # }}}1
 (($#))||	die 'Expected an argument of ^Tstart^t, ^Tstop^t, or ^Tsum^t.'

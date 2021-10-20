@@ -6,6 +6,7 @@
 #:   whose full path name includes the string ^U^Isecret^i^u or which are
 #:   in ^S$XDG_CACHE_HOME^s, ^S$TMPDIR^s, or ^S/tmp^s.
 
+needs needs-path
 function trackfile {
 	local istemp=false
 	[[ -f "$1" ]]|| {
@@ -33,10 +34,7 @@ function trackfile {
 	  }
 
 	typeset trackdir="$HOME"/hold/DOCSTORE/TRACK
-	[[ -d $trackdir ]]|| mkdir -p "$trackdir" || {
-		warn 'Could not [1mmkdir [22m $HOME/hold/DOCSTORE/TRACK'
-		return 1
-	  }
+	needs-path -or-warn "$trackdir" || return
 
 	chflags nouchg "$trackdir" # just in case we `chflags uchg *`ed
 	# Since we want the encoding to be decodeable, we need to escape 

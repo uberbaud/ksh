@@ -7,9 +7,9 @@ ED=${VISUAL:-${EDITOR:?Neither VISUAL nor EDITOR is set}}
 set -A vopts --
 
 # Usage {{{1
-typeset -- this_pgm="${0##*/}"
+typeset -- this_pgm=${0##*/}
 desparkle "$this_pgm"
-PGM="$REPLY"
+PGM=$REPLY
 function usage {
 	sparkle >&2 <<-\
 	===SPARKLE===
@@ -52,7 +52,7 @@ function warnOrDie { #{{{1
 } # }}}1
 function remove-lockfile { # {{{1
 	local lockfile base file expectedCmd
-	lockfile="$1/$2"
+	lockfile=$1/$2
 	base=$1
 	file=$2
 	expectedCmd=/home/tw/bin/ksh/suv
@@ -63,59 +63,72 @@ function remove-lockfile { # {{{1
 	]]&& return 1
 	rm "$lockfile"
 } # }}}1
+function mk-linked-rcs { # {{{1
+	local rcs_path link_to
+	rcs_path=$RCS_BASE$1
+	link_to=$2/RCS
+
+	needs-path -or-die "$rcs_path"
+	needs-path -or-die "$link_to"
+
+	ln -s "$rcs_path" "$link_to" ||
+		die "Could not ^Tln -s^t" "^U$rcs_path^u" "^U$link_to^u"
+} # }}}1
 
 (($#))|| die 'Missing required argument ^Ufile^u.'
-needs ci co $ED as-root
+needs as-root ci co desparkle $ED needs-path
 
 CI_INITIAL_DESCRIPTION='OpenBSD system file'
-LOCKBASE="${XDG_CACHE_HOME:?}"/suv/locks
-[[ -d $LOCKBASE ]]|| {
-	mkdir -p "$LOCKBASE" || die 'Could not ^Tmkdir^t ^S$LOCKBASE^s.'
-  }
+LOCKBASE=${XDG_CACHE_HOME:?}/suv/locks
+need-path -or-die "$LOCKBASE"
 
-desparkle "$1"
-filenameD="$REPLY"
-file_or_error="$(readlink -fn "$1" 2>&1)"
+filename=$1; shift
+desparkle "$filename"
+filenameD=$REPLY
+file_or_error=$(readlink -fn "$filename" 2>&1)
 [[ $file_or_error == 'readlink: '*': Permission denied' ]]&& {
 	: here is where we do **doas $K/suvX.ksh**
   }
 [[ $file_or_error == readlink:* ]]&& {
-	errmsg="${file_or_error##readlink: *: }"
+	errmsg=${file_or_error##readlink: *: }
 	die "$errmsg: ^B$filenameD^b."
   }
 [[ -a $file_or_error ]]&& {
 	[[ -f $file_or_error ]]|| die "^B$filenameD^b is not a file."
   }
 
-filename="$file_or_error"
-filepath="${filename%/*}"
+filename=$file_or_error
+filepath=${filename%/*}
 [[ $filepath == $HOME* ]] &&
 	die "^T$PGM^t only works outside of ^S\$HOME^s." \
 		"Instead, use ^T:W^t inside ^Tvim^t (^Tv^t or ^Tnew^t)."
+notify "filepath: $filepath"
 
 # GET AN EXCLUSIVE LOCK ON THE FILE
 gsub '/' '%' "$filename"
-lockfile="$REPLY"
+lockfile=$REPLY
 get-exclusive-lock-or-exit "$lockfile" "$LOCKBASE"	|| {
 	remove-lockfile "$LOCKBASE" "$lockfile" &&
 		get-exclusive-lock-or-exit "$lockfile" "$LOCKBASE"
-	} || die "PID $(<$LOCKBASE/$lockfile) has locked ^U$1^u."
+	} || die "PID $(<$LOCKBASE/$lockfile) has locked ^U$filenameD^u."
 
 print $$>"$LOCKBASE/$lockfile"
 # WE HAVE A LOCK
 
-shift
-function main {
-	holdbase="$HOME/hold/$(uname -r)/sys-files"
+HOLD_PATH=$HOME/hold
+RCS_BASE=$HOLD_PATH/common-rcs/sys-files
+needs-path -or-die "$RCS_BASE"
 
-	workingpath="$holdbase/$filepath"
+function main {
+	holdbase=$HOLD_PATH/$(uname -r)/sys-files
+
+	workingpath=$holdbase$filepath
 	[[ -d $workingpath/RCS ]]||
-		mkdir -p "$workingpath/RCS" ||
-			die "Could not ^Tmkdir -p ^U$workingpath/RCS^u^t."
+		mk-linked-rcs "$filepath" "$workingpath"
 
 	cd "$workingpath" || die "Could not ^Tcd^t to ^B$workingpath^b."
 
-	workfile="${filename##*/}"
+	workfile=${filename##*/}
 	rcsFile=RCS/$workfile,v
 	[[ -a $workfile ]]&& {
 		[[ -f $workfile ]]||
@@ -131,9 +144,9 @@ function main {
 	}
 	PREF=''
 	if [[ -f $filename ]]; then
-		fowner="$(stat -f'%Su' "$filename")"
-		fgroup="$(stat -f'%Sg' "$filename")"
-		fperm="$(stat -f'%#Lp' "$filename")"
+		fowner=$(stat -f'%Su' "$filename")
+		fgroup=$(stat -f'%Sg' "$filename")
+		fperm=$(stat -f'%#Lp' "$filename")
 		touch ./"$workfile"
 		[[ -r $filename ]]|| PREF=as-root
 		if [[ -s $filename ]]; then
@@ -141,7 +154,7 @@ function main {
 		else
 			echo >$workfile
 		fi
-		SHA384="$(cksum -qa sha384b ./"$workfile")"
+		SHA384=$(cksum -qa sha384b ./"$workfile")
 		[[ -f $rcsFile ]]&& {
 			set -A errMsg "System file and archived file have diverged."
 			[[ $warnOrDie == die ]]&&

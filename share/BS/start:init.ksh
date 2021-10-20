@@ -195,10 +195,7 @@ function set-usrhome-modes { # {{{1
 } # }}}1
 function mk-app-starter { # {{{1
 	[[ -f $USER_START ]]&& return 0 # ~$APP/bin/$S already exists
-	[[ -d $CFG/$APP ]]|| mkdir -p $CFG/$APP/RCS || {
-			warn "Could not ^Tmkdir -p^t ^S$CFG/$APP/RCS^s"
-			return 1
-		  }
+	needs-path -or-warn "$CFG/$APP" || return
 	[[ -s "$1" ]]&& return 0 # specialized $S already exists
 
 	cat >"$1" <<-\
@@ -227,7 +224,7 @@ function create-app-starter { # {{{1
 	local F P S
 
 	P=$CFG/$APP
-	mkdir -p "$P/RCS" || die "Cannot ^Tmkdir^t ^B$P^b."
+	needs-path -or-die "$P/RCS"
 
 	F=$P/$START_SCRIPT
 	mk-app-starter "$F" || die "Could not create ^Bstart-app.ksh^b."
@@ -242,11 +239,7 @@ function create-user-links { # {{{1
 	ln -sf "$KDOTDIR/share/BS/start.ksh" "$USRBIN/$APP"
 
 	D=$XDG_DOCUMENTS_DIR/$APP
-	[[ -d $D ]]||
-		mkdir -p -m 0775 "$D" || {
-			warn "Could not ^Tmkdir^t ^B\$XDG_DOCUMENTS_DIR/$APP^b"
-			return 1
-		  }
+	needs-path "$D" || return
 
 	[[ $(stat -f %Sg "$D") == $GRPNAME ]]||
 		chgrp -R $GRPNAME "$D" ||
@@ -293,7 +286,7 @@ USER_START=$APP_HOME/bin/$START_SCRIPT
 
 HOLD=~/hold/$(uname -r)/sys-files/etc
 
-mkdir -p "$HOLD/RCS" >/dev/null	|| die "Could not ^Tmkdir^t ^B$HOLD^b."
+needs-path -or-die "$HOLD/RCS"
 builtin cd "$HOLD"				|| die "Could not ^Tcd^t to ^B$HOLD^b."
 
 fTEMP=$(mktemp)

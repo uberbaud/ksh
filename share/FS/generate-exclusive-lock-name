@@ -12,12 +12,7 @@ function generate-exclusive-lock-name {
 	[[ -n ${2:-} ]]|| P=excl-lock-
 	L="$T/${P:-}${1:?Missing resource name}"
 
-	[[ -d $T ]]|| {
-		desparkle "$T"
-		warn "^S$REPLY^s is not a directory."
-		REPLY=''
-		return 1
-	  }
+	needs-path -or-warn "$T" || return
 
 	REPLY="$L"
 	return 0

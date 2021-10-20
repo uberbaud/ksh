@@ -6,19 +6,14 @@
 #:   Stores notes to ^B^S$PWD^s/NOTES^b and links in ^B^S$SYSDATA^s/notes^b.
 #:   ^GList notes with^g ^Tls-notes^t.
 
-needs xclip $BS/v.ksh
+needs xclip needs-path $BS/v.ksh
 function note {(
 	local NOTES="$PWD"/NOTES OLDPWD="$PWD" setnoglob=false
 	local noterepo=${SYSDATA:?}/notes
 	[[ $PWD == */NOTES ]]&& NOTES="$PWD"
 	[[ $NOTES == $HOME ]]&& NOTES=${XDG_DOCUMENTS_DIR:-$HOME/docs}/NOTES
-	[[ -d $noterepo ]]|| {
-		mkdir -p "$noterepo" ||
-			die "Could not ^Tmkdir^t ^B$noterepo^b."
-	  }
-	[[ -d "$NOTES"/RCS ]]|| {
-		mkdir -p "$NOTES"/RCS || die "Could not ^Tmkdir^t ^B$NOTES^b."
-	  }
+	needs-path -or-die "$noterepo"
+	needs-path -or-die "$NOTES"/RCS
 	cd "$NOTES"
 	[[ -o noglob ]]&& { setnoglob=true; set +f; }
 	set -A Q -- *.note
@@ -49,7 +44,6 @@ function note {(
 	while ! ln -s "$PWD/$seqnote" "$repolink" 2>/dev/null; do
 		[[ "$(readlink "$repolink")" == $PWD/$seqnote ]]&& break
 		repolink="${repolink%%,+([0-9])},$((tries++))"
-exit
 	done
 	(($#))|| {
 		SHA384="$(cksum -qa sha384b "$seqnote")"

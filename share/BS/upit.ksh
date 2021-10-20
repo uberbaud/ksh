@@ -96,6 +96,7 @@ function set_re { # {{{1
 } #}}}1
 function do-one {( # {{{1
 	found=false
+	h2 "$1"
 	[[ -a $1 ]]|| {
 		desparkle "$1"
 		die "^B$REPLY^b does not exist."
@@ -135,6 +136,6 @@ function do-one {( # {{{1
 
 integer RC=0
 set_re
-for d; do do-one "$d"; ((RC+=$?)); done; exit $RC
+for d; do (do-one "$d"); ((RC+=$?)); done; exit $RC
 
 # Copyright (C) 2017 by Tom Davis <tom@greyshirt.net>.

@@ -52,11 +52,7 @@ function mnt-fs { # {{{1
 	desparkle "$mntpnt";	mntpntD="$REPLY"
 	desparkle "$dev";		devD="$REPLY"
 	df -P | egrep -q "^$dev " && return 0 # already mounted
-	[[ -d $mntpnt ]]|| mkdir "$mntpnt"
-	(($?))&& {
-		warn "Could not ^Tmkdir^t ^S$mntpntD^s."
-		return 1
-	  }
+	needs-path -or-warn "$mntpnt" || return
 	
 	$WANT_FSCK && {
 		notify fsck

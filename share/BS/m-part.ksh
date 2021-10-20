@@ -82,7 +82,7 @@ needs tidy
 
 work=${XDG_PUBLICSHARE_DIR:?}/mail
 
-[[ -d $work ]]|| mkdir -p "$work" || die "Could not create ^S$work^s."
+needs-path -or-die "$work"
 cd "$work" || die "Could not ^Tcd^t to ^S$work^s."
 printf 'In \e[35m$XDG_CACHE_HOME/mail\e[39m\n'
 

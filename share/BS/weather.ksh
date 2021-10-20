@@ -62,10 +62,7 @@ new-array opts
 +opts psnwhr='6'
 
 runPath=${XDG_DATA_HOME:?}/run/weather
-[[ -d $runPath ]]||
-	mkdir -p $runPath
-[[ -d $runPath ]]||
-	die 'No such directory ^B$XDG_DATA_HOME/run/weather^b.'
+needs-path -or-die "$runPath"
 builtin cd $runPath ||
 	die 'No such directory ^B$XDG_DATA_HOME/run/weather^b.'
 

@@ -44,6 +44,8 @@ function warnOrDie { #{{{1
 	esac
 } # }}}1
 
+needs needs-path
+
 DOCSTORE="$HOME/hold/DOCSTORE"
 [[ -d $DOCSTORE ]]|| die 'No ^B~/hold/DOCSTORE^b directory.'
 builtin cd "$DOCSTORE" || die 'Could not ^Tcd^t to ^BDOCSTORE^b'
@@ -62,10 +64,8 @@ function do-one {
 	zcat "$1" |&
 	read -rp restname
 	restdir="${restname%/*}"
-	[[ -d $restdir ]]|| mkdir -p "$restdir" || {
-		warn "Could not create directory ^B$restdir^b."
-		return 1
-	  }
+	needs-path -or-warn "$restdir" || return
+
 	cat <&p >"$restname"
 }
 

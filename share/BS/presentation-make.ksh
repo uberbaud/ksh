@@ -4,6 +4,8 @@
 
 set -o nounset;: ${FPATH:?Run from within KSH}
 
+needs needs-path
+
 PRESDEFAULT=${XDG_DOCUMENTS_DIR:?}/presentations
 SRC=presentation.mdp
 CSS=presentation.css
@@ -97,10 +99,7 @@ function mkAndCleanDir {
 	[[ $1 == */* ]]&&
 		die '^WBad Programmer^w: Directory name contains ^/.'
 
-	[[ -d $1 ]]|| {
-		notify "Making ^S$1^s directory."
-		mkdir $1
-	  }
+	needs-path -or-die -with-notice "$1"
 
 	notify "Cleaning ^S$1^s directory."
 	rm -rf $1/*

@@ -106,6 +106,7 @@ kill
 let
 libtw
 list-known-hosts
+list_path_vars
 local
 localize-shared
 log
@@ -132,6 +133,7 @@ maxlimits
 mcd
 message
 needs
+needs-path
 new-array
 newest
 nextfd
@@ -189,6 +191,7 @@ sqlite3-c-api
 ssh-askfirst
 ssh-clonedir
 stop
+subst-pathvars
 suspend
 t
 tdump

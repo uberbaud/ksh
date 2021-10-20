@@ -2,12 +2,16 @@
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
 #: FUNCTION ^Ucmd^u ^Uarg1^u ^S…^s ^UargN^u
-#:   Run doas, but with three (3) tries.
+#:   Wrapper around ^Tdoas^t with the added feature of
+#:   highlighting in scripts that that doas is being run
+#:   AND what command doas will used to run.
+#:
+#:   Additionally provides a single point to update if ^Tdoas^t is replaced,
+#:   for instance with ^Tsudo^t.
 
 
 needs /usr/bin/doas prn-cmd
 function as-root {
-	local cfg=/etc/doas.conf
 	# if we're not interactive, print what we're doing
 	[[ $- == *i* ]]|| {
 		tty=${TTY:+/dev/$TTY}
@@ -19,18 +23,7 @@ function as-root {
 		  }
 		{ print -n '\033[45;37mdoas>\033[49;35m '; prn-cmd "$@"; } >$tty
 	  }
-	# check if we're always denied before we require a password or three
-	[[ $(/usr/bin/doas -C ${cfg:?} "$@") == deny ]]&&
-		die '^Tdoas^t is ^Wdenied^w for this user with this command.'
 
-	# check that we need a password, then get it with true
-	[[ $(/usr/bin/doas -C $cfg "$@") == 'permit nopass' ]]	||
-		/usr/bin/doas true									||
-		/usr/bin/doas true									||
-		/usr/bin/doas true									||
-		die 'Bad credentials'
-	# now that we have credentials attached, we can run the command
-	# without entering it again.
 	/usr/bin/doas "$@"
 }
 

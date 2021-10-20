@@ -4,6 +4,7 @@
 #: FUNCTION ^Ulock_name^u ^[^Ulock_path^u^] ^= ^S$REPLY^s
 #:   Create a name for use by {get,release}-exclusive-lock\*
 
+needs needs-path
 function generate-exclusive-lock-name {
 	local T L P
 	REPLY=''

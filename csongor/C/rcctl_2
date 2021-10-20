@@ -1,7 +1,5 @@
 amd
 apmd
-avahi_daemon
-avahi_dnsconfd
 bgpd
 bootparamd
 cron

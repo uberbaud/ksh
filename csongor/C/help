@@ -106,7 +106,7 @@ kill
 let
 libtw
 list-known-hosts
-list_path_vars
+list-path-vars
 local
 localize-shared
 log

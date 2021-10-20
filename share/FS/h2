@@ -6,7 +6,7 @@
 
 needs hN
 function h2 {
-	hN '1;48;5;142;38;5;15' '###' '###' "$@"
+	hN '1;48;5;142;38;5;238' '###' '###' "$@"
 }
 
 # Copyright © 2020 by Tom Davis <tom@greyshirt.net>.

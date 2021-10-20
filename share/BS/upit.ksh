@@ -66,14 +66,13 @@ function usage {
 } # }}}
 # process -options {{{1
 VERBOSE=false
-HEADER=false
 function bad_programmer {	# {{{2
 	die 'Programmer error:'	\
 		"  No getopts action defined for [1m-$1[22m."
   };	# }}}2
 while getopts ':Dvh' Option; do
 	case $Option in
-		v)	VERBOSE=true; HEADER=true;								;;
+		v)	VERBOSE=true;											;;
 		D)	printf "%s\n" "${dotf[@]}" |sort; return 0;				;;
 		h)	usage;													;;
 		\?)	die "Invalid option: [1m-$OPTARG[22m.";				;;
@@ -86,7 +85,6 @@ shift $(($OPTIND - 1))
 # ready to process non '-' prefixed arguments
 # /options }}}1
 (($#))|| set -- "$PWD"
-(($#>1))&& HEADER=true
 
 name-is-empty && die 'Impossibly, ^S$name^s is empty.'
 
@@ -96,7 +94,6 @@ function set_re { # {{{1
 } #}}}1
 function do-one {( # {{{1
 	found=false
-	h2 "$1"
 	[[ -a $1 ]]|| {
 		desparkle "$1"
 		die "^B$REPLY^b does not exist."
@@ -105,7 +102,8 @@ function do-one {( # {{{1
 	eval "DIR=\"\${1%/$re_dots}\""
 	desparkle "$DIR"
 	dDIR="$REPLY"
-	$HEADER && h1 "$DIR"
+	subst-pathvars "$DIR"
+	h2 "upit $REPLY"
 	$VERBOSE && notify "^Tcd^ting to ^B$dDIR^b."
 	builtin cd "$DIR" || die "Could not ^Tcd^t to ^B$dDIR^b"
 

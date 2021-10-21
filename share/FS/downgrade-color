@@ -1,7 +1,7 @@
 # <@(#)tag:tw.csongor.greyshirt.net,2020-12-09,18.09.59z/1cc79ab>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^Uansi string (no ^G^^[^g^T[^t, nor trailing ^Tm^t.
+#: FUNCTION ^Uansi string^u ^I^G(no ^S^^[^s^T[^t^G, nor trailing^g ^Tm^t^G)^g^i
 #:   Converts an ansi color string to 8bit terminal color
 
 function downgrade-color {
@@ -36,8 +36,10 @@ function downgrade-color {
 					r=$((x/6))
 					wantcmp=true
 				elif (($3<240)); then
+					# dark gray, so black
 					dwn="$dwn$sep${fb}0"
 				else
+					# light gray, so white
 					dwn="$dwn$sep${fb}7"
 				fi
 				shift 3

@@ -1,0 +1,12 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2021-06-21,16.13.34z/31555b5>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^G(no arguments)^g
+#:   Turn dpms (screen blanking) off
+#:   ^Txset -dpms^t
+
+function nodark {
+    xset -dpms
+}
+
+# Copyright © 2021 by Tom Davis <tom@greyshirt.net>.

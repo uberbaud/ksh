@@ -9,7 +9,7 @@
 #:     ^Uprefix^u, and ^Usuffix^u will only be used if ^Sstdout^s is ^Bnot^b
 #:               a terminal.
 
-needs term-has-256-colors
+needs downgrade-color term-does-utf8 term-has-256-colors
 function hN {
 	local IFS=' ' attr prefix suffix text
 	attr=${1:?Missing required ANSI escape attribute}

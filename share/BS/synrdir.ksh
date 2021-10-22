@@ -270,7 +270,7 @@ tmppath=''; rlst=''; llst='';
 $i_am_the_local && { # {{{1
 
 	: ${FPATH:?Run from within KSH}
-	needs ssh-add scp ssh
+	needs ssh-add scp ssh f-host
 
 	(($#))||	die 'Missing required argument ^Uhost:path^u.'
 	(($#>2))&&	die 'Unexpected arguments.'
@@ -279,7 +279,7 @@ $i_am_the_local && { # {{{1
 
 	remote_host="${1%%:*}"
 	remote_dir="${1#*:}"
-	host $remote_host >/dev/null ||
+	f-host $remote_host >/dev/null							||
 		die "Cannot connect to ^B$remote_host^b."
 	cd "${2:-$PWD}" ||
 		die "Could not cd to ^Tcd^t ^B$local_dir^b."

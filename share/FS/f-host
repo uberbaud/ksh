@@ -1,0 +1,19 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2021-10-22,03.49.32z/5ad0790>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Thostname^t
+#:   Wrapper around host to also check /etc/hosts
+
+function f-host {
+	local H
+	H=${1:?Missing required parameter hostname}
+	(($#==1)) && while read iaddr hname haliases; do
+		[[ $iaddr == \#* ]]&& continue
+		[[ $H == $hname || ,$haliases, == *,$H,* ]]|| continue
+		print -r -- "$hname has address $iaddr"
+		return
+	done </etc/hosts
+	/usr/bin/host "$@"
+}
+
+# Copyright © 2021 by Tom Davis <tom@greyshirt.net>.

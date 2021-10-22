@@ -4,7 +4,6 @@
 
 set -o nounset; : ${KSH_VERSION:?Run from with KSH}
 
-needs needs-path
 # Usage {{{1
 full_pgm_path="$(readlink -nf "$0")"
 : ${full_pgm_path:?}
@@ -45,7 +44,7 @@ integer LOGNONE=-1 LOGNORM=0 LOGDBUG=1
 VERBOSITY_LEVEL=$LOGNORM
 while getopts ':hR:L:k' Option; do
 	case $Option in
-		R)	needs-path "$HOME/log" || exit 72
+		R)	[[ -d $HOME/log ]]|| mkdir -p $HOME/log
 			LOGFILE="$HOME/log/synrdir-$OPTARG"
 			i_am_the_local=false
 			i_am_the_remote=true

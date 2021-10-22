@@ -4,6 +4,7 @@
 
 set -o nounset; : ${KSH_VERSION:?Run from with KSH}
 
+needs needs-path
 # Usage {{{1
 full_pgm_path="$(readlink -nf "$0")"
 : ${full_pgm_path:?}

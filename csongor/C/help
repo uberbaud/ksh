@@ -61,6 +61,8 @@ f-git
 f-go
 f-halt
 f-help
+f-m-done
+f-m-get
 f-r
 f-reboot
 f-syspatch

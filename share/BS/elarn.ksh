@@ -94,10 +94,10 @@ function make-hr { # {{{1
 	print -n -- '    '
 	while ((n--)); do print -rn -- '─'; done
 } # }}}1
-function print-lines-after { # {{{1
+function print-lines-from { # {{{1
 	local n total L ln D B E T N hr
 
-	n=$1
+	n=$(($1-1))
 	total=$2
 	L=${#Lines[*]}
 	hr=$(make-hr)
@@ -144,7 +144,7 @@ function handle-sum { # {{{1
 	# only append a SUM LINE if it isn't zero
 	if ((A)); then
 		hms=$(s2hms $A)
-		print-lines-after $mark $hms
+		print-lines-from $mark $hms
 		! $DRYRUN && sum-out "$hms" >>$LOG
 	else
 		notify "$old (previous sum)"

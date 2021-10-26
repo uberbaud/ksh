@@ -1,0 +1,47 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2021-10-19,16.44.57z/ebcd74>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^[^T-or-warn^t^|^T-or-die^t^] ^[^T-with-notice^t^] ^Udir name^u
+#:   ^Tcd^ to ^Udir name^u, optionally notifying, possibly ^Twarn^t or ^Tdie^t.
+
+needs notify desparkle
+function needs-cd {
+	local or_what notice REPLY v r
+
+	# handle option flags
+	notice=false
+	while (($#>1)); do
+		case $1 in
+			-or-warn)		or_what=warn;								;;
+			-or-die)		or_what=die;								;;
+			-with-notice)	notice=true;								;;
+			-*)				die "BAD PROGRAMMER: Unknown flag ^T$1^t.";	;;
+			*)				die "Too many parameters.";					;;
+		esac
+		shift
+	done
+
+	[[ ${1:?} == -or-* ]]&& {
+		or_what=${1#-or-}
+		shift
+	  }
+
+	subst-pathvars "$1"
+	desparkle "$REPLY"
+	if [[ $REPLY == \$* ]]; then
+		v=${REPLY%%/*}
+		r=${REPLY#*/}
+		REPLY="^F{11}\$^f^F{4}${v#\$}^f^B/$r^b"
+	else
+		REPLY="^B$REPLY^b"
+	fi
+	$notice && notify "^Tcd^t to $REPLY."
+
+	builtin cd "$1" >/dev/null 2>&1	&& return
+
+	[[ -n ${or_what:-} ]]			|| return
+
+	$or_what "Could not ^Tcd^t to $REPLY."
+}
+
+# Copyright © 2021 by Tom Davis <tom@greyshirt.net>.

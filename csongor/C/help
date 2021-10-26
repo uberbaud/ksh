@@ -135,6 +135,7 @@ maxlimits
 mcd
 message
 needs
+needs-cd
 needs-path
 new-array
 newest

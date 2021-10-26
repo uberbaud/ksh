@@ -1,7 +1,6 @@
 #!/bin/ksh
 # <@(#)tag:tw.csongor.greyshirt.net,2019-11-08,00.17.58z/4dbb98e>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
-
 set -o nounset;: ${FPATH:?Run from within KSH}
 
 : ${XDG_DOCUMENTS_DIR:?}
@@ -15,6 +14,7 @@ desparkle "$PGMDIR"
 dPGMDIR="$REPLY"
 
 DO=on
+want_2nd_display=true
 
 # Usage {{{1
 typeset -- this_pgm="${0##*/}"
@@ -39,9 +39,10 @@ function bad_programmer {	# {{{2
 	die 'Programmer error:'	\
 		"  No getopts action defined for [1m-$1[22m."
   };	# }}}2
-while getopts ':kh' Option; do
+while getopts ':knh' Option; do
 	case $Option in
 		k)	DO=off;												;;
+		n)	want_2nd_display=false;								;;
 		h)	usage;												;;
 		\?)	die "Invalid option: ^B-$OPTARG^b.";				;;
 		\:)	die "Option ^B-$OPTARG^b requires an argument.";	;;
@@ -54,6 +55,8 @@ shift $((OPTIND-1))
 # /options }}}1
 
 (($#))&& die 'Unexpected parameters.'
+
+[[ -n ${NO_EXT_DISPLAY:-} ]]&& want_2nd_display=false
 
 function init_2nd_display { #{{{1
 	local geom
@@ -93,22 +96,24 @@ function surf-xid { #{{{1
 function init_surf { #{{{1
 	start surf "$initialURL"
 	surf-xid --sync
-	set_window_full_on_d2 $surfxid
+	$want_2nd_display && set_window_full_on_d2 $surfxid
 } #}}}1
 function st-xid { #{{{1
 	stxid=${ST_XID:-"$(xdotool search $* --class '^presTerm$')"}
 } #}}}1
 function init_term { #{{{1
-	st -c presTerm -f 'Liberation Mono:pixelsize=36:antialias=true' &
+	</dev/null >~/log/present:st-wrapper.log 2>&1 (
+		st -c presTerm -f 'Liberation Mono:pixelsize=36:antialias=true'
+	) &
 	st-xid --sync
-	set_window_full_on_d2 $stxid
+	$want_2nd_display && set_window_full_on_d2 $stxid
 } #}}}1
 function on { #{{{1
 # close any open windows with --name " uberbaud-present$"
-	init_2nd_display
+	$want_2nd_display && init_2nd_display
 	init_surf
 	init_term
-	loop
+	#loop
 } #}}}1
 function off { #{{{1
 	surf-xid
@@ -120,10 +125,16 @@ function off { #{{{1
 	surfxid=
 } #}}}1
 
+function p1and2 { # {{{1
+	[[ -t 1 ]]||			# only if stdout is NOT the terminal
+		print -ru1 -- "$1"	# may be captured for `eval`
+	[[ -t 2 ]]&&			# only if stderr IS the terminal
+		print -ru2 -- "$1"	# should be printed to terminal
+} # }}}1
 function put-cmds { #{{{1
-	print -r -- "SURF_XID=${surfxid:-}"
-	print -r -- "ST_XID=${stxid:-}"
-	print -r -- "export SURF_XID ST_XID"
+	p1and2	"SURF_XID=${surfxid:-}";
+	p1and2	"ST_XID=${stxid:-}"
+	print	"export SURF_XID ST_XID"
 } #}}}1
 
 $DO; put-cmds; exit

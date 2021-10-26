@@ -60,6 +60,8 @@ SYSDATA=$xdgdata/sysdata
 	KHIST=$KU/history
   }
 
+export GIT_BARE_REPOS=$xdgdata/repos
+
 ####### IMPORT LOCAL BITS
 [[ -f $KU/kshrc ]]&& . $KU/kshrc
 

@@ -5,19 +5,22 @@
 #:   Wrapper with auto cd and branch on clone
 
 function f-git {
-	command git "$@" || return
-
-	[[ $1 != clone ]]&& return
-
-	local newdir
-	# git clone [opts] repo [local-dir-name]
-	eval "newdir=\"\${$#}\"" # get the last parameter
-	[[ $newdir == @(http|https|ftp|ftps|git|ssh):* ]]&& {
-		newdir="${newdir%.git}" # sometimes
-		newdir="${newdir##*/}"  # always
-	  }
-	builtin cd "$newdir" &&
-		git checkout -b $HOST
+	local o subcmd
+	for o; do
+		[[ $o == -* ]]&& continue
+		subcmd=$o
+		break
+	done
+	if [[ $subcmd != clone ]]; then
+		command git "$@"
+	else
+		: ${BS:?}
+		eval $($BS/git-clone-wrapper.ksh "$@") || return
+		print -r "  WORKTREE_PATH=${WORKTREE_PATH-}"
+		print -r "  REPOSITORY_PATH=${REPOSITORY_PATH-}"
+		[[ -n ${WORKTREE_PATH-} ]]&&
+			needs-cd -or-warn -with-notice "$WORKTREE_PATH"
+	fi
 }
 
 # Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

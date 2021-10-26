@@ -16,6 +16,9 @@
 #: FUNCTION expects ^Shtml^s and ^Snotes^s directories in ^Upresentation_directory^u.
 #:
 
+typeset -Z3 -i10 PAGE=0
+B=${KDOTDIR:?}/share/BS
+
 function setURL {
 	h1 $PAGE
 	xprop -id $SURF_XID	\
@@ -66,7 +69,7 @@ function R { xdotool windowraise $SURF_XID; }
 function Kill {
 	xdotool windowclose $ST_XID
 	xdotool windowclose $SURF_XID
-	present-init -k
+	$B/present-init.ksh -k
 }
 
 function h {
@@ -93,7 +96,7 @@ function present {
 		shift
 	  }
 
-	[[ -z $NO_EXT_DISPLAY ]]&& eval "$(present-init)"
+	eval "$($B/present-init.ksh ${NO_EXT_DISPLAY:+-n})"
 	: ${SURF_XID:?} ${ST_XID:?}
 
 	if [[ -z ${1:-} ]]; then
@@ -127,8 +130,7 @@ function present {
 	builtin cd $HTMLPATH ||
 		die "Could not ^Tcd^t to ^B$HTMLPATH^b."
 	P=$((PAGE))
-	typeset -i -Z3 PAGE=${P:-1}
-
+	PAGE=${P:-1}
 	notify 'Ready' 'Use ^T1^t to show first slide.' 'Use ^Th^t for help.'
 }
 

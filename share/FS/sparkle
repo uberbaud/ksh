@@ -3,17 +3,18 @@
 
 #: FUNCTION ^G(no arguments)^g
 #:   Transform marked ^SSTDIN^s to colorized ^SSTDOUT^s.
-#:     ^B^^B bold^b           ^T^^C^t ^Ghidden^g            ^E^^E error^e
-#:     ^G^^G grey^g           ^T^^H^t ^Ghidden^g            ^I^^I italic^i
-#:     ^N^^N notice^n         ^R^^R reverse^r           ^S^^S special^s
-#:     ^T^^T tty^t            ^U^^U_underline^u         ^W^^W warning^w
+#:     ^N^^N notice^n         ^W^^W warning^w           ^E^^E error^e
+#:     ^B^^B bold^b           ^T^^C^t ^Ghidden^g            ^G^^G grey^g
+#:     ^T^^H^t ^Ghidden^g         ^I^^I italic^i            ^O^^O operator^o
+#:     ^R^^R reverse^r        ^S^^S special^s           ^T^^T tty^t
+#:     ^U^^U underline^u      ^V^^V identifier^v
 #:     ^T^^F{^t^U0-255^u^T}^t ^Gforeground^g      ^T^^=^t ^=
 #:     ^T^^K{^t^U0-255^u^T}^t ^Gbackground^g      ^^[:punct:] ^= ^T^^S^t^Upunct^u^T^^s^t
 #:    Other than ^Ucaret+punctuation^u, a capital letter is the start code
 #:    and ^Ucaret+lowercase^u is end code.
 #:     ^B^^^^^b ^= ^B^^^b ^G(a doubled caret becomes a single caret)^g
 #:    ^GNote: sparkle only sparkles to a tty. That can be overridden^g
-#:          ^Gby setting ^S$SPARKLE_FORCE_COLOR^s to any value.^g
+#:          ^Gby setting ^O$^o^VSPARKLE_FORCE_COLOR^v ^Gto any value.^g
 
 needs term-does-utf8 term-has-256-colors
 function sparkle {
@@ -54,6 +55,8 @@ function sparkle {
 			-e 's/\^k/[49m/g'							\
 			-e 's/\^N/['"${sN}"'m/g'					\
 			-e 's/\^n/[39m/g'							\
+			-e 's/\^O/[38;5;11m/g'					\
+			-e 's/\^o/[39m/g'							\
 			-e 's/\^R/[7m/g'							\
 			-e 's/\^r/[27m/g'							\
 			-e 's/\^S/[35m/g'							\
@@ -62,6 +65,8 @@ function sparkle {
 			-e 's/\^t/[39m/g'							\
 			-e 's/\^U/[4m/g'							\
 			-e 's/\^u/[24m/g'							\
+			-e 's/\^V/[38;5;39m/g'					\
+			-e 's/\^v/[39m/g'							\
 			-e 's/\^W/['"$sW"'m/g'					\
 			-e 's/\^w/[39m/g'							\
 			-e 's/\^=/[35m'"$cA"'[39m/g'			\

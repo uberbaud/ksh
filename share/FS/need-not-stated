@@ -1,0 +1,22 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2021-10-26,22.07.46z/8a57a8>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Ucommand^u ^Ufile^S1^s^u ^S…^s ^Ufile^SN^s^u
+#:   Report if given ^Ucommand^u is not in the ^Tneeds^t ^Ulist^u for ^Ufile^us.
+
+needs desparkle warn
+function need-not-stated {
+	local cmd f badList
+	cmd=$1; shift
+	badList=
+	for f; do
+		egrep -q "^[[:space:]]*needs[[:>:]].+[[:<:]]$cmd[[:>:]]" "$f" &&
+			continue
+		desparkle "$f"
+		badList="$badList ^U$REPLY^u"
+	done
+	[[ -z $badList ]]||
+		warn "^T$cmd^t is not in needs list for" "$badList"
+}
+
+# Copyright © 2021 by Tom Davis <tom@greyshirt.net>.

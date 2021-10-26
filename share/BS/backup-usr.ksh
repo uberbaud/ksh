@@ -69,7 +69,7 @@ shift $(($OPTIND - 1))
 # /options }}}1
 (($#))&& die 'Unexpected arguments.'
 
-needs awk egrep mount rsync usb-mnt needs-path
+needs awk egrep mount rsync usb-mnt needs-path needs-cd
 
 rsync_opts="$(awk '{print $1}')" <<-\
 	===
@@ -153,7 +153,8 @@ function main { # {{{1
 	splitstr : "$(getent passwd $(id -un))"
 	readonly realhome="${reply[5]}"
 	[[ -d $realhome ]]|| die "No HOME (^B$realhome^b) directory."
-	cd "$realhome" || die "Could not ^Tcd^t to ^B$realhome^b."
+
+	needs-cd -or-die "$realhome"
 
 	readonly timestamp="$(Now)"
 	readonly backto="$backbase/$timestamp"

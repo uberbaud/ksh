@@ -1,7 +1,7 @@
 #!/bin/ksh
 
-needs cd h1 less sed sparkle
-cd notes || die 'Could not ^Tcd^t to ^Snotes^s.'
+needs cd h1 less sed sparkle needs-cd
+needs-cd -or-die notes
 
 for f in *; do
 	f=${f%.txt}

@@ -273,7 +273,7 @@ function hWinch		{ NEED_GET_SIZE=true; UpdateAll=true;	}
 function hUpdate	{ UpdateAll=true;						}
 function hTimer		{ UpdateAll=false;						}
 
-needs amuse:env
+needs amuse:env needs-cd
 amuse:env
 
 trap hTerm		INT HUP TERM QUIT
@@ -282,7 +282,7 @@ trap hUpdate	USR1
 trap hTimer		USR2
 trap CleanUp	EXIT
 
-cd "${AMUSE_RUN_DIR:?}" || die 'Could not ^Tcd^t to ^S$AMUSE_RUN_DIR^s.'
+needs-cd -or-die "${AMUSE_RUN_DIR:?}"
 # register the signals we want for changes to
 print USR1 >subs-playing/$$		# general status
 print USR2 >subs-time/$$		# time played

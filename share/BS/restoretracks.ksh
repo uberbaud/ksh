@@ -44,11 +44,11 @@ function warnOrDie { #{{{1
 	esac
 } # }}}1
 
-needs needs-path
+needs needs-cd needs-path
 
 DOCSTORE="$HOME/hold/DOCSTORE"
 [[ -d $DOCSTORE ]]|| die 'No ^B~/hold/DOCSTORE^b directory.'
-builtin cd "$DOCSTORE" || die 'Could not ^Tcd^t to ^BDOCSTORE^b'
+needs-cd -or-die "$DOCSTORE"
 
 function do-one {
 	local fnpre="$1"

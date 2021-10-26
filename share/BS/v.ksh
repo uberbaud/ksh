@@ -103,7 +103,7 @@ function verify-file-is-editable { # {{{1
 # TODO: test 'checked-out'ness with something like	
 #       [[ -n $(rlog -L -l bobslunch.rem) ]]		
 
-needs $ED ci co rcsdiff trackfile
+needs $ED ci co rcsdiff trackfile needs-cd needs-path
 
 (($#))|| exec "$ED" # We don't have a file, so short circut all the rest.
 
@@ -126,7 +126,7 @@ rcsmsg=''
 f_path="${f_fullpath%/*}"
 f_name="${f_fullpath##*/}"
 
-builtin cd "$f_path" || die "Could not ^Tcd^t to ^B${f_path}^b."
+needs-cd -or-die "$f_path"
 
 # we could just use ./$f_name
 # BUT then the vim process would not have a command including the path, 

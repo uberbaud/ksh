@@ -47,9 +47,9 @@ function warnOrDie { #{{{1
 	esac
 } # }}}1
 
-needs new-array cpanm
+needs new-array cpanm needs-cd
 
-cd ~/bin/perl || die 'Could not ^Tcd^t to ^S~/bin/perl^s.'
+needs-cd -or-die ~/bin/perl
 new-array wants
 
 # wrap script guts in a function so edits to this script file don't 

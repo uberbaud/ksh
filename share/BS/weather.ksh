@@ -37,7 +37,7 @@ shift $(($OPTIND - 1))
 # /options }}}1
 
 : ${DISPLAY:?}
-needs curl display xrandr awk
+needs curl display xrandr awk needs-path
 
 integer edgeOffset=20
 graph_url='http://forecast.weather.gov/meteograms/Plotter.php'

@@ -4,6 +4,7 @@
 #: FUNCTION ^G(no arguments)^g
 #:   Wrapper with auto cd and branch on clone
 
+needs needs-cd
 function f-git {
 	local o subcmd
 	for o; do

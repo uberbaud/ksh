@@ -43,11 +43,11 @@ shift $(($OPTIND - 1))
 # /options }}}1
 
 KB=$KDOTDIR/share/BS
-needs $KB/synrdir.ksh
+needs $KB/synrdir.ksh needs-cd
 docstore=$HOME/hold/DOCSTORE
 [[ -a $docstore ]]|| die "^B$docstore^b does not exist."
 [[ -d $docstore ]]|| die "^B$docstore^b is not a directory."
-cd "$docstore" || die "Could not ^Tcd^t to ^B$docstore^b."
+needs-cd -or-die "$docstore"
 
 synropt="${LOGLEVEL:+"-L $LOGLEVEL"} ${KEEP_FILES:+-k}"
 

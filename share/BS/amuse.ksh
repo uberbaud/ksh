@@ -214,9 +214,9 @@ $ACCEPTCMD && (($#)) && { # {{{
 } # }}}
 (($#))&& die 'Too many arguments. Expected only one (1).'
 
-needs amuse:env roll
+needs amuse:env roll needs-cd
 amuse:env
-cd "${AMUSE_RUN_DIR:?}" || die 'Could not ^Tcd^t to ^S$AMUSE_RUN_DIR^s.'
+needs-cd -or-die "${AMUSE_RUN_DIR:?}"
 
 $ACTION; $SYSTEMS_ARE_GO || Stop; exit
 

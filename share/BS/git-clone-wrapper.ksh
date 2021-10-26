@@ -62,8 +62,7 @@ function main { # {{{1
 	WORKTREE_PATH=$PWD/$newdir
 	needs-path -or-die "$WORKTREE_PATH"
 
-	builtin cd "$REPOSITORY_PATH" ||
-		die "Could not ^Tcd^t to ^S$REPOSITORY_PATH^s."
+	needs-cd -or-die "$REPOSITORY_PATH"
 
 	R="${R##*/}"
 	command git clone --bare "$repo" "$R" >&2 ||

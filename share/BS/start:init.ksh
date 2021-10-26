@@ -276,7 +276,7 @@ function CleanUp { # {{{1'
 (($#>1))&&	die 'Too many arguments. Expected one (1).'
 [[ $1 == -h ]]&& usage
 
-needs shquote f-v h1
+needs shquote f-v h1 needs-cd needs-path
 
 USRNAME=$(id -un)
 
@@ -287,7 +287,7 @@ USER_START=$APP_HOME/bin/$START_SCRIPT
 HOLD=~/hold/$(uname -r)/sys-files/etc
 
 needs-path -or-die "$HOLD/RCS"
-builtin cd "$HOLD"				|| die "Could not ^Tcd^t to ^B$HOLD^b."
+needs-cd -or-die "$HOLD"
 
 fTEMP=$(mktemp)
 trap CleanUp EXIT

@@ -120,10 +120,10 @@ function found { # {{{1
 	done
 } # }}}1
 
-needs amuse:env hr
+needs amuse:env hr needs-cd
 amuse:env || die "$REPLY"
-builtin cd "$AMUSE_RUN_DIR" ||
-	die "Could not ^Tcd^t to ^B$AMUSE_RUN_DIR^b."
+
+needs-cd -or-die "$AMUSE_RUN_DIR"
 
 set -- *
 [[ $1 == \* ]]&& die "^S$AMUSE_RUN_DIR^s is ^Bempty^b."

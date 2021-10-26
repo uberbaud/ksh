@@ -51,11 +51,11 @@ function warnOrDie { #{{{1
 	esac
 } # }}}1
 
-needs awk zcat
+needs awk zcat needs-cd
 
 (($#))||	die 'Missing required argument ^Upattern^u'
 (($#==1))||	die 'Too many arguments, expected one (1): ^Upattern^u.'
-cd ~/hold/DOCSTORE || die 'Could not ^Tcd^t to ^BDOCSTORE^b.'
+needs-cd -or-die ~/hold/DOCSTORE
 
 #   ↓ newline
 NL='

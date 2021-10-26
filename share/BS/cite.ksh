@@ -57,10 +57,12 @@ function main {
 (($#<1))&& die "Missing required parameter ^Uurl^u."
 (($#>1))&& die "Too many parameters. Expected only one (1)."
 
+needs needs-cd
+
 tempD=$(mktemp -d)
 trap "rm -rf '$tempD'"	EXIT
 print $tempD
-cd "$tempD" || die "Could not ^Tcd^t to ^B$tempD^b."
+needs-cd "$tempD"
 
 main "$1"; exit
 

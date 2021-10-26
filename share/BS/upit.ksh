@@ -4,7 +4,7 @@
 
 set -o nounset;: ${FPATH:?Run from within KSH}
 
-needs desparkle die h1 new-array notify splitstr warn
+needs desparkle die h1 new-array notify splitstr warn needs-cd
 
 new-array name dotf exec cmds haz
 
@@ -100,12 +100,9 @@ function do-one {( # {{{1
 	  }
 
 	eval "DIR=\"\${1%/$re_dots}\""
-	desparkle "$DIR"
-	dDIR="$REPLY"
 	subst-pathvars "$DIR"
 	h2 "upit $REPLY"
-	$VERBOSE && notify "^Tcd^ting to ^B$dDIR^b."
-	builtin cd "$DIR" || die "Could not ^Tcd^t to ^B$dDIR^b"
+	needs-cd -or-die ${VERBOSE:+-with-notify} "$DIR"
 
 	integer i=${#name[*]}
 	while ((i--)); do
@@ -129,7 +126,10 @@ function do-one {( # {{{1
 		break
 	done
 
-	$found || die "^B$dDIR^b is not a supported ^Ivcs^i repository."
+	$found && return
+
+	desparkle "$DIR"
+	die "^B$REPLY^b is not a supported ^Ivcs^i repository."
 )} # }}}1
 
 integer RC=0

@@ -78,17 +78,19 @@ function main {
 	for h; do
 		h=${h%/kshrc}
 print "host: $h"
-		cd "$h" || { warn "Could not ^Tcd^t ^B$h^b."; break; }
+		needs-cd -or-warn "$h" || break
 		provide-needs-for-host "$h"
 		cd $KDOTDIR
 	done
 }
 
+needs needs-cd
+
 : ${KDOTDIR:?}
 FS=$KDOTDIR/share/FS;	[[ -d $FS ]]|| die 'No directory ^S$K/share/FS^s.'
 BS=$KDOTDIR/share/BS;	[[ -d $BS ]]|| die 'No directory ^S$K/share/BS^s.'
 
-cd $KDOTDIR || die 'Could not ^Tcd^t to ^B$KDOTDIR^b.'
+needs-cd -or-die "$KDOTDIR"
 set -- */kshrc
 main "$@"; exit
 

@@ -51,10 +51,10 @@ function warnOrDie { #{{{1
 	esac
 } # }}}1
 
-needs awk less sparkle
+needs awk less sparkle needs-cd
 
 [[ -d $REPO ]]|| exit 0		#empty
-cd $REPO || die 'Could not ^Tcd^t into ^B$REPO^b.'
+needs-cd -or-die "$REPO"
 
 TAB='	'
 NL='

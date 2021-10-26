@@ -4,7 +4,7 @@
 
 set -o nounset;: ${FPATH:?Run from within KSH}
 
-needs needs-path
+needs needs-cd needs-path
 
 PRESDEFAULT=${XDG_DOCUMENTS_DIR:?}/presentations
 SRC=presentation.mdp
@@ -81,7 +81,7 @@ fi
 
 [[ -a $PRESPATH/$CSS  ]]|| CSS=$PRESDEFAULT/$CSS
 
-cd $PRESPATH || die "Could not ^Tcd^t to ^S$PRESPATH^s."
+needs-cd -or-die "$PRESPATH"
 
 META_TO=
 META_BY=

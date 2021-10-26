@@ -131,7 +131,7 @@ function mnt-drv {
 } # }}}1
 
 : ${USER:?}
-needs df awk egrep as-root
+needs df awk egrep as-root needs-path
 
 ffsopts='-t ffs -s -o rw,noexec,nodev,sync,softdep'
 fatopts="-t msdos -s -o rw,noexec,nosuid,-g=$USER,-u=$USER"

@@ -95,7 +95,7 @@ function is-it-standard { # {{{1
 } # }}}1
 function handle-standard { # {{{1
 	worktree="$(git-top-level-memoize)"		 || die 'Could not resolve work tree.'
-	builtin cd "$worktree"			 || die "Could not ^Tcd^t to ^B$worktree^b."
+	needs-cd -or-die "$worktree"
 
 	trunk=$(get-local-to-remote-branch) ||
 									die 'Cannot resolve link branch.'
@@ -159,7 +159,7 @@ function convert-and-move-repo-to-bare { # {{{1
 
 [[ -d $REPODIR ]]|| die "No such directory: ^B$REPODIR^b."
 
-needs git i-can-haz-inet git-remote-links needs-path
+needs git i-can-haz-inet git-remote-links needs-cd needs-path
 
 NL='
 ' # capture a newline

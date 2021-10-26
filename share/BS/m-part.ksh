@@ -58,7 +58,7 @@ function clean-html {( # {{{1
 	local file tdir ferr fhtml
 	file=$(readlink -fn "${1:?}")
 	tdir="$(mktemp -d)"
-	cd $tdir			|| die "Could not ^Tcd^t to ^S$tdir^s."
+	needs-cd -or-die $tdir
 	ln "$file" 0.html	|| die "Could not ^Tln^t to ^S$file^s."
 	tidy-repeat
 	((REPLY))&& {
@@ -78,12 +78,12 @@ function clean-html {( # {{{1
 			 "Did ^Enot^e ^Trmdir^t ^S$PWD^s"
 	fi
 )} # }}}1
-needs tidy
+needs tidy needs-cd needs-path
 
 work=${XDG_PUBLICSHARE_DIR:?}/mail
 
 needs-path -or-die "$work"
-cd "$work" || die "Could not ^Tcd^t to ^S$work^s."
+needs-cd -or-die "$work"
 printf 'In \e[35m$XDG_CACHE_HOME/mail\e[39m\n'
 
 new-array parts

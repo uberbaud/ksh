@@ -45,12 +45,14 @@ function warnOrDie { #{{{1
 	esac
 } # }}}1
 
+needs needs-cd
+
 (($#))|| die 'Expected one argument ^Uhostglob^u.'
 (($#==1))||	die 'Too many arguments. Expected ^Uhostglob^u.'
 
 secrets="${XDG_DATA_HOME:?}"/secrets
 [[ -d $secrets ]]|| die 'No secrets directory.'
-cd $secrets || die 'Could not ^Tcd^t to ^Bsecrets^b.'
+needs-cd -or-die "$secrets"
 
 set -- *"$1"*.pwd
 [[ "$*" == \**\*.pwd ]]&& exit 1

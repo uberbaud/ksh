@@ -60,10 +60,10 @@ function GIT { # {{{1
 
 (($#))&& die 'Unexpected arguments. Expected ^Bnone^b.'
 
-needs git h1 i-can-haz-inet
+needs git h1 i-can-haz-inet needs-cd
 
 i-can-haz-inet	|| die 'No internet' "$REPLY"
-cd ${KDOTDIR:?}	|| die 'Could not ^Tcd^t to ^S$KDOTDIR^s.'
+needs-cd -or-die "${KDOTDIR:?}"
 
 branch="$(git rev-parse --abbrev-ref HEAD 2>/dev/null)"
 [[ $branch == trunk ]]&& die 'On branch ^Etrunk^e!!!'

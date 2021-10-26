@@ -76,7 +76,7 @@ function mk-linked-rcs { # {{{1
 } # }}}1
 
 (($#))|| die 'Missing required argument ^Ufile^u.'
-needs as-root ci co desparkle $ED needs-path
+needs as-root ci co desparkle $ED needs-cd needs-path
 
 CI_INITIAL_DESCRIPTION='OpenBSD system file'
 LOCKBASE=${XDG_CACHE_HOME:?}/suv/locks
@@ -126,7 +126,7 @@ function main {
 	[[ -d $workingpath/RCS ]]||
 		mk-linked-rcs "$filepath" "$workingpath"
 
-	cd "$workingpath" || die "Could not ^Tcd^t to ^B$workingpath^b."
+	needs-cd "$workingpath"
 
 	workfile=${filename##*/}
 	rcsFile=RCS/$workfile,v

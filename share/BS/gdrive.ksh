@@ -59,7 +59,7 @@ function do-one-drive { # {{{1
 	desparkle "$1"
 	dispD="$REPLY"
 	[[ -d $D ]]|| die "No such account directory ^S$dispD^s."
-	cd "$D" || die "Could not ^Tcd^t to ^S$dispD^s."
+	needs-cd -or-die "$D"
 
 	if [[ -f .grive ]]; then
 		notify "Syncing ^S$dispD^s."
@@ -75,9 +75,9 @@ function do-one-drive { # {{{1
 	fi
 } # }}}1
 
-needs grive
+needs grive needs-cd
 [[ -d $GDRIVE ]]|| die "No such directory ^B$GDRIVE^b (^S\$GDRIVE^s)."
-cd "$GDRIVE" || die "Could not ^Tcd^t to ^B$GDRIVE^b."
+needs-cd -or-die "$GDRIVE"
 
 $want_accts_list && list-accts
 

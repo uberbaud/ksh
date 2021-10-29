@@ -42,14 +42,6 @@ done
 shift $(($OPTIND - 1))
 # ready to process non '-' prefixed arguments
 # /options }}}1
-function warnOrDie { #{{{1
-	case $warnOrDie in
-		die)  die "$@" 'Use [1m-f22m to force an edit.';		;;
-		warn) warn "$@";											;;
-		*)    die '[1mProgrammer error[22m:' \
-					'warnOrDie is [1m${warnOrDie}[22m.';		;;
-	esac
-} # }}}1
 (($#))||	die 'Missing required argument ^Uwindowid^u.'
 (($#>1))&&	die 'Too many arguments. Expected only one.'
 [[ $1 == ?(0x)+([0-9]) ]]||

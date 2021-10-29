@@ -47,14 +47,6 @@ done
 shift $(($OPTIND - 1))
 # ready to process non '-' prefixed arguments
 # /options }}}1
-function warnOrDie { #{{{1
-	case $warnOrDie in
-		die)  die "$@" 'Use ^B-f^b to force an edit.';		;;
-		warn) warn "$@";											;;
-		*)    die '^BProgrammer error^b:' \
-					'warnOrDie is ^B${warnOrDie}^b.';		;;
-	esac
-} # }}}1
 function already-in-edit { # {{{1
 	set -- $(<$1)
 	warn "File is already being edited (pid=^B$1^b)"
@@ -103,7 +95,7 @@ function verify-file-is-editable { # {{{1
 # TODO: test 'checked-out'ness with something like	
 #       [[ -n $(rlog -L -l bobslunch.rem) ]]		
 
-needs $ED ci co rcsdiff trackfile needs-cd needs-path
+needs $ED ci co rcsdiff trackfile needs-cd needs-path warnOrDie
 
 (($#))|| exec "$ED" # We don't have a file, so short circut all the rest.
 

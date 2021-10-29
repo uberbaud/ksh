@@ -119,7 +119,8 @@ export PERL5LIB=$USR_PLIB
 export PERLBREW_BIN=$PERLBREW_CURRENT/bin
 export PERL_MB_OPT="--install_base $USR_PLIB"
 export PERL_MM_OPT="INSTALL_BASE=$USR_PLIB"
-
+# similar but for raku
+export RAKULIB=$xdgdata/lib/raku
 
 ####### SET PATH
 function wantpath { # {{{1

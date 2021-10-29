@@ -35,14 +35,6 @@ done
 shift $(($OPTIND - 1))
 # ready to process non '-' prefixed arguments
 # /options }}}1
-function warnOrDie { #{{{1
-	case $warnOrDie in
-		die)  die "$@" 'Use [1m-f22m to force an edit.';		;;
-		warn) warn "$@";											;;
-		*)    die '[1mProgrammer error[22m:' \
-					'warnOrDie is [1m${warnOrDie}[22m.';		;;
-	esac
-} # }}}1
 function expire-old-mail { # {{{1
 	print -nu2 ' [34m>>>[0m [1mDeleting[0m old trash ... '
 	if pick -before -30 +deleted -seq expired 2>/dev/null; then

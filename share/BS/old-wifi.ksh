@@ -42,16 +42,6 @@ done
 shift $(($OPTIND - 1))
 # ready to process non '-' prefixed arguments
 # /options }}}1
-function warnOrDie { #{{{1
-	case "$warnOrDie" in
-		die)	die "$@" 'Use ^B-f^b to force a reconnect.';	;;
-		warn)	warn "$@";										;;
-		*)
-			desparkle "$warnOrDie"
-			die '^BProgrammer error^b:' "warnOrDie is ^B$REPLY^b."
-			;;
-	esac
-} # }}}1
 function get-wifi-device { # {{{1
 
 	awkpgm="$(</dev/stdin)" <<-\
@@ -90,7 +80,7 @@ function LOG-INET-STATS {
 # DELETE TO HERE }}}1
 
 [[ -d $wifi_config ]]|| die 'wifi config directory does not exist.'
-needs doas ifconfig dhclient awk
+needs doas ifconfig dhclient awk warnOrDie
 
 # default
 (($#))||	set -- fred

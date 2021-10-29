@@ -35,14 +35,6 @@ done
 shift $(($OPTIND - 1))
 # ready to process non '-' prefixed arguments
 # /options }}}1
-function warnOrDie { #{{{1
-	case $warnOrDie in
-		die)  die "$@" 'Use [1m-f22m to force an edit.';		;;
-		warn) warn "$@";											;;
-		*)    die '[1mProgrammer error[22m:' \
-					'warnOrDie is [1m${warnOrDie}[22m.';		;;
-	esac
-} # }}}1
 function is-empty { # {{{1
 	[[ -s $1 ]]&& return 1
 	print -- "  $2: \033[38;5;217m-\033[0m"

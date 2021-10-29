@@ -35,33 +35,25 @@ done
 shift $((OPTIND-1))
 # ready to process non '-' prefixed arguments
 # /options }}}1
-function warnOrDie { #{{{1
-	case $warnOrDie in
-		die)  die "$@" 'Use [1m-f22m to force an edit.';		;;
-		warn) warn "$@";											;;
-		*)    die '[1mProgrammer error[22m:' \
-					'warnOrDie is [1m${warnOrDie}[22m.';		;;
-	esac
-} # }}}1
-function try-path {
+function try-path { # {{{1
 	warn "^Ttry-path^t: not yet implemented"
-}
-function try-script {
+} # }}}1
+function try-script { # {{{1
 	warn "^Ttry-script^t: not yet implemented"
-}
-function try-function {
+} # }}}1
+function try-function { # {{{1
 	[[ -f $FS/$1	]]|| return 1
 	[[ -f F/$1		]]&& return 0
 	ln -s $FS/$1 F/$1 ||
 		warn "Could not link ^S\$FS/$1^s to ^S$2/F/^s."
-}
-function find-needs-for-host {
+} # }}}1
+function find-needs-for-host { # {{{1
 	find -f ./B ./F -type l -print0							|
 		xargs -0 egrep -h '^[[:space:]]*needs[[:space:]]'	|
 		egrep -o '[^[:space:]]+'							|
 		sort -u
-}
-function provide-needs-for-host {
+} # }}}1
+function provide-needs-for-host { # {{{1
 	local need host
 	host=$1
 	set -- $(find-needs-for-host)
@@ -72,7 +64,7 @@ function provide-needs-for-host {
 				try-path $need $host		||
 					warn "Could not find ^B$need^b ($host)."
 	done
-}
+} # }}}1
 
 function main {
 	for h; do

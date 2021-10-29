@@ -42,14 +42,6 @@ done
 shift $(($OPTIND - 1))
 # ready to process non '-' prefixed arguments
 # /options }}}1
-function warnOrDie { #{{{1
-	case $warnOrDie in
-		die)  die "$@" 'Use ^B-f^b to force an edit.';		;;
-		warn) warn "$@";											;;
-		*)    die '^BProgrammer error^b:' \
-					"warnOrDie is ^S${warnOrDie}^s.";		;;
-	esac
-} # }}}1
 function remove-lockfile { # {{{1
 	local lockfile base file expectedCmd
 	lockfile=$1/$2
@@ -76,7 +68,7 @@ function mk-linked-rcs { # {{{1
 } # }}}1
 
 (($#))|| die 'Missing required argument ^Ufile^u.'
-needs as-root ci co desparkle $ED needs-cd needs-path
+needs as-root ci co desparkle $ED needs-cd needs-path warnOrDie
 
 CI_INITIAL_DESCRIPTION='OpenBSD system file'
 LOCKBASE=${XDG_CACHE_HOME:?}/suv/locks

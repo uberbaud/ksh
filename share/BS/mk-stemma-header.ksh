@@ -72,14 +72,6 @@ done
 shift $(($OPTIND - 1))
 # ready to process non '-' prefixed arguments
 # /options }}}1
-function warnOrDie { #{{{1
-	case $warnOrDie in
-		die)  die "$@" 'Use [1m-f22m to force an edit.';		;;
-		warn) warn "$@";											;;
-		*)    die '[1mProgrammer error[22m:' \
-					'warnOrDie is [1m${warnOrDie}[22m.';		;;
-	esac
-} # }}}1
 (($#>2))&& die 'Too many nonflag parameters. Expected at most two (2).'
 pfx=${1:+${1% } }
 sfx=${2:+ ${2# }}
@@ -89,7 +81,7 @@ bins[1]='random'
 # we only need to find what we don't already have
 [[ -n ${M:-} ]]|| bins[${#bins[*]}]='id'
 [[ -n ${U:-} ]]|| bins[${#bins[*]}]='uname'
-needs "${bins[@]}"
+needs "${bins[@]}" warnOrDie
 
 if $DATEGIVEN && $TIMEGIVEN; then
 	DTs="$(date -ju +'%Y-%m-%d:%H.%M.%Sz' "$Dy$Dm$Dd$Th$Tm.$Ts" 2>/dev/null)" ||

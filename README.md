@@ -47,6 +47,17 @@ which in this regard at least, I liked.
 You can get help on scripts in the `$KDOTDIR/bin` directory by calling 
 them with the `-h` flag.
 
+Bugs
+=====
+
+Files containing FPATH compatible functions are in share/FS and linked 
+to $HOST/F, where F could stand for FPATH or FUNCTIOn, so that makes 
+sense. BUT files containing executable scripts are in share/BS and 
+linked to $HOST/B, where B stands for bin, which is the traditional name 
+for directories with executables, but which stands for binary. Perhaps 
+instead of B and BS, it should be P and PS (for PATH) or S and SS (for 
+SCRIPT).
+
 Contributing
 =============
 
@@ -58,4 +69,8 @@ Copyright
 
 Copyright (C) 2016 by Tom Davis <tom@greyshirt.net>.
 
-` <@(#)tag:csongor.greyshirt.net,2017-08-09:tw/02.57.09z/83fa5a> `
+
+<!--
+  <@(#)tag:csongor.greyshirt.net,2017-08-09:tw/02.57.09z/83fa5a>
+  vim: filetype=markdown
+-->

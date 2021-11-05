@@ -17,7 +17,7 @@ function subst-pathvars {
 		case $1 in
 			-c)	PATH_VARS=;												;;
 			-s)	lcmd=set;												;;
-			-*)	die "^WBAD PROGRAMMER^w: Unknown flag ^S$1^s.";			;;
+			-*)	bad-programmer "^T$0^t Unknown flag ^S$1^s.";			;;
 			*)	die "^T$0^t expects at most one non-flag parameter.";	;;
 		esac
 		shift

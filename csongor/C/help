@@ -17,6 +17,7 @@ ansi-escapes
 as-root
 ascii
 autoload
+bad-programmer
 bg
 binary
 bind
@@ -137,6 +138,7 @@ message
 need-not-stated
 needs
 needs-cd
+needs-file
 needs-path
 new-array
 newest
@@ -197,6 +199,7 @@ ssh-clonedir
 stop
 subst-pathvars
 suspend
+sysexits
 t
 tdump
 term-does-utf8
@@ -218,6 +221,7 @@ unalias
 unix
 unset
 unset-alternate-screen
+use-app-paths
 utf8
 utf8-to-octal
 utf8codes

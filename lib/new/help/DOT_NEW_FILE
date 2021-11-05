@@ -1,0 +1,20 @@
+
+    A ^B.new^b file sets actions for ^Tnew^t in that directory.  The file may
+    contain empty lines, comment lines, and declarations.  Comment lines
+    start with an octothorpe (^#) or semi-colon (^;).  Declarations may be
+    ^Bdefaults^b or a ^Bredirect^b.
+
+    ^BDEFAULTS FILE^b
+
+    Each declaration has the format:
+        ^Ufiletype^u^T:^t^[^Umod1^u^] ^G# The colon ^Bis^b mandatory.^g
+
+    The first declaration sets the default ^Ufiletype^u if neither ^T-t^t nor
+    an extension is used. Additional declarations set a default ^Umod^u for
+    the given filetype.
+
+    ^BREDIRECT^b
+
+    A redirect file causes ^Tnew^t to create the file in an
+    ^Ualternate path^u, and then create a soft link from that file in this
+

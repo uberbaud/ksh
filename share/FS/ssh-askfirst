@@ -30,7 +30,7 @@ function ssh-askfirst {
 			/usr/bin/ssh "$host" "$@"
 			$HOST-colors
 			;;
-		*)		die 'Bad Programmer.';						;;
+		*)		bad-programmer "^$0^t unhandled cmd ^B$cmd^b.";		;;
 	esac
 }
 

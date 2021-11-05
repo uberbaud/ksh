@@ -1,0 +1,24 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2021-10-29,00.59.44z/29cc894>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Uname^u
+#:   Sets ^VAPP_PATH^v to ^O$^o^VKDOTDIR^v^T/share/lib/^t^O$^o^Vname^v
+#:   Prefixes ^VPATH^v and ^VFPATH^v with ^O$^o^VAPP_PATH^v^T/^t^O{^o^TB^t^O,^o^TF^T^O}^o respectively, if they exist.
+
+function use-app-paths {
+	local A I
+	I=lib
+	[[ -n ${1:-} ]]|| bad-programmer "^T$0^t: missing parameter ^Uname^u."
+	A=${KDOTDIR:?}/$I/$1
+	[[ -d $A ]]|| {
+		warn "No private path ^O\$^o^VKDOTDIR^v^T/$I/^t^B$1^b."
+		return
+	  }
+	[[ -d $A/F && :$FPATH: != *:$A/F:* ]]&&
+		FPATH=$A/F${FPATH:+:"$FPATH"}
+	[[ -d $A/B && :$PATH: != *:$A/B:* ]]&&
+		PATH=$A/B${PATH:+:"$PATH"}
+	APP_PATH=$A
+}
+
+# Copyright © 2021 by Tom Davis <tom@greyshirt.net>.

@@ -1,0 +1,18 @@
+# <@(#)tag:csongor.greyshirt.net,2017-08-07:tw/16.08.35z/35c49a>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Umsg-ln1^u ^[^Umsg-ln…N^u^]
+#:   Output an error message to ^SSTDERR^s and ^Texit^t ^F{3}${^f^Nerrno^n^F{3}:-^f^B1^b^F{3}}^f.
+
+needs message
+function bad-programmer {
+	local EX_SOFTWARE=70
+
+	message '  ^WBAD PROGRAMMER^w:' '                 ' "$@"
+
+	# don't exit a user's shell, just get back to the prompt
+	[[ -o interactive ]]&& kill -s TERM $$
+	exit $EX_SOFTWARE
+  }
+
+# vim: ft=ksh ts=4

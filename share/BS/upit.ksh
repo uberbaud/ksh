@@ -102,7 +102,7 @@ function do-one {( # {{{1
 	eval "DIR=\"\${1%/$re_dots}\""
 	subst-pathvars "$DIR"
 	h2 "upit $REPLY"
-	needs-cd -or-die ${VERBOSE:+-with-notify} "$DIR"
+	needs-cd -or-die ${VERBOSE:+-with-notice} "$DIR"
 
 	integer i=${#name[*]}
 	while ((i--)); do

@@ -1,0 +1,38 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2021-10-19,16.44.57z/ebcd74>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^[^T-or-warn^t^|^T-or-die^t^] ^[^T-with-notice^t^] ^Udir name^u
+#:   ^Tmkdir^ if necessary, possibly warn or die
+
+needs warn die desparkle subst-pathvars
+function needs-file {
+	local or_what REPLY v r
+
+	while (($#>1)); do
+		case $1 in
+			-or-warn)	or_what=warn;									;;
+			-or-die)	or_what=die;									;;
+			-*)			bad-programmer "$0: Unknown flag ^T$1^t.";		;;
+			*)			die "Too many parameters.";						;;
+		esac
+		shift
+	done
+	[[ -n ${or_what-} ]]||
+		bad-programmer "^T$0^t is missing required ^T-or-^t^{^Twarn^t^,^Tdie^}"
+
+	[[ -f $1 ]]&& return
+
+	subst-pathvars "$1"
+	desparkle "$REPLY"
+	if [[ $REPLY == \$* ]]; then
+		v=${REPLY%%/*}
+		r=${REPLY#*/}
+		REPLY="^O\$^o^V${v#\$}^v^B/$r^b"
+	else
+		REPLY="^B$REPLY^b"
+	fi
+
+	$or_what "$errmsg"
+}
+
+# Copyright © 2021 by Tom Davis <tom@greyshirt.net>.

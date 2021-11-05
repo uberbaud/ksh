@@ -84,8 +84,10 @@ bins[1]='random'
 needs "${bins[@]}" warnOrDie
 
 if $DATEGIVEN && $TIMEGIVEN; then
-	DTs="$(date -ju +'%Y-%m-%d:%H.%M.%Sz' "$Dy$Dm$Dd$Th$Tm.$Ts" 2>/dev/null)" ||
-		die "Bad date or time format."
+	DTs="$(date -ju +'%Y-%m-%d:%H.%M.%Sz' "$Dy$Dm$Dd$Th$Tm.$Ts" 2>&1)" || {
+		desparkle "${DTs%?usage: *}"
+		die "$REPLY"
+	  }
 	[[ $DTs == "$Dy-$Dm-$Dd:$Th.$Tm.$Ts"z ]]||
 		die "Bad date or time values." "in:  $Dy-$Dm-$Dd:$Th.$Tm.$Ts""z" "out: $DTs"
 elif $DATEGIVEN; then
@@ -108,7 +110,7 @@ typeset -i16 X=$$$A$B$C
 [[ -n ${M:-} ]]|| { M="$(uname -n)"; M="${M%.*}"; }
 [[ -n ${U:-} ]]|| { U="$(id -un)"; }
 [[ -n ${H:-} ]]|| { H="${URI_AUTHORITY-${EMAIL#*@}}"; }
-: ${M-Neither URI_AUTHORITY nor EMAIL is set.}
+: ${H-Neither URI_AUTHORITY nor EMAIL is set.}
 
 #	'@' = \0100, '(' = \050, '#' = \043, ')' = \051
 #print -n '<\0100\050\043\051'"tag:$M.$H,$D:$U/$T/${X#?(-)16#}>"

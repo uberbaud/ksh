@@ -49,7 +49,7 @@ function pkg {
 					I) casen=false;								;;
 					\?) die "Invalid option: ^B-$OPTARG^b.";	;;
 					\:) die "Option ^B-$OPTARG^b requires an argument."; ;;
-					*)  die "BAD PROGRAMMER. Need a getopt case for $Option."
+					*)  bad-programmer "^T$0^t: Need a getopt case for $Option."
 						;;
 				esac
 			done

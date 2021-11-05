@@ -27,7 +27,7 @@ showvar() {
 				!)	set -- "$1" "$!" "PID of last bg process started";	;;
 				$)	set -- "$1" "$$" "shell PID (parent of subshell)";	;;
 				0)	set -- "$1" "$0" "name of shell or function";		;;
-				*) die 'Bad programmer (2nd case).';	;;
+				*) bad-programmer '(2nd case).';						;;
 			esac
 			sparkle <<-==SPARKLE==
 			  ^B$1^b is a ^Bspecial^b variable indicating the $3

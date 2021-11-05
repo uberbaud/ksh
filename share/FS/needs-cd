@@ -4,7 +4,7 @@
 #: FUNCTION ^[^T-or-warn^t^|^T-or-die^t^] ^[^T-with-notice^t^] ^Udir name^u
 #:   ^Tcd^ to ^Udir name^u, optionally notifying, possibly ^Twarn^t or ^Tdie^t.
 
-needs notify desparkle
+needs notify warn die bad-programmer desparkle subst-pathvars
 function needs-cd {
 	local or_what notice REPLY v r
 
@@ -12,11 +12,11 @@ function needs-cd {
 	notice=false
 	while (($#>1)); do
 		case $1 in
-			-or-warn)		or_what=warn;								;;
-			-or-die)		or_what=die;								;;
-			-with-notice)	notice=true;								;;
-			-*)				die "BAD PROGRAMMER: Unknown flag ^T$1^t.";	;;
-			*)				die "Too many parameters.";					;;
+			-or-warn)		or_what=warn;									;;
+			-or-die)		or_what=die;									;;
+			-with-notice)	notice=true;									;;
+			-*)				bad-programmer "^T$0^t: Unknown flag ^T$1^t.";	;;
+			*)				die "Too many parameters.";						;;
 		esac
 		shift
 	done

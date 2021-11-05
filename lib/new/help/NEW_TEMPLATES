@@ -1,0 +1,91 @@
+    ^BNEW TEMPLATE FILES GUIDE^b
+
+    A template may contain items which will be replaced in the final
+    output. The items can be any of:
+
+        ^S«[^s^VDICT_VALUE^v^S]»^s              → ^Glookup value from dictionary^g
+        ^S«=^s^Vliteral value^v^S»^s            → ^Tliteral value^t
+        ^S«(^s^V[meta]^v^S)»^s                  → ^T«[meta]»^t
+
+    Additionally, ^VDICT_VALUE^vs can have modifiers in the form of
+        ^S«[^s^GDICT_VALUE^g^O:^o^VM^v^S]»^s
+    Where ^VM^v can be any one of:
+      File portion indicator
+        ^TP^t → Path
+        ^TF^t → File (Base+Extension)
+        ^TX^t → Extension
+        ^TB^t → Base
+      Case transformation
+        ^TU^t → Uppercase
+        ^TL^t → Lowercase
+        ^TT^t → Title case
+      Or
+        ^TA^t → ASCIIfy (change ^T©^t to ^T(C)^t, for example)
+        ^TZ^t → Allow undefined or null string
+
+    Multiple modifiers can included, and will be processed left to right.
+
+    For example, if ^VMY_VAL^v is ^G'^g^T/home/me/my/path/somewhere.ext^t^G'^g, then
+    ^S«[^s^VMY_VAL^v^O:^o^TPB^t^S]»^s yields ^G'^g^Tpath^t^G'^g.
+
+    Without the ^TZ^t modifier, undefined environment variables referenced in
+    the template are a fatal error.
+
+    A simple template file MUST be in ^O$^o^VTEMPLATES_FOLDER^v, and MUST 
+    have a name of ^B^Uout ext^u.tmpl^b.
+
+    Templates with ^Bmods^b MUST be in ^O$^o^VTEMPLATES_FOLDER^v^T/^t^Uout ext^u
+    and MUST have a name of ^B^Umod^u.tmpl^b.
+
+    The template directories MUST contain a file named ^TDESCRIPTION^t.  
+    The first line is the description which will be processed by sparkle 
+    and shown with the ^Tnew -X ^Umod^u^t command.  Any additional lines 
+    in the file will be displayed at the very end of the ^T-X^t output.
+
+    Additionally each mod has its own file containing a ^S«REM»^sed header 
+    whose first line is the description and with an optional second line 
+    of the format:
+
+      ^T«REM» option: optval1 optval2 … optvalN^t
+
+    The ^Ioption^i bit will be used as the text in ^Tnew -X^t output, 
+    and the ^IoptvalN^i bits are the valid mod options. Each line of a 
+    file with such options MUST begin with ^B^UoptvalN^u:^b or ^Ball:^b.  
+    Lines matching the requested mod option(s) or all, will be output less 
+    the ^BoptionN:^b bit. Any files missing the ^Uoptval^u: prefix will be 
+    skipped.
+
+    ^BExamples^b
+
+       ^BDESCRIPTION^b
+       ┌──────────────────────────────────────────┐
+       │This is the best file type. Try it.       │
+       │^GNote: see all those ^Blovely^b mods^g           │
+       │      ^Glisted above.^g                       │
+       └──────────────────────────────────────────┘
+
+       ^B^Umod^u.tmpl^b
+       ┌──────────────────────────────────────────┐
+       │^S«REM»^sAn excellent mod. Try it.            │
+       │; ^S«[^s^VIDENT^v^S]»^s                               │
+       │; ^S«=^s^Tvim^t^S»^s: ft=xclnt tw=10                  │
+       │                                          │
+       │Subject: ^S«[^s^VDESCRIPTION^v^S]»^s                  │
+       │                                          │
+       │^S«[^s^VCOPYRIGHT^v^S]»^s                             │
+       └──────────────────────────────────────────┘
+
+       ^B^Umod with options^u.tmpl^b
+       ┌──────────────────────────────────────────┐
+       │^S«REM»^sAnother excellent mod. Try it too.   │
+       │^S«REM»^slove: eros philos agape              │
+       │all:; ^S«[^s^VIDENT^v^S]»^s                           │
+       │all:; ^S«=^s^Tvim^t^S»^s: ft=xclnt tw=10              │
+       │all:                                      │
+       │eros:A rose, a rose, a rose.              │
+       │philos:Road trip!                         │
+       │agape:Free hugs Monday.                   │
+       │                                          │
+       │all:^S«[^s^VCOPYRIGHT^v^S]»^s                         │
+       └──────────────────────────────────────────┘
+

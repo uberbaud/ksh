@@ -1,11 +1,38 @@
 # <@(#)tag:csongor.greyshirt.net,2017-08-07:tw/16.08.35z/35c49a>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^Umsg-ln1^u ^[^Umsg-ln…N^u^]
+#: FUNCTION ^[^Uerrname^u^] ^Umsg-ln1^u ^[^Umsg-ln…N^u^]
 #:   Output an error message to ^SSTDERR^s and ^Texit^t ^F{3}${^f^Nerrno^n^F{3}:-^f^B1^b^F{3}}^f.
+#:   If ^Uerrname^u is given, the standard exit number for that name will
+#:   be used. Use ^Thelp sysexits^t for information about those names.
 
 needs message
 function die {
+	[[ ${1-} == +([A-Z]) ]]&& {
+		local wantshift=true;
+		case $1 in
+			OK)          errno=0;		;; # successful termination
+			USAGE)       errno=64;		;; # command line usage error
+			DATAERR)     errno=65;		;; # data format error
+			NOINPUT)     errno=66;		;; # cannot open input
+			NOUSER)      errno=67;		;; # addressee unknown
+			NOHOST)      errno=68;		;; # host name unknown
+			UNAVAILABLE) errno=69;		;; # service unavailable
+			SOFTWARE)    errno=70;		;; # internal software error
+			OSERR)       errno=71;		;; # system error (e.g., can't fork)
+			OSFILE)      errno=72;		;; # critical OS file missing
+			CANTCREAT)   errno=73;		;; # can't create (user) output file
+			IOERR)       errno=74;		;; # input/output error
+			TEMPFAIL)    errno=75;		;; # temp failure; might succeed on retry
+			PROTOCOL)    errno=76;		;; # remote error in protocol
+			NOPERM)      errno=77;		;; # permission denied
+			CONFIG)      errno=78;		;; # configuration error
+			*) wantshift=false
+				;;
+		esac
+		$wantshift && shift
+	  }
+
 	message '  ^EFAILED^e:' '         ' "$@"
 	# don't exit a user's shell, just get back to the prompt
 	[[ -o interactive ]]&& kill -s TERM $$

@@ -72,7 +72,7 @@ needs as-root ci co desparkle $ED needs-cd needs-path warnOrDie
 
 CI_INITIAL_DESCRIPTION='OpenBSD system file'
 LOCKBASE=${XDG_CACHE_HOME:?}/suv/locks
-need-path -or-die "$LOCKBASE"
+needs-path -or-die "$LOCKBASE"
 
 filename=$1; shift
 desparkle "$filename"

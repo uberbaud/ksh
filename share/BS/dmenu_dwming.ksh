@@ -2,7 +2,7 @@
 # <@(#)tag:tw.csongor.greyshirt.net,2020-12-28,19.09.22z/47b5b85>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
 
-exec 2>~/log/dmenu_dwming.log
+exec 2>>~/log/dmenu_dwming.log
 set -o nounset;: ${FPATH:?Run from within KSH}
 
 cmdcache=${XDG_CACHE_HOME:-"$HOME/.cache"}/wdm-dmenu-cmds

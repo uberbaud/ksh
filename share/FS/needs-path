@@ -4,45 +4,51 @@
 #: FUNCTION ^[^T-or-warn^t^|^T-or-die^t^] ^[^T-with-notice^t^] ^Udir name^u
 #:   ^Tmkdir^ if necessary, possibly warn or die
 
-needs notify desparkle
+needs notify warn die desparkle subst-pathvars bad-programmer
 function needs-path {
-	local or_what notice REPLY v r
+	local or_what notice REPLY v r create errmsg
 
+	create=true
 	notice=false
 	while (($#>1)); do
 		case $1 in
-			-or-warn)		or_what=warn;								;;
-			-or-die)		or_what=die;								;;
-			-with-notice)	notice=true;								;;
-			-*)				die "BAD PROGRAMMER: Unknown flag ^T$1^t.";	;;
-			*)				die "Too many parameters.";					;;
+			-or-warn)		or_what=warn;									;;
+			-or-die)		or_what=die;									;;
+			-no-create)		create=false;									;;
+			-with-notice)	notice=true;									;;
+			-*)				bad-programmer "^T$0^t: Unknown flag ^T$1^t.";	;;
+			*)				die "Too many parameters.";						;;
 		esac
 		shift
 	done
+	$notice && ! $create && bad-programmer \
+		'^T-no-create^t and ^T-with-notice^t are mutually exclusive.'
 
-	[[ ${1:?} == -or-* ]]&& {
-		or_what=${1#-or-}
-		shift
-	  }
-
-	[[ -d $1 ]]						&& return
+	[[ -d $1 ]]&& return
 
 	subst-pathvars "$1"
 	desparkle "$REPLY"
 	if [[ $REPLY == \$* ]]; then
 		v=${REPLY%%/*}
 		r=${REPLY#*/}
-		REPLY="^F{11}\$^f^F{4}${v#\$}^f^B/$r^b"
+		REPLY="^O\$^o^V${v#\$}^v^B/$r^b"
 	else
 		REPLY="^B$REPLY^b"
 	fi
-	$notice && notify "Creating directory $REPLY."
 
-	mkdir -p "$1" >/dev/null 2>&1	&& return
+	if $create; then
+		$notice && notify "Creating directory $REPLY."
+		mkdir -p "$1" >/dev/null 2>&1 && return
+		errmsg="Could not ^Tmkdir -p^t $REPLY."
+	else
+		[[ -n ${or_what-} ]]||
+			bad-programmer "^T$0 -no-create^t requires ^T-or-^t^{^Twarn^t^,^Tdie^t^}"
+		errmsg="No such directory $REPLY."
+	fi
 
-	[[ -n ${or_what:-} ]]			|| return
+	[[ -n ${or_what:-} ]]|| return
 
-	$or_what "Could not ^Tmkdir -p^t $REPLY."
+	$or_what "$errmsg"
 }
 
 # Copyright © 2021 by Tom Davis <tom@greyshirt.net>.

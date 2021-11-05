@@ -1,0 +1,40 @@
+Standard ^Verrnames^v and ^Verrno^v values according to ^B/usr/include/sysexits.h^b.
+; <@(#)tag:tw.csongor.greyshirt.net,2021-11-05,15.49.09z/e49b5>
+
+^Verrname^v^/^Verrno^v is one of
+    ^TOK^t^/^V0^v
+    ^TUSAGE^t^/^V64^v The command was used incorrectly, eg: with the wrong number of 
+        arguments, a bad flag, a bad syntax in a parameter, or whatever.
+    ^TDATAERR^t^/^V65^v The input data was incorrect in some way. This should only be 
+        used for user’s data, not system files.
+    ^TNOINPUT^t^/^V66^v An input file, not a system file, did not exist or was not 
+        readable.  This could also include errors like “^INo message^i” to a 
+        mailer (if it cared to catch it).
+    ^TNOUSER^t^/^V67^v The user specified did not exist.  This might be used for mail 
+        addresses or remote logins.
+    ^TNOHOST^t^/^V68^v The host specified did not exist.  This is used in mail 
+        addresses or network requests.
+    ^TUNAVAILABLE^t^/^V69^v A service is unavailable.  This can occur if a support 
+        program or file does not exist.  This can also be used as a catchall 
+        message when something you wanted to do doesn’t work, but you don’t 
+        know why.
+    ^TSOFTWARE^t^/^V70^v An internal software error has been detected. This should be 
+        limited to non-operating system related errors as possible.
+    ^TOSERR^t^/^V71^v An operating system error has been detected. This is intended to 
+        be used for such things as “^Icannot fork^i”, “^Icannot create pipe^i”, or the 
+        like.  It includes things like ^Tgetuid^t returning a user that does not 
+        exist in the ^Tpasswd^t file.
+    ^TOSFILE^t^/^V72^v Some system file (eg: ^T/etc/passwd^t, ^T/var/run/utmp^t, etc.) does 
+        not exist, cannot be opened, or has an error (eg: ^Bsyntax error^b).
+    ^TCANTCREAT^t^/^V73^v A user specified output file cannot be created.
+    ^TIOERR^t^/^V74^v An error occurred while doing I/O on some file.
+    ^TTEMPFAIL^t^/^V75^v temporary failure, indicating something that is not really an 
+        error.  In sendmail, this means that a mailer, for example,  could not 
+        create a connection, and the request should be reattempted later.
+    ^TPROTOCOL^t^/^V76^v the remote system returned something that was “^Inot possible^i” 
+        during a protocol exchange.
+    ^TNOPERM^t^/^V77^v You did not have sufficient permission to perform the operation. 
+        This is not intended for file system problems, which should use 
+        ^BNOINPUT^b or ^BCANTCREAT^b, but rather for higher level permissions.
+    ^TCONFIG^t^/^V78^v Something was found in an unconfigured or misconfigured state.
+

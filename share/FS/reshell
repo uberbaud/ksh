@@ -24,7 +24,7 @@ function reshell {
 			n)	doenv=false;										;;
 			\?)	die "Invalid option: ^B-$OPTARG^b.";				;;
 			\:)	die "Option ^B-$OPTARG^b requires an argument.";	;;
-			*)	die "Bad programmer.";								;;
+			*)	bad-programmer "^T$0^t: unknown option ^B-$Opt^b.";	;;
 		esac
 	done
 	shift $((OPTIND-1))

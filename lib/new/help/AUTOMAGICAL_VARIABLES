@@ -1,0 +1,22 @@
+  ^NAutomagical variables:^n
+    «[FILE]»         := 'path/SomeFile.Ext'
+    «[TITLE]»        := 'SomeFile'
+                        ^G# $TITLE || $FILE:B^g
+    «[TIMESTAMP]»    := '1973-05-14 17:30:00 Z' ^G# UTC^g
+    «[DATE]»         := '1973-05-14'
+    «[YEAR]»         := '1973'
+    «[AUTHOR]»       := 'Thomas Anderson'
+                        ^G# $AUTHOR || fullname from passwd for id^g
+    «[ORGANIZATION]» := 'Thomas Anderson'
+                        ^G# $ORGANIZATION || $AUTHOR^g
+    «[COPYRIGHT]»    := 'Copyright © 1973 by Tom Anderson <tanderson@matrix.dev>.'
+                        ^G# Copyright © $YEAR by $ORGANIZATION <$EMAIL>^g
+                        ^G# $EMAIL must be exported elsewhere^g
+    «[IDENT]»        := '<@(#)tag:stemma/RFC4151 tag>'
+  ^NFrom the command line:^n
+    «[DESCRIPTION]»  := 'RCS initial message'
+  ^NModifiers:^n
+   Case: ^BU^b^Gpper^g, ^BL^b^Gower^g, ^BT^b^Gitlecase^g
+   File: ^BP^b^Gath^g, ^BF^b^Gile_wo_path^g, ^BB^b^Gasename^g, ^BE^b^Gxtension^g
+   ^BA^b^Gscii^g: ^T©^t ^= ^T(C)^t
+   ^BZ^b^Gero length^g: Allow unset and empty variables.

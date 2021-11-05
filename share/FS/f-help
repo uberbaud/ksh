@@ -43,11 +43,20 @@ function f-help {
 	if [[ -n $funcfile ]]; then
 		_show_function_help "$funcfile" "$1"
 	elif   [[ -f $helpdir/$1 ]]; then
-		local pager SPARKLE_FORCE_COLOR
+		local htmp pager SPARKLE_FORCE_COLOR
+		htmp=$(mktemp -t help-XXXXXXXX)
+		[[ -f $htmp ]]||
+			die UNAVAILABLE 'Could not ^Tmktemp^t'
+		sed -e '/^;/d' <$helpdir/$1 >$htmp
+		[[ -s $htmp ]]|| {
+			die UNAVAILABLE "^Tmktemp^t file ^B$htmp^b is empty."
+			rm -f "$htmp"
+		  }
 		[[ -t 1 ]]&& SPARKLE_FORCE_COLOR=true
 		pager=${PAGER:-less}
-		(($(wc -l<$helpdir/$1)<LINES))&& pager=cat
-		sparkle < $helpdir/$1 | $pager
+		(($(wc -l <$htmp)<LINES))&& pager=cat
+		sparkle <$htmp | $pager
+		rm "$htmp"
 	else
 		die "No help for [1m$1[22m"
 	fi

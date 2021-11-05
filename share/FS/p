@@ -26,7 +26,7 @@ function p {
 			elif [[ $s == /* ]]; then
 				n="$n$p'*/*'"
 			else
-				die "Bad Programmer: matched ^[$s^]."
+				bad-programmer "^T$0^t: matched ^[$s^]."
 			fi
 			t="${s#[\'/]}"
 		done

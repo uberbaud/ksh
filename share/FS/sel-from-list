@@ -3,9 +3,9 @@
 
 #: FUNCTION ^[^T-on^t^] ^Uitem1^u ^Uitem2^u ^S...^s ^UitemN^u ^= $reply
 #:   Wrapper around ^Tdialog^t.
-#:   places selected indexes in array ^S$reply^s
+#:   places selected indexes in array ^O$^o^Vreply^v
 #:   ^T-on^t  Selects everything (default is to select nothing).
-#:   Use ^S$TITLE^s to set the title.
+#:   Use ^O$^o^VTITLE^v to set the title.
 
 function sel-from-list {
 	needs dialog

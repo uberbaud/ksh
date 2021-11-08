@@ -2,22 +2,21 @@
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
 #: FUNCTION ^Udefaults_file^u ^Ucommand^u
-#:   Process a defaults file and run ^Tcommand^T ^S$(<^s^Udefaults_file^u^)
+#:   Process a defaults file and run ^Tcommand^T ^O$(<^o^Udefaults_file^u^O)^o
 
+needs needs-file
 function with-defaults {
 	local cmd file options A B C
 	file=${1:-Missing required options: file _cmd_}
+	needs-file -or-die "$file"
 	cmd=${2:-Missing required second option _cmd_}
 	shift 2
-	if [[ -f $file ]]; then
-		A='/^#/d'
-		B='/^[[:space:]]*$/d'
-		C='s/[[:space:]]*#.*//'
-		options=$(sed -E -e "$A" -e "$B" -e "$C" "$file"|tr \\n \ )
-	else
-		desparkle "$file"
-		warn "No such file: $S$REPLY^s."
-	fi
+
+	A='/^#/d'
+	B='/^[[:space:]]*$/d'
+	C='s/[[:space:]]*#.*//'
+	options=$(sed -E -e "$A" -e "$B" -e "$C" "$file"|tr \\n \ )
+
 	eval "$cmd $options \"\$@\""
 }
 

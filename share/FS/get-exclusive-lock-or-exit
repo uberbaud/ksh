@@ -1,7 +1,7 @@
 # <@(#)tag:csongor.greyshirt.net,2017-12-17:tw/01.36.03z/2058dc2>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
 
-#: FUNCTION ^Ulock_name^u ^[^Ulock_path^u^] ^= "^S$REPLY^s
+#: FUNCTION ^Ulock_name^u ^[^Ulock_path^u^] ^= "^O$^o^VREPLY^v
 #:   Attempts to create a lock with ^Ulock_name^u in the ^Ulock_path^u,
 #:     which defaults to $TMPDIR or if that's unset, to /tmp.
 #:   Exits with 0 on success and >0 on failure.

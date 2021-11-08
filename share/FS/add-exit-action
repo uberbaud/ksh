@@ -3,7 +3,7 @@
 
 #: FUNCTION ^Utrap_action^u
 #:   Wrapper around trap with some memory.
-#:   Uses ^S$TRAPEXIT^s array.
+#:   Uses ^O$^o^VTRAPEXIT^v array.
 
 needs new-array
 function add-exit-action {

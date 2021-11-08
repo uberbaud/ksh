@@ -2,7 +2,7 @@
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
 #: FUNCTION ^Umatch^u ^Ustring^u ^[^Uarray_name^u^]
-#:   Splits a ^Ustring^u on ^Umatch^u into ^Uarray_name^u (or ^S$reply^s).
+#:   Splits a ^Ustring^u on ^Umatch^u into ^Uarray_name^u (or ^O$^o^Vreply^v).
 #:   where ^Umatch^u is any string, and so is ^Ustring^u.
 
 function splitstr {

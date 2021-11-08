@@ -16,7 +16,7 @@ function list-known-hosts {
 	[[ $fnames -ot $fknown ]]&& {
 		dq='^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$'
 		[[ -e $fnames ]]|| touch $fnames
-		[[ -w $fnames ]]|| die '^S$fnames^s is not writable'
+		[[ -w $fnames ]]|| die "^S$fnames^s is not writable"
 		awk '{print $1}' $fknown|tr , \\n|egrep -v "$dq"|sort >$fnames
 	  }
 	print -r -- "$(<$fnames)"

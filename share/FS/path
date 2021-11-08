@@ -2,7 +2,7 @@
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
 #: FUNCTION ^[^Upath_string^u^]
-#:   Shows the components of a ^Upath_string^u. Defaults to ^S$PATH^s
+#:   Shows the components of a ^Upath_string^u. Defaults to ^O$^o^VPATH^v
 
 function path {
 	local IFS=:

@@ -5,11 +5,11 @@
 #:   Co-processicize sqlite3 and sugar the interaction. If no SQL statement
 #:     is given on the command line, reads it from ^Sstdin^s.
 #:   Starts the co-process if it isn't already going.
-#:   Sets array ^S$SQLFD^s to the co-process file descriptors.
-#:   Exports ^S$SQLSEP^s as field separator, but uses user set value if
+#:   Sets array ^O$^o^VSQLFD^v to the co-process file descriptors.
+#:   Exports ^O$^o^VSQLSEP^v as field separator, but uses user set value if
 #:     it's set before the initial call to SQL.
-#:   Uses ^S$SQL_AUTODIE^s (^Itrue^i, ^Iwarn^i, or ^Ifalse^i). Defaults to ^Itrue^i.
-#:   Uses ^S$SQL_VERBOSE^s (^Itrue^i or ^Ifalse^i). Defaults to ^S${verbose:-^s^Nfalse^n^S}^s.
+#:   Uses ^O$^o^VSQL_AUTODIE^v (^Itrue^i, ^Iwarn^i, or ^Ifalse^i). Defaults to ^Itrue^i.
+#:   Uses ^O$^o^VSQL_VERBOSE^v (^Itrue^i or ^Ifalse^i). Defaults to ^O${^o^Vverbose^v^O:-^o^Tfalse^t^O}^o.
 #:   ^NSee also: SQLify^n
 
 needs sqlite3
@@ -18,7 +18,7 @@ function SQL {
 	local verbose="${SQL_VERBOSE:-${verbose:-false}}"
 	local autodie="${SQL_AUTODIE:-true}" autowarn=false
 	[[ $autodie == ?(true|false|warn) ]]|| {
-		warn '^BSQL_AUTODIE^b is set incorrectly (^S$autodie^s).' \
+		warn '^BSQL_AUTODIE^b is set incorrectly (^O$^o^Vautodie^v).' \
 			 'Resetting ^BAUTODIE^b to ^Btrue^b.'
 		autodie=true
 	  }

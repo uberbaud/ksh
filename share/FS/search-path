@@ -1,7 +1,7 @@
 # <@(#)tag:csongor.greyshirt.net,2017-11-14:tw/01.31.37z/4f8b8b1>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^Upath^u ^Ufile_1^u ^[ ^S…^s ^Ufile_n^u^] ^= ^S$reply^s
+#: FUNCTION ^Upath^u ^Ufile_1^u ^[ ^S…^s ^Ufile_n^u^] ^= ^O$^o^Vreply^v
 #:   Search in ^Upath^u for ^Ufile^us where ^Upath^u is a string of colon (^S:^s)
 #:   delimited paths.
 

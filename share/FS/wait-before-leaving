@@ -6,7 +6,7 @@
 #:   Leave without prompting ^IIF^i
 #:     1. The command exited without error,
 #:     2. ^SSHORTWAIT^s was set, and
-#:     3. ^S$SHORTWAIT^s ^T<=^t ^S$SECONDS^s
+#:     3. ^O$^o^VSHORTWAIT^v ^T<=^t ^O$^o^VSECONDS^v
 
 function wait-before-leaving {
 	local rc

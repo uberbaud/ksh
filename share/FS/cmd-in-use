@@ -2,7 +2,7 @@
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
 #: FUNCTION ^[^Ufgrep_options^u^] ^Ucmd_name^u
-#:   Check ^S$K^s, ^S$B^s, ^S$F^s, and ^S$HOST^s variants for ^Ucmd_name^u
+#:   Check ^O$^o^VK^v, ^O$^o^VB^v, ^O$^o^VF^v, and ^O$^o^VHOST^v variants for ^Ucmd_name^u
 
 function cmd-in-use {(
 	local cmd eopts f link alt
@@ -29,7 +29,7 @@ function cmd-in-use {(
 
 	[[ -n $DEBUG ]]&& {
 		desparkle "$cmd"
-		notify "looking for:" ^I^N$REPLY^n^i
+		notify "looking for: ^I^N$REPLY^n^i"
 	  }
 
 	builtin cd ${KDOTDIR:?}

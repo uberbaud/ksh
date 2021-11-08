@@ -78,17 +78,17 @@ function git-top-level-memoize { # {{{1
 	print "${TOPLEVEL:="$(git-top-level)"}"
 } # }}}1
 function GIT { notify "git $*"; command git "$@"; }
-function is-it-bare { # {{{1
+function it-is-bare { # {{{1
 	local bool
 	bool=$(git rev-parse --is-bare-repository 2>/dev/null)
 	${bool:-false}
 } # }}}1
-function is-it-a-linked-worktree { # {{{1
+function it-is-a-linked-worktree { # {{{1
 	# if it's not bare, but it is git, then the .git file
 	# system object will be a file pointing to the repository.
 	[[ -f $(git-top-level-memoize)/.git ]]
 } # }}}1
-function is-it-standard { # {{{1
+function it-is-standard { # {{{1
 	local bool
 	bool=$(git rev-parse --is-inside-work-tree 2>/dev/null)
 	${bool:-false}
@@ -164,17 +164,17 @@ needs git i-can-haz-inet git-remote-links needs-cd needs-path
 NL='
 ' # capture a newline
 
-i-can-haz-inet					 || die 'No internet' "$REPLY"
+i-can-haz-inet || die 'No internet' "$REPLY"
 
 REPO=$(git rev-parse --path-format=absolute --git-common-dir) ||
 	die 'Not a ^Sgit^b repository.'
 
-if is-it-bare; then
+if it-is-bare; then
 	GIT fetch --all
-elif is-it-a-linked-worktree; then
-	GIT -C "$REPO" fetch --all	# -C is not necessary but here it's userdoc
-	GIT merge origin
-elif is-it-standard; then
+elif it-is-a-linked-worktree; then
+	GIT -C "$REPO" fetch --all	# -C SHOULD NOT be necessary, but it's userdoc
+	GIT pull
+elif it-is-standard; then
 	# TODO: mv .git $REPODIR/$basename.git                          #
     #       barify $REPODIR/$basename.git                           #
 	#       print -r -- "$WORKTREE_SKELETON" >.git                  #

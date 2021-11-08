@@ -2,7 +2,7 @@
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
 #: FUNCTION ^G(no arguments)^g
-#:   Prints matching aliases builtins, functions (existing and ^S$FPATH^s),
+#:   Prints matching aliases builtins, functions (existing and ^O$^o^VFPATH^v),
 #:   and executables.
 
 function matching-commands {

@@ -3,7 +3,7 @@
 
 #: FUNCTION ^Usource_file^u ^[^Uexecute_file^u ^Uargs…^u^]
 #:   Watch a single file and run ^Tmake^t when it changes.
-#:   Executes ^S${^s^F{12}source^f^G%^g^S^F{12}.*^f^S}^s or ^S$2^s if given
+#:   Executes ^O${^o^Vsource^v^O%^o^T.^t^S*^s^O}^o or ^O$^o^V2^v if given
 
 needs watch-file
 function make-on-filechange {

@@ -2,7 +2,7 @@
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
 #: FUNCTION ^G(no arguments)^g
-#:   prints ^S$1^s split on ^S$SQLSEP^s tab-delimited.
+#:   prints ^O$^o^V1^v split on ^O$^o^VSQLSEP^v tab-delimited.
 
 function sql-fields {
 	local TAB SEP F

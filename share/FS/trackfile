@@ -4,7 +4,7 @@
 #: FUNCTION ^Ufile_name^u
 #:   Notes that a file should be synced. Ignores requests for files
 #:   whose full path name includes the string ^U^Isecret^i^u or which are
-#:   in ^S$XDG_CACHE_HOME^s, ^S$TMPDIR^s, or ^S/tmp^s.
+#:   in ^O$^o^VXDG_CACHE_HOME^v, ^O$^o^VTMPDIR^v, or ^S/tmp^s.
 
 needs needs-path
 function trackfile {

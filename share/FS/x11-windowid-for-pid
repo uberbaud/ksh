@@ -1,7 +1,7 @@
 # <@(#)tag:csongor.greyshirt.net,2017-11-16:tw/20.46.20z/74b1bb>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^Upid^u ^= ^S$REPLY^s
+#: FUNCTION ^Upid^u ^= ^O$^o^VREPLY^v
 #:   find an X11 window id for a descendent process
 
 needs xdotool ps

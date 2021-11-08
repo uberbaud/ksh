@@ -2,7 +2,7 @@
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
 #: FUNCTION ^[^Unew-path^u^]
-#:   Wraps the builtin to provide a default ^Unew-path^u of ^S$HOME^s
+#:   Wraps the builtin to provide a default ^Unew-path^u of ^O$^o^VHOME^v
 #:   Also shows any todo ^Bitems^b for the new directory.
 
 # NOTE: this works with alias cd='_u="$-"; set -u; f-cd'

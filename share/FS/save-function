@@ -3,8 +3,8 @@
 
 #: FUNCTION ^Uname^u ^Uusage/help_message^u
 #:   (re)Saves an already ^Idefined^i function given by ^Uname^u.
-#:   Saves to the last path in ^S$FPATH^s if there is no definition file
-#:     already, or overwrites the first match in ^S$FPATH^s if one exists.
+#:   Saves to the last path in ^O$^o^VFPATH^v if there is no definition file
+#:     already, or overwrites the first match in ^O$^o^VFPATH^v if one exists.
 
 function save-function {(
 	local fpath fname fbody fstart fend oprefix=xx i

@@ -1,9 +1,9 @@
 # <@(#)tag:csongor.greyshirt.net,2017-12-17:tw/01.36.03z/2058dc2>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
 
-#: FUNCTION ^Ulock_name^u ^[^Ulock_path^u^] ^= ^S$REPLY^s
+#: FUNCTION ^Ulock_name^u ^[^Ulock_path^u^] ^= ^O$^o^VREPLY^v
 #:   Attempts to create a lock with ^Ulock_name^u in ^Ulock_path^u, which
-#:   defaults to ^S$TMPDIR^s or ^B/tmp^b.
+#:   defaults to ^O$^o^VTMPDIR^v or ^B/tmp^b.
 #:   The locking is handled by
 #:     1) Creating a unique temporary file (^Sunique name^s) using ^Tmktemp^t,
 #:     2) trying in a loop to link the unique file to a file named ^Ulock_name^u,

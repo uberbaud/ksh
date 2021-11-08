@@ -3,7 +3,7 @@
 
 #: FUNCTION ^Uold^u ^Unew^u ^Utext^u ^[^Uvarname^u^] ^= ^Bvarname^b or ^BREPLY^b
 #:   Replaces ^Uold^u occurences in ^Utext^u with ^Unew^u.
-#:   The result is placed in ^S${4:-REPLY}^s.
+#:   The result is placed in ^O${^o^V4^v^O:-^o^TREPLY^t^O}^o.
 
 function gsub {
 	: ${1:?parameter 'old' cannot be empty}

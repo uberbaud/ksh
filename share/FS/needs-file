@@ -1,28 +1,26 @@
 # <@(#)tag:tw.csongor.greyshirt.net,2021-10-19,16.44.57z/ebcd74>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^[^T-or-warn^t^|^T-or-die^t^] ^[^T-with-notice^t^] ^Udir name^u
-#:   ^Tmkdir^ if necessary, possibly warn or die
+#: FUNCTION ^T-or-warn^t^|^T-or-die^t ^Ufile name^u
+#:   ^Twarn^t or ^Tdie^t if not .
 
 needs warn die desparkle subst-pathvars
 function needs-file {
-	local or_what REPLY v r
+	local or_what REPLY v r reqmsg
 
-	while (($#>1)); do
-		case $1 in
-			-or-warn)	or_what=warn;									;;
-			-or-die)	or_what=die;									;;
-			-*)			bad-programmer "$0: Unknown flag ^T$1^t.";		;;
-			*)			die "Too many parameters.";						;;
-		esac
-		shift
-	done
-	[[ -n ${or_what-} ]]||
-		bad-programmer "^T$0^t is missing required ^T-or-^t^{^Twarn^t^,^Tdie^}"
+	reqwod='^T-or-^t^O{^o^Twarn^t^O,^o^Tdie^t^O}^o'
+	(($#<2))&& die "Missing required parameters. Expected $reqwod ^Ufile^u."
+	(($#>2))&& die "Too man parameters. Expected only $reqwod ^Ufile^u."
 
-	[[ -f $1 ]]&& return
+	case $1 in
+		-or-warn) or_what=warn;										;;
+		-or-die)  or_what=die;										;;
+		*) bad-programmer "$0: First parameter MUST be $reqwod";	;;
+	esac
 
-	subst-pathvars "$1"
+	[[ -f $2 ]]&& return
+
+	subst-pathvars "$2"
 	desparkle "$REPLY"
 	if [[ $REPLY == \$* ]]; then
 		v=${REPLY%%/*}
@@ -32,7 +30,7 @@ function needs-file {
 		REPLY="^B$REPLY^b"
 	fi
 
-	$or_what "$errmsg"
+	$or_what "No such file: $REPLY."
 }
 
 # Copyright © 2021 by Tom Davis <tom@greyshirt.net>.

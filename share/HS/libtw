@@ -37,5 +37,5 @@
     to return or die on error.
 
 ^BBUILDING^b
-    Where ^NCPATH^n^T=^t^S$HOME^s^T/local/c^t
-    Use ^Tclang -I/^t^S$CPATH^s^T/api -L^t^S$CPATH^s^T/lib -ltw ^U...^u^t
+    Where ^NCPATH^n^T=^t^O$^o^VHOME^v^T/local/c^t
+    Use ^Tclang -I/^t^O$^o^VCPATH^v^T/api -L^t^O$^o^VCPATH^v^T/lib -ltw ^U...^u^t

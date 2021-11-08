@@ -11,7 +11,7 @@
 #:       ^Bpresentation.mdp^b.
 #:     If ^Upresentation_file^u is given, the ^Upresentation_directory^u is
 #:       the directory the file is in.
-#:     If neither is given, the ^Upresentation_directory^u is ^S$PWD^s, and
+#:     If neither is given, the ^Upresentation_directory^u is ^O$^o^VPWD^v, and
 #:       the ^Upresentation_file^u is ^Bpresentation.mdp^b.
 #: FUNCTION expects ^Shtml^s and ^Snotes^s directories in ^Upresentation_directory^u.
 #:

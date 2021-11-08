@@ -2,7 +2,7 @@
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
 #: FUNCTION ^[^Ulogname^u^]
-#:   Redirects ^Sstderr^s to ^S${^s^Ulogname^u^F{13}:-^f~/log/^S${^s^N0^n^F{13}##^f^F{3}*^f/^}.log^}
+#:   Redirects ^Sstderr^s to ^O${^o^V1^v^O:-^o^T~/log/^t^O${^o^V0^v^O##^o^S*^s^T/^t^O}^o^T.log^t^O}^o
 
 # 1. We want to keep $0 as the CALLERs name, so we use bash style
 #    declaration FUNC ()

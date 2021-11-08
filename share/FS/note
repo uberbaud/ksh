@@ -3,7 +3,7 @@
 
 #: FUNCTION ^[^Unote_text^u^]
 #:   Jot a quick note.
-#:   Stores notes to ^B^S$PWD^s/NOTES^b and links in ^B^S$SYSDATA^s/notes^b.
+#:   Stores notes to ^B^O$^o^VPWD^v/NOTES^b and links in ^B^O$^o^VSYSDATA^v/notes^b.
 #:   ^GList notes with^g ^Tls-notes^t.
 
 needs xclip needs-path $BS/v.ksh

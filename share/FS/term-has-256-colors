@@ -3,7 +3,7 @@
 
 #: FUNCTION ^G(no arguments)^g
 #:   Test terminal as best we can.
-#:   Uses and sets ^S$HAS_256_COLORS^s (1 or 0)
+#:   Uses and sets ^O$^o^VHAS_256_COLORS^v (1 or 0)
 
 needs tput
 function term-has-256-colors {

@@ -5,13 +5,13 @@
 #:   Create functions and variables to handle arrays when
 #:     ^Tset -o nounset^t
 #:   Creates variable:
-#:       ^BNEXT_^S$varname^s_ID^b
+#:       ^BNEXT_^O$^o^Vvarname^v_ID^b
 #:   Creates functions:
-#:       ^B+^S$varname^s^b to add items to an array;
-#:       ^B^S$varname^s-is-empty^b, and
-#:       ^B^S$varname^s-not-empty^b to test arrays;
-#:       ^B^S$varname^s-reset^b to empty array, and set
-#:            ^BNEXT_^S$varname^s_ID^b to ^B0^b
+#:       ^B+^O$^o^Vvarname^v^b to add items to an array;
+#:       ^B^O$^o^Vvarname^v-is-empty^b, and
+#:       ^B^O$^o^Vvarname^v-not-empty^b to test arrays;
+#:       ^B^O$^o^Vvarname^v-reset^b to empty array, and set
+#:            ^BNEXT_^O$^o^Vvarname^v_ID^b to ^B0^b
 
 function new-array {
 	local V

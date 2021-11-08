@@ -1,7 +1,7 @@
 # <@(#)tag:tw.csongor.greyshirt.net,2019-09-24,00.29.05z/1761cd1>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^Ulock_name^u ^[^Ulock_path^u^] ^= ^S$REPLY^s
+#: FUNCTION ^Ulock_name^u ^[^Ulock_path^u^] ^= ^O$^o^VREPLY^v
 #:   Create a name for use by {get,release}-exclusive-lock\*
 
 needs needs-path

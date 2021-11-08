@@ -5,7 +5,7 @@
 #:   Create & edit a temporary file then output the contents to ^SSTDOUT^s,
 #:   and finally, delete the temporary file.
 #:
-#:   The ^Ufilename^u is only useful if your ^S$EDITOR^s uses it to determine
+#:   The ^Ufilename^u is only useful if your ^O$^o^VEDITOR^v uses it to determine
 #:   syntax highlighting.
 
 function vtmp {

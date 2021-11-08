@@ -3,8 +3,8 @@
 
 #: FUNCTION ^Ulogfile^u ^Ulog_message^u
 #:   Standardize output format for user logs.
-#:   Writes to ^S$HOME/log/^Ulogfile^u^s
-#:   Sets ^S$REPLY^s with any errors
+#:   Writes to ^O$^o^VHOME^v^T/log/^t^Ulogfile^u
+#:   Sets ^VREPLY^v with any errors
 
 function log {
 	local logdir logfile

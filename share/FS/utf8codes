@@ -1,9 +1,9 @@
 # <@(#)tag:csongor.greyshirt.net,2018-02-10:tw/20.55.41z/2c1d996>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
 
-#: FUNCTION ^Uutf8_string^u ^[^Umaxlen^u^] ^= ^S$REPLEN^s, ^[^S$REPLY^s^]
-#:   Sets ^S$REPLEN^s to number of unicode code points in the ^Uutf8_string^u.
-#:   If ^Umaxlen^u is given and is greater than zero (0), ^S$REPLY^s is set to the
+#: FUNCTION ^Uutf8_string^u ^[^Umaxlen^u^] ^= ^O$^o^VREPLEN^v, ^[^O$^o^VREPLY^v^]
+#:   Sets ^O$^o^VREPLEN^v to number of unicode code points in the ^Uutf8_string^u.
+#:   If ^Umaxlen^u is given and is greater than zero (0), ^O$^o^VREPLY^v is set to the
 #:     string chopped to that length.
 #: ^G^BNote^b: Some codepoints are double wide, but they are still one codepoint,^g
 #:       ^GAdditionally, combining characters count as codepoints.^g

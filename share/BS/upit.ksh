@@ -4,7 +4,7 @@
 
 set -o nounset;: ${FPATH:?Run from within KSH}
 
-needs desparkle die h1 new-array notify splitstr warn needs-cd
+needs desparkle die h1 needs-cd new-array notify splitstr subst-pathvars warn
 
 new-array name dotf exec cmds haz
 

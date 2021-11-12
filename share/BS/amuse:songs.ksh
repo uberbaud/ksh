@@ -86,7 +86,7 @@ function show-full {
 		  FROM amuse.vtags
 		 WHERE value LIKE $1
 		)
-	 ORDER BY performer, album, track
+	 ORDER BY album, track, performer
 		;
 	==SQLITE==
 	sql-reply ''

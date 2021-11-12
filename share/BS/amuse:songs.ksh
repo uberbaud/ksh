@@ -9,9 +9,9 @@ action=append
 
 # Usage {{{1
 typeset -- this_pgm="${0##*/}"
+desparkle "$this_pgm"
+PGM="$REPLY"
 function usage {
-	desparkle "$this_pgm"
-	PGM="$REPLY"
 	sparkle >&2 <<-\
 	===SPARKLE===
 	^F{4}Usage^f: ^T$PGM^t ^[^T-r^t^|^T-l^t^] ^UsqlPattern^u
@@ -30,11 +30,12 @@ function bad_programmer {	# {{{2
 	die 'Programmer error:'	\
 		"  No getopts action defined for [1m-$1[22m."
   };	# }}}2
+flag=
 while getopts ':lprh' Option; do
 	case $Option in
-		l)	action=list;										;;
-		p)	action=prepend;										;;
-		r)	which=raw; action=list;								;;
+		l)	action=list; flag=l									;;
+		p)	action=prepend; flag=p;								;;
+		r)	which=raw; action=list; flag=r;						;;
 		h)	usage;												;;
 		\?)	die "Invalid option: ^B-$OPTARG^b.";				;;
 		\:)	die "Option ^B-$OPTARG^b requires an argument.";	;;
@@ -45,26 +46,16 @@ done
 shift $((OPTIND-1))
 # ready to process non '-' prefixed arguments
 # /options }}}1
-
-needs awk amuse:env sql-reply
-amuse:env
-(($#))|| {
-	SONGS="$AMUSE_RUN_DIR"/song.lst
-	if [[ -s $SONGS ]]; then
-		awk -F\\t '{print $2}' "$SONGS"
+function list-current-songlist { # {{{1
+	if [[ -s song.lst ]]; then
+		awk -F\\t '{print $2}' song.lst
 	elif [[ $(<$AMUSE_RUN_DIR/random) == true ]]; then
 		print '  ^Srandom^s' |sparkle >&2
 	else
 		print '  ^Gempty^g'  |sparkle >&2
 	fi
-	exit
-  }
-
-ARD="${AMUSE_RUN_DIR:?}"
-SQL "ATTACH '${AMUSE_DATA_HOME:?}/amuse.db3' AS amuse;"
-
-function show-raw {
-
+} # }}}1
+function show-raw { # {{{1
 	SQL <<-==SQLITE==
 	SELECT file, kind, label, value
 	  FROM amuse.vtags
@@ -72,9 +63,8 @@ function show-raw {
 	     ;
 	==SQLITE==
 	sql-reply ''
-}
-
-function show-full {
+} # }}}1
+function show-full { # {{{1
 	SQL <<-==SQLITE==
 	SELECT
 		id,
@@ -90,41 +80,78 @@ function show-full {
 		;
 	==SQLITE==
 	sql-reply ''
-}
-
-function @play {
+} # }}}1
+function start-playing { # {{{1
 	$KDOTDIR/share/BS/volume.ksh >/dev/null
 	amuse:send-cmd play
-}
-
-Play=@play
-PipeEdit='| pipedit song.lst'
-case $action in
-	list)
-		[[ -t 1 ]]&& Action='| less -FLSwX'
-		PipeEdit=
-		Play=:
-		;;
-	append)
-		Action=">>$ARD/song.lst"
-		;;
-	prepend)
-		N="$ARD/song.new"
-		O="$ARD/song.lst"
-		Action=">'$N'; cat '$O'>>'$N'; mv '$N' '$O'"
-		;;
-	*)	die 'Bad Programmer:' "No such action: ^B$action^b."
-		;;
-esac
-
-function main {
+} # }}}1
+function do-sql { # {{{1
 	for W; do
 		W="%$W%"
 		SQLify W
 		show-$which "$W"
 	done
+} # }}}1
+
+[[ $# -eq 0 && $action != append ]]&&
+	die "Missing ^UsqlPattern^u, required for flag ^T-$flag^t."	\
+		"Use ^T$PGM^t without args to list ^Bsonglist^b."
+
+needs awk amuse:env needs-cd sql-reply
+amuse:env
+needs-cd -or-die "${AMUSE_RUN_DIR:?}"
+
+# handle no arguments / no database lookup
+(($#))|| { list-current-songlist; exit; }
+
+SQL "ATTACH '${AMUSE_DATA_HOME:?}/amuse.db3' AS amuse;"
+
+function main {
+	if [[ $action == list ]]; then
+		local filter
+		[[ -t 1 ]]&& filter='| less -FLSwX'
+		eval "do-sql \"\$@\" ${filter:-}"
+	else
+		local H tmpfile
+		tmpfile=$(mktemp songlist.XXXXXXXXX)
+		trap "rm -f '$tmpfile'" EXIT
+
+		M='You may change the first word to'
+		if [[ $action == prepend ]]; then
+			H="PREPEND // $M APPEND or IGNORE"
+		elif [[ $action == append ]]; then
+			H="APPEND // $M PREPEND or IGNORE"
+		else
+			bad-programmer "action is ^S$action^s."
+		fi
+		print -r -- "# $H" >$tmpfile
+		do-sql "$@" >>$tmpfile
+		"${VISUAL:-${EDITOR:-vi}}" "$tmpfile"
+
+		[[ -s $tmpfile ]]|| exit
+
+		read commentchar action ignore <$tmpfile
+		[[ $commentchar == \# ]]|| die 'Missing header.' 'Doing nothing.'
+		typeset -l A=$action
+		sed -i -E -e '/^#/d' "$tmpfile"
+		[[ -s $tmpfile ]]|| exit
+		case $A in
+			append)
+				cat "$tmpfile" >>song.lst
+				;;
+			prepend)
+				cat song.lst >>$tmpfile
+				mv "$tmpfile" song.lst
+				;;
+			ignore)
+				exit 0
+				;;
+			*)	die "Unknown action: ^B$A^b."
+				;;
+		esac
+		start-playing
+	fi
 }
 
-eval "main \"\$@\" ${PipeEdit:-} ${Action:-}";$Play; exit
-
+main "$@"; exit
 # Copyright (C) 2019 by Tom Davis <tom@greyshirt.net>.

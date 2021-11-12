@@ -4,7 +4,8 @@
 
 set -o nounset;: ${FPATH:?Run from within KSH}
 
-needs desparkle die h1 needs-cd new-array notify splitstr subst-pathvars warn
+needs desparkle die h1 needs-cd new-array notify splitstr subst-pathvars warn \
+		yes-or-no
 
 new-array name dotf exec cmds haz
 
@@ -131,9 +132,21 @@ function do-one {( # {{{1
 	desparkle "$DIR"
 	die "^B$REPLY^b is not a supported ^Ivcs^i repository."
 )} # }}}1
+function keep-going { # {{{1
+	$SIGHAPPENED || return 0
+	SIGHAPPENED=false
+	yes-or-no 'Continue'
+} # }}}1
+SIGHAPPENED=false
+SIGS='HUP INT QUIT TERM'
+trap 'SIGHAPPENED=true' $SIGS
 
 integer RC=0
 set_re
-for d; do (do-one "$d"); ((RC+=$?)); done; exit $RC
+for d; do
+	(trap - $SIGS; do-one "$d")
+	((RC+=$?))
+	keep-going || break
+done; exit $RC
 
 # Copyright (C) 2017 by Tom Davis <tom@greyshirt.net>.

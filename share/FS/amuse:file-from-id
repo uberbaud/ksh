@@ -18,7 +18,7 @@ function amuse:file-from-id {
 	P="${1%"$F"}"
 	DURATION="$2"
 	REPLY="$AMUSE_DATA_HOME/$P/$F.oga"
-	notify "$P/$F.oga"
+	print -r -- "$P/$F.oga"
 }
 
 # Copyright © 2020 by Tom Davis <tom@greyshirt.net>.

@@ -48,7 +48,6 @@ amuse:env || fullstop "$REPLY"
 alias please-START-another-song='return 0'
 alias DONT-start-another-song='return 1'
 
-SERVER_LOCK=
 CONTINUE=true
 function kill-player { #{{{1
 	[[ -s player-pid ]]|| return
@@ -60,7 +59,7 @@ function kill-player { #{{{1
 function sig		{ >sigpipe print -- "$1" &	}
 function hQuit		{ CONTINUE=false;			}
 function hCleanUp	{ #{{{1
-	release-exclusive-lock "$SERVER_LOCK"
+	release-exclusive-lock server-lock "$AMUSE_RUN_DIR"
 	rm -f sigpipe
 	kill-player
 	: >final
@@ -293,7 +292,6 @@ builtin cd "$AMUSE_RUN_DIR" ||
 
 get-exclusive-lock -no-wait server-lock "$AMUSE_RUN_DIR" ||
 	fullstop 'amuse-server is already running'
-SERVER_LOCK=$REPLY
 
 [[ -s server-pid && -n $(ps -p $(<server-pid) -ocommand=) ]]&&
 	fullstop 'amuse-server is already running (2)'

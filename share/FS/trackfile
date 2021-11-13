@@ -6,9 +6,10 @@
 #:   whose full path name includes the string ^U^Isecret^i^u or which are
 #:   in ^O$^o^VXDG_CACHE_HOME^v, ^O$^o^VTMPDIR^v, or ^S/tmp^s.
 
-needs needs-path
+needs gsub needs-path
 function trackfile {
-	local istemp=false
+	local istemp T
+	istemp=false
 	[[ -f "$1" ]]|| {
 		warn "Can't track a non-existent file." "$1"
 		return 1
@@ -18,17 +19,17 @@ function trackfile {
 		return 0
 	  }
 
-	typeset t="$(readlink -nf "$1")" p=''
-	[[ -n "$t" ]]|| { warn 'File disappeared!'; return 1; }
+	T="$(readlink -nf "$1")"
+	[[ -n "$T" ]]|| { warn 'File disappeared!'; return 1; }
 
-	[[ $t == /tmp/* ]]&&									istemp=true
-	[[ -n $TMPDIR && $t == $TMPDIR/* ]]&&					istemp=true
-	[[ -n $XDG_CACHE_HOME && $t == $XDG_CACHE_HOME/* ]]&&	istemp=true
+	[[ $T == /tmp/* ]]&&										istemp=true
+	[[ -n ${TMPDIR-} && $T == $TMPDIR/* ]]&&					istemp=true
+	[[ -n ${XDG_CACHE_HOME-} && $T == $XDG_CACHE_HOME/* ]]&&	istemp=true
 	$istemp && {
 		warn 'Will not track a ^Btemporary^b file.'
 		return 0
 	  }
-	[[ $t == *secret* ]]&& {
+	[[ $T == *secret* ]]&& {
 		warn 'Will not track a ^Bsecret^b file.'
 		return 0
 	  }
@@ -40,10 +41,10 @@ function trackfile {
 	# Since we want the encoding to be decodeable, we need to escape 
 	# percent signs (%), which means we also need to escape whatever we 
 	# use to escape. We'll just use the common backslash for that.
-	while [[ "$t" == *\\* ]]	{ p="$p${t%%\\*}\\\\"; t="${t#*\\}"; }
-	while [[ "$t" == *%* ]]		{ p="$p${t%%%*}\\%"; t="${t#*%}"; }
-	while [[ "$t" == */* ]]		{ p="$p${t%%/*}%"; t="${t#*/}"; }
-	: >"$trackdir/$p$t"
+	gsub  '\'  '\\'  "$T"  T	# double any existing backslashes
+	gsub  '%'  '\%'  "$T"  T	# backslash any existing percent signs
+	gsub  '/'  '%'   "$T"  T	# translate any / (directory separators) to %
+	: >"$trackdir/$T"
 }
 
 

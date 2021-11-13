@@ -68,7 +68,8 @@ function mk-linked-rcs { # {{{1
 } # }}}1
 
 (($#))|| die 'Missing required argument ^Ufile^u.'
-needs as-root ci co desparkle $ED needs-cd needs-path warnOrDie
+needs as-root ci co desparkle get-exclusive-lock $ED needs-cd needs-path	\
+	release-exclusive-lock warnOrDie
 
 CI_INITIAL_DESCRIPTION='OpenBSD system file'
 LOCKBASE=${XDG_CACHE_HOME:?}/suv/locks
@@ -99,9 +100,9 @@ notify "filepath: $filepath"
 # GET AN EXCLUSIVE LOCK ON THE FILE
 gsub '/' '%' "$filename"
 lockfile=$REPLY
-get-exclusive-lock-or-exit "$lockfile" "$LOCKBASE"	|| {
+get-exclusive-lock -no-wait "$lockfile" "$LOCKBASE"	|| {
 	remove-lockfile "$LOCKBASE" "$lockfile" &&
-		get-exclusive-lock-or-exit "$lockfile" "$LOCKBASE"
+		get-exclusive-lock -no-wait "$lockfile" "$LOCKBASE"
 	} || die "PID $(<$LOCKBASE/$lockfile) has locked ^U$filenameD^u."
 
 print $$>"$LOCKBASE/$lockfile"

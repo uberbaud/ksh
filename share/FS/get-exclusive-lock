@@ -1,24 +1,26 @@
 # <@(#)tag:csongor.greyshirt.net,2017-12-17:tw/01.36.03z/2058dc2>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
 
-#: FUNCTION ^Ulock_name^u ^[^Ulock_path^u^] ^= ^O$^o^VREPLY^v
+#: FUNCTION ^[^T-no-wait^t^] ^Ulock_name^u ^[^Ulock_path^u^] ^= ^O$^o^VREPLY^v
 #:   Attempts to create a lock with ^Ulock_name^u in ^Ulock_path^u, which
 #:   defaults to ^O$^o^VTMPDIR^v or ^B/tmp^b.
 #:   The locking is handled by
 #:     1) Creating a unique temporary file (^Sunique name^s) using ^Tmktemp^t,
 #:     2) trying in a loop to link the unique file to a file named ^Ulock_name^u,
-#:         and when it succeeds,
+#:          moving to step #3 only when it succeeds,
+#:        ^BOR^b, if ^T-no-wait^t is given,
+#:          try only once to link, saving the success or failure for step #4,
 #:     3) delete (unlink) the ^Sunique name^s, and finally
 #:     4) return.
 #:   Returns the name of the lock file in ^SREPLY^s
 
 needs watch-file generate-exclusive-lock-name is-exclusive-lock-valid
 function get-exclusive-lock {
-	local L U lnRC imexit=true
+	local L U lnRC nowait
 	lnRC=0
-	imexit=false
+	nowait=false
 
-	[[ ${1:-} == exit-dont-wait ]]&& { imexit=true; shift; }
+	[[ ${1:-} == -no-wait ]]&& { nowait=true; shift; }
 
 	generate-exclusive-lock-name "$@" || return 1
 	L="$REPLY"; REPLY=''
@@ -31,7 +33,7 @@ function get-exclusive-lock {
 	[[ -f $L ]]&&
 		{ is-exclusive-lock-valid "$L" || rm -f "$L"; }
 
-	if $imexit; then
+	if $nowait; then
 		ln "$U" "$L" 2>/dev/null
 		lnRC=$?
 	else

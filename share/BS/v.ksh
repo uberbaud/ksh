@@ -65,7 +65,7 @@ function safe-to-edit { #{{{1
 	LOCKNAME="$REPLY"
 	V_CACHE="$XDG_CACHE_HOME/v"
 	needs-path -or-die "$V_CACHE"
-	get-exclusive-lock-or-exit "$LOCKNAME" $V_CACHE ||
+	get-exclusive-lock -no-wait "$LOCKNAME" $V_CACHE ||
 		already-in-edit "$REPLY"
 }
 function check-flags-for-writability { # {{{1
@@ -95,7 +95,8 @@ function verify-file-is-editable { # {{{1
 # TODO: test 'checked-out'ness with something like	
 #       [[ -n $(rlog -L -l bobslunch.rem) ]]		
 
-needs $ED ci co rcsdiff trackfile needs-cd needs-path warnOrDie
+needs $ED ci co get-exclusive-lock rcsdiff trackfile needs-cd needs-path	\
+	release-exclusive-lock warnOrDie
 
 (($#))|| exec "$ED" # We don't have a file, so short circut all the rest.
 

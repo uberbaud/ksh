@@ -42,10 +42,10 @@ function Warn { print -u2 "$pgm: $*"; }
 	shift; (($#))&&
 		Warn "Unexpected parameters: $*"
 } # }}}1
-needs apm get-exclusive-lock-or-exit release-exclusive-lock log xlock
+needs apm get-exclusive-lock release-exclusive-lock log xlock
 
 LOCK=twScreenLock
-get-exclusive-lock-or-exit $LOCK
+get-exclusive-lock -no-wait $LOCK
 
 log timesheet xlock begin || warn $REPLY
 

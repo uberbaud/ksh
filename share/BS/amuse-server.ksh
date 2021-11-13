@@ -39,15 +39,16 @@ done
 shift $((OPTIND-1))
 # ready to process non '-' prefixed arguments
 # /options }}}1
-needs amuse:env fpop play-one-ogg SQL
+needs amuse:env get-exclusive-lock fpop play-one-ogg release-exclusive-lock SQL
 # Set AMUSE_COMMANDS, AMUSE_RUN_DIR, AMUSE_DATA_HOME, and
 # create function is-valid-amuse-cmd
 amuse:env || fullstop "$REPLY"
-: "${AMUSE_DATA_HOME:?}" "${AMUSE_RUN_DIR:?}"
+: ${AMUSE_DATA_HOME:?} ${AMUSE_RUN_DIR:?}
 
 alias please-START-another-song='return 0'
 alias DONT-start-another-song='return 1'
 
+SERVER_LOCK=
 CONTINUE=true
 function kill-player { #{{{1
 	[[ -s player-pid ]]|| return
@@ -59,6 +60,7 @@ function kill-player { #{{{1
 function sig		{ >sigpipe print -- "$1" &	}
 function hQuit		{ CONTINUE=false;			}
 function hCleanUp	{ #{{{1
+	release-exclusive-lock "$SERVER_LOCK"
 	rm -f sigpipe
 	kill-player
 	: >final
@@ -289,14 +291,17 @@ function watchtime	{ # {{{1
 builtin cd "$AMUSE_RUN_DIR" ||
 	fullstop 'Could not `cd` to "$AMUSE_RUN_DIR".'
 
-[[ -s server-pid && -n $(ps -p $(<server-pid) -ocommand=) ]]&&
+get-exclusive-lock -no-wait server-lock "$AMUSE_RUN_DIR" ||
 	fullstop 'amuse-server is already running'
-	
-[[ -a sigpipe ]]&&
-	rm -f sigpipe
+SERVER_LOCK=$REPLY
 
-mkfifo sigpipe || fullstop 'Is server already running?'
+[[ -s server-pid && -n $(ps -p $(<server-pid) -ocommand=) ]]&&
+	fullstop 'amuse-server is already running (2)'
 print -- $$ >server-pid
+
+[[ -a sigpipe ]]&& rm -f sigpipe
+mkfifo sigpipe || fullstop 'Is server already running?'
+
 : >final
 : >player-pid
 touch random		# don't change it, just make sure it exists

@@ -1,0 +1,31 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2021-12-06,04.48.09z/2a9ab4a>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Udirectory^u ^Usignal^u
+#:   Set up a subscription to a publisher.
+#:
+#:   The publisher, on updating some resource, will notify subscribers by
+#:   sending the given ^Usignal^u to the subscribing process.
+#:   Sets the variable ^VSUBSCRIPTION_FILES^v, concatenating the file name.
+
+function subscribe {
+	local fname
+	typeset -u signal
+	[[ -d $1 ]]|| return 1
+	fname=$(readlink -fn $1)/$$
+	signal=${2#SIG}
+	# verify $2 is a valid signal
+	[[ $signal == @(KILL|STOP|9|17) ]]&&
+		bad-programmer "Signal ^B$signal^b can not be caught."
+	[[ $signal == @(+([0-9])|ABRT|ALRM|BUS|CHLD|CONT|EMT|FPE|HUP|ILL|INFO|INT|IO|PIPE|PROF|QUIT|SEGV|STOP|SYS|TERM|THR|TRAP|TSTP|TTIN|TTOU|URG|USR1|USR2|VTALRM|WINCH|XCPU|XFSZ) ]]||
+		bad-programmer "^B$signal^b is not a recognized signal."
+	[[ $signal == +([0-9]) ]]&& ((signal<1 || signal>32)) &&
+			bad-programmer "^B$signal^b is not a recognized signal."
+	# It is valid, so record the signal in a file named the pid in the
+	# directory $1.
+	print -- "$2" >$fname || return
+	# On success, record the signal in variable SUBSCRIPTION_FILES
+	SUBSCRIPTION_FILES="${SUBSCRIPTION_FILES:+"$SUBSCRIPTION_FILES" }$fname"
+}
+
+# Copyright © 2021 by Tom Davis <tom@greyshirt.net>.

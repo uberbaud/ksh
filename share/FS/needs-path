@@ -1,19 +1,22 @@
 # <@(#)tag:tw.csongor.greyshirt.net,2021-10-19,16.44.57z/ebcd74>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^[^T-or-warn^t^|^T-or-die^t^] ^[^T-with-notice^t^] ^Udir name^u
-#:   ^Tmkdir^ if necessary, possibly warn or die
+#: FUNCTION ^[^T-or-warn^t^|^T-or-die^t^] ^[^T-no-create^t^] ^[^T-with-notice^t^] ^Udir name^u
+#:   ^Tmkdir^t if necessary unless ^T-no-create^t, possibly warn or die, optionally
+#:   notifying if it is created.
 
 needs notify warn die desparkle subst-pathvars bad-programmer
 function needs-path {
-	local or_what notice REPLY v r create errmsg
+	local or_what notice v r create errmsg w_warn w_die
 
 	create=true
 	notice=false
+	w_warn=false
+	w_die=false
 	while (($#>1)); do
 		case $1 in
-			-or-warn)		or_what=warn;									;;
-			-or-die)		or_what=die;									;;
+			-or-warn)		w_warn=true;	or_what=warn;					;;
+			-or-die)		w_die=true;	or_what=die;						;;
 			-no-create)		create=false;									;;
 			-with-notice)	notice=true;									;;
 			-*)				bad-programmer "^T$0^t: Unknown flag ^T$1^t.";	;;
@@ -23,6 +26,9 @@ function needs-path {
 	done
 	$notice && ! $create && bad-programmer \
 		'^T-no-create^t and ^T-with-notice^t are mutually exclusive.'
+
+	$w_warn && $w_die && bad-programmer \
+		'^T-or-warn^t and ^T-or-die^t are mutually exclusive.'
 
 	[[ -d $1 ]]&& return
 

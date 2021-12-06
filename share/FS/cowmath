@@ -8,7 +8,11 @@ needs cowsay bc lolcat
 function cowmath {
 	MSG='Moo?'
 	(($#))&& MSG="$* = $(print -- "$*"|bc)"
-	cowsay -- "$MSG" | lolcat
+	cowsay -- "$MSG" |
+		sed -E													\
+			-e 's/^ _+ $/[33m&[39m/'						\
+			-e 's/^<(.*)>$/[33m<[1;39m\1[22;33m>[39m/'	\
+			-e '/^ -+ $/,$s/.*/[33m&[39m/'
 }
 
 

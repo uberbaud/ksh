@@ -103,7 +103,7 @@ export LOCALBIN=$xdgdata/bin
 # LUA wants SEMICOLON separated PATTERNS, empty item is default
 export LUA_PATH_5_3="$xdgdata/lua/5.3/?.lua;$xdgdata/lua/5.3/?/init.lua;;"
 export LUA_CPATH_5_3="$xdgdata/lua/5.3/?.so;;"
-export CARGO_HOME=$xdgcfg/cargo
+export CARGO_HOME=$xdgdata/cargo
 export TEMPLATES_FOLDER=$xdgdata/templates
 export TMPDIR=$xdgcache/temp
 export USRBIN=$HOME/bin/ksh
@@ -145,6 +145,7 @@ wantpath /usr/games				APPEND
 wantpath "$PERLBREW_ROOT/bin"	APPEND
 wantpath "$JDK_PATH"			APPEND
 wantpath $ROFFTOOLS_PATH		APPEND
+wantpath "$CARGO_HOME/bin"		APPEND
 
 # input, locale, and such
 set -o vi -o vi-tabcomplete
@@ -271,7 +272,7 @@ alias prn="printf '  \e[35m｢\e[39m%s\e[35m｣\e[39m\n'"
 	: run in sub-shell for exceptions sake; (
 		wantRelease=true
 		makeout=$KCOMPLETE/make.out
-		get-exclusive-lock-or-exit completion-make || {
+		get-exclusive-lock -no-wait completion-make || {
 			wantRelease=false
 			warn 'using old completions'
 		  }

@@ -8,6 +8,12 @@
 needs term-does-utf8
 function ls-todos {
 	[[ -f TODO ]]|| return 0
+	local ln
+	# is it one of ours?
+	IFS= read ln <TODO
+	[[ $REPLY == @\ +([0-9-])\ +([0-9:])\ Z* ]]|| return 0
+
+	# it is, so list it
 	: ${NL:?}
 	local Body Head Lines Sep ShowIt TODO H
 	ShowIt=false

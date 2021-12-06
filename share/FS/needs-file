@@ -4,14 +4,14 @@
 #: FUNCTION ^T-or-warn^t^|^T-or-die^t ^Ufile name^u
 #:   ^Twarn^t or ^Tdie^t if not .
 
-needs warn die desparkle subst-pathvars
+needs warn die sparkle-path
 function needs-file {
-	local or_what REPLY v r reqmsg
+	local or_what REPLY reqwod
+
+	(($#<2))&& bad-programmer "$0: Missing required parameters."
+	(($#>2))&& bad-programmer "$0: Too man parameters."
 
 	reqwod='^T-or-^t^O{^o^Twarn^t^O,^o^Tdie^t^O}^o'
-	(($#<2))&& die "Missing required parameters. Expected $reqwod ^Ufile^u."
-	(($#>2))&& die "Too man parameters. Expected only $reqwod ^Ufile^u."
-
 	case $1 in
 		-or-warn) or_what=warn;										;;
 		-or-die)  or_what=die;										;;
@@ -20,16 +20,7 @@ function needs-file {
 
 	[[ -f $2 ]]&& return
 
-	subst-pathvars "$2"
-	desparkle "$REPLY"
-	if [[ $REPLY == \$* ]]; then
-		v=${REPLY%%/*}
-		r=${REPLY#*/}
-		REPLY="^O\$^o^V${v#\$}^v^B/$r^b"
-	else
-		REPLY="^B$REPLY^b"
-	fi
-
+	sparkle-path "$2"
 	$or_what "No such file: $REPLY."
 }
 

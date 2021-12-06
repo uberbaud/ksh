@@ -1,17 +1,31 @@
 # <@(#)tag:tw.csongor.greyshirt.net,2020-12-28,23.03.12z/1f42168> vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
 #: FUNCTION ^Ustring^u
-#:   Quote a string against shell expansion ^= REPLY
+#:   Quote a string against shell expansion ^= ^O${^o^V2^v^O:-^o^TREPLY^t^O}^o
 
 needs gsub
 function shquote {
+	# localize if we're NOT using REPLY as the return value
+	[[ ${2:-REPLY} == REPLY ]]||
+		local REPLY
 	REPLY=${1:-}
+
+	# it needs surrounding quotes
 	if [[ $REPLY == *[\<\|\>\;\(\&\)\\\"[:space:]]* ]]; then
 		gsub "'" "'\\''" "$REPLY"
 		REPLY="'$REPLY'"
+	# it only needs single quotes to be escaped
 	elif [[ $REPLY == *\'* ]]; then
 		gsub "'" "\\'" "$REPLY"
+	# it doesn't need anything
+	# else
+	# 	:
 	fi
+
+	# set the desired variable if it isn't REPLY,
+	#   if it IS, it's already set
+	[[ ${2:-REPLY} == REPLY ]]||
+		eval $2=\$REPLY
 }
 
 # Copyright © 2020 by Tom Davis <tom@greyshirt.net>.

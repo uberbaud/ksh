@@ -148,6 +148,7 @@ for f; do
 		# system bits
 		player-pid)		show-file		$f "$fLeft";		;;
 		server-pid)		show-file		$f "$fLeft";		;;
+		server-lock)	show-file		$f "$fLeft";		;;
 		sigpipe)		show-pipe		$f "$fLeft";		;;
 		subs-playing)	show-subdir		$f "$fLeft";		;;
 		subs-time)		show-subdir		$f "$fLeft";		;;

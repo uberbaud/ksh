@@ -89,17 +89,13 @@ function handle-donelist {
 	COLUMNS=$(tput columns)
 	W=$((COLUMNS-4))
 	for taskNum; do
-		print -n -- '\033[1;1H'
-		dialog								\
-			--title "Task Completed?"		\
-			--tab-correct					\
-			--tab-len 4						\
-			--trim							\
-			--cr-wrap						\
-			--yesno "${body[taskNum]}" 7 $W
-		(($?))|| mark-as-done $taskNum
+		splitstr "$NL    " "${body[taskNum]#    }" lines
+		print -u2 '\033[36m        ┌────────────────────────────────────\033[0m'
+		message '  Task ^F{6}─┤^f' '        ^F{6}│^f' "${lines[@]}"
+		print -u2 '\033[36m        └────────────────────────────────────\033[0m'
+		yes-or-no "     \033[33m  Mark task as complete?\033[39m" &&
+			mark-as-done $taskNum
 	done
-	clear
 }
 
 function update-TODO-file {

@@ -208,8 +208,17 @@ function docmd-paused { #{{{1
 function docmd-no-op { #{{{1
 	DONT-start-another-song
 } #}}}1
+function set-audiodevice { # {{{1
+	vAUDEV=${1:?}
+	# between play-one-ogg runs, there is sometimes an audible click,
+	# but running a very quiet track alongside that cleans it up.
+	[[ -n $CLICK_CONTROL ]]&&
+		kill $CLICK_CONTROL
+	/usr/bin/aucat ${vAUDEV:+-f "${vAUDEV}"} -i /dev/zero &
+	CLICK_CONTROL=$!
+} # }}}1
 function docmd-changed-audev { # {{{1
-	vAUDEV=$(<audiodevice)
+	set-audiodevice "$(<audiodevice)"
 	DONT-start-another-song
 } # }}}1
 function is-valid-cmd { # {{{1
@@ -304,7 +313,7 @@ mkfifo sigpipe || fullstop 'Is server already running?'
 : >player-pid
 touch random		# don't change it, just make sure it exists
 touch audiodevice	# don't change it, just make sure it exists
-vAUDEV=$(<audiodevice)
+set-audiodevice "$(<audiodevice)"
 
 SQLSEP='	'
 SQL "ATTACH '$AMUSE_DATA_HOME/amuse.db3' AS amuse;"
@@ -319,8 +328,7 @@ sig no-op		# prime the fifo so it is opened (no fatal error
 				# bypassing SIGEXIT) and give the loop something to do
 				# at startup.
 #_________________________________________________________________________
-evloop;exit	# do the loop and exit on the same line so edits
-						# to this file while running don't result in
-						# weirdness
+evloop;exit		# do the loop and exit on the same line so edits
+				# to this file while running don't result in weirdness
 
 # Copyright (C) 2019 by Tom Davis <tom@greyshirt.net>.

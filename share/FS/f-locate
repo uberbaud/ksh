@@ -1,0 +1,15 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2021-11-22,21.27.44z/39a4334>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^G(no arguments)^g
+#:   Wrap two (2) locate calls with one command.
+
+needs /usr/bin/locate
+function f-locate {
+	local USRDB=${XDG_CACHE_HOME:?}/locate.db
+	/usr/bin/locate "$@"
+	[[ " $* " == *-d\ * ]]||
+		/usr/bin/locate -d "$USRDB" "$@"
+}
+
+# Copyright © 2021 by Tom Davis <tom@greyshirt.net>.

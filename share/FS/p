@@ -69,6 +69,8 @@ function p {
 			"Isn't it time to do something permanent with it?"
 	else
 		date +%s >$fUSE
+		mk-stemma-header \# >README.rem
+		v README.rem
 	fi
 
 	true # leave on a good note

@@ -10,6 +10,7 @@ set -o errexit -o nounset;: ${FPATH:?Run from within KSH}
 
 AUTHOR='Tom Davis <tom@greyshirt.net>'
 CFG=$XDG_CONFIG_HOME/start
+PUB=$HOME/public/start
 SKEL_DIR=$CFG/home_template
 APP_BASE=/home/apps
 GRPNAME=usrapp
@@ -193,16 +194,12 @@ function update-doas-conf { # {{{1'
 function set-usrhome-modes { # {{{1
 	@ chmod -R g+w $APP_HOME/{Public,bin,log,media}
 } # }}}1
-function mk-app-starter { # {{{1
-	[[ -f $USER_START ]]&& return 0 # ~$APP/bin/$S already exists
-	needs-path -or-warn "$CFG/$APP" || return
-	[[ -s "$1" ]]&& return 0 # specialized $S already exists
-
-	cat >"$1" <<-\
-		======
+function skelout { # {{{1
+	cat <<-\
+	======
 		#!/bin/ksh
 		$(mk-stemma-header \#)
-		# \vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
+		# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
 
 		typeset -i i=0
 		for o; do
@@ -212,18 +209,27 @@ function mk-app-starter { # {{{1
 
 		exec $(which -a "$APP" | egrep ^/usr/) "\${opts[@]}"
 		# Copyright (C) $(date +%Y) by $AUTHOR.
-		======
+	======
+} # }}}1
+function mk-app-starter { # {{{1
+	[[ -f $USER_START ]]&& return 0 # ~$APP/bin/$S already exists
+	needs-path -or-warn "$PUB/$APP" || return
+	[[ -s $1 ]]&& return 0 # specialized $S already exists
 
-	((!$?))&&
-		chmod a+rx "$1" &&
-		ci -u -i -t"-Start $APP as its own user in <$GRPNAME> group"  "$1" ||
-		return 1
+	skelout >$1 || {
+		warn 'Could not write app-starter.'
+		return
+	  }
+
+	chgrp usrapp "$1" || warn "Could not set group on ^S$1^s."
+	chmod g+rx "$1" &&
+		ci -u -i -t"-Start $APP as its own user in <$GRPNAME> group"  "$1"
 
 } # }}}1
 function create-app-starter { # {{{1
 	local F P S
 
-	P=$CFG/$APP
+	P=$PUB/$APP
 	needs-path -or-die "$P/RCS"
 
 	F=$P/$START_SCRIPT
@@ -261,7 +267,7 @@ function link-from-out-into-app-home { # {{{1'
 	# links are being created to not yet existent files, but that's fine
 	link-as-app "$XDG_DOWNLOAD_DIR"			"$APP_HOME/Downloads"
 	link-as-app "$XDG_DOCUMENTS_DIR/$APP"	"$APP_HOME/Documents"
-	link-as-app "$CFG/$APP/$START_SCRIPT"	"$USER_START"
+	link-as-app "$PUB/$APP/$START_SCRIPT"	"$USER_START"
 
 } # }}}1
 function CleanUp { # {{{1'

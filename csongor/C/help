@@ -1,3 +1,4 @@
+NOT-IMPLEMENTED
 S
 SQL
 SQLify
@@ -63,6 +64,7 @@ f-go
 f-halt
 f-help
 f-host
+f-locate
 f-m-done
 f-m-get
 f-r
@@ -88,7 +90,6 @@ fullstop
 functions
 generate-exclusive-lock-name
 get-exclusive-lock
-get-exclusive-lock-or-exit
 getopts
 git-remote-links
 gsub
@@ -190,6 +191,7 @@ shift
 showvar
 shquote
 sparkle
+sparkle-path
 splitstr
 sql-fields
 sql-reply
@@ -197,6 +199,7 @@ sqlite3-c-api
 ssh-askfirst
 ssh-clonedir
 stop
+subscribe
 subst-pathvars
 suspend
 sysexits
@@ -221,6 +224,7 @@ unalias
 unix
 unset
 unset-alternate-screen
+unsubscribe-all
 use-app-paths
 utf8
 utf8-to-octal

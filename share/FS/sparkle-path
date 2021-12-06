@@ -1,0 +1,22 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2021-12-01,03.28.02z/541f9aa>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Upath^u ^= ^O$^o^VREPLY^v
+#:   Returns a sparkle appropriate string for a path.
+
+needs desparkle subst-pathvars
+function sparkle-path {
+	local v r
+	subst-pathvars "$1"
+	desparkle "$REPLY"
+	if [[ $REPLY == \$* ]]; then
+		v=${REPLY%%/*}
+		r=${REPLY#*/}
+		REPLY="^O\$^o^V${v#\$}^v^B/$r^b"
+	else
+		REPLY="^B$REPLY^b"
+	fi
+	true
+}
+
+# Copyright © 2021 by Tom Davis <tom@greyshirt.net>.

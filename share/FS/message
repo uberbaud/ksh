@@ -1,7 +1,7 @@
 # <@(#)tag:tw.csongor.greyshirt.net,2020-12-03,22.24.43z/1e95609>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^G(no arguments)^g
+#: FUNCTION ^Uln 1 prefix^u ^Uother lines prefix^u ^[^Umsg ln1^u ^S…^s ^[^Umsg lnN^u^]^]
 #:   Generalized bit for notify, warn, and die.
 
 needs sparkle

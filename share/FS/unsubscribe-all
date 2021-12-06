@@ -1,0 +1,13 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2021-12-06,06.25.02z/41a9310>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^G(no arguments)^g
+#:   Unsubscribe from notifications requested using the ^Tsubscribe^t function.
+#:   (remove subscription files listed in ^VSUBSCRIPTION_FILES^v.)
+
+function unsubscribe-all {
+	[[ -z ${SUBSCRIPTION_FILES:-} ]]&& return
+	rm -f $SUBSCRIPTION_FILES
+}
+
+# Copyright © 2021 by Tom Davis <tom@greyshirt.net>.

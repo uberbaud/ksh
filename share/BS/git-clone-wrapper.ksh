@@ -4,6 +4,8 @@
 
 set -o nounset;: ${FPATH:?Run from within KSH}
 
+TRAPSIGS='EXIT HUP INT QUIT TRAP BUS TERM'
+
 # Usage {{{1
 typeset -- this_pgm="${0##*/}"
 function usage {
@@ -46,47 +48,73 @@ function show_var { #{{{1
 	shquote "$val"
 	print -r -- "$vname='$REPLY'"
 } # }}}1
+function clean-up { # {{{1
+	local i dword
+	remove_on_die-is-empty && return
+
+	if [[ ${#remove_on_die[*]} -eq 1 ]]; then
+		dword=directory
+	else
+		dword=directories
+	fi
+
+	warn 'Use'
+	i=${#remove_on_die[*]}
+	while ((i--)); do
+		print -- "                 ^T${remove_on_die[i]}^T"
+	done | sparkle >&2
+	print -u2 -- "          to remove the added but unused $dword."
+} # }}}1
 function main { # {{{1
-	local R repo newdir
+	local R repo repo_base newdir
 	repo=$1
 	newdir=$2
 
-	needs-path -or-die ${GIT_BARE_REPOS:?}
+	# git worktree directory
+	WORKTREE_PATH=$PWD/$newdir
+	[[ -d $WORKTREE_PATH ]]|| {
+		needs-path -or-die "$WORKTREE_PATH"
+		shquote "$WORKTREE_PATH"
+		+remove_on_die "rmdir $REPLY"
+	  }
 
 	# git bare repository directory
 	R=${repo##@(http|https|ftp|ftps|git|ssh):*(/)}
-	REPOSITORY_PATH=$GIT_BARE_REPOS/${R%/*}
-	needs-path -or-die "$REPOSITORY_PATH"
+	REPOSITORY_PATH=$GIT_BARE_REPOS/$R
+	repo_base=${REPOSITORY_PATH%/*}
+	[[ -d $repo_base ]]|| {
+		needs-path -or-die "$repo_base"
+		shquote "$repo_base"
+		+remove_on_die "rmdir $repo_base"
+	  }
 
-	# git worktree directory
-	WORKTREE_PATH=$PWD/$newdir
-	needs-path -or-die "$WORKTREE_PATH"
-
-	needs-cd -or-die "$REPOSITORY_PATH"
+	needs-cd -or-die "$repo_base"
 
 	R="${R##*/}"
 	command git clone --bare "$repo" "$R" >&2 ||
 		die "^Tgit clone --bare^t ^B$repo^b"
+	shquote "$REPOSITORY_PATH"
+	+remove_on_die "rm -rf $REPLY"
 
 	needs-cd -or-die "$R"
 	command git worktree add "$WORKTREE_PATH" -b "$HOST" >&2 ||
 		die '^Tgit worktree add ^O$^o^VWORKTREE_PATH^v ^T-b^t ^O$^o^VHOST^v' \
 			"WORKTREE_PATH=^S${WORKTREE_PATH-}^s" "HOST=^S${HOST-}^s"
 
-	needs-cd -or-die -with-notice "$WORKTREE_PATH"
-
+	trap - $TRAPSIGS
 	show_var WORKTREE_PATH
 	show_var REPOSITORY_PATH
+
 } # }}}1
 
-needs needs-path needs-cd shquote
+needs needs-path needs-cd new-array shquote
 
 (($#<=4))||	die 'Can only handle simple clone commands.'
 
 [[ $1 == clone ]]||	die 'Expected sub-command to be ^Tclone^t.'
 
 [[ $2 == @(http|https|ftp|ftps|git|ssh):* ]]||
-	die "~arameter does not appear to be a REPOSITORY_PATH name."
+	die "Parameter does not appear to be a REPOSITORY_PATH name."
 repo=$2
 
 if [[ -n ${3-} ]]; then
@@ -95,6 +123,9 @@ else
 	newdir=${repo##*/}
 	newdir=${newdir%.git}
 fi
+
+new-array remove_on_die
+trap clean-up $TRAPSIGS
 
 main "$repo" "$newdir"; exit
 

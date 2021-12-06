@@ -76,23 +76,28 @@ function browse-the-web  { #{{{1
 	${BROWSER:-$USRBIN/surf} "$scheme://$url"
 } #}}}1
 function handle-cmd { # {{{
-	local cmd
+set -x
+	local cmd qARGS
 	read -r req args
 	[[ -z $req ]]&& { st & return; }
 
 	[[ $req == ESC ]]&& return 1
 
+	# aliases
 	case $req in
-		g)	req=google;		;;
-		a)	req=amazon;		;;
-		c)	req=cpan;		;;
-		w)	req=wikipedia;	;;
-		h)	req=http;		;;
-		s)	req=https;		;;
+		g)	req=google;				;;
+		a)	req=amazon;				;;
+		c)	req=cpan;				;;
+		w)	req=wikipedia;			;;
+		h)	req=http;				;;
+		s)	req=https;				;;
+		,)	req=lockdown; args=z;	;;
 		wordnet)
-			req=wnb;		;;
+			req=wnb;				;;
 	esac
 
+
+# websearch
 	[[ " $websearch " == *" $req "* ]]&& {
 		websearch "$req" "$args"
 		surf "$REPLY"
@@ -104,30 +109,42 @@ function handle-cmd { # {{{
 		return
 	  }
 
-	shquote "$args" # => REPLY
+	shquote "$args" qARGS
 	if [[ $req == !* ]]; then
-		cmd="${req#!*( )} $REPLY"
+		cmd="${req#!*( )} $qARGS"
 	elif [[ $req == ,* ]]; then
-		cmd=", z"
+		cmd="lockdown z"
 	elif [[ " $starts " == *" $req "* ]]; then
-		cmd="start $req $REPLY"
-	elif [[ " $others $x11 " == *" $req "* ]]; then
-		cmd="$req $REPLY"
+		cmd="start $req $qARGS"
+# amuse
+	elif [[ " $amuse " == *" $req "* ]]; then
+		cmd="amuse:send-cmd ${req#@}"
+# special
+	elif [[ " $amuse " == *" $req "* ]]; then
+		print -u2 -- "$req: not implemented yet."
+		return 1
+# others, web, or x11
+	elif [[ " $others $web $x11 " == *" $req "* ]]; then
+		cmd="$req $qARGS"
 	else
 		local msg='Unknown `dmenu_dwming` Command'
-		cmd="Xdialog --title '$msg' --msgbox '$msg$NL$req '$REPLY 0 0"
+		cmd="Xdialog --title '$msg' --msgbox '$msg$NL$req '$qARGS 0 0"
 	fi
 	ksh -c "$cmd" &
 } # }}}1
 
-needs dmenu dwm_dmenu_completion grep sort
+needs amuse:env dmenu dwm_dmenu_completion grep sort
 starts=''
 for n in ${XDG_CONFIG_HOME:-~/config}/start/*.ini; do
 	n=${n##*/}
 	n=${n%.ini}
 	starts="$starts $n"
 done
-amuse=$(functions + | grep ^@)
+
+amuse:env
+amuse=''
+for a in $AMUSE_COMMANDS; do amuse="$amuse @$a"; done; amuse=${amuse# }
+
 websearch='g a w amazon book cpan google imdb map synonyms translate wikipedia'
 x11='display ghb glxgears oclock showrgb soffice xcalc xclock xmag xwd'
 others='amuse weather wordnet wnb'

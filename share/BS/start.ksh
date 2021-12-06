@@ -8,6 +8,7 @@ realbin=$(realbin "$0")
 shortcall=${0##*/};       shortcall=${shortcall%.*}
 shortbin=${realbin##*/};  shortbin=${shortbin%.*}
 appUser=''
+dPublic=${XDG_PUBLICSHARE_DIR:?}
 
 if [[ $shortcall != $shortbin ]]; then
 	appUser="${shortcall#start-}"
@@ -84,6 +85,29 @@ app-framework-exists "$appUser" ||
 
 xauth list $DISPLAY		>/home/apps/xauth-add
 print -r -- "$DISPLAY"	>/home/apps/display
+
+(($#))&& {
+	# move files as necessary to a publicly accessible place.
+	i=0
+	for a; do
+		# if it's a file but not in the public directory
+		if [[ -a $a && $a != ~/public/* ]]; then
+			f=${t:="$(mktemp -qd ~/public/tmp/start.XXXXXXXXX)"}/${a##*/} ||
+				die 'Could not ^Tmktemp^t'
+			cp "$a" "$f" || die "Could not ^Tcp^t ^B$a^b."
+			o[i++]=$f
+		else
+			o[i++]=$a
+		fi
+	done
+	# make sure everything supposedly accessible is
+	[[ -d ${t:-} ]]&& {
+		chgrp -R usrapp "$t"	# mark the directory AND everything it contains
+		chmod -R g+wr "$t"		# mark the directory AND everything it contains
+		chmod g+x "$t"			# mark ONLY the directory browsable
+	}
+	set -- "${o[@]}"
+}
 
 exec doas -u "$appUser" /usr/local/bin/start "$@"
 

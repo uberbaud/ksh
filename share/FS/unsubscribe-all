@@ -6,8 +6,9 @@
 #:   (remove subscription files listed in ^VSUBSCRIPTION_FILES^v.)
 
 function unsubscribe-all {
-	[[ -z ${SUBSCRIPTION_FILES:-} ]]&& return
-	rm -f $SUBSCRIPTION_FILES
+	[[ -n ${SUBSCRIPTION_FILES:-} ]]&&
+		rm -f $SUBSCRIPTION_FILES
+	SUBSCRIPTION_FILES=
 }
 
 # Copyright © 2021 by Tom Davis <tom@greyshirt.net>.

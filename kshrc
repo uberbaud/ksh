@@ -116,7 +116,7 @@ export PSQLRC=$xdgcfg/pg/psqlrc
 export USR_PLIB=$xdgdata/lib/perl5
 export PERL5LIB=$USR_PLIB
 # ^ add? -> # ${PERLBREW_LIB:+:$PERLBREW_LIB}
-export PERLBREW_BIN=$PERLBREW_CURRENT/bin
+#export PERLBREW_BIN=$PERLBREW_CURRENT/bin
 export PERL_MB_OPT="--install_base $USR_PLIB"
 export PERL_MM_OPT="INSTALL_BASE=$USR_PLIB"
 # similar but for raku
@@ -135,14 +135,13 @@ function wantpath { # {{{1
 	fi
 } # }}}1
 # PREPEND, so in reverse order
-wantpath "$PERLBREW_BIN"		PREPEND
-wantpath "$MMH_BIN_PATH"		PREPEND
 wantpath "$LOCALBIN"			PREPEND
 wantpath "$HOME"/bin			PREPEND
 wantpath "$USRBIN"				PREPEND
 # APPEND, so in order
+wantpath "$MMH_BIN_PATH"		APPEND
 wantpath /usr/games				APPEND
-wantpath "$PERLBREW_ROOT/bin"	APPEND
+wantpath "$PERL5LIB/bin"		APPEND
 wantpath "$JDK_PATH"			APPEND
 wantpath $ROFFTOOLS_PATH		APPEND
 wantpath "$CARGO_HOME/bin"		APPEND

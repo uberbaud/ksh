@@ -6,20 +6,28 @@
 #:   the description text if none is given. Uses file ^S./TODO^s.
 
 function todo {
+	local TODO todo
 	[[ $1 == -h ]]&& die 'Use ^Thelp todo^t'
-	[[ $PWD == ${HOME?} ]]&& {
-		local C="${XDG_DATA_HOME?}/conky/conky.1"
-		(($#))&& print -r -- "$*" >>"$C"
-		v "$C"
-		return 0
-	  }
-	local now="$(date -u +'%Y-%m-%d %H:%M:%S Z')"
-	local H="@ $now" TODO="$*"
-	[[ -n $TODO ]]|| TODO="$(vtmp TODO)"
-	[[ -n $TODO ]]|| return 0
+
+	# get a todo item or return
+	if (($#)); then
+		TODO="$*"
+	else
+		TODO="$(vtmp TODO)"
+		[[ -n $TODO ]]|| return 0
+	fi
 	splitstr NL "$TODO" todo
+
+	# VCMS CHECK-OUT
 	[[ -f RCS/TODO,v ]]&& co -q -l TODO
-	{ printf '%s\n' "$H"; printf '    %s\n' "${todo[@]}"; } >>TODO
+
+	# save the item in the prefered format
+	>>TODO (
+		date -u +'@ %Y-%m-%d %H:%M:%S Z'
+		printf '    %s\n' "${todo[@]}"
+	  )
+
+	# VCMS CHECK-IN
 	if [[ -f RCS/TODO,v ]]; then
 		ci -q -j -m'add' -u TODO
 	elif [[ -d RCS ]]; then

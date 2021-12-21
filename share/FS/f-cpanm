@@ -1,7 +1,7 @@
 # <@(#)tag:tw.csongor.greyshirt.net,2020-05-23,00.59.43z/4d187c0>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^G(no arguments)^g
+#: FUNCTION
 #:   Wrapper around cpanm
 
 needs cpanm

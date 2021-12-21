@@ -8,9 +8,10 @@
 #:             ^Nalnum   blank   digit   lower   punct   upper^n
 #:             ^Nalpha   cntrl   graph   print   space   xdigit^n
 
+needs needs-file
 function ascii {
 	local fASCII=${SYSDATA:?}/ascii.txt
-	[[ -f $fASCII ]]|| die "Missing file ^S$fASCII^s."
+	needs-file -or-die "$fASCII"
 	print -n -- "$(<$fASCII)"
 }
 

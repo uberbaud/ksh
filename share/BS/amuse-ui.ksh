@@ -76,49 +76,26 @@ shift $((OPTIND-1))
 # ready to process non '-' prefixed arguments
 # /options }}}1
 function get-size { #{{{1
-	local x
 	NEED_GET_SIZE=false # we're getting it
-	# tput lines/columns doesn't seem to return the correct values, so…
-	print -n '\033[999;999H' # move to bottom right corner
-	set -- $(get-row-col)
-	LINES=$1
-	COLUMNS=$2
+	eval "$(resize -u)"
 	lastRowPLAYED=$(((LINES-2)/4))
 	rowPLAYING=$((lastRowPLAYED+1))
 	rowSTATUS=$LINES
+	if   ((COLUMNS > 33)); then	statusBarSize=all		# full size
+	elif ((COLUMNS > 25)); then	statusBarSize=noplayed	# no total time
+	elif ((COLUMNS > 14)); then	statusBarSize=remaining	# only remaining time
+	elif ((COLUMNS > 11)); then statusBarSize=notime	# no time info
+	else						statusBarSize=none		# no status info
+	fi
 	# SIZES with spaces: status=4, again=7 (max)
 	#       TIME(played / total -> remaining)=22
 	#       TIME(total -> remaining)=14
 	#       TIME(remaining)=5
-	if ((COLUMNS > 33)); then
-		# full size
-		statusBarSize=all
-		x=$(((COLUMNS-33)/4))
-		colState=$x
-		colTime=$((x+11+x))
-	elif ((COLUMNS > 25)); then
-		# no total time
-		statusBarSize=noplayed
-		x=$(((COLUMNS-22)/4))
-		colState=$x
-		colTime=$((x+11+x))
-	elif ((COLUMNS > 14)); then
-		# only remaining time
-		statusBarSize=remaining
-		x=$(((COLUMNS-22)/4))
-		colState=$x
-		colTime=$((x+11+x))
-	elif ((COLUMNS > 11)); then
-		# no time info
-		statusBarSize=notime
-		colState=$(((COLUMNS-11)/2))
-		colTime=0
-	else
-		# no status info
-		statusBarSize=none
-		colState=0
-		colTime=0
-	fi
+	case $statusBarSize in
+		none)	colState=0;                   colTime=0;					;;
+		notime)	colState=$(((COLUMNS-11)/2)); colTime=0;					;;
+		*)		colState=$(((COLUMNS-22)/4)); colTime=$(((2*colState)+11));	;;
+	esac
 } #}}}1
 function print-played { # {{{1
 	print -n -- $colorTPlayed

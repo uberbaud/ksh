@@ -102,8 +102,8 @@ l=$((${#cal[*]}-1))
 $yearOnly && { printf ' %s\n' "${cal[@]}"; exit 0; }
 
 # ─────────────────────────────────────────────────────── GET EVENTS ───
-needs calendar tput
-integer COLUMNS="$(tput cols)"; ((COLUMNS))|| COLUMNS=80
+needs calendar resize
+eval $(resize -u)
 months='jan feb mar apr may jun jul aug sep oct nov dec'
 t="${months%$MON*}"
 typeset -Z 2 MM=$(((${#t}/4)+1)) DOM
@@ -181,7 +181,6 @@ fi
 # ──────────────────────────────────────────────────────────── PRINT ───
 # the ANSI sequence \e[#G moves to the absolute column #
 
-integer LINES=$(tput lines)
 if ((LINES>last)); then
 	pager=cat
 else

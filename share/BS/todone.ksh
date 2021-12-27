@@ -86,7 +86,7 @@ function handle-donelist {
 		return 0
 	  }
 
-	COLUMNS=$(tput columns)
+	[[ -n ${COLUMNS-} ]]|| eval "$(resize -u)"
 	W=$((COLUMNS-4))
 	for taskNum; do
 		splitstr "$NL    " "${body[taskNum]#    }" lines

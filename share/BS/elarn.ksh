@@ -13,6 +13,7 @@ NL='
 readonly ndxDate=0 ndxStart=1 ndxStop=2 ndxDur=3 ndxNote=4
 
 DRYRUN=false
+DOUNSET=false
 # Usage {{{1
 typeset -- this_pgm="${0##*/}"
 function usage {
@@ -20,8 +21,13 @@ function usage {
 	PGM="$REPLY"
 	sparkle >&2 <<-\
 	===SPARKLE===
-	^F{4}Usage^f: ^T$PGM start^t^|^Tstop^t^|^[^T-n^t^] ^Tsum^t^
+	^F{4}Usage^f: ^T$PGM start^t^|^Tstop^t ^[^Utasks description^u^]
 	         Keep a record of Panera out-of-schedule e-learning.
+	         Task descriptions for start and stop will be concatenated.
+	       ^T$PGM^t ^[^T-n^t^|^T-u^t^] ^Tsum^t
+	         Sum and show the unreported sessions.
+	         ^T-n^t  ^BDry run^b. Show the sum but don't record the sessions as reported.
+	         ^T-u^t  Unset sessions as reported. Implies ^T-n^t.
 	       ^T$PGM -h^t
 	         Show this help message.
 	===SPARKLE===
@@ -35,6 +41,7 @@ function bad_programmer { # {{{2
 while getopts ':nh' Option; do
 	case $Option in
 		n)	DRYRUN=true;										;;
+		u)	DOUNSET=true; DRYRUN=true;							;;
 		h)	usage;												;;
 		\?)	die "Invalid option: ^B-$OPTARG^b.";				;;
 		\:)	die "Option ^B-$OPTARG^b requires an argument.";	;;
@@ -158,14 +165,29 @@ shift
 [[ $s == @(start|stop|sum) ]]||
 	die "Needed arg of ^Tstart^t^|^Tstop^t^|^Tsum^t^"
 
+[[ $s == @(start|stop) ]]&& {
+	$DOUNSET && die "Cannot unset recorded on ^B$s^b (only on ^Bsum^b)."
+	$DRYRUN && die "Cannot do a dryrun on ^B$s^b (Only on ^Bsum^b)."
+  }
+
 COMMENT="$*"
+[[ -n $COMMENT && $s == sum ]]&&
+	die '^UTask description^u is not supported on ^Bsum^b.'
 
 needs splitstr
 
 splitstr "$NL" "$(<$LOG)" Lines
-
 i=${#Lines[*]}
 ((i--))	# index is zero based, so the last index is the array size less one.
+
+$DOUNSET && {
+	[[ ${Lines[i]} == ---\ +([0-9:]) ]]||
+		die 'Last line is not a sumation (^T-u^t)'
+	# remove last item from Lines[*] AND decrement i
+	unset Lines[i--]
+	# remove last line from file
+	sed -i '$d' "$LOG"
+  }
 
 # skip backward past any comments until we have a data row
 while [[ ${Lines[i]} == \#* ]]; do ((i--)); done

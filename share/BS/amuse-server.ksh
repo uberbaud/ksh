@@ -208,13 +208,26 @@ function docmd-paused { #{{{1
 function docmd-no-op { #{{{1
 	DONT-start-another-song
 } #}}}1
+function click-control { # {{{1
+	 >/dev/null 2>&1 (
+		local CONTINUE=true
+		trap CONTINUE=false HUP INT QUIT TERM
+		while $CONTINUE; do
+			/usr/bin/aucat ${vAUDEV:+-f "${vAUDEV}"} -i /dev/zero &
+			AUCAT_PID=$!
+			wait $AUCAT_PID
+		done
+		# wait will return on signals, so aucat may still be running
+		kill $AUCAT_PID
+	)
+} # }}}1
 function set-audiodevice { # {{{1
 	vAUDEV=${1:?}
 	# between play-one-ogg runs, there is sometimes an audible click,
 	# but running a very quiet track alongside that cleans it up.
 	[[ -n $CLICK_CONTROL ]]&&
 		kill $CLICK_CONTROL
-	/usr/bin/aucat ${vAUDEV:+-f "${vAUDEV}"} -i /dev/zero &
+	click-control &
 	CLICK_CONTROL=$!
 } # }}}1
 function docmd-changed-audev { # {{{1

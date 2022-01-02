@@ -8,42 +8,51 @@ needs needs-path
 
 P=/home/tw/local/gnu-tools
 
-QUIET=false
-[[ ${1:-} == -q ]]&& {
-	QUIET=true
+# PROCESS OPTIONS # {{{1
+VERBOSE=true
+SKIP_RESHELL=false
+while [[ ${1:-} == -* ]]; do
+	case $1 in
+		-q) VERBOSE=false;					;;
+		-n) SKIP_RESHELL=true;				;;
+		-h)	set -- HELP;					;;
+		*)  die "Unknown flag: ^B$1^b.";	;;
+	esac
 	shift
-  }
-
+done
+# }}}1
+# USAGE {{{1
 this_pgm="${0##*/}"
 (($#))&& {
 	desparkle "$this_pgm"
 	PGM="$REPLY"
+	sparkle-path "$P"
 	sparkle >&2 <<-\
 	===SPARKLE===
 	^F{4}Usage^f: ^T$PGM^t ^[^T-q^t^]
-	         Set an environment for running gnu dev tools as first class
-	           for instance, make runs gmake
-	           links g{diff,diff3,make,sdiff}
+	         Create links for g{diff,deff3,make,sdiff} in $REPLY, and
+	         Start a new shell with $REPLY prepended to ^O\$^o^VPATH^v.
+	           so that, for instance, ^Tmake^t runs ^Tgmake^t.
 	           ^T-q^t  Don\'t print header message.
+	           ^T-n^t  Don\'t start a new shell.
 	       ^T$PGM -h^t
 	         Show this help message.
 	===SPARKLE===
 	exit 1
-}
+} # }}}1
+function show-message { # {{{1
+	local INFO WARN NORM
 
-S=$(getent passwd $(id -u)|awk -F: '{print $7}')
+	if [[ -t 2 ]]; then
+		INFO='\033[36m'
+		WARN='\033[1;33m'
+		NORM='\033[0m'
+	else
+		INFO=''
+		WARN=''
+		NORM=''
+	fi
 
-if [[ -t 2 ]]; then
-	INFO='\033[36m'
-	WARN='\033[1;33m'
-	NORM='\033[0m'
-else
-	INFO=''
-	WARN=''
-	NORM=''
-fi
-
-$QUIET || {
 	print -n -- "$INFO"
 	cat >&2 <<-===
 		# On OpenBSD, \`make\` is the bsd make, and GNU's make is a second class
@@ -60,44 +69,53 @@ $QUIET || {
 		# use a variable \$(MAKE) which can point to either name for GNU make.
 		===
 	print -- "$NORM"
-  }
 
-needs-path -or-die "$P"
-typeset -i founds
-for c in make {,s}diff diff3 {,e,f}grep; do
-	g=$(whence -p g$c) || {
-		warn "Could not find ^Tg$c^t." "skipping"
-		continue
-	  }
-	[[ -e $P/$c ]]|| ln -s "$g" "$P/$c" || {
-		warn "Could not ^Tln -s^t ^S$g^s."
-		continue
-	  }
-	((founds++))
-done
-((founds))|| die "Did not link any of the GNU tools." "quitting"
+} # }}}1
+function make-gnu-links { # {{{1
+	needs-path -or-die "$P"
+	typeset -i founds
+	for c in make {,s}diff diff3 {,e,f}grep; do
+		g=$(whence -p g$c) || {
+			warn "Could not find ^Tg$c^t." "skipping"
+			continue
+	  	}
+		[[ -e $P/$c ]]|| ln -s "$g" "$P/$c" || {
+			warn "Could not ^Tln -s^t ^S$g^s."
+			continue
+	  	}
+		((founds++))
+	done
+	((founds))
+} # }}}1
+function reshell_with_the_goods { # {{{1
+	S=$(getent passwd $(id -u)|awk -F: '{print $7}')
 
-getent shells "$S" >/dev/null || {
-	printf "$WARN%s$NORM" 'Could not get a valid shell.'
-	exit 1
-  }
+	getent shells "$S" >/dev/null || {
+		printf "$WARN%s$NORM" 'Could not get a valid shell.'
+		return 1
+  	}
 
-ESC=$(printf '\033')
-W=$ESC[33m
-N=$ESC[0m
-I=$ESC[36m
+	ESC=$(printf '\033')
+	W=$ESC[33m
+	N=$ESC[0m
+	I=$ESC[36m
+	
+	cat <<-===
+		$W
+		Starting new shell ($I$S$W)
+		$W  with $N$P
+		$W  prefixed to $I\$PATH
+		$W
+		Use$N exit$W to exit
+		$N
+		===
 
-cat <<-===
-	$W
-	Starting new shell ($I$S$W)
-	$W  with $N$P
-	$W  prefixed to $I\$PATH
-	$W
-	Use$N exit$W to exit
-	$N
-	===
+	ps1="\\[$ESC[4m\\]GNU Tools subshell ($S)\\[$ESC[24m\\]\\$ "
+	PS1="$ps1" ENV= PATH=$P:$PATH exec $S
+} # }}}1
 
-ps1="\\[$ESC[4m\\]GNU Tools subshell ($S)\\[$ESC[24m\\]\\$ "
-PS1="$ps1" ENV= PATH=$P:$PATH exec $S
+$VERBOSE		&& show-message
+make-gnu-links	|| die "Did not link any of the GNU tools." "quitting"
+$SKIP_RESHELL	|| reshell_with_the_goods
 
 # Copyright (C) 2021 by Tom Davis <tom@greyshirt.net>.

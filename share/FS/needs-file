@@ -8,7 +8,7 @@ needs warn die sparkle-path
 function needs-file {
 	local or_what REPLY reqwod
 
-	(($#<2))&& bad-programmer "$0: Missing required parameters."
+	(($#<2))&& bad-programmer "$0: Missing required ^T-or-^t^O{^o^Twarn^t^O,^o^Tdie^t^O}^o."
 	(($#>2))&& bad-programmer "$0: Too man parameters."
 
 	reqwod='^T-or-^t^O{^o^Twarn^t^O,^o^Tdie^t^O}^o'

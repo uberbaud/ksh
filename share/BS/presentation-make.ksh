@@ -17,7 +17,7 @@ dSEPARATOR=$REPLY
 
 # Usage {{{1
 typeset -- this_pgm="${0##*/}"
-function usage {
+function usage { # {{{1
 	desparkle "$this_pgm"
 	PGM="$REPLY"
 	sparkle >&2 <<-\
@@ -86,13 +86,11 @@ needs-cd -or-die "$PRESPATH"
 META_TO=
 META_BY=
 META_ON=
-META_COPYRIGHT=
-META_TITLE=
 typeset -i -Z3 PAGE
 
 # wrap script guts in a function so edits to this script file don't 
 # affect running instances of the script.
-function mkAndCleanDir {
+function mkAndCleanDir { # {{{1
 	(($#))|| die '^WBad Programmer^w: no argument to ^SmkAndCleanDir^s.'
 	[[ -n ${1:-} ]]||
 		die '^WBad Programmer^w: empty argument to ^SmkAndCleanDir^s.'
@@ -103,17 +101,16 @@ function mkAndCleanDir {
 
 	notify "Cleaning ^S$1^s directory."
 	rm -rf $1/*
-}
-
-function checkFile {
+} # }}}1
+function checkFile { # {{{1
 	: ${1:?No or empty arg to checkFile}
 	[[ -a $1 ]]|| die "Could not find file ^S$1^s."
 	[[ -f $1 ]]|| die "^S$1^s is not a file."
 	[[ -r $1 ]]|| die "^S$1^s is not readable."
-}
-
-function format-date {
+} # }}}1
+function format-date { # {{{1
 	local NOW HMS Y M D ON
+	[[ -n ${1-} ]]|| return
 	NOW=$(date +%s)
 	HMS=$(date -r $NOW +%H%M.%S)
 	Y=${1%%-*}
@@ -123,23 +120,31 @@ function format-date {
 	THEN=$(date -j +%s $Y$M$D$HMS)
 	((NOW<=THEN))||
 		warn 'Presentation Date is in the past.'
-	REPLY=$(date -r $THEN +'%B %e, %Y')
-}
+	set -- $(date -r $THEN +'%B %e, %Y')
+	print -r -- "$@"
+} # }}}1
+function entify { # {{{1
+	local vname=$1 description=${2:-${1#META_}}
+	eval vtext=\${$vname-}
+	[[ -n $vtext ]]|| {
+		warn "Missing Meta ^B$description^b."
+		return
+	  }
 
-function entify {
-	gsub '&' '&amp;' "$1"
+	gsub '&' '&amp;' "$vtext"
 	gsub '<' '&lt;' "$REPLY"
 	gsub '>' '&gt;' "$REPLY"
-}
-
-function process-header {
+	eval $vname=\$REPLY
+} # }}}1
+function process-header { # {{{1
 	local L line
 	L=0
 	while IFS= read -ru4 line; do
 		((L++))
-		[[ $line == %%\ * ]]&& continue
-		[[ $line == --+(-) ]]&& break
-		[[ $line == %[[:space:]]* ]]|| {
+		[[ -z $line ]]&&		continue # skip empty lines
+		[[ $line == %%\ * ]]&&	continue # skip meta lines
+		[[ $line == --+(-) ]]&&	break    # exit on ---+
+		[[ $line == %[[:space:]]* ]]|| { # warn on the unexpected
 			desparkle "$line"
 			warn "Syntax Error: Line ^B$L^b:" "^U$REPLY^u"
 			continue
@@ -149,35 +154,26 @@ function process-header {
 			to[[:space:]]*) META_TO=${line##to+([[:space:]])};	;;
 			by[[:space:]]*) META_BY=${line##by+([[:space:]])};	;;
 			on[[:space:]]*) META_ON=${line##on+([[:space:]])};	;;
-			Copyright[[:space:]]*) META_COPYRIGHT=$line;			;;
+			Copyright[[:space:]]*) META_COPYRIGHT=$line;		;;
 			*)
-				[[ -z $META_TITLE ]]||
+				[[ -z ${META_TITLE-} ]]||
 					warn 'Multiple Titles in Header!'
 				META_TITLE=$line
 				;;
 		esac
 	done
-}
+} # }}}1
+function canonize-meta { # {{{1
 
-function clean-meta {
-	[[ -z $META_TITLE ]]&&	warn 'Missing Meta ^BTitle^b.'
-	entify "$META_TITLE"; META_TITLE="$REPLY"
+	entify META_TITLE		'Title'
+	entify META_TO			'Audience'
+	entify META_BY			'Author/Presenter'
+	META_ON=$(format-date "$META_ON")
+	entify META_ON			'Presentation Date'
+	entify META_COPYRIGHT	'Copyright'
 
-	[[ -z $META_TO ]]&&		warn 'Missing Meta ^BAudience^b.'
-	entify "$META_TO"; META_TO="$REPLY"
-
-	[[ -z $META_BY ]]&&		warn 'Missing Meta ^BAuthor^b.'
-	entify "$META_BY"; META_BY="$REPLY"
-
-	[[ -z $META_ON ]]&&		warn 'Missing Meta ^BPresentation Date^b.'
-	format-date "$META_ON"
-	entify "$REPLY"; META_ON="$REPLY"
-
-	entify "$META_COPYRIGHT"; META_COPYRIGHT="$REPLY"
-
-}
-
-function split-file {
+} # }}}1
+function split-file { # {{{1
 	PAGE=1
 	exec 5>build/p$PAGE
 	while IFS= read -ru4 line; do
@@ -190,17 +186,13 @@ function split-file {
 		print -ru5 -- "$line"
 	done
 	exec 5>&-
-}
-
-function process-source {
-	exec 4<"$SRC"
+} # }}}1
+function process-source { # {{{1
 	process-header
-	clean-meta
+	canonize-meta
 	split-file
-	exec 4>&-
-}
-
-function main {
+} # }}}1
+function main { # {{{1
 	checkFile $SRC
 	checkFile $CSS
 
@@ -212,7 +204,7 @@ function main {
 
 	notify 'Making ^SMarkdown^s pages.'
 	#split -p "$SEPARATOR" $SRC build/p
-	process-source "$SRC"
+	process-source 4<$SRC
 
 	notify 'Converting ^SMarkdown^s pages to html pieces.'
 	set -- build/*
@@ -254,7 +246,7 @@ function main {
 	<head>
 	  <meta charset="UTF-8">
 	  <meta name="author" content="$META_BY">
-	  ${HTML_RIGHTS:-}
+	${HTML_RIGHTS:-}
 	  <link
 	    rel="stylesheet"
 	    type="text/css"
@@ -264,17 +256,15 @@ function main {
 	  <title>uberbaud-presents</title>
 	</head>
 	<body>
-	    <h1>$META_TITLE</h1>
+	<h1>$META_TITLE</h1>
 	===
 
 	HTML_SUFFIX="$(</dev/stdin)" <<-\
 	===
-	    <div id="info">$META_TO / $META_ON</div>
+	<div id="info">$META_TO / $META_ON</div>
 	</body>
 	</html>
 	===
-
-
 
 	set -- build/*.phtm
 	for f; do
@@ -282,17 +272,19 @@ function main {
 		h=html/$n.html
 		notify "Creating ^S$h^s."
 		n=${n##+(0)}
-		exec 4>$h
-		print -ru4 -- "$HTML_PREFACE"
-	    print -ru4 -- "<div id=\"main\">"
-		print -ru4 -- "$(<$f)"
-		print -ru4 -- "    </div>"
-		print -ru4 -- "    <div id=\"counter\">${n##+(0)}/$#</div>"
-		print -ru4 -- "$HTML_SUFFIX"
-		exec 4>&-
+		page=$(</dev/stdin) <<-\
+		===
+			$HTML_PREFACE
+			<div id="main">
+			$(<$f)
+			</div>
+			<div id="counter">${n##+(0)}/$#</div>
+			$HTML_SUFFIX
+		===
+		>$h print -r -- "$page"
 	done
 
-}
+} # }}}1
 
 main "$@"; exit
 

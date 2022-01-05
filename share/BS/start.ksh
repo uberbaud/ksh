@@ -109,6 +109,7 @@ print -r -- "$DISPLAY"	>/home/apps/display
 	set -- "${o[@]}"
 }
 
+[[ -n ${PGM_OPTIONS-} ]]&& print -- "$PGM_OPTIONS"
 exec doas -u "$appUser" /usr/local/bin/start "$@"
 
 # Copyright (C) 2021 by Tom Davis <tom@greyshirt.net>.

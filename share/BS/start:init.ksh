@@ -8,6 +8,7 @@
 
 set -o errexit -o nounset;: ${FPATH:?Run from within KSH}
 
+KEEPENVS='AUDIODEVICE START_OPTIONS'
 AUTHOR='Tom Davis <tom@greyshirt.net>'
 CFG=$XDG_CONFIG_HOME/start
 PUB=$HOME/public/start
@@ -16,6 +17,7 @@ APP_BASE=/home/apps
 GRPNAME=usrapp
 APP_CLASS=app
 START_SCRIPT=start-app.ksh
+STARTER_BIN=/usr/local/bin/start
 logName='start-init-doas'
 NL='
 ' # end of NL assignment
@@ -82,9 +84,10 @@ function hold_ci { # {{{1
 } # }}}1
 function install-usrbin-start { # {{{1
 	local U
-	U=/usr/local/bin
-	[[ -f $U/start ]]&& return 0
 
+	[[ -f $STARTER_BIN ]]&& return 0
+
+	U=${STARTER_BIN%/*}
 	[[ -f $CFG/start ]]||
 		die "No ^Tstart^t script for ^B$U^b."
 
@@ -171,7 +174,7 @@ function create-app-user { # {{{1
 } # }}}1
 function update-doas-conf { # {{{1'
 	local D A a B
-	D="permit nopass $USRNAME as $APP cmd /usr/local/bin/start"
+	D="permit nopass setenv { $KEEPENVS } $USRNAME as $APP cmd $STARTER_BIN"
 	egrep -q "^$D\$" /etc/doas.conf && return
 
 	hold_initialize doas.conf

@@ -49,7 +49,7 @@ function utf8codes {
 	while [[ $str == *[$ustart]+([$ucont])* ]]; do
 		p=${str%%[$ustart]+([$ucont])*}
 		s=${str##"$p"[$ustart]+([$ucont])}
-		c=${str%"$s"}"; c="${c#"$p"}
+		c=${str%"$s"}; c=${c#"$p"}
 		addpart "$p" || break
 		addpart "$c" 1 || break
 		str=$s

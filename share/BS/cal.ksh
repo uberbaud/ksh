@@ -153,7 +153,7 @@ for ln in "${calevs[@]}"; do
 	word=''; line=''
 	while ((${#ev})); do
 		word=${ev%% *}
-		ev=${ev#"$word"}"; ev="${ev# } # remove word and POSSIBLY space
+		ev=${ev#"$word"}; ev=${ev# } # remove word and POSSIBLY space
 		((${#line}+${#word}>evsize))&& {
 			+evlist "$H${line# }$E"
 			line='   '

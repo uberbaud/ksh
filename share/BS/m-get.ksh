@@ -46,9 +46,9 @@ shift $(($OPTIND - 1))
 # /options }}}1
 function group { # {{{1
 	mark +inbox -sequence x -delete a
-	x=$(pick +inbox -sequence x -sequence "$@"); x=${x:-0}"; x="${x% *}
+	x=$(pick +inbox -sequence x -sequence "$@"); x=${x:-0}; x=${x% *}
 	mark +inbox -sequence x -delete oldhat
-	y=$(pick +inbox x -nolist); y=${y:-0}"; y="${y% *}
+	y=$(pick +inbox x -nolist); y=${y:-0}; y=${y% *}
 	((y+x))&& {
 		+scanout "$1:" "new $y, total $x"
 		+groups "$1"
@@ -84,9 +84,9 @@ fetchmail 2>&1 | while read -r resp; do
 		'reading message '*) continue; ;;
 		*' message'*seen\)*)
 			tM=${resp%% *}
-			sM=${resp#*\(}"; sM="${sM% seen\) *}
+			sM=${resp#*\(}; sM=${sM% seen\) *}
 			N=$((tM-sM))
-			W=${resp#* for }"; W="${W% at *}
+			W=${resp#* for }; W=${W% at *}
 			M=message; [[ $resp == *messages* ]]&& M=messages
 			if ((N)); then
 				P "Getting ^F{5}$N^f $M for ^F{5}$W^f."
@@ -96,7 +96,7 @@ fetchmail 2>&1 | while read -r resp; do
 			;;
 		*' message'*)
 			N=${resp%% *}
-			W=${resp#* for }"; W="${W% at *}
+			W=${resp#* for }; W=${W% at *}
 			M=message; [[ $resp == *messages* ]]&& M=messages
 			if ((N)); then
 				P "Getting ^S$N^s $M for ^S$W^s."
@@ -105,7 +105,7 @@ fetchmail 2>&1 | while read -r resp; do
 			fi
 			;;
 		'fetchmail: No mail for '*)
-			W=${resp#* for }"; W="${W% at *}
+			W=${resp#* for }; W=${W% at *}
 			P "No new messages for ^S$W^s."
 			;;
 		*) warn "$resp"; ;;

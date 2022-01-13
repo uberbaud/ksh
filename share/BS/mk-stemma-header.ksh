@@ -45,16 +45,16 @@ while getopts ':H:M:D:T:U:h' Option; do
 			;;
 		D)	[[ $OPTARG == @(19|2[0-9])[0-9][0-9][/.-]@(0[1-9]|1[0-2])[/.-]@([0-2][0-9]|3[01]) ]]||
 				die "Bad date format. Expected ^B%Y-%m-d^b."
-			Dy=${OPTARG%%[/.-]*}"; OPTARG="${OPTARG#?????}
-			Dm=${OPTARG%[/.-]*}"; OPTARG="${OPTARG#???}
+			Dy=${OPTARG%%[/.-]*}; OPTARG=${OPTARG#?????}
+			Dm=${OPTARG%[/.-]*}; OPTARG=${OPTARG#???}
 			Dd=$OPTARG
 			((Dy>1969))|| die "Can only do dates after the epoch (1970)."
 			DATEGIVEN=true
 			;;
 		T)	[[ $OPTARG == @([01][0-9]|2[0-3])[:.-][0-5][0-9][:.-]@([0-5][0-9]|60)?([Zz]) ]]||
 				die "Bad time format (expected ^BHH.MM.SS^b, found ^B$OPTARG^b."
-			Th=${OPTARG%%[[:punct:]]*}"; OPTARG="${OPTARG#???}
-			Tm=${OPTARG%[[:punct:]]*}"; OPTARG="${OPTARG#???}
+			Th=${OPTARG%%[[:punct:]]*}; OPTARG=${OPTARG#???}
+			Tm=${OPTARG%[[:punct:]]*}; OPTARG=${OPTARG#???}
 			Ts=${OPTARG%[Zz]}
 			TIMEGIVEN=true
 			;;

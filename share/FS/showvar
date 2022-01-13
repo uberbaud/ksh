@@ -162,12 +162,12 @@ showvar() {
 		attr[noun]="$type"
 		atlen[noun]="$tlen"
 		[[ $decl == *'-L'* ]]&& {
-			num=${decl#*-L}"; num="${num%% *}
+			num=${decl#*-L}; num=${num%% *}
 			attr[++ndx]="left justified to $num bytes"
 			atlen[ndx]=$((24+${#num}))
 		  }
 		[[ $decl == *'-R'* ]]&& {
-			num=${decl#*-R}"; num="${num%% *}
+			num=${decl#*-R}; num=${num%% *}
 			attr[++ndx]="right justified to $num bytes"
 			atlen[ndx]=$((25+${#num}))
 		  }

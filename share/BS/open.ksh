@@ -115,7 +115,7 @@ function open-one-file { # {{{1
 	fi
 
 	if $is_remote; then
-		url=${file#http*://}"; url="${url%\?*}
+		url=${file#http*://}; url=${url%\?*}
 	else
 		desparkle "${file##*/}"
 		url=$REPLY

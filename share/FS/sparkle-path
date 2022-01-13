@@ -1,22 +1,29 @@
 # <@(#)tag:tw.csongor.greyshirt.net,2021-12-01,03.28.02z/541f9aa>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^Upath^u ^= ^O$^o^VREPLY^v
+#: FUNCTION ^Upath^u ^[^Usparkle code^u^] ^= ^O$^o^VREPLY^v
 #:   Returns a sparkle appropriate string for a path.
+#:   Path components are highlighted with the given ^Usparkle code^u, or
+#:     ^I^^B^i if not specified.
 
-needs desparkle subst-pathvars
+needs desparkle gsub subst-pathvars
 function sparkle-path {
 	local v r
+	typeset -u S=${2:-B}	# starting sparkle code (default to 'B')
+	typeset -l -L1 E=$S		# ending sparkle code (lower cased start)
 	subst-pathvars "$1"
 	desparkle "$REPLY"
-	if [[ $REPLY == \$* ]]; then
+	if [[ $REPLY == \$*/* ]]; then	# var + more path bits
 		v=${REPLY%%/*}
-		r=${REPLY#*/}
-		REPLY="^O\$^o^V${v#\$}^v^B/$r^b"
-	else
-		REPLY="^B$REPLY^b"
+		r=/${REPLY#*/}
+	elif [[ $REPLY == \$* ]]; then	# just var
+		v=$REPLY
+	else							# just path bits
+		r=$REPLY
 	fi
-	true
+
+	[[ -n $r ]]&& gsub / "^$E^/^$S" "$r" r
+	REPLY=${v:+"^O\$^o^V${v#\$}^v"}${r:+"${r#^$E}^$E"}
 }
 
 # Copyright © 2021 by Tom Davis <tom@greyshirt.net>.

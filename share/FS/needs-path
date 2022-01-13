@@ -5,7 +5,7 @@
 #:   ^Tmkdir^t if necessary unless ^T-no-create^t, possibly warn or die, optionally
 #:   notifying if it is created.
 
-needs notify warn die desparkle subst-pathvars bad-programmer
+needs notify warn die bad-programmer
 function needs-path {
 	local or_what notice v r create errmsg w_warn w_die
 
@@ -32,15 +32,7 @@ function needs-path {
 
 	[[ -d $1 ]]&& return
 
-	subst-pathvars "$1"
-	desparkle "$REPLY"
-	if [[ $REPLY == \$* ]]; then
-		v=${REPLY%%/*}
-		r=${REPLY#*/}
-		REPLY="^O\$^o^V${v#\$}^v^B/$r^b"
-	else
-		REPLY="^B$REPLY^b"
-	fi
+	sparkle-path "$1"
 
 	if $create; then
 		$notice && notify "Creating directory $REPLY."

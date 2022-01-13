@@ -4,7 +4,7 @@
 #: FUNCTION ^[^T-or-warn^t^|^T-or-die^t^] ^[^T-with-notice^t^] ^Udir name^u
 #:   ^Tcd^ to ^Udir name^u, optionally notifying, possibly ^Twarn^t or ^Tdie^t.
 
-needs notify warn die bad-programmer desparkle subst-pathvars
+needs notify warn die bad-programmer sparkle-path
 function needs-cd {
 	local or_what notice REPLY v r
 
@@ -26,21 +26,16 @@ function needs-cd {
 		shift
 	  }
 
-	subst-pathvars "$1"
-	desparkle "$REPLY"
-	if [[ $REPLY == \$* ]]; then
-		v=${REPLY%%/*}
-		r=${REPLY#*/}
-		REPLY="^F{11}\$^f^F{4}${v#\$}^f^B/$r^b"
-	else
-		REPLY="^B$REPLY^b"
-	fi
-	$notice && notify "^Tcd^t to $REPLY."
+	$notice && {
+		sparkle-path "$1"
+		notify "^Tcd^t to $REPLY."
+	  }
 
 	builtin cd "$1" >/dev/null 2>&1	&& return
 
 	[[ -n ${or_what:-} ]]			|| return
 
+	[[ -n ${REPLY-} ]]|| sparkle-path "$1"
 	$or_what "Could not ^Tcd^t to $REPLY."
 }
 

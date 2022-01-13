@@ -6,10 +6,10 @@
 set -o nounset;: ${FPATH:?Run from within KSH}
 
 # Usage {{{1
-typeset -- this_pgm="${0##*/}"
+typeset -- this_pgm=${0##*/}
 function usage {
 	desparkle "$this_pgm"
-	PGM="$REPLY"
+	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
 	^F{4}Usage^f: ^T$PGM^t ^[^T-q^t^] ^T-r^t^|^T-efmsF^t ^[^Usources^u^]
@@ -80,7 +80,7 @@ function debug-show-filters { # {{{1
 	print -u2
 } # }}}1
 # fmt_bare {{{1
-fmt_bare="$(</dev/stdin)" <<-\
+fmt_bare=$(</dev/stdin) <<-\
 	\===
 	BasedOnStyle: LLVM,
 	ColumnLimit: 9999,
@@ -107,7 +107,7 @@ fmt_bare="$(</dev/stdin)" <<-\
 	===
 # }}}1
 # fmt_pretty {{{1
-fmt_pretty="$(</dev/stdin)" <<-\
+fmt_pretty=$(</dev/stdin) <<-\
 	\===
 	BasedOnStyle: LLVM,
 	ColumnLimit: 80,

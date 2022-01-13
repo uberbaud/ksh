@@ -11,7 +11,7 @@ function RCS-mv-one {
 	f=$(readlink -nf "$1")
 	sF=${f##*/}; sP=${f%$sF}
 	if [[ -d $2 ]]; then
-		tF="$sF"
+		tF=$sF
 		tP=$(readlink -nf "$2")
 	else
 		f=$(readlink -nf "$2")

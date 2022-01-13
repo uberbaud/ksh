@@ -10,11 +10,11 @@ function pipedit {
 	if [[ -z ${1:-} ]]; then
 		File=pipedit.tmp
 	elif [[ $1 == *.* ]]; then
-		File="$1"
+		File=$1
 	else
 		File=pipedit."$1"
 	fi
-	TmpDir="$(mktemp -td pipedit-XXXXXXXXX)" ||
+	TmpDir=$(mktemp -td pipedit-XXXXXXXXX) ||
 		die 'Could not ^Tmktemp^t directory'
 	cat >"$TmpDir/$File"
 	exec 4<>/dev/tty

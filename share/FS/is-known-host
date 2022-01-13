@@ -7,7 +7,7 @@
 needs list-known-hosts
 function is-known-host {
 	local check k
-	check="${1:-Missing required _host_name_}"
+	check=${1:-Missing required _host_name_}
 	set -- $(list-known-hosts)
 	for k; do
 		[[ $check == $k ]]&& return 0

@@ -7,10 +7,10 @@ set -o nounset;: ${FPATH:?Run from within KSH}
 DRYRUN=false
 
 # Usage {{{1
-typeset -- this_pgm="${0##*/}"
+typeset -- this_pgm=${0##*/}
 function usage {
 	desparkle "$this_pgm"
-	PGM="$REPLY"
+	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
 	^F{4}Usage^f: ^T${PGM}^t ^[^T-n^t^] ^Ufile^u ^[^Ufile2_...^u^]
@@ -48,20 +48,20 @@ sysdata=${SYSDATA:?}
 
 function get-filetype-from-ext { # {{{1
 	gsub '/' '\/' "$1"
-	typeset -l e="$REPLY"
-	REPLY="$(awk -F'\t' "/^$e\t/ {print \$2}" $sysdata/mime.types)"
+	typeset -l e=$REPLY
+	REPLY=$(awk -F'\t' "/^$e\t/ {print \$2}" $sysdata/mime.types)
 } # }}}1
 function get-handler-for-filetype { # {{{1
 	gsub '/' '\/' "$1"
-	local ft="$REPLY"
-	REPLY="$(awk -F'\t' "/^$ft\t/ {print \$2}" $sysdata/mime.handlers)"
+	local ft=$REPLY
+	REPLY=$(awk -F'\t' "/^$ft\t/ {print \$2}" $sysdata/mime.handlers)
 } # }}}1
 function exec-handler { # {{{1
-	local handler="$1" arg="$2"
+	local handler=$1 arg=$2
 	[[ $handler == *%f ]]&& {
-		arg="$(readlink -nf $arg)"
+		arg=$(readlink -nf $arg)
 		gsub %f %s "$handler"
-		handler="$REPLY"
+		handler=$REPLY
 	  }
 	gsub '\' '\\' "$REPLY"
 	gsub '"' '\"' "$handler"
@@ -76,16 +76,16 @@ function open-one-file { # {{{1
 	local file='' is_remote=false filetype='' filehandler='' url=''
 	if [[ $1 == https://* ]]; then
 		is_remote=true
-		file="$1"
+		file=$1
 	else
-		file="$(readlink -nf "$1" 2>/dev/null)"
+		file=$(readlink -nf "$1" 2>/dev/null)
 		desparkle "$file"
 		[[ -n $file ]]|| { warn "^B$REPLY^b: No such path."; return 1; }
 		[[ -a $file ]]|| { warn "^B$REPLY^b: No such file."; return 1; }
 		[[ -f $file ]]|| { warn "^B$REPLY^b: Not a file.";   return 1; }
 	fi
 
-	typeset -l F="$file"
+	typeset -l F=$file
 	if $is_remote; then
 		REPLY='remote/web'
 	elif [[ $F == readme.m@(d|arkdown) ]]; then
@@ -101,24 +101,24 @@ function open-one-file { # {{{1
 	fi
 
 	if [[ -n ${REPLY:-} ]]; then
-		filetype="$REPLY"
+		filetype=$REPLY
 	else
-		filetype="$(file -bi "$file")"
+		filetype=$(file -bi "$file")
 	fi
 
 	get-handler-for-filetype "$filetype"
 	if [[ -n ${REPLY:-} ]]; then
-		filehandler="$REPLY"
+		filehandler=$REPLY
 	else
 		warn "No handler for ^B$filetype^b."
 		return 1
 	fi
 
 	if $is_remote; then
-		url="${file#http*://}"; url="${url%\?*}"
+		url=${file#http*://}"; url="${url%\?*}
 	else
 		desparkle "${file##*/}"
-		url="$REPLY"
+		url=$REPLY
 	fi
 
 	local n1 n2

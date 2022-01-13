@@ -6,12 +6,12 @@
 
 function sql-fields {
 	local TAB SEP F
-	SEP="${2-  }"
+	SEP=${2-  }
 	TAB='	'
 	splitstr "$SQLSEP" "$1" sqlfields 
 	for F in "${sqlfields[@]}"; do
 		print -rn -- "$SEP$F" 
-		SEP="$TAB"
+		SEP=$TAB
 	done
 	print
 }

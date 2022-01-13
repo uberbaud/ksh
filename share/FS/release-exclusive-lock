@@ -11,7 +11,7 @@ function release-exclusive-lock {
 	local L
 
 	generate-exclusive-lock-name "$@" || return 1
-	L="$REPLY"
+	L=$REPLY
 
 	[[ -f $L ]]|| {
 		desparkle "$L"

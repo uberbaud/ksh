@@ -7,7 +7,7 @@
 function cmd-in-use {(
 	local cmd eopts f link alt
 	: ${NL:?} ${TAB:?} "${1:?Missing required parameter _cmd_name_}"
-	IFS="$NL"
+	IFS=$NL
 	# pop cmd from args.
 	cmd=$*
 	(($#>1))&& {

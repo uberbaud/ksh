@@ -8,10 +8,10 @@ warnOrDie=die
 new-array xwd_opts
 
 # Usage {{{1
-typeset -- this_pgm="${0##*/}"
+typeset -- this_pgm=${0##*/}
 function usage {
 	desparkle "$this_pgm"
-	PGM="$REPLY"
+	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
 	^F{4}Usage^f: ^T$PGM^t  ^[^Uxwd options^u^] ^[^T--^t ^Uconvert options^u^] ^Uoutput file^u

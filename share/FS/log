@@ -9,15 +9,15 @@
 function log {
 	local logdir logfile
 	REPLY=''
-	logdir="$HOME"/log
+	logdir=$HOME/log
 	[[ -d $logdir ]]|| {
 		REPLY="$REPLY, $logdir is not a directory, writing to \$HOME"
-		logdir="$HOME"
+		logdir=$HOME
 	  }
 	logfile="$logdir/$1"; shift
 	print "$(date -u +'%Y-%m-%d %H:%M:%S Z')  $*" >>"$logfile" ||
 		REPLY="$REPLY, problem writing to $logfile."
-	REPLY="${REPLY#, }"
+	REPLY=${REPLY#, }
 	[[ -z $REPLY ]]
 }
 

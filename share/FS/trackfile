@@ -10,7 +10,7 @@ needs gsub needs-path
 function trackfile {
 	local istemp T
 	istemp=false
-	[[ -f "$1" ]]|| {
+	[[ -f $1 ]]|| {
 		warn "Can't track a non-existent file." "$1"
 		return 1
 	  }
@@ -19,8 +19,8 @@ function trackfile {
 		return 0
 	  }
 
-	T="$(readlink -nf "$1")"
-	[[ -n "$T" ]]|| { warn 'File disappeared!'; return 1; }
+	T=$(readlink -nf "$1")
+	[[ -n $T ]]|| { warn 'File disappeared!'; return 1; }
 
 	[[ $T == /tmp/* ]]&&										istemp=true
 	[[ -n ${TMPDIR-} && $T == $TMPDIR/* ]]&&					istemp=true
@@ -34,7 +34,7 @@ function trackfile {
 		return 0
 	  }
 
-	typeset trackdir="$HOME"/hold/DOCSTORE/TRACK
+	typeset trackdir=$HOME/hold/DOCSTORE/TRACK
 	needs-path -or-warn "$trackdir" || return
 
 	chflags nouchg "$trackdir" # just in case we `chflags uchg *`ed

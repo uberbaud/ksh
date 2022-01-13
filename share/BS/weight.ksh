@@ -7,10 +7,10 @@ set -o nounset;: ${FPATH:?Run from within KSH}
 period=6
 
 # Usage {{{1
-typeset -- this_pgm="${0##*/}"
+typeset -- this_pgm=${0##*/}
 function usage {
 	desparkle "$this_pgm"
-	PGM="$REPLY"
+	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
 	^F{4}Usage^f: ^T$PGM^t ^[^T-dg^t^] ^[^T-m^t ^Umonths^u^]
@@ -76,9 +76,9 @@ function get-weight { # {{{1
 			fi
 		elif [[ $class == [cfs] ]]; then
 			case $datum in
-				Enter)		REPLY="$weight"; return 0;	;;
-				Tab)		REPLY="$weight"; return 0;	;;
-				Escape)		REPLY="$weight"; return 1;	;;
+				Enter)		REPLY=$weight; return 0;	;;
+				Tab)		REPLY=$weight; return 0;	;;
+				Escape)		REPLY=$weight; return 1;	;;
 				-)			REPLY="-";
 							gohorz $col
 							print -n "  -  "
@@ -86,7 +86,7 @@ function get-weight { # {{{1
 							;;
 				h|Backspace)
 							if ((${#weight})); then
-								weight="${weight%?}"
+								weight=${weight%?}
 								goleft 1
 								print -n " "
 								goleft 1
@@ -111,12 +111,12 @@ function get-newday-vars { #{{{1
 	  SELECT morning FROM health.weight WHERE morning IS NOT NULL $LASTONE;
 	  SELECT evening FROM health.weight WHERE evening IS NOT NULL $LASTONE;
 	==SQLITE==
-	NEWDAY="${sqlreply[0]}"
-	LASTMORNING="${sqlreply[1]}"
-	LASTEVENING="${sqlreply[2]}"
+	NEWDAY=${sqlreply[0]}
+	LASTMORNING=${sqlreply[1]}
+	LASTEVENING=${sqlreply[2]}
 } #}}}1
 function save-info { # {{{1
-	local d="$1" m="$2" e="$3"
+	local d=$1 m=$2 e=$3
 	[[ $m == - ]]&& m=NULL
 	[[ $e == - ]]&& e=NULL
 	SQL <<-==SQLITE==
@@ -145,11 +145,11 @@ function entry { # {{{1
 		print -n -- "$NEWDAY"
 
 		get-weight $MORNING ${LASTMORNING%?.?} || { tput el1; break; }
-		[[ $REPLY != - ]]&& LASTMORNING="$REPLY"
+		[[ $REPLY != - ]]&& LASTMORNING=$REPLY
 		m=$REPLY
 
 		get-weight $EVENING ${LASTEVENING%?.?} || { tput el1; break; }
-		[[ $REPLY != - ]]&& LASTEVENING="$REPLY"
+		[[ $REPLY != - ]]&& LASTEVENING=$REPLY
 		e=$REPLY
 
 		print
@@ -204,7 +204,7 @@ function main { #{{{1
 DBNAME="${SYSDATA:?}/health.db3"
 [[ -f $DBNAME ]]|| die 'No database ^B^S$SYSDATA^s/health.db3^b.'
 TAB='	'
-SQLSEP="$TAB"
+SQLSEP=$TAB
 SQL "ATTACH '$DBNAME' AS health;"
 LASTONE='ORDER BY day DESC LIMIT 1'
 

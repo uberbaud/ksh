@@ -16,10 +16,10 @@ integer defaultMin=13	defaultMax=19	minLen=-1	maxLen=-1	count=3
 integer reqLen=0
 
 # Usage {{{1
-typeset -- this_pgm="${0##*/}"
+typeset -- this_pgm=${0##*/}
 function usage {
 	desparkle "$this_pgm"
-	PGM="$REPLY"
+	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
 	^F{4}Usage^f: ^T$PGM^t ^[^IPassword Options^i^] ^[^IOutput Options^i^] ^[^IRetention Options^i^]
@@ -61,7 +61,7 @@ quiet=false
 function set-alphabet { #{{{2
 	$alphabetIsSet &&
 		die '^BAmbiguous^b: ^Ualphabet^u is set more than once.'
-	local options="$1"
+	local options=$1
 	[[ -n $options ]]|| die '^Ualphabet^u cannot be empty.'
 
 	while [[ -n $options ]]; do
@@ -78,7 +78,7 @@ function set-alphabet { #{{{2
 					die "Unknown alphabet specifier ^U$REPLY^u."
 					;;
 		esac
-		options="${options#?}"
+		options=${options#?}
 	done
 
 	# do this after processing the class specifiers in case a user 
@@ -115,9 +115,9 @@ while getopts ':a:c:n:x:e:u:O:s:qmrh' Option; do
 		e)  add-id 'eml' "$OPTARG";									;;
 		u)  add-id 'usr' "$OPTARG";									;;
 		O)  add-custom-id "$OPTARG";								;;
-		s)  symbols="$OPTARG";										;;
+		s)  symbols=$OPTARG;										;;
 		q)  quiet=true;												;;
-		m)  posint maxLen $mob_max; symbols="$mob_punct";			;;
+		m)  posint maxLen $mob_max; symbols=$mob_punct;			;;
 		r)	updatePassword=true;									;;
 		h)	usage;													;;
 		\?)	die "Invalid option: [1m-$OPTARG[22m.";				;;
@@ -134,7 +134,7 @@ shift $(($OPTIND - 1))
 		[[ $symbols == +([[:punct:]]) ]]||
 			warn 'Non-punctuation characters included by ^T-s^t.'
 	  }
-	punct="$symbols"
+	punct=$symbols
   }
 
 $alphabetIsSet || set-alphabet "$defaultAlphabet"
@@ -162,7 +162,7 @@ needs cut random umenu xclip new-array umask
 
 (($# <= 1 ))|| die 'Too many arguments. Expected one (1).'
 typeset -l domain=''
-(($#))&& domain="$1"
+(($#))&& domain=$1
 
 if $infoIsSet; then
 	[[ -n $domain ]]|| die '^Udomain^u is required to ^Brecord^b ^Uinfo^u.'
@@ -240,7 +240,7 @@ if $quiet; then
 	printf "%s\n" "${results[@]}"
 else
 	### choose a password from those generated
-	password="$(umenu "${results[@]}")"
+	password=$(umenu "${results[@]}")
 	[[ -n $password ]]|| die 'No information saved.'
 
 	print -n "$password" | xclip -selection clipboard -in

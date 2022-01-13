@@ -5,10 +5,10 @@
 set -o nounset;: ${FPATH:?Run from within KSH}
 
 # Usage {{{1
-typeset -- this_pgm="${0##*/}"
+typeset -- this_pgm=${0##*/}
 function usage {
 	desparkle "$this_pgm"
-	PGM="$REPLY"
+	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
 	^F{4}Usage^f: ^T$PGM^t ^Udomain^u
@@ -40,10 +40,10 @@ shift $((OPTIND-1))
 edit=${VISUAL:-${EDITOR:?'Neither $VISUAL nor $EDITOR is defined.'}}
 needs "$edit"
 
-secrets="${XDG_DATA_HOME:?}"/secrets
+secrets=${XDG_DATA_HOME:?}/secrets
 [[ -d $secrets ]]|| die 'No secrets directory.'
 
-domain="$(pass-find "$@")" || die 'No matching ^Idomain^i found.'
+domain=$(pass-find "$@") || die 'No matching ^Idomain^i found.'
 
 "$edit" "$secrets/$domain.pwd"
 

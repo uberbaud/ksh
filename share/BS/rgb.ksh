@@ -5,10 +5,10 @@
 set -o nounset;: ${FPATH:?Run from within KSH}
 
 # Usage {{{1
-typeset -- this_pgm="${0##*/}"
+typeset -- this_pgm=${0##*/}
 function usage {
 	desparkle "$this_pgm"
-	PGM="$REPLY"
+	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
 	^F{4}Usage^f: ^T${PGM}^t ^F{1}R^f ^F{2}G^f ^F{4}B^f
@@ -116,7 +116,7 @@ function set-hex6 { # {{{1
 		if ((rG==16)); then
 			HEX='#000000'
 		else
-			typeset p="${palG[rG-232]}"
+			typeset p=${palG[rG-232]}
 			HEX="#$p$p$p"
 		fi
 		set -A rgb -- '' '' '' "$HEX" "$ANSI"
@@ -128,7 +128,7 @@ function set-hex6 { # {{{1
 } # }}}1
 function set-hex3 { # {{{1
 	local hex r g b
-	hex="${1#\#}"
+	hex=${1#\#}
 	r=${hex%??}
 	b=${hex#??}
 	g=${hex#?}; g=${g%?}
@@ -201,7 +201,7 @@ term-has-256-colors ||
 
 x3=[0-9a-fA-F][0-9a-fA-F][0-9a-fA-F]
 if (($#==1)); then
-	x="$1"
+	x=$1
 	if		[[ $x == \#$x3 ]];		then set-hex3 $1
 	elif	[[ $x == \#$x3$x3 ]];	then set-hex6 $1
 	elif	[[ $x == *[!0-9]* ]];	then std-die;
@@ -239,7 +239,7 @@ term-does-utf8 || Latin='\0311\0347\0376\0360'
 Alpha="ABCDefgh$(print -- "$Latin")"
 
 
-typeset -L 33 RGB="${rgb[0]:-*} ${rgb[1]:-*} ${rgb[2]:-*}"
+typeset -L 33 RGB=${rgb[0]:-*} ${rgb[1]:-*} ${rgb[2]:-*}
 printf '%40s %s\n' "$RGB"                           "${fig[0]}"
 printf "$showme" ${rgb[4]} ${rgb[4]} "$Alpha"		"${fig[1]}"
 printf "$showme" ${rgb[4]} ${rgb[4]} '_0123456789-' "${fig[2]}"

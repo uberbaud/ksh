@@ -5,8 +5,8 @@
 #:   Set terminal to csongor colors.
 
 function csongor-colors {
-	local bg="${CSONGOR_XTERM_WINDOW_BG:?}"
-	local fg="${CSONGOR_XTERM_WINDOW_FG:?}"
+	local bg=${CSONGOR_XTERM_WINDOW_BG:?}
+	local fg=${CSONGOR_XTERM_WINDOW_FG:?}
 	set-colors-bg-fg "$bg" "$fg"
 }
 

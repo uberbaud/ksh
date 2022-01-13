@@ -14,10 +14,10 @@ vstep='0.03125'
 sndiorc=${XDG_CONFIG_HOME}/etc/sndioctl.rc
 
 # Usage {{{1
-typeset -- this_pgm="${0##*/}"
+typeset -- this_pgm=${0##*/}
 function usage {
 	desparkle "$this_pgm"
-	PGM="$REPLY"
+	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
 	^F{4}Usage^f: ^T$PGM^t ^[^Uvolume^u^|^T+^t^|^T-^t^|^T-m^t^|^Tmute^t^|^T-t^t^|^Ttoggle-mute^t^]

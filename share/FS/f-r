@@ -8,17 +8,17 @@
 function f-r {
 	typeset readme=''
 	if (($#)); then
-		readme="$1"
+		readme=$1
 	else
 		set -- @([Rr][Ee][Aa][Dd]*|*.[Rr][Ee][Aa][Dd][Mm][Ee])
 		for p; do
-			[[ -f "$p" ]]&& { readme="$p"; break; }
+			[[ -f $p ]]&& { readme=$p; break; }
 		done
 
-		[[ -n "$readme" ]]|| die 'No README found.'
+		[[ -n $readme ]]|| die NOINPUT 'No README found.'
 	fi
 
-	typeset -l lext="${readme##*.}"
+	typeset -l lext=${readme##*.}
 	if [[ $lext == @(m?(?(ar)k)d?(?(o)?(w)n)?(t?(e)xt)|rmd) ]]; then
 		needs markdown-to-html w3m
 		markdown-to-html "$readme" | w3m -T text/html

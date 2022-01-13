@@ -6,7 +6,7 @@
 
 function ls-lan {
 	local l h awkpgm lan
-	awkpgm="$(</dev/stdin)" <<-\
+	awkpgm=$(</dev/stdin) <<-\
 	\==AWK==
 	/not found:/	{printf("  %s\n\033[1A",$1);next}
 					{printf("  %-16s  %s\n",$1,$NF)}

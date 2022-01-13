@@ -6,10 +6,10 @@ set -o nounset;: ${FPATH:?Run from within KSH}
 
 UPPER_LIMIT=20
 # Usage {{{1
-typeset -- this_pgm="${0##*/}"
+typeset -- this_pgm=${0##*/}
 function usage {
 	desparkle "$this_pgm"
-	PGM="$REPLY"
+	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
 	^F{4}Usage^f: ^T${PGM}^t ^[^T-H^t^]
@@ -57,7 +57,7 @@ function tidy-repeat { # {{{1
 function clean-html {( # {{{1
 	local file tdir ferr fhtml
 	file=$(readlink -fn "${1:?}")
-	tdir="$(mktemp -d)"
+	tdir=$(mktemp -d)
 	needs-cd -or-die $tdir
 	ln "$file" 0.html	|| die "Could not ^Tln^t to ^S$file^s."
 	tidy-repeat
@@ -88,20 +88,20 @@ printf 'In \e[35m$XDG_CACHE_HOME/mail\e[39m\n'
 
 new-array parts
 
-mark="$(mktemp mark-XXXXXXXXX)"
+mark=$(mktemp mark-XXXXXXXXX)
 
 mhstore "$@"
 for f in *; do
 	[[ $f == $mark ]]&& continue	# skip mark
 	[[ $f -ot $mark ]]&& continue	# skip old files
-	if [[ $f == *.txt && "$( file -bi "$f" )" == text/html ]]; then
-		H="${f%.*}.html"
-		mv "$f" "$H" && f="$H"
+	if [[ $f == *.txt && $(file -bi "$f") == text/html ]]; then
+		H=${f%.*}.html
+		mv "$f" "$H" && f=$H
 	elif [[ $f == *.html ]]; then
 		:
 	elif $forceHTML; then
-		H="${f%.*}.html"
-		mv "$f" "$H" && f="$H"
+		H=${f%.*}.html
+		mv "$f" "$H" && f=$H
 	fi
 	# fix all the Microsoft (et al.) broken html marked as xhtml
 	[[ $f == *.html ]]&& clean-html "$f"

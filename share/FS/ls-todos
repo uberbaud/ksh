@@ -18,8 +18,8 @@ function ls-todos {
 	local Body Head Lines Sep ShowIt TODO H
 	ShowIt=false
 	Sep="@ "
-	TODO="$(<TODO)"
-	TODO="${TODO#$Sep}"
+	TODO=$(<TODO)
+	TODO=${TODO#$Sep}
 	splitstr "$NL$Sep" "$TODO" todo
 	: Pipe to sparkle; {
 		local ln first last s1 sF sN sL
@@ -31,9 +31,9 @@ function ls-todos {
 		[[ ${1:-} == -H ]]&& { H="  ^N$sB TODO $sB^n\n"; shift; }
 		Sep=''
 		for Task in "${todo[@]}"; do
-			Head="${Task%%$NL*}"
+			Head=${Task%%$NL*}
 			[[ $Head == *' DONE '* ]]&& continue
-			Body="${Task#$Head$NL}"
+			Body=${Task#$Head$NL}
 			if (($#)); then
 				for Match; do
 					[[ $Body == *$Match* ]]&& {

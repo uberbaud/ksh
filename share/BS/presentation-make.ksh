@@ -16,10 +16,10 @@ desparkle "$SEPARATOR"
 dSEPARATOR=$REPLY
 
 # Usage {{{1
-typeset -- this_pgm="${0##*/}"
+typeset -- this_pgm=${0##*/}
 function usage { # {{{1
 	desparkle "$this_pgm"
-	PGM="$REPLY"
+	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
 	^F{4}Usage^f: ^T$PGM^t ^[^Upresentation_path^u^|^Upresentation_file^u^]
@@ -149,7 +149,7 @@ function process-header { # {{{1
 			warn "Syntax Error: Line ^B$L^b:" "^U$REPLY^u"
 			continue
 		  }
-		line="${line##%+([[:space:]])}"
+		line=${line##%+([[:space:]])}
 		case $line in
 			to[[:space:]]*) META_TO=${line##to+([[:space:]])};	;;
 			by[[:space:]]*) META_BY=${line##by+([[:space:]])};	;;
@@ -219,10 +219,10 @@ function main { # {{{1
 	notify 'Creating templates.'
 
 	# IF we have a copyright, THEN create a rights section
-	[[ -n $META_COPYRIGHT ]]&& HTML_RIGHTS="$(</dev/stdin)" <<-\
+	[[ -n $META_COPYRIGHT ]]&& HTML_RIGHTS=$(</dev/stdin) <<-\
 	===
 	  <meta name="copyright"
-	    content="$META_COPYRIGHT"
+	    content=$META_COPYRIGHT
 	    >
 	  <meta name="doc-rights" content="Copywritten Work">
 	  <!-- LICENSE
@@ -239,13 +239,13 @@ function main { # {{{1
 	    -->
 	===
 
-	HTML_PREFACE="$(</dev/stdin)" <<-\
+	HTML_PREFACE=$(</dev/stdin) <<-\
 	===
 	<!DOCTYPE html>
 	<html lang="en">
 	<head>
 	  <meta charset="UTF-8">
-	  <meta name="author" content="$META_BY">
+	  <meta name="author" content=$META_BY>
 	${HTML_RIGHTS:-}
 	  <link
 	    rel="stylesheet"
@@ -259,7 +259,7 @@ function main { # {{{1
 	<h1>$META_TITLE</h1>
 	===
 
-	HTML_SUFFIX="$(</dev/stdin)" <<-\
+	HTML_SUFFIX=$(</dev/stdin) <<-\
 	===
 	<div id="info">$META_TO / $META_ON</div>
 	</body>

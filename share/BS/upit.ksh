@@ -15,7 +15,7 @@ GITUP=$B/gitup.ksh
 	die 'No ^S$B^s^T/gitup.ksh^t so using git pull.'
 
 function @ { # {{{1
-	local NAME="$1 (${3#"$B"/})" DOTF="$2" EXEC="$3"; shift 3
+	local NAME="$1 (${3#"$B"/})" DOTF=$2 EXEC=$3; shift 3
 	+name "$NAME"
 	+dotf "$DOTF"
 	+exec "$EXEC"
@@ -39,11 +39,11 @@ function @ { # {{{1
 # Usage {{{1
 NL='
 ' # <- a newline
-this_pgm="${0##*/}"
+this_pgm=${0##*/}
 function usage {
 	desparkle "$this_pgm"
-	PGM="$REPLY"
-	supported="$(printf '%s\n' "${haz[@]}"|sort|column -c 68)"
+	PGM=$REPLY
+	supported=$(printf '%s\n' "${haz[@]}"|sort|column -c 68)
 	gsub "$NL" "$NL             ^B" "$supported"
 	gsub ' (' '^b (^T' "$REPLY"
 	gsub ')' '^t)^B' "$REPLY"
@@ -110,7 +110,7 @@ function do-one {( # {{{1
 		$VERBOSE && notify "Looking for ^B${dotf[i]}^b."
 		[[ -a ${dotf[i]} ]]|| continue
 
-		EXEC="${exec[i]}"
+		EXEC=${exec[i]}
 		which $EXEC >/dev/null 2>&1 || {
 			warn "Found ^B${dotf[i]}^b, but ${name[i]} is not installed."
 			continue

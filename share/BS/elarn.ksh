@@ -15,10 +15,10 @@ readonly ndxDate=0 ndxStart=1 ndxStop=2 ndxDur=3 ndxNote=4
 DRYRUN=false
 DOUNSET=false
 # Usage {{{1
-typeset -- this_pgm="${0##*/}"
+typeset -- this_pgm=${0##*/}
 function usage {
 	desparkle "$this_pgm"
-	PGM="$REPLY"
+	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
 	^F{4}Usage^f: ^T$PGM start^t^|^Tstop^t ^[^Utasks description^u^]
@@ -113,7 +113,7 @@ function print-lines-from { # {{{1
 	while ((++n<L)); do
 		ln=${Lines[n]}
 		isRECORD "$ln" && print -- "$ln"
-	done | while IFS="$TAB" read D B E T N; do
+	done | while IFS=$TAB read D B E T N; do
 		print -- "\t$D   $(s2hms $T)\t$N"
 	done
 	print -- "$hr\n\t     \033[1mTOTAL   $total\033[0m\n"
@@ -125,7 +125,7 @@ function handle-sum { # {{{1
 	A=0
 	mark=0
 	while ((c<l)); do
-		L="${Lines[c]}"
+		L=${Lines[c]}
 		case $L in
 			\#*) :; ;;
 			---*)

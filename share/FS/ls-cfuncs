@@ -6,7 +6,7 @@
 
 function ls-cfuncs {
 	local awkpgm s
-	awkpgm="$(</dev/stdin)" <<-\
+	awkpgm=$(</dev/stdin) <<-\
 	\==AWK==
     /^[ \t]/	{next}
 	/^[#}]/		{t="";next}

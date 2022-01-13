@@ -9,7 +9,7 @@ function amuse:send-cmd {
 	amuse:env
 	local fifo cpid
 	: ${1:?Missing required argument.}
-	fifo="${AMUSE_RUN_DIR:?}"/sigpipe
+	fifo=${AMUSE_RUN_DIR:?}/sigpipe
 	[[ -e $fifo ]]|| die 'The ^Bamuse-server^b is not running.'
 	[[ -p $fifo ]]|| die 'Weirdly, ^Bsigfile^b is not a ^Ififo^i.'
 	( # handle the case where sigpipe exists, but there's noone listening.

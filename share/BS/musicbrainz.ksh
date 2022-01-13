@@ -7,10 +7,10 @@ USER_AGENT='UberbaudMusicbrainzClient/0.1 +http://uberbaud.net'
 MBRNZ='https://musicbrainz.org/ws/2'
 
 # Usage {{{1
-typeset -- this_pgm="${0##*/}"
+typeset -- this_pgm=${0##*/}
 function usage {
 	desparkle "$this_pgm"
-	PGM="$REPLY"
+	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
 	^F{4}Usage^f: ^T$PGM^t

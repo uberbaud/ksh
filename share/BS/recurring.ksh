@@ -5,10 +5,10 @@
 set -o nounset;: ${FPATH:?Run from within KSH}
 
 # Usage {{{1
-typeset -- this_pgm="${0##*/}"
+typeset -- this_pgm=${0##*/}
 function usage {
 	desparkle "$this_pgm"
-	PGM="$REPLY"
+	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
 	^F{4}Usage^f: ^T$PGM^t ^[^T-x^t^]
@@ -50,14 +50,14 @@ if $ALT; then
 		[[ ${date:-#} == \#* ]]&& continue
 		[[ $from == @(wells|) ]]&& print $payto
 		[[ $from == @(paypal) ]]&& {
-			PAYPAL="${PAYPAL:-},${payto%%+([[:space:]])}"
+			PAYPAL=${PAYPAL:-},${payto%%+([[:space:]])}
 		  }
 	done <$fDATA
 	[[ -n $PAYPAL ]] && PAYPAL=" (${PAYPAL#,})";
 	print "PayPal$PAYPAL"
 else
 	# AWKPGM {{{1
-	AWKPGM="$(</dev/stdin)" <<-\
+	AWKPGM=$(</dev/stdin) <<-\
 	\==AWK==
 		BEGIN { FS="\t";i=0 }
 		/^(#|--|$)/ {next}

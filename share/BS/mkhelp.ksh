@@ -20,8 +20,8 @@ man ksh |
 echo 'renaming'
 for x in x*; do
 	read -r name therest <$x
-	name="${name##+(^[BU])}"
-	name="${name%%+(^[bu])}"
+	name=${name##+(^[BU])}
+	name=${name%%+(^[bu])}
 	[[ $name == '[' ]]&& name=test
 	if [[ -f $name ]]; then
 		printf '  concat %s to %s.\n' $x $name

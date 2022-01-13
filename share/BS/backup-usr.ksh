@@ -21,13 +21,13 @@ stop_after_mount=false
 quiet=false
 
 desparkle "$backbase"
-backbaseD="$REPLY"
+backbaseD=$REPLY
 
 # Usage {{{1
-typeset -- this_pgm="${0##*/}"
+typeset -- this_pgm=${0##*/}
 function usage {
 	desparkle "$this_pgm"
-	PGM="$REPLY"
+	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
 	^F{4}Usage^f: ^T$PGM^t
@@ -71,7 +71,7 @@ shift $(($OPTIND - 1))
 
 needs awk egrep mount rsync usb-mnt needs-path needs-cd
 
-rsync_opts="$(awk '{print $1}')" <<-\
+rsync_opts=$(awk '{print $1}') <<-\
 	===
 	--relative			# store with full path appended to destination
 	--delete			# delete files on destination not on source
@@ -110,11 +110,11 @@ function initial-backup { # {{{1
 function standard-backup { # {{{1
 	[[ -h $backbase/current ]]||
 		die "^B$backbase/current^b is not a ^Slink^s."
-	readonly lastback="$(readlink -fn $backbase/current)"
+	readonly lastback=$(readlink -fn $backbase/current)
 	[[ -n $lastback ]]|| die 'Could not find link for ^Ucurrent^u.'
 	[[ -d $lastback ]]|| die '^Ucurrent^u does not link to a valid directory.'
 
-	do-rsync --link-dest="$lastback"
+	do-rsync --link-dest=$lastback
 	rm "$backbase"/current
 } # }}}1
 function check-attached { #{{{
@@ -151,12 +151,12 @@ function main { # {{{1
 	$stop_after_mount && return
 
 	splitstr : "$(getent passwd $(id -un))"
-	readonly realhome="${reply[5]}"
+	readonly realhome=${reply[5]}
 	[[ -d $realhome ]]|| die "No HOME (^B$realhome^b) directory."
 
 	needs-cd -or-die "$realhome"
 
-	readonly timestamp="$(Now)"
+	readonly timestamp=$(Now)
 	readonly backto="$backbase/$timestamp"
 	[[ -d $backto ]]&&
 		die "Backup directory ^B$backto^b already exists."

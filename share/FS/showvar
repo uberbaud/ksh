@@ -119,7 +119,7 @@ showvar() {
 			done
 			(($#==1))&& # 1, not 0, becaue we saved the variable name
 				die "Variable is not set."
-			V="$(typeset|egrep " $1\$")"
+			V=$(typeset|egrep " $1\$")
 			shift # remove variable name
 			set -- "$V" "$@"
 			;;
@@ -136,18 +136,18 @@ showvar() {
 			done
 			(($#==1))&& # 1, not 0, becaue we saved the variable name
 				die "Variable is not set."
-			v="$(typeset|egrep " $1\$")"
+			v=$(typeset|egrep " $1\$")
 			shift # remove variable name
 			set -- "$v" "$@"
 			;;
 	esac
-	varname="${1##* }"
+	varname=${1##* }
 	integer ndx=-1 scrcol=1 noun=0
 	function @decl { #{{{1
 		local decl num type=scalar tlen=6
-		decl="${1% *}"			# remove name
-		decl="${decl#typeset}"	#remove keyword (which might be all that's left
-		decl="${decl# }"		#remove leading space if it exists
+		decl=${1% *}			# remove name
+		decl=${decl#typeset}	#remove keyword (which might be all that's left
+		decl=${decl# }		#remove leading space if it exists
 
 		[[ $decl == *'-i'* ]]&& { type="integer"; tlen=7; }
 		[[ $decl == *'-U'* ]]&& { type="unsigned integer"; tlen=16; }
@@ -162,18 +162,18 @@ showvar() {
 		attr[noun]="$type"
 		atlen[noun]="$tlen"
 		[[ $decl == *'-L'* ]]&& {
-			num="${decl#*-L}"; num="${num%% *}"
+			num=${decl#*-L}"; num="${num%% *}
 			attr[++ndx]="left justified to $num bytes"
 			atlen[ndx]=$((24+${#num}))
 		  }
 		[[ $decl == *'-R'* ]]&& {
-			num="${decl#*-R}"; num="${num%% *}"
+			num=${decl#*-R}"; num="${num%% *}
 			attr[++ndx]="right justified to $num bytes"
 			atlen[ndx]=$((25+${#num}))
 		  }
 	} #}}}1
 	function @newline { #{{{1
-		local pad="${1:-}"
+		local pad=${1:-}
 		print -n -- "\n$pad"
 		scrcol=$((${#pad}+1)) # we moved one (1) past the padding
 	} #}}}1
@@ -216,13 +216,13 @@ showvar() {
 	fi
 	@newline
 	typeset -R4 -i K=0
-	integer COLUMNS="${COLUMNS:-9999}" c
+	integer COLUMNS=${COLUMNS:-9999} c
 	((c=COLUMNS-6))
 	while (($#)); do
-		k="$1" v="$2"
+		k=$1 v=$2
 		if [[ $k == *\] ]]; then
-			k="${k#*\[}"
-			K="${k%\]}"
+			k=${k#*\[}
+			K=${k%\]}
 			print -n "$K) "
 		else
 			print -n '    '

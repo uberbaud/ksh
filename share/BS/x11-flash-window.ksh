@@ -5,10 +5,10 @@
 set -o nounset;: ${FPATH:?Run from within KSH}
 
 # Usage {{{1
-typeset -- this_pgm="${0##*/}"
+typeset -- this_pgm=${0##*/}
 function usage {
 	desparkle "$this_pgm"
-	PGM="$REPLY"
+	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
 	^F{4}Usage^f: ^T$PGM^t ^[^T-d^t^] ^[^T-q^t^] ^Uwindowid^u
@@ -84,7 +84,7 @@ function main {
 	imgpid=$!
 	sleep 0.3
 
-	imgwinid="$(xdotool search --name "$imgtitle")"
+	imgwinid=$(xdotool search --name "$imgtitle")
 	xdotool windowraise $1;			sleep 0.2
 	xdotool windowraise $imgwinid;	sleep 0.3
 	xdotool windowraise $1;			sleep 0.2

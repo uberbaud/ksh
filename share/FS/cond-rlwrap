@@ -21,7 +21,7 @@ function cond-rlwrap {
 	  }
 	if $WRAPIT; then
 		fflag=${RLWRAP_HOME:-:}/${cmd##*/}_flags
-		[[ -f $fflag ]]&& rlflags="$(<$fflag)"
+		[[ -f $fflag ]]&& rlflags=$(<$fflag)
 		rlwrap ${rlflags:-} -- "$cmd" "$@"
 	else
 		"$cmd" "$@"

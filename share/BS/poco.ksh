@@ -8,10 +8,10 @@ DUPLEX=true; ECON=false; FIT=false; MANUAL=false; RAW=false; REVERSE=false
 COPIES=1; RANGES=
 
 # Usage {{{1
-typeset -- this_pgm="${0##*/}"
+typeset -- this_pgm=${0##*/}
 function usage {
 	desparkle "$this_pgm"
-	PGM="$REPLY"
+	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
 	^F{4}Usage^f: ^T$PGM^t ^[^Uoptions^u^] ^[^Ufile1^u ^S…^s^]
@@ -52,7 +52,7 @@ shift $((OPTIND-1))
 # /options }}}1
 function boolvar { # {{{1
 	local B=true O=$1
-	[[ $O == no?(t)?(-)* ]]&& { B=false; O="${O##no?(t)?(-)}"; }
+	[[ $O == no?(t)?(-)* ]]&& { B=false; O=${O##no?(t)?(-)}; }
 	[[ $O == *=* ]]&& {
 		local N=${O%%=*}
 		typeset -l Ob=${O#*=}

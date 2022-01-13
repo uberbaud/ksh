@@ -25,7 +25,7 @@ function ws-get-cpan-search  { #{{{1
 } #}}}1
 function ws-get-google-search  { #{{{1
 	a="https://www.google.com/search?hl=en&q="
-	b="$1"
+	b=$1
 	c="&btnG=Google+Search"
 	REPLY="$a$b$c"
 } #}}}1
@@ -40,7 +40,7 @@ function ws-get-synonyms-search  { #{{{1
 } #}}}1
 function ws-get-translate-search  { #{{{1
 	a='https://translate.google.com/?hl=en&tab=wT#auto|en|'
-	b="$1"
+	b=$1
 	REPLY="$a$b"
 } #}}}1
 function ws-get-wikipedia-search { #{{{1

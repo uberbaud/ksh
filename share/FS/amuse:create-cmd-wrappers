@@ -15,14 +15,14 @@ function amuse:create-cmd-wrappers {
 	done
 	# Create wrapper @funcs for amuse functions
 	for cmd in $F/amuse:*; do
-		cmd="${cmd#$F/}"
+		cmd=${cmd#$F/}
 		[[ $cmd == $self ]]&& continue
-		name="${cmd#amuse:}"
+		name=${cmd#amuse:}
 		eval "function @$name { $cmd \"\$@\"; }"
 	done
 	# Create wrapper @funcs for amuse helper scripts
 	for cmd in $B/amuse:*; do
-		name="${cmd#$B/amuse:}"
+		name=${cmd#$B/amuse:}
 		name=${name%.ksh}
 		eval "function @$name { $cmd \"\$@\"; }"
 	done

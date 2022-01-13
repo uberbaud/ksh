@@ -7,10 +7,10 @@ set -o nounset;: ${FPATH:?Run from within KSH}
 wifi_config=${XDG_CONFIG_HOME:?}/wifi
 
 # Usage {{{1
-typeset -- this_pgm="${0##*/}"
+typeset -- this_pgm=${0##*/}
 function usage {
 	desparkle "$this_pgm"
-	PGM="$REPLY"
+	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
 	^F{4}Usage^f: ^T${PGM}^t ^[^T-f^t^] ^[^Unwid^u^|down^]
@@ -44,7 +44,7 @@ shift $(($OPTIND - 1))
 # /options }}}1
 function get-wifi-device { # {{{1
 
-	awkpgm="$(</dev/stdin)" <<-\
+	awkpgm=$(</dev/stdin) <<-\
 		\==AWK==
 			/^[^ \t]/ {d=$1}
 			/^\tmedia: IEEE802.11/ {print d}
@@ -55,11 +55,11 @@ function get-wifi-device { # {{{1
 	(($#))||	die 'Could not find a ^Bwifi^b device.'
 	(($#>1))&&	die 'Multiple ^Bwifi^b devices found. Bailing.'
 
-	wifi="$1"
+	wifi=$1
 } # }}}1
 # LOG-INET-STATS ←→ DELETE THIS {{{1
 LOG_INET_STATS_RUNS=0
-LOG_INET_STATS_awkpgm="$(</dev/stdin)" <<-\
+LOG_INET_STATS_awkpgm=$(</dev/stdin) <<-\
 	\==AWK==
 		BEGIN			{ FS=":" }
 		/^[^\t]/		{ d=$1; next }
@@ -102,10 +102,10 @@ set -A cfgs -- $wifi_config/[0-9][0-9],$1*
 [[ ${cfgs[0]} == *\* ]]&& die 'Could not find a matching wifi configuration file.'
 ((${#cfgs[@]}>1))&& { set -A cfgs -- "$(omenu "${cfgs[@]}")" || exit 0; }
 
-cfg="$(readlink -nf "${cfgs[0]}")"
+cfg=$(readlink -nf "${cfgs[0]}")
 [[ -n $cfg ]]|| die 'IMPOSSIBLE THING #1'
 
-nwid="${cfg#$wifi_config/[0-9][0-9],}"
+nwid=${cfg#$wifi_config/[0-9][0-9],}
 # there's a newline character, right ... about ... there
 #     ↓
 gsub '

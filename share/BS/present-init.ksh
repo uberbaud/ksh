@@ -8,19 +8,19 @@ initialURL="file://$XDG_DOCUMENTS_DIR/presentations/uberbaud-logo.html"
 Title='uberbaud-presentation' # <title>...</title> in html file
 Display1='eDP-1'
 
-PGMBIN="$(readlink -fn "$0")"
-PGMDIR="${PGMBIN%/*}"
+PGMBIN=$(readlink -fn "$0")
+PGMDIR=${PGMBIN%/*}
 desparkle "$PGMDIR"
-dPGMDIR="$REPLY"
+dPGMDIR=$REPLY
 
 DO=on
 want_2nd_display=true
 
 # Usage {{{1
-typeset -- this_pgm="${0##*/}"
+typeset -- this_pgm=${0##*/}
 function usage {
 	desparkle "$this_pgm"
-	PGM="$REPLY"
+	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
 	^F{4}Usage^f: ^T$PGM^t ^[^T-k^t^]
@@ -64,7 +64,7 @@ function init_2nd_display { #{{{1
 	[[ -n ${1:-} ]]||
 		die 'No ^Bconnected^b second display found.'
 
-	Display2="$1"
+	Display2=$1
 	xrandr --output "$Display2" --auto --right-of "$Display1"
 	set -- $(xrandr|awk "/^$Display2 /")
 	shift # we already have Display2 and we want to shift later

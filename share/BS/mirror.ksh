@@ -5,10 +5,10 @@
 set -o nounset;: ${FPATH:?Run from within KSH}
 
 # Usage {{{1
-typeset -- this_pgm="${0##*/}"
+typeset -- this_pgm=${0##*/}
 function usage {
 	desparkle "$this_pgm"
-	PGM="$REPLY"
+	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
 	^F{4}Usage^f: ^T$PGM^t ^Ufile/dir^u ^U…^u ^Umachine^u
@@ -38,7 +38,7 @@ shift $((OPTIND-1))
 function validate-exists {
 	local failures=0
 	for f; do
-		[[ -a "$f" ]]&& continue
+		[[ -a $f ]]&& continue
 		desparkle "$f"
 		warn "^B$REPLY^b does not exist"
 		((failures++))
@@ -53,7 +53,7 @@ needs new-array is-known-host desparkle
 function sendem {
 	local fullpath
 	for p; do
-		fullpath="$(readlink -fn "$p")"
+		fullpath=$(readlink -fn "$p")
 		notify "scp -r \"$fullpath\" $AWAY:\"$fullpath\""
 		scp -r "$fullpath" $AWAY:"$fullpath"
 	done
@@ -63,7 +63,7 @@ new-array F
 while (($#>1)) { +F "$1"; shift; }
 validate-exists "${F[@]}" || die 'Cannot send nonexistent files' quitting
 
-AWAY="$1"
+AWAY=$1
 is-known-host $AWAY || die "^B$AWAY^B is not a known host."
 
 sendem "${F[@]}"; exit

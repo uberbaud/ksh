@@ -18,7 +18,7 @@ function fsave {
 	  }
 	: ${1:-Missing required function description}
 	P=${FPATH:-.}; P=${P%%:*}
-	FBODY="$fText" new -t ksh -x function $P/$fName "$*"
+	FBODY=$fText new -t ksh -x function $P/$fName "$*"
 }
 
 # Copyright © 2019 by Tom Davis <tom@greyshirt.net>.

@@ -5,10 +5,10 @@
 set -o nounset;: ${FPATH:?Run from within KSH}
 
 # Usage {{{1
-typeset -- this_pgm="${0##*/}"
+typeset -- this_pgm=${0##*/}
 function usage {
 	desparkle "$this_pgm"
-	PGM="$REPLY"
+	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
 	^F{4}Usage^f: ^T$PGM^t ^Umusic_file^u ^S…^s
@@ -40,9 +40,9 @@ shift $((OPTIND-1))
 function do-one-file {
 	# Convert file to ogg if necessary
 	# Get new name from
-	#   ckSum="$(oggdec -QRo - $OLDFILE | cksum -a sha384b)"
-	#   fName="${ckSum#?}"
-	#   fPath="${ckSum%"$fName"}"
+	#   ckSum=$(oggdec -QRo - $OLDFILE | cksum -a sha384b)
+	#   fName=${ckSum#?}
+	#   fPath=${ckSum%"$fName"}
 	# Compare info if already exists
 	# OR, Hardlink (if originally ogg) OR mv (if converted) to
 	#   $AMUSE_DATA_HOME/$fPath/$fName

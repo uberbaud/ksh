@@ -37,10 +37,10 @@ reqInt() {
 }
 
 # Usage {{{1
-typeset -- this_pgm="${0##*/}"
+typeset -- this_pgm=${0##*/}
 function usage {
 	desparkle "$this_pgm"
-	PGM="$REPLY"
+	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
 	^F{4}Usage^f: ^T${PGM}^t ^[^Uoptions^u^] ^[^Uinfile^u ^U…^u]
@@ -89,14 +89,14 @@ shift $(($OPTIND - 1))
 
 ((shft<0))&& shft=$((shft%C)) # handle shft with large negative magnitude
 
-typeset -L $cpc remove=''; gsub ' ' '?' "$remove"; remove="$REPLY"
+typeset -L $cpc remove=''; gsub ' ' '?' "$remove"; remove=$REPLY
 function rainbowify-line {
 	typeset -i ndx=$2
-	typeset line="$1" p='' t=''
+	typeset line=$1 p='' t=''
 	while ((${#line}>$cpc)); do
-		t="${line#$remove}"
-		p="${line%"$t"}"
-		line="$t"
+		t=${line#$remove}
+		p=${line%"$t"}
+		line=$t
 		print -n "\033[$bfg;5;${colors[ndx]}m$p"
 		ndx=$(( ((ndx+1)%C) ))
 	done
@@ -106,11 +106,11 @@ function rainbowify-line {
 
 function rainbowify-stdin {
 	local t='' p=''
-	t="$(</dev/stdin)"
+	t=$(</dev/stdin)
 	# remove any existing ansi escapes
 	while [[ $t == *'['+([!mK])[mK]* ]]; do
 		p="$p${t%%'['+([!mK])[mK]*}"
-		t="${t#'['+([!mK])[mK]*}"
+		t=${t#'['+([!mK])[mK]*}
 	done
 	t="$p$t"
 	splitstr NL "$t"

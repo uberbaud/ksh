@@ -6,7 +6,7 @@
 
 function _show_function_help {
 	local awkpgm
-	awkpgm="$(</dev/stdin)" <<-\
+	awkpgm=$(</dev/stdin) <<-\
 		\==AWK==
 			/^#:/	{p=1}
 			!p		{ next }
@@ -21,7 +21,7 @@ function _show_function_help {
 				  }
 			  }
 		==AWK==
-	awk -v fn="${1##*/}" "$awkpgm" "$1" | sparkle
+	awk -v fn=${1##*/} "$awkpgm" "$1" | sparkle
 }
 
 function f-help {

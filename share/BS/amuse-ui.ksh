@@ -45,10 +45,10 @@ SubScript[8]='₈'
 SubScript[9]='₉'
 
 # Usage {{{1
-typeset -- this_pgm="${0##*/}"
+typeset -- this_pgm=${0##*/}
 function usage {
 	desparkle "$this_pgm"
-	PGM="$REPLY"
+	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
 	^F{4}Usage^f: ^T$PGM^t
@@ -194,16 +194,16 @@ function update-screen { # {{{1
 	i=$lastRowPLAYED
 	while ((i)); do
 		((i--))
-		IFS="$TAB" read -r id song dtenths || song=''
+		IFS=$TAB read -r id song dtenths || song=''
 		BUFFER[i]="$song"
 	done <played.lst
-	IFS="$TAB" read -r id song DURATION <playing
+	IFS=$TAB read -r id song DURATION <playing
 	DSEC=${DURATION%?}
 	DHMS=$(s2hms ${DSEC:-0})
 	BUFFER[rowPLAYING-1]="$song"
 	i=$((rowPLAYING-1))
 	while ((++i<LINES)); do
-		IFS="$TAB" read -r id song dtenths || song=''
+		IFS=$TAB read -r id song dtenths || song=''
 		BUFFER[i]="$song"
 	done <song.lst
 
@@ -212,15 +212,15 @@ function update-screen { # {{{1
 	print -n -- "$colorPlayed"
 	i=0
 	while ((i<$lastRowPLAYED)); do
-		L="${BUFFER[i]:-~}"
+		L=${BUFFER[i]:-~}
 		((i++))
 		print -n -- "\033[$i;1H $L "
 	done
-	L="${BUFFER[i]:-~}"
+	L=${BUFFER[i]:-~}
 	((i++))
 	print -n -- "\033[$i;1H $colorPlaying$L$colorNext "
 	while ((i<(LINES-1))); do
-		L="${BUFFER[i]:-~}"
+		L=${BUFFER[i]:-~}
 		((i++))
 		print -n -- "\033[$i;1H $L "
 	done

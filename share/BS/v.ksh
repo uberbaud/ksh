@@ -3,18 +3,18 @@
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
 
 set -o nounset;: ${FPATH:?Run from KSH}
-ED="${VISUAL:-${EDITOR:?Neither VISUAL nor EDITOR is set.}}"
+ED=${VISUAL:-${EDITOR:?Neither VISUAL nor EDITOR is set.}}
 
 [[ -n $LOCALBIN ]] || die '^S$LOCALBIN^s is not set.'
 [[ -d $LOCALBIN ]] || die '^S$LOCALBIN^s is not a directory.'
-[[ :"$PATH": == *:"$LOCALBIN":* ]]|| PATH="${PATH%:}:$LOCALBIN"
+[[ :$PATH: == *:$LOCALBIN:* ]]|| PATH=${PATH%:}:$LOCALBIN
 
 [[ " ${DEBUG:-} " == *' v.zsh '* ]]&& set -x
 
-typeset -- this_pgm="${0##*/}"
+typeset -- this_pgm=${0##*/}
 function usage { # {{{1
 	desparkle "$this_pgm"
-	PGM="$REPLY"
+	PGM=$REPLY
 	sparkle <<-\
 	==SPARKLE==
 	^F{4}Usage^f: ^T${PGM}^t  ^[^T-f^t^] ^Ufile^u ^[^Umessage^u^]
@@ -59,11 +59,11 @@ function already-in-edit { # {{{1
 } # }}}1
 function safe-to-edit { #{{{1
 	local F
-	F="${1:?Programmer error. Missing parameter.}"
+	F=${1:?Programmer error. Missing parameter.}
 	gsub % %% "$F"
 	gsub / %  "$REPLY"
-	LOCKNAME="$REPLY"
-	V_CACHE="$XDG_CACHE_HOME/v"
+	LOCKNAME=$REPLY
+	V_CACHE=$XDG_CACHE_HOME/v
 	needs-path -or-die "$V_CACHE"
 	get-exclusive-lock -no-wait "$LOCKNAME" $V_CACHE ||
 		already-in-edit "$REPLY"
@@ -75,10 +75,10 @@ function check-flags-for-writability { # {{{1
 	((flags&NOWRITES))|| return 0
 
 	flagstr=''
-	((flags&UCHG))&&	flagstr="$flagstr,uchg"
-	((flags&UAPPND))&&	flagstr="$flagstr,uappnd"
-	((flags&SCHG))&&	flagstr="$flagstr,schg"
-	((flags&SAPPND))&&	flagstr="$flagstr,sappnd"
+	((flags&UCHG))&&	flagstr=$flagstr,uchg
+	((flags&UAPPND))&&	flagstr=$flagstr,uappnd
+	((flags&SCHG))&&	flagstr=$flagstr,schg
+	((flags&SAPPND))&&	flagstr=$flagstr,sappnd
 	die "File is flagged ^B${flagstr#,}^b. It is not writable."
 } # }}}1
 function verify-file-is-editable { # {{{1
@@ -86,7 +86,7 @@ function verify-file-is-editable { # {{{1
 	[[ -f $f_fullpath ]]||	die "^B$1^b is ^Bnot^b a file."
 	[[ $f_fullpath == *,v ]]&&
 		warnOrDie "Seems to be an ^BRCS archive^b file."
-	ftype="$(/usr/bin/file -b "$f_fullpath")"
+	ftype=$(/usr/bin/file -b "$f_fullpath")
 
 	[[ $ftype == *text* || $ftype == *XML* ]]||
 		warnOrDie "Does not seem to be a text file."
@@ -102,7 +102,7 @@ needs $ED ci co get-exclusive-lock rcsdiff trackfile needs-cd needs-path	\
 
 
 [[ -a $1 ]]|| die "No such file ^B$1^b."
-f_fullpath="$(readlink -fn -- "$1" 2>/dev/null)" ||
+f_fullpath=$(readlink -fn -- "$1" 2>/dev/null) ||
 	die "Could not ^Treadlink^t ^B$1^b."
 shift
 
@@ -112,12 +112,12 @@ safe-to-edit "$f_fullpath"
 
 hasmsg=false
 rcsmsg=''
-(($#))&& { hasmsg=true; rcsmsg="$*"; }
+(($#))&& { hasmsg=true; rcsmsg=$*; }
 
 # because we've `readlink`ed the arg, it's guaranteed to have at least 
 # one (1) forward slash ('/') as (and at) the root.
-f_path="${f_fullpath%/*}"
-f_name="${f_fullpath##*/}"
+f_path=${f_fullpath%/*}
+f_name=${f_fullpath##*/}
 
 needs-cd -or-die "$f_path"
 
@@ -138,22 +138,22 @@ function main {
 	do-vcms-checkout "$f_name"
 	# -------8<----------------8<--------------8<----------------8<-------
 	has_rcs=false
-	[[ -d RCS && -f RCS/"$f_name,v" ]] && {
+	[[ -d RCS && -f RCS/$f_name,v ]] && {
 		has_rcs=true
 		rcsdiff -q ./"$f_name" ||
 			warnOrDie 'RCS and checked out versions differ.'
 		# avoid "writable ./f_name exists; remove it? [ny](n):"
-		[[ -w ./"$f_name" ]]&& chmod a-w ./"$f_name"
+		[[ -w ./$f_name ]]&& chmod a-w ./"$f_name"
 		co -q -l ./"$f_name" ||
 			die "Could not ^Tco -l^t ^B${f_name}^b."
 	  }
 	# ------->8---------------->8-------------->8---------------->8-------
 
-	CKSUM_BEFORE="$(cksum -qa sha1b "$f_fullpath")"
+	CKSUM_BEFORE=$(cksum -qa sha1b "$f_fullpath")
 
 	$ED "$f_fullpath"
 
-	CKSUM_AFTER="$(cksum -qa sha1b "$f_fullpath")"
+	CKSUM_AFTER=$(cksum -qa sha1b "$f_fullpath")
 	[[ $CKSUM_BEFORE != $CKSUM_AFTER ]]&& {
 		trackfile "$f_fullpath"
 		[[ -f .LAST_UPDATED ]]&& date -u +"$ISO_DATE" >.LAST_UPDATED

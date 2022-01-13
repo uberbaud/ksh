@@ -7,10 +7,10 @@ typeset -R5 LINENO
 PS4='$LINENO | '
 
 # Usage {{{1
-typeset -- this_pgm="${0##*/}"
+typeset -- this_pgm=${0##*/}
 function usage {
 	desparkle "$this_pgm"
-	PGM="$REPLY"
+	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
 	^F{4}Usage^f: ^T$PGM^t
@@ -69,15 +69,15 @@ function hCleanUp	{ #{{{1
 function file-from-id { # {{{1
 	local F P
 	SQL "SELECT pcm_sha384b FROM files WHERE id = $1;"
-	F="${sqlreply[0]#?}"
-	P="${sqlreply[0]%"$F"}"
+	F=${sqlreply[0]#?}
+	P=${sqlreply[0]%"$F"}
 	REPLY="$AMUSE_DATA_HOME/$P/$F.oga"
 } # }}}1
 function move-played-to-history { # {{{
 	local PlayedBuf PlayingBuf
-	PlayingBuf="$(<playing)"
+	PlayingBuf=$(<playing)
 	: >playing
-	PlayedBuf="$(<played.lst)"
+	PlayedBuf=$(<played.lst)
 	print -r -- "$PlayingBuf" >played.lst
 	print -r -- "$PlayedBuf" >>played.lst
 } # }}}
@@ -249,7 +249,7 @@ function notify-subscribers { # {{{1
 } # }}}1
 function handle-cmd { # {{{1
 	local PLAYING
-	typeset -l cmd="${1:-}"
+	typeset -l cmd=${1:-}
 	is-valid-cmd "${cmd-EMPTY}" || {
 		if [[ -z $cmd ]]; then
 			print 'Missing command from ^Ssigpipe^s.'

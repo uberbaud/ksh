@@ -10,14 +10,14 @@ needs date needs-path
 function xat {
 	(($#))|| return 0
 
-	local NOW="$(date +%s)" THEN='' DAY='today'
+	local NOW=$(date +%s) THEN='' DAY='today'
 	if [[ $1 == ?(1[0-9]|2[0-3]):[0-5][0-9] ]]; then
 		local h=${1%:*} m=${1#*:}
-		THEN="$(date -j +%s $h$m)"
+		THEN=$(date -j +%s $h$m)
 		((NOW<THEN))|| ((THEN+=(24*60*60)))
 	elif [[ $1 == [0-9]:[0-5][0-9] ]]; then
 		local h=${1%:*} m=${1#*:}
-		THEN="$(date -j +%s 0$h$m)"
+		THEN=$(date -j +%s 0$h$m)
 		((NOW<THEN))|| ((THEN+=(12*60*60)))
 		((NOW<THEN))|| ((THEN+=(12*60*60)))
 	elif [[ $1 == +([0-9])h+([0-9])?(m) ]]; then
@@ -30,19 +30,19 @@ function xat {
 		die 'Unrecognized time or interval format.'
 	fi
 
-	[[ "$(date -r $NOW +%d)" == "$(date -r $THEN +%d)" ]]|| DAY='tomorrow'
+	[[ $(date -r $NOW +%d) == $(date -r $THEN +%d) ]]|| DAY=tomorrow
 
 	local alarms=${XDG_DATA_HOME:?}/alarms
 	needs-path -or-die "$alarms"
 
 	local fmt='  \e[34m>>>\e[39m Setting message for \e[1m%s\e[22m %s.\n'
-	local HHMM="$(date -r $THEN +%H:%M)"
+	local HHMM=$(date -r $THEN +%H:%M)
 	printf "$fmt" "$HHMM" $DAY
 	# but we're really setting it 15 seconds before that, which is 
 	# itself rounded down to the exact minute
 	THEN=$((THEN-(THEN%60)-15))
 
-	local alfile="$alarms"/$THEN
+	local alfile=$alarms/$THEN
 	[[ -s $alfile ]]|| date -r $THEN +"%Y-%m-%d $HHMM" >>$alfile
 	shift
 	(($#))|| set "WAKE UP!${NL}IT'S THAT TIME!"

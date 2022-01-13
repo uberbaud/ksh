@@ -10,14 +10,10 @@ shortbin=${realbin##*/};  shortbin=${shortbin%.*}
 appUser=''
 dPublic=${XDG_PUBLICSHARE_DIR:?}
 
-if [[ $shortcall != $shortbin ]]; then
-	appUser="${shortcall#start-}"
-else
-# Usage {{{1
-typeset -- this_pgm="${0##*/}"
-function usage {
+typeset -- this_pgm=${0##*/}
+function usage { # {{{1
 	desparkle "$this_pgm"
-	PGM="$REPLY"
+	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
 	^F{4}Usage^f: ^T$PGM^t
@@ -27,28 +23,6 @@ function usage {
 	===SPARKLE===
 	exit 0
 } # }}}
-# process -options {{{1
-function bad_programmer {	# {{{2
-	die 'Programmer error:'	\
-		"  No getopts action defined for [1m-$1[22m."
-  };	# }}}2
-while getopts ':h' Option; do
-	case $Option in
-		h)	usage;												;;
-		\?)	die "Invalid option: ^B-$OPTARG^b.";				;;
-		\:)	die "Option ^B-$OPTARG^b requires an argument.";	;;
-		*)	bad_programmer "$Option";							;;
-	esac
-done
-# remove already processed arguments
-shift $((OPTIND-1))
-# ready to process non '-' prefixed arguments
-# /options }}}1
-	(($#))|| die 'Missing required parameter ^Uapp-name^u.'
-	appUser=$1
-	shift
-fi
-
 function app-framework-exists { # {{{1
 	# does the app's user exist?
 	getent passwd "$1" >/dev/null || {
@@ -79,14 +53,8 @@ function setup-app-framework { # {{{1
 
 	/home/tw/config/ksh/share/BS/start:init.ksh "$1"
 } # }}}1
-
-app-framework-exists "$appUser" ||
-	setup-app-framework "$appUser" || die "Cannot run ^T$REPLY^t."
-
-xauth list $DISPLAY		>/home/apps/xauth-add
-print -r -- "$DISPLAY"	>/home/apps/display
-
-(($#))&& {
+function publicify-files { # {{{1
+	local i a t
 	# move files as necessary to a publicly accessible place.
 	i=0
 	for a; do
@@ -106,8 +74,25 @@ print -r -- "$DISPLAY"	>/home/apps/display
 		chmod -R g+wr "$t"		# mark the directory AND everything it contains
 		chmod g+x "$t"			# mark ONLY the directory browsable
 	}
-	set -- "${o[@]}"
-}
+} # }}}1
+
+if [[ $shortcall != $shortbin ]]; then
+	appUser=${shortcall#start-}
+elif [[ ${1-} == +(-)h?(elp) ]]; then
+	usage
+else
+	(($#))|| die 'Missing required parameter ^Uapp-name^u.'
+	appUser=$1
+	shift
+fi
+
+app-framework-exists "$appUser" ||
+	setup-app-framework "$appUser" || die "Cannot run ^T$REPLY^t."
+
+xauth list $DISPLAY		>/home/apps/xauth-add
+print -r -- "$DISPLAY"	>/home/apps/display
+
+(($#))&& { publicify-files "$@"; set -- "${o[@]}"; }
 
 [[ -n ${PGM_OPTIONS-} ]]&& print -- "$PGM_OPTIONS"
 exec doas -u "$appUser" /usr/local/bin/start "$@"

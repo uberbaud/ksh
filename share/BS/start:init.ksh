@@ -26,7 +26,7 @@ TAB='	'
 this_pgm=${0##*/}
 function usage { # {{{1
 	desparkle "$this_pgm"
-	PGM="$REPLY"
+	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
 	^F{4}Usage^f: ^T$PGM^t ^Uapp^u
@@ -262,7 +262,7 @@ function create-user-links { # {{{1
 				# the moment, we'll sort it out later.
 } # }}}1
 function link-as-app { # {{{1
-	[[ -a "$2" ]]&& return 0 # it exists, nothing to do
+	[[ -a $2 ]]&& return 0 # it exists, nothing to do
 	@ doas -u $APP ln -sf "$1" "$2"
 } # }}}1
 function link-from-out-into-app-home { # {{{1'

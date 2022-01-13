@@ -6,14 +6,14 @@
 #:   The result is placed in ^O${^o^V4^v^O:-^o^TREPLY^t^O}^o.
 
 function gsub {
-	: ${1:?parameter 'old' cannot be empty}
+	: ${1:?parameter \'old\' cannot be empty}
 	eval ${4:-REPLY}=
 	set -- "${4:-REPLY}" "$(
 		unset p old new text
-		p='';old="$1";new="${2:-}";text="${3:-}"
-		while [[ $text == *"$old"* ]]; do
-			p="$p${text%%"$old"*}$new"
-			text="${text#*"$old"}"
+		p=''; old=$1; new=${2:-}; text=${3:-}
+		while [[ $text == *$old* ]]; do
+			p=$p${text%%"$old"*}$new
+			text=${text#*"$old"}
 		done
 		print -r -- "$p$text"
 	  )" || return $?

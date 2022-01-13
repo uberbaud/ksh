@@ -6,10 +6,10 @@ set -o nounset;: ${FPATH:?Run from within KSH}
 unset FILE DIR PID SWPF
 
 # Usage {{{1
-typeset -- this_pgm="${0##*/}"
+typeset -- this_pgm=${0##*/}
 function usage {
 	desparkle "$this_pgm"
-	PGM="$REPLY"
+	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
 	^F{4}Usage^f: ^T$PGM^t ^[^T-dfpsS^t^] ^[^Ufile^u^]
@@ -72,7 +72,7 @@ showAll=true; file=''
 	showAll=false
 	[[ -a $1 ]]|| die "^B$1^b does not exist."
 	[[ -f $1 ]]|| die "^B$1^b is not a file."
-	file="$(readlink -fn "$1")"
+	file=$(readlink -fn "$1")
 	[[ -n $file ]]|| die 'Total weirdness, ^Treadlink^t fails.'
   }
 
@@ -81,26 +81,26 @@ splitstr NL "$(nvim -r 2>&1|tr -d '\r')" swapinfo
 for ln in "${swapinfo[@]}"; do
 	[[ $ln == '   In directory '*: ]]&& {
 		show-prev
-		ln="${ln#   In directory }"
-		ln="${ln%%*(/):}"
-		DIR="$ln"
+		ln=${ln#   In directory }
+		ln=${ln%%*(/):}
+		DIR=$ln
 		continue
 	  }
 	[[ $ln == [1-9]*([0-9]).* ]]&& {
 		show-prev
-		ln="${ln##+([0-9]).+( )}"
-		SWPF="$ln"
+		ln=${ln##+([0-9]).+( )}
+		SWPF=$ln
 		continue
 	  }
 	[[ $ln == +( )'file name: '* ]]&& {
-		ln="${ln#+( )file name: }"
+		ln=${ln#+( )file name: }
 		eval FILE="'$ln'"
 		continue
 	  }
 	[[ $ln == +( )'process ID: '+([0-9])' (still running)' ]]&& {
-		ln="${ln#+( )process ID: }"
-		ln="${ln% \(still running\)}"
-		PID="$ln"
+		ln=${ln#+( )process ID: }
+		ln=${ln% \(still running\)}
+		PID=$ln
 		continue
 	  }
 done

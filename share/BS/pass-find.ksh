@@ -5,10 +5,10 @@
 set -o nounset;: ${FPATH:?Run from within KSH}
 
 # Usage {{{1
-typeset -- this_pgm="${0##*/}"
+typeset -- this_pgm=${0##*/}
 function usage {
 	desparkle "$this_pgm"
-	PGM="$REPLY"
+	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
 	^F{4}Usage^f: ^T$PGM^t ^Udomain^u
@@ -42,14 +42,14 @@ needs needs-cd
 (($#))|| die 'Expected one argument ^Uhostglob^u.'
 (($#==1))||	die 'Too many arguments. Expected ^Uhostglob^u.'
 
-secrets="${XDG_DATA_HOME:?}"/secrets
+secrets=${XDG_DATA_HOME:?}/secrets
 [[ -d $secrets ]]|| die 'No secrets directory.'
 needs-cd -or-die "$secrets"
 
 set -- *"$1"*.pwd
-[[ "$*" == \**\*.pwd ]]&& exit 1
+[[ $* == \**\*.pwd ]]&& exit 1
 
-choice="$(umenu "$@")"|| exit 1
+choice=$(umenu "$@")|| exit 1
 
 print -- "${choice%.pwd}"
 

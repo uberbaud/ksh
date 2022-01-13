@@ -8,9 +8,9 @@
 
 needs xclip needs-path $BS/v.ksh
 function note {(
-	local NOTES="$PWD"/NOTES OLDPWD="$PWD" setnoglob=false
+	local NOTES=$PWD/NOTES OLDPWD=$PWD setnoglob=false
 	local noterepo=${SYSDATA:?}/notes
-	[[ $PWD == */NOTES ]]&& NOTES="$PWD"
+	[[ $PWD == */NOTES ]]&& NOTES=$PWD
 	[[ $NOTES == $HOME ]]&& NOTES=${XDG_DOCUMENTS_DIR:-$HOME/docs}/NOTES
 	needs-path -or-die "$noterepo"
 	needs-path -or-die "$NOTES"/RCS
@@ -22,16 +22,16 @@ function note {(
 	[[ ${Q[0]} == \*.note ]]|| # returning *.note means no matches
 		for q in "${Q[@]}"; do
 			c=${q%.note}
-			((seqnum<c))&& seqnum="$c"
+			((seqnum<c))&& seqnum=$c
 		done
 	# just in case everyone is trying to create a new note in the same 
 	# directory!
-	local TMPFILE="$(mktemp note-XXXXXXXXX)" tries=5 repolink SHA384
+	local TMPFILE=$(mktemp note-XXXXXXXXX) tries=5 repolink SHA384
 	while ((tries--)); do
 		((seqnum++))
 		seqnote=$seqnum.note
 		ln "$TMPFILE" "$seqnote" && break
-		octet="$(dd bs=1 count=1 status=none if=/dev/urandom)"
+		octet=$(dd bs=1 count=1 status=none if=/dev/urandom)
 		sleep 0.$(printf '%03d' \'$octet)
 	done
 	/bin/rm "$TMPFILE"
@@ -42,13 +42,13 @@ function note {(
 	repolink="$noterepo/$(date -u +'%Y-%m-%dz')-${OLDPWD##*/}-$seqnum"
 	tries=0
 	while ! ln -s "$PWD/$seqnote" "$repolink" 2>/dev/null; do
-		[[ "$(readlink "$repolink")" == $PWD/$seqnote ]]&& break
+		[[ $(readlink "$repolink") == $PWD/$seqnote ]]&& break
 		repolink="${repolink%%,+([0-9])},$((tries++))"
 	done
 	(($#))|| {
-		SHA384="$(cksum -qa sha384b "$seqnote")"
+		SHA384=$(cksum -qa sha384b "$seqnote")
 		$BS/v.ksh $seqnote '.'
-		[[ $SHA384 == "$(cksum -qa sha384b "$seqnote")" ]]&& {
+		[[ $SHA384 == $(cksum -qa sha384b "$seqnote") ]]&& {
 			# no changes, so delete everything.
 			warn "Discarding empty note."
 			/bin/rm -f "$seqnote" "RCS/$seqnote,v" "$repolink"

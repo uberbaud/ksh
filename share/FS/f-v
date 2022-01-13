@@ -25,7 +25,7 @@ function f-v {
 	(($#))&& shift
 	# ZSH inspired =word -> $(which word)
 	[[ $filexp == =* && ! -f $filexp ]]&& {
-		filexp="${filexp#=}"
+		filexp=${filexp#=}
 		cmdexp=$(command -v "$filexp") ||
 			die "Could not resolve ^B$filexp^b."
 		if [[ $cmdexp == alias\ * ]]; then

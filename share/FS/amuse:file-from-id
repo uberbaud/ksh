@@ -8,15 +8,15 @@ needs amuse:env grep notify sqlite3
 function amuse:file-from-id {
 	local D Q R F P
 	amuse:env
-	D="${AMUSE_DATA_HOME:?}"/amuse.db3
+	D=${AMUSE_DATA_HOME:?}/amuse.db3
 	# @@@ will be the separator between sqlite3 informative output and
 	# real data
 	Q="SELECT '@@@',pcm_sha384b, dtenths FROM files WHERE id = ${1:?}"
 	set -- $(sqlite3 -separator ' ' "$D" "$Q" 2>/dev/null)
 	while [[ $1 != @@@ ]] { shift; }; shift
-	F="${1#?}"
-	P="${1%"$F"}"
-	DURATION="$2"
+	F=${1#?}
+	P=${1%"$F"}
+	DURATION=$2
 	REPLY="$AMUSE_DATA_HOME/$P/$F.oga"
 	print -r -- "$P/$F.oga"
 }

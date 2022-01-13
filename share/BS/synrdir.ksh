@@ -5,14 +5,14 @@
 set -o nounset; : ${KSH_VERSION:?Run from with KSH}
 
 # Usage {{{1
-full_pgm_path="$(readlink -nf "$0")"
+full_pgm_path=$(readlink -nf "$0")
 : ${full_pgm_path:?}
-this_pgm="${0##*/}"
+this_pgm=${0##*/}
 LOGLEVELS='^Bnone^b, ^Bnormal^b, or ^Ball^b.'
 keep=false
 function usage {
 	desparkle "$this_pgm"
-	PGM="$REPLY"
+	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
 	^F{4}Usage^f: ^T${PGM}^t ^[-L ^Uloglevel^u^] ^[^Uuser^u^T@^t^]^Uhost^u^T:^t^Uremote_dir^u ^Ulocal_dir^u
@@ -76,8 +76,8 @@ shift $(($OPTIND - 1))
 # ready to process non '-' prefixed arguments
 # /options }}}1
 
-MYNAME="$(readlink -fn "$0")"
-CKSUM="$(cksum -qa sha384b "$MYNAME")"
+MYNAME=$(readlink -fn "$0")
+CKSUM=$(cksum -qa sha384b "$MYNAME")
 DIR_IS_SET=false
 
 tmfmt='%Y-%m-%dT%H:%M:%S%z'
@@ -87,7 +87,7 @@ statvars='modtm perm size flags'
 alias r-fail='{ r-reply fail; return 1; }'
 alias r-okay='{ r-reply okay; return 0; }'
 alias require_dir_be_set='$DIR_IS_SET || { r-reply dirunset; return 1; }'
-alias l-log="$LOG_PRINTER"
+alias l-log=$LOG_PRINTER
 
 function l-log-normal { # {{{1
 	(($1>$VERBOSITY_LEVEL))&& return
@@ -99,7 +99,7 @@ function l-log-all { # {{{1
 	notify "$@"
 } # }}}1
 function r-log { # {{{1
-	typeset -L12 REQ="$1"
+	typeset -L12 REQ=$1
 	print -u3 "$REQ: $2"
 } # }}}1
 function l-request { #{{{1
@@ -107,7 +107,7 @@ function l-request { #{{{1
 	print -pr -- "$@"
 } # }}}1
 function l-reply-is { # {{{1
-	local expected="$1"; shift
+	local expected=$1; shift
 	[[ ${1:-} == WITH-VARS ]]&& shift
 	read -pr status "$@"
 	l-log $LOGDBUG "got: $status, expected: $expected"
@@ -118,7 +118,7 @@ function r-reply { # {{{1
 	print -r -- "$@"
 } # }}}1
 function r-request-is { # {{{1
-	local request expected="$1"; shift
+	local request expected=$1; shift
 	[[ ${1:-} == WITH-VARS ]]&& shift
 	read -r request "$@"
 	r-log request "got: $request, expected: $expected"
@@ -142,7 +142,7 @@ function l-getfile { # {{{1
 	l-request i-wantfile "$1"
 	local status $statvars flagstr
 	l-reply-is sending WITH-VARS $statvars && {
-		dd of="$1" count=$size bs=1 status=none <&p
+		dd of=$1 count=$size bs=1 status=none <&p
 		touch -md "$(date -ur $modtm +'%Y-%m-%dT%H:%M:%SZ')" "./$1" 
 		chmod ${perm#??} "./$1"
 		fflags-to-flagstr $flags
@@ -155,7 +155,7 @@ function r-pushfile { # {{{1
 	require_dir_be_set
 	set -A statfo $(stat -qf "$statfmt" -- "$1") || r-fail
 	r-reply sending "${statfo[@]}"
-	dd if="$1" count="${statfo[2]}" bs=1 status=none
+	dd if=$1 count=${statfo[2]} bs=1 status=none
 	r-okay
 } # }}}1
 function r-setdir { # {{{1
@@ -169,7 +169,7 @@ function l-putfile { # {{{1
 	set -A statfo $(stat -qf "$statfmt" -- "$1") || l-quit
 	l-request sending "${statfo[@]}"
 	l-reply-is go || l-quit
-	dd if="$1" count="${statfo[2]}" bs=1 status=none >&p
+	dd if=$1 count=${statfo[2]} bs=1 status=none >&p
 	l-request done
 	l-reply-is okay
 } #}}}1
@@ -179,7 +179,7 @@ function r-pullfile { # {{{1
 	local status $statvars
 	r-request-is sending WITH-VARS $statvars && {
 		r-reply go
-		dd of="$1" count=$size bs=1 status=none
+		dd of=$1 count=$size bs=1 status=none
 		touch -md "$(date -ur $modtm +'%Y-%m-%dT%H:%M:%SZ')" "./$1"
 		chmod ${perm#??} "./$1"
 		fflags-to-flagstr $flags
@@ -277,14 +277,14 @@ $i_am_the_local && { # {{{1
 	[[ $1 == *:* ]]||
 		die 'Missing ^Uhost^u or ^Uremote_directory^u (no colon in arg1).'
 
-	remote_host="${1%%:*}"
-	remote_dir="${1#*:}"
+	remote_host=${1%%:*}
+	remote_dir=${1#*:}
 	f-host $remote_host >/dev/null							||
 		die "Cannot connect to ^B$remote_host^b."
 	cd "${2:-$PWD}" ||
 		die "Could not cd to ^Tcd^t ^B$local_dir^b."
 
-	tmppath="$(mktemp -d)"
+	tmppath=$(mktemp -d)
 	add-exit-action l-cleanup
 
 	rlst=$tmppath/r.lst
@@ -301,7 +301,7 @@ $i_am_the_local && { # {{{1
 		kill %1
 		die "Remote doesn't understand ^Bcksum^b." "$msg_neednew"
 	  }
-	[[ $rcksum == "$CKSUM" ]]|| {
+	[[ $rcksum == $CKSUM ]]|| {
 		kill %1
 		die "Checksums do not match" "$msg_neednew"
 	  }

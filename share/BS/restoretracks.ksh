@@ -5,10 +5,10 @@
 set -o nounset;: ${FPATH:?Run from within KSH}
 
 # Usage {{{1
-typeset -- this_pgm="${0##*/}"
+typeset -- this_pgm=${0##*/}
 function usage {
 	desparkle "$this_pgm"
-	PGM="$REPLY"
+	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
 	^F{4}Usage^f: ^T$PGM^t
@@ -43,7 +43,7 @@ DOCSTORE="$HOME/hold/DOCSTORE"
 needs-cd -or-die "$DOCSTORE"
 
 function do-one {
-	local fnpre="$1"
+	local fnpre=$1
 	set -- $fnpre*
 	[[ $1 == $fnpre\* ]]&& {
 		warn "No matching file ^BDOCSTORE/$1^b*"
@@ -55,7 +55,7 @@ function do-one {
 	  }
 	zcat "$1" |&
 	read -rp restname
-	restdir="${restname%/*}"
+	restdir=${restname%/*}
 	needs-path -or-warn "$restdir" || return
 
 	cat <&p >"$restname"

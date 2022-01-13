@@ -19,7 +19,7 @@ function reshell {
 					LD_LIBRARY_PATH NLSPATH
 	while getopts ':e:fn' Opt; do
 		case $Opt in
-			e)	useenv="$OPTARG";									;;
+			e)	useenv=$OPTARG;									;;
 			f)	force=true;											;;
 			n)	doenv=false;										;;
 			\?)	die "Invalid option: ^B-$OPTARG^b.";				;;
@@ -30,9 +30,9 @@ function reshell {
 	shift $((OPTIND-1))
 
 	(($#))|| die 'Missing required argument ^Bshell^b'
-	desparkle "$1"; sD="$REPLY"
+	desparkle "$1"; sD=$REPLY
 	if $force; then
-		s="$(readlink -fn "$1")"
+		s=$(readlink -fn "$1")
 		[[ -n $s ]]|| die "^B$sD^b does not exist."
 		[[ -f $s ]]|| die "^B$sD^b is not a file."
 		[[ -x $s ]]|| die "^B$sD^b is not executable."
@@ -44,7 +44,7 @@ function reshell {
 	REPLY=''
 
 	$doenv && {
-		ENV="${useenv:-"${XDG_CONFIG_HOME:-$HOME/config}/${s##*/}/env"}"
+		ENV=${useenv:-"${XDG_CONFIG_HOME:-$HOME/config}/${s##*/}/env"}
 		[[ -f $ENV ]]&& {
 			ENV=$(readlink -fn $ENV)
 			if [[ -f $ENV ]]; then
@@ -55,7 +55,7 @@ function reshell {
 		  }
 	  }
 
-	set -A setenvs -- SHELL="$s"
+	set -A setenvs -- SHELL=$s
 	for k in "${keepvars[@]}"; do
 		eval v=\$$k
 		[[ -n $v ]]|| continue

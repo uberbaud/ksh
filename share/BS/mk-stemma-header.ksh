@@ -5,10 +5,10 @@
 set -o nounset;: ${FPATH:?Run from within KSH}
 
 # Usage {{{1
-typeset -- this_pgm="${0##*/}"
+typeset -- this_pgm=${0##*/}
 function usage {
 	desparkle "$this_pgm"
-	PGM="$REPLY"
+	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
 	^F{4}Usage^f: ^T$PGM^t ^[^Uoptions^u^] ^[^Uprefix^u ^[^Usuffix^u^]^]
@@ -36,31 +36,31 @@ while getopts ':H:M:D:T:U:h' Option; do
 	case $Option in
 		H)	[[ $OPTARG == [[:alnum:]]*(+([[:alnum:]-])[[:alnum:]])*(.[[:alnum:]]*(+([[:alnum:]-])[[:alnum:]])) ]]||
 				die "Bad URI character in host name."
-			H="$OPTARG"
+			H=$OPTARG
 			;;
 		M)	[[ $OPTARG == [[:alnum:]]*(+([[:alnum:]-])[[:alnum:]]) ]]||
 				die "Bad machine name characters." \
 					"Expected [[:alnum:]-] not starting or ending with a dash."
-			M="$OPTARG"
+			M=$OPTARG
 			;;
 		D)	[[ $OPTARG == @(19|2[0-9])[0-9][0-9][/.-]@(0[1-9]|1[0-2])[/.-]@([0-2][0-9]|3[01]) ]]||
 				die "Bad date format. Expected ^B%Y-%m-d^b."
-			Dy="${OPTARG%%[/.-]*}"; OPTARG="${OPTARG#?????}"
-			Dm="${OPTARG%[/.-]*}"; OPTARG="${OPTARG#???}"
-			Dd="$OPTARG"
+			Dy=${OPTARG%%[/.-]*}"; OPTARG="${OPTARG#?????}
+			Dm=${OPTARG%[/.-]*}"; OPTARG="${OPTARG#???}
+			Dd=$OPTARG
 			((Dy>1969))|| die "Can only do dates after the epoch (1970)."
 			DATEGIVEN=true
 			;;
 		T)	[[ $OPTARG == @([01][0-9]|2[0-3])[:.-][0-5][0-9][:.-]@([0-5][0-9]|60)?([Zz]) ]]||
 				die "Bad time format (expected ^BHH.MM.SS^b, found ^B$OPTARG^b."
-			Th="${OPTARG%%[[:punct:]]*}"; OPTARG="${OPTARG#???}"
-			Tm="${OPTARG%[[:punct:]]*}"; OPTARG="${OPTARG#???}"
-			Ts="${OPTARG%[Zz]}"
+			Th=${OPTARG%%[[:punct:]]*}"; OPTARG="${OPTARG#???}
+			Tm=${OPTARG%[[:punct:]]*}"; OPTARG="${OPTARG#???}
+			Ts=${OPTARG%[Zz]}
 			TIMEGIVEN=true
 			;;
 		U)	[[ $OPTARG == +([[:alnum:]_.~-]|%[[:xdigit:]][[:xdigit:]]) ]]||
 				die "Bad URI character in user name."
-			U="$OPTARG"
+			U=$OPTARG
 			;;
 		h)	usage;													;;
 		\?)	die "Invalid option: [1m-$OPTARG[22m.";				;;
@@ -84,7 +84,7 @@ bins[1]='random'
 needs "${bins[@]}" warnOrDie
 
 if $DATEGIVEN && $TIMEGIVEN; then
-	DTs="$(date -ju +'%Y-%m-%d:%H.%M.%Sz' "$Dy$Dm$Dd$Th$Tm.$Ts" 2>&1)" || {
+	DTs=$(date -ju +'%Y-%m-%d:%H.%M.%Sz' "$Dy$Dm$Dd$Th$Tm.$Ts" 2>&1) || {
 		desparkle "${DTs%?usage: *}"
 		die "$REPLY"
 	  }
@@ -95,11 +95,11 @@ elif $DATEGIVEN; then
 elif $TIMEGIVEN; then
 	die 'If you give the time, you must also give the date.'
 else
-	DTs="$(date -u +'%Y-%m-%d:%H.%M.%Sz')"
+	DTs=$(date -u +'%Y-%m-%d:%H.%M.%Sz')
 fi
 
-D="${DTs%:*}"
-T="${DTs#*:}"
+D=${DTs%:*}
+T=${DTs#*:}
 
 # Use the pid, but suffix it with with 3 digits, making the result
 # unpredictable while maintaining uniqueness.
@@ -107,9 +107,9 @@ random -e 10;	A=$?;
 random -e 10;	B=$?
 random -e 10;	C=$?
 typeset -i16 X=$$$A$B$C
-[[ -n ${M:-} ]]|| { M="$(uname -n)"; M="${M%.*}"; }
-[[ -n ${U:-} ]]|| { U="$(id -un)"; }
-[[ -n ${H:-} ]]|| { H="${URI_AUTHORITY-${EMAIL#*@}}"; }
+[[ -n ${M:-} ]]|| { M=$(uname -n); M=${M%.*}; }
+[[ -n ${U:-} ]]|| { U=$(id -un); }
+[[ -n ${H:-} ]]|| { H=${URI_AUTHORITY-${EMAIL#*@}}; }
 : ${H-Neither URI_AUTHORITY nor EMAIL is set.}
 
 #	'@' = \0100, '(' = \050, '#' = \043, ')' = \051

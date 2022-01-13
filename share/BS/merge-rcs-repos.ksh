@@ -13,10 +13,10 @@ DSCR=
 MAINV=
 
 # Usage {{{1
-typeset -- this_pgm="${0##*/}"
+typeset -- this_pgm=${0##*/}
 function usage {
 	desparkle "$this_pgm"
-	PGM="$REPLY"
+	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
 	^F{4}Usage^f: ^T$PGM^t ^[^T-t^t ^Udescription^u^] ^[^T-m^t ^Uhard copy^u^] ^Ua,v^u ^Ub,v^u
@@ -97,7 +97,7 @@ function rcs-recompose-all { # {{{1
 
 	# incorporate all of the previous changes
 	for t in *.text; do
-		m="$(<${t%.text}.msg)"
+		m=$(<${t%.text}.msg)
 		ln -f "$t" "$fName"
 		ci -q -j -m"${m:-[not specified]}" "$fName"
 	done
@@ -117,7 +117,7 @@ function verify-repos { # {{{1
 			die "^B$v^b is not an ^SRCS^s file." "^B$f^b is the repository."
 
 		# get unique repository names
-		n="${v##*/}"
+		n=${v##*/}
 		for r in "${repo_names[@]}"; do
 			[[ $n == $r ]]&& continue 2
 		done

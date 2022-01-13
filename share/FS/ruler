@@ -10,7 +10,7 @@
 needs forceline
 function ruler {
 	typeset -- dots='....+....' Ruler=''
-	typeset -i count="${1:-${COLUMNS:-80}}"
+	typeset -i count=${1:-${COLUMNS:-80}}
 	((count<1))&& die 'syntax: ruler width-in-columns'
 
 	typeset -R 1 dial

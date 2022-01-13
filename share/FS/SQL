@@ -15,8 +15,8 @@
 needs sqlite3
 function SQL {
 	local sql response READY='\007\007\007' # three bells
-	local verbose="${SQL_VERBOSE:-${verbose:-false}}"
-	local autodie="${SQL_AUTODIE:-true}" autowarn=false
+	local verbose=${SQL_VERBOSE:-${verbose:-false}}
+	local autodie=${SQL_AUTODIE:-true} autowarn=false
 	[[ $autodie == ?(true|false|warn) ]]|| {
 		warn '^BSQL_AUTODIE^b is set incorrectly (^O$^o^Vautodie^v).' \
 			 'Resetting ^BAUTODIE^b to ^Btrue^b.'
@@ -24,8 +24,8 @@ function SQL {
 	  }
 	[[ $autodie == warn ]]&& { autodie=false; autowarn=true; }
 
-	SQLSEP="${SQLSEP:-"$(print '\034')"}" # ^\ -> field separator
-	(($#))&& sql="$*" || sql="$(</dev/stdin)"
+	SQLSEP=${SQLSEP:-"$(print '\034')"} # ^\ -> field separator
+	(($#))&& sql="$*" || sql=$(</dev/stdin)
 	set -A sqlreply --
 	((${SQLFD[0]:-}))|| {
 		sqlite3 -noheader -batch -list -separator "$SQLSEP" 2>&1 |&

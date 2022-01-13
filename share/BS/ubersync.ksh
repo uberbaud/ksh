@@ -7,10 +7,10 @@ set -A RHOSTS -- uberbaud.net yt.lan
 set -o nounset;: ${FPATH:?Run from within KSH}
 : ${KDOTDIR:?}
 # Usage {{{1
-typeset -- this_pgm="${0##*/}"
+typeset -- this_pgm=${0##*/}
 function usage {
 	desparkle "$this_pgm"
-	PGM="$REPLY"
+	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
 	^F{4}Usage^f: ^T${PGM}^t
@@ -49,7 +49,7 @@ docstore=$HOME/hold/DOCSTORE
 [[ -d $docstore ]]|| die "^B$docstore^b is not a directory."
 needs-cd -or-die "$docstore"
 
-synropt="${LOGLEVEL:+"-L $LOGLEVEL"} ${KEEP_FILES:+-k}"
+synropt=${LOGLEVEL:+"-L $LOGLEVEL"} ${KEEP_FILES:+-k}
 
 function main {
 	notify "Updating ^SDOCSTORE^s"

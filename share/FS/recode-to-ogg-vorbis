@@ -11,12 +11,12 @@ function recode-to-ogg-vorbis {
 	: ${1:?}
 	local ain='' oga='' ainD=''
 	[[ -f $1 ]]|| die "^B$1^b is not a file"
-	ain="$(readlink -fn "$1")"
+	ain=$(readlink -fn "$1")
 	[[ -n $ain ]]|| die "^BWeirdly, ^Treadlink ^U$1^u fails."
 
 	oga="${ain%.*}.oga"
 	desparkle "$ain"
-	ainD="$REPLY"
+	ainD=$REPLY
 	[[ $ainD == ${XDG_MUSIC_DIR%/}/* ]]&&
 		ainD="\$xdgmusic/${ainD#"${XDG_MUSIC_DIR%/}"/}"
 

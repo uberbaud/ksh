@@ -5,10 +5,10 @@
 set -o nounset;: ${FPATH:?Run from within KSH}
 
 # Usage {{{1
-typeset -- this_pgm="${0##*/}"
+typeset -- this_pgm=${0##*/}
 function usage {
 	desparkle "$this_pgm"
-	PGM="$REPLY"
+	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
 	^F{4}Usage^f: ^T$PGM^t ^Umatch1^u ^[^S…^s ^UmatchN^u^]
@@ -44,11 +44,11 @@ needs dialog
 NL='
 ' # ^ capture the newline
 Sep="$NL@ "
-TODO="$(<TODO)"
-TODO="${TODO#${Sep#$NL}}"
+TODO=$(<TODO)
+TODO=${TODO#${Sep#$NL}}
 splitstr "$Sep" "$TODO" todo
 
-TimeStamp="$(date -u +'%Y-%m-%d %H:%M:%S Z')"
+TimeStamp=$(date -u +'%Y-%m-%d %H:%M:%S Z')
 DoneList=''
 
 # wrap script guts in a function so edits to this script file don't 
@@ -57,9 +57,9 @@ function filter-tasks {
 	local i Task Head Body Match
 	i=0
 	while ((i<${#todo[*]})); do
-		Task="${todo[i]}"
-		Head="${Task%%$NL*}"
-		Body="${Task#$Head$NL}"
+		Task=${todo[i]}
+		Head=${Task%%$NL*}
+		Body=${Task#$Head$NL}
 		head[i]="$Head"
 		body[i]="$Body"
 		[[ $Head == *' DONE '* ]]|| {

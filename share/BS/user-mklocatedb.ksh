@@ -4,7 +4,7 @@
 
 set -o nounset
 
-PGM="${0##*/}"
+PGM=${0##*/}
 LOG=${HOME:?}/log/${PGM%.ksh}.log
 XDG_DATA_HOME=$HOME/local
 XDG_CACHE_HOME=$XDG_DATA_HOME/cache

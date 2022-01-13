@@ -7,10 +7,10 @@ set -o nounset;: ${FPATH:?Run from within KSH}
 TRAPSIGS='EXIT HUP INT QUIT TRAP BUS TERM'
 
 # Usage {{{1
-typeset -- this_pgm="${0##*/}"
+typeset -- this_pgm=${0##*/}
 function usage {
 	desparkle "$this_pgm"
-	PGM="$REPLY"
+	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
 	^F{4}Usage^f: ^T$PGM^t
@@ -90,7 +90,7 @@ function main { # {{{1
 
 	needs-cd -or-die "$repo_base"
 
-	R="${R##*/}"
+	R=${R##*/}
 	command git clone --bare "$repo" "$R" >&2 ||
 		die "^Tgit clone --bare^t ^B$repo^b"
 	shquote "$REPOSITORY_PATH"

@@ -5,13 +5,13 @@
 #:   Handle mail from the OpenBSD CVS change list specially.
 
 function obsd {
-	local filter='' W=5 refold='' P="${PAGER:-less}"
+	local filter='' W=5 refold='' P=${PAGER:-less}
 	needs show fold awk $P cat
 
 	# arbitary number after which the file list will be shown as "*"
 	MAXFILES=${OBSD_MAXFILE_LIST:-7}
 	(($MAXFILES))|| warn 'OBSD_MAXFILE_LIST is set to 0, no files listed.'
-	filter="$(</dev/stdin)" <<-\
+	filter=$(</dev/stdin) <<-\
 		\==AWK==
 		# |>>> Message 5          ← when there's more than one (1) message
 		/^>>> Message [0-9]+$/			{ N=$3; p=0; }
@@ -51,7 +51,7 @@ function obsd {
 							{printf( "%s ", $0 );}
 		==AWK==
 
-	refold="$(</dev/stdin)" <<-\
+	refold=$(</dev/stdin) <<-\
 	==AWK==
 	/^$/ {next}							# skip blank lines
 	/^[0-9]+\$/ {X="obsd:";Y=\$0;next}
@@ -67,7 +67,7 @@ function obsd {
 	blnk='/^[[:space:]]$/d'
 
 	local OUTPUT linecount
-	OUTPUT="$(
+	OUTPUT=$(
 		SPARKLE_FORCE_COLOR=1;
 		show +inbox obsd -form mhl.body								|
 		sed -E -e "$spesc" -e "$ok" -e "$eok" -e "$rby" -e "$blnk"	|
@@ -75,7 +75,7 @@ function obsd {
 		fold -s -w $((COLUMNS-W-7))					|
 		awk "$refold"								|
 		sparkle
-	  )"
+	  )
 	linecount=$(print "$OUTPUT"|wc -l|tr -cd '[0-9]')
 
 	[[ -t 1 ]]||			P=cat

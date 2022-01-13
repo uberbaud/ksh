@@ -12,15 +12,15 @@ needs f-which
 function resolve-alias {
 	local ref seen IFS anum
 	IFS=' '
-	ref="${1:?}"
+	ref=${1:?}
 	shift
 	seen="$*"
-	newref="$(command -v $ref)" ||
+	newref=$(command -v $ref) ||
 		die "Could not resolve ^B$ref^b." \
 			"followed:${seen:+ $seen} $ref"
 	if [[ $newref == alias\ * ]]; then
-		newref="${newref##alias "$ref"=?(\')}"
-		newref="${newref%% *}"
+		newref=${newref##alias "$ref"=?(\')}
+		newref=${newref%% *}
 		[[ " $seen " == *" $newref "* ]]&&
 			die "There may by a cyclical alias issue."	\
 				"followed:${seen:+ $seen} $ref"			\

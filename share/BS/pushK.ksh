@@ -5,10 +5,10 @@
 set -o nounset;: ${FPATH:?Run from within KSH}
 
 # Usage {{{1
-typeset -- this_pgm="${0##*/}"
+typeset -- this_pgm=${0##*/}
 function usage {
 	desparkle "$this_pgm"
-	PGM="$REPLY"
+	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
 	^F{4}Usage^f: ^T${PGM}^t
@@ -57,7 +57,7 @@ needs git h1 i-can-haz-inet needs-cd
 i-can-haz-inet	|| die 'No internet' "$REPLY"
 needs-cd -or-die "${KDOTDIR:?}"
 
-branch="$(git rev-parse --abbrev-ref HEAD 2>/dev/null)"
+branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
 [[ $branch == trunk ]]&& die 'On branch ^Etrunk^e!!!'
 
 function commit-everything {

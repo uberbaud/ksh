@@ -180,11 +180,11 @@ function main {
 		ci -q -u -i -t"-${*:-$CI_INITIAL_DESCRIPTION}" ./"$workfile"
 	fi
 	[[ -n $SHA384 ]]&& {
-		[[ $SHA384 == "$(cksum -qa sha384b ./"$workfile")" ]]&& {
+		[[ $SHA384 == $(cksum -qa sha384b ./"$workfile") ]]&& {
 			notify 'There were no changes made.' 'Exiting.'
 			exit 0
 		  }
-		[[ $SHA384 != "$($PREF cksum -qa sha384b "$filename")" ]]&& {
+		[[ $SHA384 != $($PREF cksum -qa sha384b "$filename") ]]&& {
 			warn "^B$filenameD^b has changed since reading."
 			desparkle "$workingpath/$workfile"
 			yes-or-no Continue ||

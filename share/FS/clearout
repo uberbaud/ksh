@@ -8,21 +8,21 @@
 function clearout {
 	local askperm=true
 	(($#))&& {
-		[[ "$*" == '-f' ]]||
+		[[ $* == -f ]]||
 			die 'Unexpected parameters.'			\
 				'Empties and removes directory.'	\
-				'  [1m-f[22m to skip permission.'
+				'  ^B-f^b to skip permission.'
 		askperm=false
 	  }
 
-	local P="${PWD##*/}"
+	local P=${PWD##*/}
 	$askperm && {
 		h1 "Clean out ${PWD}?"
 		find . -type f | column
-		yes-or-no "Empty and remove [1m$P[22m" || return 1
+		yes-or-no "Empty and remove \033[1m$P\033[22m" || return 1
 	  }
 	cd ..
-	warn "Cleaning out and removing [1m$P[22m."
+	warn "Cleaning out and removing ^B$P^b."
 	/bin/rm -rf ./"$P"
 }
 

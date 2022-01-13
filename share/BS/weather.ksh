@@ -5,10 +5,10 @@
 set -o nounset;: ${FPATH:?Run from within KSH}
 
 # Usage {{{1
-typeset -- this_pgm="${0##*/}"
+typeset -- this_pgm=${0##*/}
 function usage {
 	desparkle "$this_pgm"
-	PGM="$REPLY"
+	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
 	^F{4}Usage^f: ^T${PGM}^t
@@ -88,7 +88,7 @@ function doit {
 	chart="chart-$(date -u +'%Y-%m-%d,%H:%M:%S'z)"
 	graph_opts=''
 	for o in "${opts[@]}"; { graph_opts="$graph_opts&$o"; }
-	graph_opts="${graph_opts#&}"
+	graph_opts=${graph_opts#&}
 	curl -o "$chart" -sL "$graph_url?$graph_opts"
 	eval "$(get-img-w-h "$chart")"
 	kill $infoPid

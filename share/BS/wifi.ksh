@@ -7,10 +7,10 @@ WIFI_DIR=${XDG_CONFIG_HOME:?}/wifi
 WIFI_DEFAULT="$WIFI_DIR/default-join"
 
 # Usage {{{1
-typeset -- this_pgm="${0##*/}"
+typeset -- this_pgm=${0##*/}
 function usage {
 	desparkle "$this_pgm"
-	PGM="$REPLY"
+	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
 	^F{4}Usage^f: ^T$PGM^t
@@ -42,7 +42,7 @@ needs as-root ifconfig
 # wrap script guts in a function so edits to this script file don't 
 # affect running instances of the script.
 function main {
-	em0status="$(ifconfig em0|awk -F': ' '/status/ {print $2}')"
+	em0status=$(ifconfig em0|awk -F': ' '/status/ {print $2}')
 	if [[ $em0status == 'no carrier' ]]; then
 		as-root ifconfig em0 down
 		as-root ifconfig iwm0 up

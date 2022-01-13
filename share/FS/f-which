@@ -7,13 +7,13 @@
 function x-which-one {
 	local whence rc found=false
 	# alias
-	whence="$(alias -- "$1")" && { print -r -- "$whence"; found=true; }
+	whence=$(alias -- "$1") && { print -r -- "$whence"; found=true; }
 	eval $SATISFIED
 	# function
 	typeset -f -- "$1" && found=true
 	eval $SATISFIED
 
-	whence="$(unalias -- "$1"; unset -f -- "$1"; command -V -- "$1")"
+	whence=$(unalias -- "$1"; unset -f -- "$1"; command -V -- "$1")
 	case "${whence#* is }" in
 		*reserved*)	print -r -- "$1 #reserved";			found=true;		;;
 		*special*)	print -r -- "$1 #special builtin";	found=true;		;;

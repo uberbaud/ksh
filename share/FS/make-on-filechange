@@ -10,8 +10,8 @@ function make-on-filechange {
 	local src exe; integer i=0 rc
 	(($#))|| die 'Expected at least a ^Usource_file^u parameter.'
 
-	src="$1"
-	exe="${2:-"${src%.*}"}"
+	src=$1
+	exe=${2:-"${src%.*}"}
 	[[ $exe == /* ]]|| exe=./"$exe"
 
 	[[ -a $src ]]|| die "^B$src^b does not exist."

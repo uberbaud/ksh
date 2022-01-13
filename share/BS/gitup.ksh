@@ -6,10 +6,10 @@ set -o nounset;: ${FPATH:?Run from within KSH}
 
 REPODIR=$XDG_DATA_HOME/repos
 # Usage {{{1
-typeset -- this_pgm="${0##*/}"
+typeset -- this_pgm=${0##*/}
 function usage {
 	desparkle "$this_pgm"
-	PGM="$REPLY"
+	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
 	^F{4}Usage^f: ^T${PGM}^t
@@ -54,7 +54,7 @@ function get-local-to-remote-branch { # {{{1
 			[[ $remote == */@(main|master|trunk) ]]&&	{ found=true; break; }
 		done
 		$found || {
-			IFS="$NL"
+			IFS=$NL
 			warn 'Multiple local-to-remote branches found:' $(git-remote-links)
 			branch=
 		  }
@@ -94,7 +94,7 @@ function it-is-standard { # {{{1
 	${bool:-false}
 } # }}}1
 function handle-standard { # {{{1
-	worktree="$(git-top-level-memoize)"		 || die 'Could not resolve work tree.'
+	worktree=$(git-top-level-memoize)		 || die 'Could not resolve work tree.'
 	needs-cd -or-die "$worktree"
 
 	trunk=$(get-local-to-remote-branch) ||
@@ -104,10 +104,10 @@ function handle-standard { # {{{1
 		GIT checkout "$trunk"		 || die "Could not ^Tcheckout^t ^B$trunk^b."
 	  }
 
-	before="$(git-current-ref)"
+	before=$(git-current-ref)
 	[[ -f .gitmodules ]]&& GIT submodule update --remote
 	GIT pull || die "Couldn't ^Tpull^t."
-	after="$(git-current-ref)"
+	after=$(git-current-ref)
 
 	[[ $branch == $trunk ]]&& {
 		warn "On branch ^B$trunk^b (MAIN BRANCH)."

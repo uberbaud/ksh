@@ -10,7 +10,7 @@ function now {
 	local fmt utc
 	(($#>1))&& die 'Too many arguments (at most "-u" or "-t").'
 
-	fmt="${ISO_DATE:-%Y-%m-%d %H:%M:%S %z}"
+	fmt=${ISO_DATE:-%Y-%m-%d %H:%M:%S %z}
 	(($#))&& {
 		case $1 in
 			-c)	fmt='%Y%m%d-%H%M%S';			;;

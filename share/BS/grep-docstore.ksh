@@ -5,10 +5,10 @@
 set -o nounset;: ${FPATH:?Run from within KSH}
 
 # Usage {{{1
-typeset -- this_pgm="${0##*/}"
+typeset -- this_pgm=${0##*/}
 function usage {
 	desparkle "$this_pgm"
-	PGM="$REPLY"
+	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
 	^F{4}Usage^f: ^T$PGM^t ^[^T-o^t^|^T-a^t^] ^Upattern^u
@@ -53,7 +53,7 @@ needs-cd -or-die ~/hold/DOCSTORE
 NL='
 ' # ↑ newline
 
-AWKPGM="$(</dev/stdin)" <<-\
+AWKPGM=$(</dev/stdin) <<-\
 	===AWKPGM===
 	NR == 1	{ f=\$0; next }
 	/$1/	{ print f; nextfile }

@@ -5,10 +5,10 @@
 set -o nounset;: ${FPATH:?Run from within KSH}
 
 # Usage {{{1
-typeset -- this_pgm="${0##*/}"
+typeset -- this_pgm=${0##*/}
 function usage {
 	desparkle "$this_pgm"
-	PGM="$REPLY"
+	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
 	^F{4}Usage^f: ^T$PGM^t
@@ -38,11 +38,11 @@ shift $(($OPTIND - 1))
 function mnt-fs { # {{{1
 	local dev mntpnt mntpntD devD
 	dev=/dev/"$1"
-	mntpnt="$2"
+	mntpnt=$2
 	shift 2
 
-	desparkle "$mntpnt";	mntpntD="$REPLY"
-	desparkle "$dev";		devD="$REPLY"
+	desparkle "$mntpnt";	mntpntD=$REPLY
+	desparkle "$dev";		devD=$REPLY
 	df -P | egrep -q "^$dev " && return 0 # already mounted
 	needs-path -or-warn "$mntpnt" || return
 	
@@ -62,9 +62,9 @@ function mnt-fs { # {{{1
 } # }}}1
 function mount-fs-ondev-at { # {{{1
 	local fstype devpart mntpnt
-	fstype="$1"
-	devpart="$2"
-	mntpnt="$3"
+	fstype=$1
+	devpart=$2
+	mntpnt=$3
 
 	case "$fstype" in
 		MSDOS)		mnt-fs "$devpart" "$mntpnt" $fatopts;		;;
@@ -76,7 +76,7 @@ function mount-fs-ondev-at { # {{{1
 	esac
 } # }}}1
 # mnt-drv and resources {{{1
-awkpgm="$(</dev/stdin)" <<-\
+awkpgm=$(</dev/stdin) <<-\
 	\==AWKPGM==
 	function printname() {
 		if (label)		print label;
@@ -92,19 +92,19 @@ awkpgm="$(</dev/stdin)" <<-\
 
 function mnt-drv {
 	local dev diskinfo fstype id label namefile newlabel part
-	dev="$1"
-	id="${2:-}"
+	dev=$1
+	id=${2:-}
 	splitstr NL "$(as-root disklabel "$dev" | awk "${awkpgm[@]}")" diskinfo
-	label="${diskinfo[0]}"
+	label=${diskinfo[0]}
 	unset diskinfo[0]; set -A diskinfo -- "${diskinfo[@]}"
-	label="${label%%+([[:space:]])}"
+	label=${label%%+([[:space:]])}
 	((${#diskinfo[*]}==1))|| {
 		warn 'Too many drives, bailing.'
 		return 1
 	  }
 
-	part="${diskinfo%: *}"
-	fstype="${diskinfo#*: }"
+	part=${diskinfo%: *}
+	fstype=${diskinfo#*: }
 	WANT_FSCK=true
 	mount-fs-ondev-at "$fstype" "$dev$part" /vol/"$label"
 

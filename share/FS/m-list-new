@@ -8,7 +8,7 @@ function m-list-new {
 	local scanseq c
 	((LINES))|| LINES=$(tput lines)
 	scanseq='¬L'
-	[[ -n "$(flist +inbox -sequence L -noshowzero)" ]]|| scanseq='a'
+	[[ -n $(flist +inbox -sequence L -noshowzero) ]]|| scanseq='a'
 	set -- $(pick +inbox $scanseq -nolist 2>/dev/null)
 	c=${1:-0}
 	if ((c>(LINES-8))); then

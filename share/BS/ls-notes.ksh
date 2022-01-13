@@ -7,10 +7,10 @@ REPO="NOTES"
 SUFFIX=".note"
 
 # Usage {{{1
-typeset -- this_pgm="${0##*/}"
+typeset -- this_pgm=${0##*/}
 function usage {
 	desparkle "$this_pgm"
-	PGM="$REPLY"
+	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
 	^F{4}Usage^f: ^T$PGM^t^[^T-a^t^] ^[^T-c^t^]
@@ -65,7 +65,7 @@ for H; do
 	fi
 done
 
-AWKPGM="$(</dev/stdin)" <<-\
+AWKPGM=$(</dev/stdin) <<-\
 	\===AWK===
 		/<@\(#\)tag:/ {next}
 		FNR == 2 && /^[0-9][0-9][0-9][0-9]-[01][0-9]-[0-3][0-9].* Z/ {

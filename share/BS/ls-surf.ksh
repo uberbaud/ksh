@@ -8,10 +8,10 @@ fmtVerbose='%-11s %-11s %s\n'
 
 show=show-regular
 # Usage {{{1
-typeset -- this_pgm="${0##*/}"
+typeset -- this_pgm=${0##*/}
 function usage {
 	desparkle "$this_pgm"
-	PGM="$REPLY"
+	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
 	^F{4}Usage^f: ^T${PGM}^t
@@ -65,7 +65,7 @@ function ls-every-surf { # {{{1
 		get-surf-uri $id || continue
 		url=$REPLY
 		if [[ $url == file:* ]]; then
-			url="${url#file://}"
+			url=${url#file://}
 			[[ $url == $PWD/* ]]&& url="./${url#$PWD/}"
 			[[ $url == $HOME/* ]]&& url="~/${url#$HOME/}"
 			$show $id "$url"

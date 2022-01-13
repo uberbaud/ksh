@@ -7,10 +7,10 @@ set -o nounset;: ${FPATH:?Run from within KSH}
 homepage="file://${XDG_DATA_HOME:?}/twSite/homepage.html"
 
 # Usage {{{1
-typeset -- this_pgm="${0##*/}"
+typeset -- this_pgm=${0##*/}
 function usage {
 	desparkle "$this_pgm"
-	PGM="$REPLY"
+	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
 	^F{4}Usage^f: ^T$PGM^t ^[^Uurl^u^]
@@ -40,8 +40,8 @@ shift $((OPTIND-1))
 
 needs xprop
 
-WID="$(xprop -root 32x ':$0' _NET_ACTIVE_WINDOW)"
-WID="${WID##*:}"
+WID=$(xprop -root 32x ':$0' _NET_ACTIVE_WINDOW)
+WID=${WID##*:}
 xprop -id $WID -f _SURF_GO 8s -set _SURF_GO "${1:-$homepage}"
 
 # Copyright (C) 2019 by Tom Davis <tom@greyshirt.net>.

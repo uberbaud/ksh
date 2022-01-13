@@ -23,9 +23,9 @@ function get-exclusive-lock {
 	[[ ${1:-} == -no-wait ]]&& { nowait=true; shift; }
 
 	generate-exclusive-lock-name "$@" || return 1
-	L="$REPLY"; REPLY=''
+	L=$REPLY; REPLY=''
 
-	U="$(mktemp "${L%/*}"/excl-lock.XXXXXXXXXXX)" || {
+	U=$(mktemp "${L%/*}"/excl-lock.XXXXXXXXXXX) || {
 		warn 'Could not create a temporary file.'; return 1
 	  }
 	ps -opid=,lstart= -p $$ >$U
@@ -43,7 +43,7 @@ function get-exclusive-lock {
 	fi
 
 	/bin/rm "$U"
-	REPLY="$L"
+	REPLY=$L
 	return $lnRC
 }
 

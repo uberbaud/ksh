@@ -7,10 +7,10 @@ set -o nounset;: ${FPATH:?Run from within KSH}
 ltype='performer'
 
 # Usage {{{1
-typeset -- this_pgm="${0##*/}"
+typeset -- this_pgm=${0##*/}
 function usage {
 	desparkle "$this_pgm"
-	PGM="$REPLY"
+	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
 	^F{4}Usage^f: ^T$PGM^t ^[^T-a^t^|^T-s^t^] ^[^Upattern^u^]
@@ -53,10 +53,10 @@ if (($#)); then
 		  }
 		where="${where:-} OR value LIKE '$P%'"
 	done
-	where="${where# OR }"
+	where=${where# OR }
 else
 	random -e 28
-	R="$(printf "\x$(printf %x $((63+$?)))")"
+	R=$(printf "\x$(printf %x $((63+$?)))")
 	if [[ $R == '@' ]]; then
 		where="value < 'A'"
 	elif [[ $R == '?' ]]; then

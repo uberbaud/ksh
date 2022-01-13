@@ -5,10 +5,10 @@
 #:   Set PERL5LIB to $PERL5LIB:${1:-PWD}
 
 function set-perl5lib {
-	local want="${1:-PWD}"
+	local want=${1:-PWD}
 	[[ :$PERL5LIB: == *:$want:* ]]||
-		PERL5LIB="${PERL5LIB:+"$PERL5LIB":}${1:-"$PWD"}"
-	export PERL5LIB="${PERL5LIB#:}"
+		PERL5LIB=${PERL5LIB:+"$PERL5LIB":}${1:-"$PWD"}
+	export PERL5LIB=${PERL5LIB#:}
 }
 
 # Copyright © 2019 by Tom Davis <tom@greyshirt.net>.

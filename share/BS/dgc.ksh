@@ -5,10 +5,10 @@
 set -o nounset;: ${FPATH:?Run from within KSH}
 
 # Usage {{{1
-typeset -- this_pgm="${0##*/}"
+typeset -- this_pgm=${0##*/}
 function usage {
 	desparkle "$this_pgm"
-	PGM="$REPLY"
+	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
 	^F{4}Usage^f: ^T$PGM^t ^[-D ^Ukey^u^T=^t^Uval^u^] ^Udgidl_file^u
@@ -39,7 +39,7 @@ shift $((OPTIND-1))
 # /options }}}1
 
 (($#))|| die 'Missing required DataGlue IDL input file.'
-DGIDL="$1"; shift
+DGIDL=$1; shift
 (($#))&& die 'Too many unflagged parameters. Expected one (1)'
 
 die 'Sorry, not ^Byet^b implemented.' 						\

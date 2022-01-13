@@ -2,7 +2,7 @@
 # <@(#)tag:csongor.greyshirt.net,2017-08-11:tw/04.49.36z/23cefa>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
 
-set -o nounset;: ${FPATH:?Run from within KSH}
+set -o nounset; : ${FPATH:?Run from within KSH}
 needs date
 
 typeset -- calOpts='' daysAfter=1 daysBefore=0
@@ -12,12 +12,11 @@ typeset -l -L 3 MON=${justnow[2]}
 typeset -- yearOnly=false withWeek=false
 
 # Usage {{{1
-typeset -- this_pgm="${0##*/}"
+this_pgm=${0##*/}
 function usage {
 	desparkle "$this_pgm"
-	PGM="$REPLY"
-	sparkle >&2 <<-\
-	===SPARKLE===
+	PGM=$REPLY
+	sparkle >&2 <<-===SPARKLE===
 	^F{4}Usage^f: ^T${PGM}^t ^[^T-w^t^|^T-y^t^] ^[^T-A^t ^Unum^u^] ^[^T-B^t ^Unum^u^] ^[^Uyear^u^] ^[^Umonth_name^u^] ^[^Uday^u^]
 	         Wrapper and pretty formatter for ^Tcal^t and ^Tcalendar^t
 	         ^T-w^t      Display week numbers too.
@@ -31,10 +30,6 @@ function usage {
 	exit 0
 } # }}}
 # process -options {{{1
-function bad_programmer {	# {{{2
-	die 'Programmer error:'	\
-		"  No getopts action defined for [1m-$1[22m."
-  };	# }}}2
 while getopts ':wyA:B:h' Option; do
 	case $Option in
 		w)	calOpts="$calOpts -w"; withWeek=true;					;;
@@ -42,9 +37,9 @@ while getopts ':wyA:B:h' Option; do
 		A)	daysAfter=$OPTARG;										;;
 		B)	daysBefore=$OPTARG;										;;
 		h)	usage;													;;
-		\?)	die "Invalid option: [1m-$OPTARG[22m.";				;;
-		\:)	die "Option [1m-$OPTARG[22m requires an argument.";	;;
-		*)	bad_programmer "$Option";								;;
+		\?)	die USAGE "Invalid option: ^B-$OPTARG^b.";				;;
+		\:)	die USAGE "Option ^B-$OPTARG^b requires an argument.";	;;
+		*)	bad-programmer "No getopts defined for ^T$Option^t.";	;;
 	esac
 done
 # remove already processed arguments
@@ -105,7 +100,7 @@ $yearOnly && { printf ' %s\n' "${cal[@]}"; exit 0; }
 needs calendar resize
 eval $(resize -u)
 months='jan feb mar apr may jun jul aug sep oct nov dec'
-t="${months%$MON*}"
+t=${months%$MON*}
 typeset -Z 2 MM=$(((${#t}/4)+1)) DOM
 ((YEAR<1970))&& {
 	printf "\e[48;5;222m%${COLUMNS}s\r %s\e[49m\n"	\
@@ -116,7 +111,7 @@ typeset -Z 2 MM=$(((${#t}/4)+1)) DOM
 }
 useDate="$YEAR$MM$DOM"
 
-evblob="$(calendar -A $daysAfter -B $daysBefore -t $useDate)" ||
+evblob=$(calendar -A $daysAfter -B $daysBefore -t $useDate) ||
 	die 'Problem with ^Tcalendar^t.'
 
 # ──────────────────────────────────────────── FORMAT events listing ───
@@ -126,7 +121,7 @@ evsize=$((COLUMNS-(calSize+5))) # adding various gutters and borders
 
 # we use the saved epoch TimeStamp just in case we passed midnight 
 # during the intervenning time. Unlikely though that may be.
-TODAY="$(date -r $TS +'%b %d ')"
+TODAY=$(date -r $TS +'%b %d ')
 TOMORROW="$(date -r $((TS+86400)) +'%b %d ')"
 
 expectday=''
@@ -137,7 +132,7 @@ splitstr NL "$evblob" calevs
 for ln in "${calevs[@]}"; do
 	splitstr TAB "$ln" tuple
 	[[ ${tuple[0]:-} == $expectday ]]|| {
-		expectday="${tuple[0]}"
+		expectday=${tuple[0]}
 		case "$expectday" in
 			"$TODAY")		+evlist '[1m   today[22m';		;;
 			"$TOMORROW")	+evlist '[1m   tomorrow[22m';	;;
@@ -146,7 +141,7 @@ for ln in "${calevs[@]}"; do
 	  }
 	# remove extraneous spaces
 	unset tuple[0]; set -A tuple -- ${tuple[*]}
-	ev="${tuple[*]}"
+	ev=${tuple[*]}
 	if [[ $ev == *BIRTHDAY ]]; then
 		H='[38;5;241;48;5;225m'; E='[48;5;128;38;5;226m 🎂 [0m'
 		ev="${ev%BIRTHDAY} "
@@ -156,8 +151,8 @@ for ln in "${calevs[@]}"; do
 	# break lines according to whitespace and terminal size
 	word=''; line=''
 	while ((${#ev})); do
-		word="${ev%% *}"
-		ev="${ev#"$word"}"; ev="${ev# }" # remove word and POSSIBLY space
+		word=${ev%% *}
+		ev=${ev#"$word"}"; ev="${ev# } # remove word and POSSIBLY space
 		((${#line}+${#word}>evsize))&& {
 			+evlist "$H${line# }$E"
 			line='   '
@@ -191,8 +186,8 @@ integer i=-1 cI=0 eI=0
 fmt=" %-${calSize}s  %s\n"
 while ((i++<last)); do
 	cLn=''; eLn=''
-	(((cS<=i)&&(i<=cE)))&& cLn="${cal[cI++]}"
-	(((eS<=i)&&(i<=eE)))&& eLn="${evlist[eI++]}"
+	(((cS<=i)&&(i<=cE)))&& cLn=${cal[cI++]}
+	(((eS<=i)&&(i<=eE)))&& eLn=${evlist[eI++]}
 	printf "$fmt" "$cLn" "$eLn"
 done | $pager
 

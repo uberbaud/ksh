@@ -6,8 +6,8 @@
 
 function desparkle {
 	typeset -- t="$*" p=''
-	while [[ "$t" == *'^'* ]] { p="$p${t%%^*}^^"; t="${t#*^}"; }
-	REPLY="$p$t"
+	while [[ $t == *^* ]] { p=$p${t%%^*}^^; t=${t#*^}; }
+	REPLY=$p$t
 }
 
 # vim: ft=ksh ts=4

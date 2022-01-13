@@ -16,14 +16,14 @@ function i-can-haz-inet {
     REPLY='Connected'
     needs route grep
 	awkpgm='/interface:/ {i=$2} /gateway:/ {g="G"$2} END {print g,i}'
-	info="$(route -n get default 2>&1|awk "$awkpgm")"
+	info=$(route -n get default 2>&1|awk "$awkpgm")
 	[[ $info == G* ]]|| {
 		REPLY='No gateway to Internet.'
 		return 4
 	  }
 
-	if="${info#* }"
-	status="$(ifconfig $if | awk -F': ' '/status:/ {print $2;exit}')"
+	if=${info#* }
+	status=$(ifconfig $if | awk -F': ' '/status:/ {print $2;exit}')
 	[[ $status == active ]]|| {
 		REPLY="Interface $if status is \"$status\"."
 		return 3
@@ -36,7 +36,7 @@ function i-can-haz-inet {
     ## +short        : inet address only
     ## +time=1       : 1 second to timeout instead of default 5 seconds
     ## A             : section type
-	#DIG="$(dig +short +time=1 $NAME A 2>/dev/null)" || {
+	#DIG=$(dig +short +time=1 $NAME A 2>/dev/null) || {
 	#	REPLY='DNS lookup for "fred.lan" failed.'
 	#	return 2
 	#  }
@@ -44,13 +44,13 @@ function i-can-haz-inet {
 	# try again
     NAME='uberbaud.net'
 	ADDR='208.167.249.143'
-	DIG="$(dig +short +time=1 $NAME A 2>/dev/null)" || {
+	DIG=$(dig +short +time=1 $NAME A 2>/dev/null) || {
 		REPLY='local DNS lookup failed.'
 		return 2
 	  }
 	[[ -n $DIG ]]|| {
     	# @8.8.8.8      : google DNS
-		DIG="$(dig @8.8.8.8 +short +time=1 $NAME A 2>/dev/null)" || {
+		DIG=$(dig @8.8.8.8 +short +time=1 $NAME A 2>/dev/null) || {
 			REPLY='local and google DNS lookups failed.'
 			return 2
 		  }

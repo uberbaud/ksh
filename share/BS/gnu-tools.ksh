@@ -22,10 +22,10 @@ while [[ ${1:-} == -* ]]; do
 done
 # }}}1
 # USAGE {{{1
-this_pgm="${0##*/}"
+this_pgm=${0##*/}
 (($#))&& {
 	desparkle "$this_pgm"
-	PGM="$REPLY"
+	PGM=$REPLY
 	sparkle-path "$P"
 	sparkle >&2 <<-\
 	===SPARKLE===
@@ -111,7 +111,7 @@ function reshell_with_the_goods { # {{{1
 		===
 
 	ps1="\\[$ESC[4m\\]GNU Tools subshell ($S)\\[$ESC[24m\\]\\$ "
-	PS1="$ps1" ENV= PATH=$P:$PATH exec $S
+	PS1=$ps1 ENV= PATH=$P:$PATH exec $S
 } # }}}1
 
 $VERBOSE		&& show-message

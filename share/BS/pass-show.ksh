@@ -5,10 +5,10 @@
 set -o nounset;: ${FPATH:?Run from within KSH}
 
 # Usage {{{1
-typeset -- this_pgm="${0##*/}"
+typeset -- this_pgm=${0##*/}
 function usage {
 	desparkle "$this_pgm"
-	PGM="$REPLY"
+	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
 	^F{4}Usage^f: ^T$PGM^t
@@ -36,10 +36,10 @@ shift $((OPTIND-1))
 # ready to process non '-' prefixed arguments
 # /options }}}1
 
-secrets="${XDG_DATA_HOME:?}"/secrets
+secrets=${XDG_DATA_HOME:?}/secrets
 [[ -d $secrets ]]|| die 'No secrets directory.'
 
-domain="$(pass-find "$@")" ||
+domain=$(pass-find "$@") ||
 	die 'Did not find any matching domains.'
 notify "$domain"
 
@@ -47,13 +47,13 @@ pwrec="$secrets/$domain.pwd"
 
 cat "$pwrec" >&2 || exit 1
 
-awkpgm="$(</dev/stdin)" <<-\
+awkpgm=$(</dev/stdin) <<-\
 	\==AWKPGM==
 	BEGIN		{ FS=":[ \t]+" }
 	/^p(wd)?: /	{ print $2; nextfile }
 	==AWKPGM==
 
-password="$(awk "$awkpgm" "$pwrec")"
+password=$(awk "$awkpgm" "$pwrec")
 print -n "$password" | xclip -selection clipboard -in
 notify 'Your ^Bpassword^b has been copied to the ^Bclipboard^b.'
 

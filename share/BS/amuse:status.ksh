@@ -5,10 +5,10 @@
 : ${FPATH:?Run from within KSH}
 
 # Usage {{{1
-typeset -- this_pgm="${0##*/}"
+typeset -- this_pgm=${0##*/}
 function usage {
 	desparkle "$this_pgm"
-	PGM="$REPLY"
+	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
 	^F{4}Usage^f: ^T$PGM^t
@@ -63,7 +63,7 @@ function show-playing { # {{{1
 	mark=' '
 	((idlen+infolen>maxLen))&& mark='…'
 	typeset -R$((maxLen-(idlen))) rtext=$info
-	info="${rtext##+([ [:punct:]])}"
+	info=${rtext##+([ [:punct:]])}
 	print -- "  $2: \033[38;5;248m$id \033[38;5;217m$mark\033[34m$info\033[0m"
 } # }}}1
 function show-subdir { #{{{1

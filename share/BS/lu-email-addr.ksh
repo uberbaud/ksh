@@ -6,10 +6,10 @@ set -o nounset;: ${FPATH:?Run from within KSH} ${XDG_DATA_HOME:?}
 needs awk
 
 # Usage {{{1
-typeset -- this_pgm="${0##*/}"
+typeset -- this_pgm=${0##*/}
 function usage {
 	desparkle "$this_pgm"
-	PGM="$REPLY"
+	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
 	^F{4}Usage^f: ^T${PGM}^t ^Upattern^u
@@ -41,13 +41,13 @@ emailf=${SYSDATA:?}/emails.tsv
 [[ -f $emailf ]]|| die "Can't find the email file."
 
 gsub [[:punct:]] '.*' "$*"		# no punctuation
-typeset -l pattern="$REPLY"		# lower case bits
+typeset -l pattern=$REPLY		# lower case bits
 
 [[ -z $pattern ]]&&			return 1
 [[ $pattern == '.*' ]]&&	return 1
 pattern='(^| )'"$pattern"
 
-awkpgm="$(</dev/stdin)" <<-\
+awkpgm=$(</dev/stdin) <<-\
 	==AWK==
 	{
 		l=tolower(\$1);				# match lower case bits

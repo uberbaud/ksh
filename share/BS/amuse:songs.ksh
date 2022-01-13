@@ -8,9 +8,9 @@ which=full
 action=append
 
 # Usage {{{1
-typeset -- this_pgm="${0##*/}"
+typeset -- this_pgm=${0##*/}
 desparkle "$this_pgm"
-PGM="$REPLY"
+PGM=$REPLY
 function usage {
 	sparkle >&2 <<-\
 	===SPARKLE===

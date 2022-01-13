@@ -6,7 +6,7 @@
 
 function qvis {
 	local NL TAB='	' p s out='' c
-	integer maxlen="${2:-${COLUMNS:-80}}" len=0 chop=2
+	integer maxlen=${2:-${COLUMNS:-80}} len=0 chop=2
 NL='
 '
 	# if it's blank, we're done
@@ -19,24 +19,23 @@ NL='
 		print -- "$1"
 		return 0
 	  }
-	gsub \' \'\\\'\' "$1"		# quote any quotes
-	REPLY="'$REPLY'"			# quote whole string
-	REPLY="${REPLY#\'\'}"		# remove empty quote at beginning
-	REPLY="${REPLY%\'\'}"		# remove empty quote at end
-	text="$REPLY"
+	gsub \' \'\\\'\' "$1"	# quote any quotes
+	REPLY="'$REPLY'"		# quote whole string
+	REPLY=${REPLY#\'\'}		# remove empty quote at beginning
+	REPLY=${REPLY%\'\'}		# remove empty quote at end
+	text=$REPLY
 	utf8codes "$REPLY" $maxlen
-	len="$REPLEN"
-	[[ "$REPLY" == "$text" ]]|| {
+	len=$REPLEN
+	[[ $REPLY == $text ]]|| {
 		chomp "$REPLY"; chop=1; ((maxlen--));
 	  }
-	gsub '\' '\\' "$REPLY"		# escape existing escapes for print
-	text="$REPLY"
+	gsub '\' '\\' "$REPLY" text		# escape existing escapes for print
 	while [[ $text == *[[:cntrl:]]* ]]; do
 		((++len>maxlen))&& {
-			chomp "$text" $chop; text="$REPLY"; chop=1; ((maxlen--));
+			chomp "$text" $chop; text=$REPLY; chop=1; ((maxlen--));
 		  }
-		s="${text#*[[:cntrl:]]}"	# end without CTRL
-		p="${text%"$s"}"			# beginning WITH CNTRL
+		s=${text#*[[:cntrl:]]}	# end without CTRL
+		p=${text%"$s"}			# beginning WITH CNTRL
 		# for some reason, parameter substitutions eat NL and TAB
 		case "$p" in
 			*"$NL")	 c="\033[35m^J\033[39m";	;;
@@ -79,7 +78,7 @@ NL='
 				;;
 		esac
 		out="$out${p%?}$c"
-		text="$s"
+		text=$s
 	done
 	out="$out$text"
 	((chop==1))&& out="$out\033[35m→\033[0m"

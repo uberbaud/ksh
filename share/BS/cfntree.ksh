@@ -7,10 +7,10 @@ set -o nounset;: ${FPATH:?Run from within KSH}
 SkipDiagram=true
 OutFile=cfntree.out
 # Usage {{{1
-typeset -- this_pgm="${0##*/}"
+typeset -- this_pgm=${0##*/}
 function usage {
 	desparkle "$this_pgm"
-	PGM="$REPLY"
+	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
 	^F{4}Usage^f: ^T$PGM^t ^[^T-d^t^] ^[^Ubase dir^u^|^Ufiles ...^u^]

@@ -15,12 +15,12 @@ function p {
 
 	local choice='-'
 	if (($#==2)); then
-		choice="$1"
+		choice=$1
 	else
-		local P possibles t="${1%/}" p s n=''
+		local P possibles t=${1%/} p s n=''
 		while [[ $t == *[\'/]* ]]; do
-			p="${t%%[\'/]*}"
-			s="${t#"$p"}"
+			p=${t%%[\'/]*}
+			s=${t#"$p"}
 			if [[ $s == \'* ]]; then
 				n="$n$p'\''"
 			elif [[ $s == /* ]]; then
@@ -28,7 +28,7 @@ function p {
 			else
 				bad-programmer "^T$0^t: matched ^[$s^]."
 			fi
-			t="${s#[\'/]}"
+			t=${s#[\'/]}
 		done
 		n="$n$t"
 		eval "set -A P -- *'$n'*"
@@ -36,7 +36,7 @@ function p {
 		for p in "${P[@]}"; { [[ -d $p ]]&& possibles[i++]="$p"; }
 
 		if ((i==0)); then
-			choice="$(umenu "<$1>" *)"
+			choice=$(umenu "<$1>" *)
 		elif ((${#possibles[*]}>1)); then
 			local inthere=false
 			for p in "${possibles[@]}"; do
@@ -45,11 +45,11 @@ function p {
 				break
 			done
 			$inthere || set -A possibles -- "<$1>" "${possibles[@]}"
-			choice="$( umenu "${possibles[@]}" )"
+			choice=$( umenu "${possibles[@]}" )
 		else
-			choice="${possibles[0]}"
+			choice=${possibles[0]}
 		fi
-		[[ $choice == "<$1>" ]]&& choice="$1"
+		[[ $choice == "<$1>" ]]&& choice=$1
 	fi
 
 	[[ -n $choice ]]|| return
@@ -58,8 +58,8 @@ function p {
 	cd "$choice"
 	fUSE=.created
 	if [[ -f $fUSE  ]]; then
-		first="$(<$fUSE)"
-		now="$(date +%s)"
+		first=$(<$fUSE)
+		now=$(date +%s)
 		((secs_per_day=24*60*60))
 		((first/=secs_per_day))
 		((now/=secs_per_day))

@@ -7,10 +7,10 @@ set -o nounset;: ${FPATH:?Run from within KSH}
 GDRIVE=$HOME/hold/gdrive
 
 # Usage {{{1
-typeset -- this_pgm="${0##*/}"
+typeset -- this_pgm=${0##*/}
 function usage {
 	desparkle "$this_pgm"
-	PGM="$REPLY"
+	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
 	^F{4}Usage^f: ^T$PGM^t ^[^Ulist_of_google_drives^u^]
@@ -57,7 +57,7 @@ function do-one-drive { # {{{1
 	local D dispD
 	D="$GDRIVE/$1"
 	desparkle "$1"
-	dispD="$REPLY"
+	dispD=$REPLY
 	[[ -d $D ]]|| die "No such account directory ^S$dispD^s."
 	needs-cd -or-die "$D"
 

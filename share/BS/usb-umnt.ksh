@@ -5,10 +5,10 @@
 set -o nounset;: ${FPATH:?Run from within KSH}
 
 # Usage {{{1
-typeset -- this_pgm="${0##*/}"
+typeset -- this_pgm=${0##*/}
 function usage {
 	desparkle "$this_pgm"
-	PGM="$REPLY"
+	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
 	^F{4}Usage^f: ^T$PGM^t ^[^Udrive^u …^]
@@ -55,13 +55,13 @@ function main {
 	local awkpgm haves wants have want
 	new-array haves wants
 
-	awkpgm="$(</dev/stdin)" <<-\
+	awkpgm=$(</dev/stdin) <<-\
 	\==AWK==
 	NR==1			{next}
 	/\/dev\/sd0/	{next}
 					{print $NF}
 	==AWK==
-	IFS="$NL"
+	IFS=$NL
 	+haves $(df -P|awk -F'/' "$awkpgm")
 	IFS=" $TAB$NL"
 	if haves-is-empty; then
@@ -78,7 +78,7 @@ function main {
 				warn "^B$want^b is not a mount point(1)."
 				continue
 			  }
-			want="$(readlink -nf "$want")"
+			want=$(readlink -nf "$want")
 			for have in "${haves[@]}"; do
 				[[ ${want#/vol/} == $have ]]|| continue 1
 				+wants "$want"

@@ -13,10 +13,10 @@
 set -o nounset
 
 # Usage {{{1
-typeset -- this_pgm="${0##*/}"
+typeset -- this_pgm=${0##*/}
 function usage {
 	desparkle "$this_pgm"
-	PGM="$REPLY"
+	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
 	^F{4}Usage^f: ^T${PGM}^t
@@ -66,10 +66,10 @@ for t in *; do
 		rm "$t"
 		continue
 	  }
-	original="$REPLY"
-	SHA384="$(cksum -qa sha384b "$original")"
+	original=$REPLY
+	SHA384=$(cksum -qa sha384b "$original")
 	gsub '/' '_' "$SHA384"
-	SHA384="$REPLY"
+	SHA384=$REPLY
 	FNAME=../$SHA384
 	if [[ -f $FNAME ]]; then
 		warn "sha384b already exists for ^B$t^b."

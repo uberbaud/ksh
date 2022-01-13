@@ -5,10 +5,10 @@
 set -o nounset;: ${FPATH:?Run from within KSH}
 
 # Usage {{{1
-typeset -- this_pgm="${0##*/}"
+typeset -- this_pgm=${0##*/}
 function usage {
 	desparkle "$this_pgm"
-	PGM="$REPLY"
+	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
 	^F{4}Usage^f: ^T${PGM}^t
@@ -44,13 +44,13 @@ function expire-old-mail { # {{{1
 	fi
 } # }}}1
 function Done { # {{{1
-	[[ -z "$(flist +inbox -sequence marked -fast -noshowzero)" ]]
+	[[ -z $(flist +inbox -sequence marked -fast -noshowzero) ]]
 } # }}}1
 
 needs flist folder forceline mark pick refile rmm yes-or-no
 
 # clean out groupmail list
-GROUPMAIL="${MMH:?}"/groupmail
+GROUPMAIL=${MMH:?}/groupmail
 [[ -e $GROUPMAIL ]]&& { [[ -w $GROUPMAIL ]]|| chmod u+w "$GROUPMAIL"; }
 : >$GROUPMAIL
 
@@ -68,7 +68,7 @@ printCheckMsg()		printf "$M$P$B Checking$S %s$C ... "		"$1" >&2
 printRefileMsg()	printf "    $B Refiling$C messages.\n"		"$1" >&2
 printSkipMsg()		printf "skipping (no matching messages).\n"	"$1" >&2
 function X { # {{{1
-	local filter="$1" pattern="$2" box="$3" msg="$4"
+	local filter=$1 pattern=$2 box=$3 msg=$4
 
 	printCheckMsg "$msg"
 	pick marked +inbox "$filter" "$pattern" -sequence picked 2>/dev/null

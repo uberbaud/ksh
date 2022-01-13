@@ -5,10 +5,10 @@
 set -o nounset;: ${FPATH:?Run from within KSH}
 
 # Usage {{{1
-typeset -- this_pgm="${0##*/}"
+typeset -- this_pgm=${0##*/}
 function usage {
 	desparkle "$this_pgm"
-	PGM="$REPLY"
+	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
 	^F{4}Usage^f: ^T$PGM^t ^Uurl^u
@@ -45,7 +45,7 @@ gitraw=https://raw.githubusercontent.com
 [[ $1 == $giturl/* ]]|| die 'URL does not point to ^Bgithub^b.'
 
 # $AWKPGM {{{1
-AWKPGM="$(</dev/stdin)" <<-\
+AWKPGM=$(</dev/stdin) <<-\
 	\==AWKPGM==
     /^[ \t]*<td class="content">/ {
 			p=1
@@ -77,7 +77,7 @@ function grab { # {{{1
 } # }}}1
 
 function main {
-	local prjdir="${1##*/}" filelist f fname
+	local prjdir=${1##*/} filelist f fname
 	mkdir "$prjdir" ||
 		die "Could not ^Tmkdir^t ^B$prjdir^b."
 	grab "$prjdir.html" "$1"

@@ -6,14 +6,14 @@
 #:   where ^Umatch^u is any string, and so is ^Ustring^u.
 
 function splitstr {
-	local Sep="$1" Str="$2" Vname="${3:-reply}" Head i=0
+	local Sep=$1 Str=$2 Vname=${3:-reply} Head i=0
 	unset -v $Vname
 	[[ $Sep == TAB  ]]&&	Sep='	' # ← ACTUAL TAB CHARACTER
 	[[ $Sep == NL  ]]&&	Sep='
 ' # ← SINGLE QUOTE!!! ENCAPSULATING newline
 	while [[ $Str == *$Sep* ]]; do
-		Head="${Str%%"$Sep"*}"
-		Str="${Str#"$Head$Sep"}"
+		Head=${Str%%"$Sep"*}
+		Str=${Str#"$Head$Sep"}
 		eval $Vname[i++]=\$Head
 	done
 	eval "[[ -n \$Str ]] && $Vname[i]=\$Str"

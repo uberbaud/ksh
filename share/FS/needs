@@ -23,12 +23,12 @@ function needs {
 			fullfill=false
 		  }
 		for x; do
-			[[ -n "$(whence -- "$x")" ]]&& continue
+			[[ -n $(whence -- "$x") ]]&& continue
 			$fullfill "$x" || badlist="$badlist $x";
 		done
 		[[ -z $badlist ]]&& return
 
-		badlist="${badlist##+( )}"
+		badlist=${badlist##+( )}
 		print -ru2 "$F: Missing needed commands: $B$badlist$N"
 		[[ -o interactive ]]&& kill -s TERM $$
 		# not reached if kill $$ was run successfully

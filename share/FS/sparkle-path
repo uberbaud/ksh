@@ -8,7 +8,7 @@
 
 needs desparkle gsub subst-pathvars
 function sparkle-path {
-	local v r
+	local v= r=
 	typeset -u S=${2:-B}	# starting sparkle code (default to 'B')
 	typeset -l -L1 E=$S		# ending sparkle code (lower cased start)
 	subst-pathvars "$1"

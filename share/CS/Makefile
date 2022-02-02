@@ -86,6 +86,13 @@ HELP_HCHG=$(KDOTDIR)/share/HS/.LAST_UPDATED
 help: $(HELP_FCHG) $(HELP_HCHG)
 	@$(HELP_UPBIN)
 
+PKG_LOG = $(HOME)/hold/$(OSREV)/pkg.log
+MAN_CONF = /etc/man.conf
+LIST_MAN_PAGES = $(KDOTDIR)/share/BS/list-man-pages.ksh
+man: $(PKG_LOG) $(MAN_CONF)
+	@echo $@
+	@$(LIST_MAN_PAGES) >$@
+
 MAIL_ACCT_DIR=$(XDG_CONFIG_HOME)/fetchmail
 MAIL_ACCOUNTS=$(MAIL_ACCT_DIR)/accounts
 mget: $(MAIL_ACCOUNTS)
@@ -110,7 +117,6 @@ sysctl:
 	@awk -F= '/^[^ \t]/ {print $$1}' tmp.sysctl >$@
 	@rm tmp.sysctl
 
-PKG_LOG = $(HOME)/hold/$(OSREV)/pkg.log
 rcctl_2: $(PKG_LOG)
 	@echo $@
 	@/bin/ls -1 /etc/rc.d >$@

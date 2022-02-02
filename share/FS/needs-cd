@@ -2,7 +2,7 @@
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
 #: FUNCTION ^[^T-or-warn^t^|^T-or-die^t^] ^[^T-with-notice^t^] ^Udir name^u
-#:   ^Tcd^ to ^Udir name^u, optionally notifying, possibly ^Twarn^t or ^Tdie^t.
+#:   ^Tcd^t to ^Udir name^u, optionally notifying, possibly ^Twarn^t or ^Tdie^t.
 
 needs notify warn die bad-programmer sparkle-path
 function needs-cd {
@@ -21,10 +21,10 @@ function needs-cd {
 		shift
 	done
 
-	[[ ${1:?} == -or-* ]]&& {
-		or_what=${1#-or-}
-		shift
-	  }
+	(($#))||	bad-programmer "Missing required ^Udir name^u."
+	(($#>1))&&	bad-programmer				\
+					'Too many parameters.'	\
+					'Expected ^U-flags^u and ^Udir name^u.'
 
 	$notice && {
 		sparkle-path "$1"

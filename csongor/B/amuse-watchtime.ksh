@@ -1,1 +1,0 @@
-/home/tw/config/ksh/share/BS/amuse-watchtime.ksh

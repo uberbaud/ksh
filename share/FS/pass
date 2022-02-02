@@ -14,7 +14,7 @@
 #:   otherwise,
 #:     use ^Tpass-gen^t (generate a password for ^Udomain^u).
 #:
-#:   Scripts are located in ^U^O$^o^VKDOTDIR^v/bin^u
+#:   Scripts are located in ^U^O$^o^VKDOTDIR^v/share/BS^u
 
 needs ${KDOTDIR:?}/$HOST/B/pass-{gen,show}.ksh
 function pass {

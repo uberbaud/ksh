@@ -47,7 +47,7 @@ export KAKOUNE_POSIX_SHELL=/usr/local/bin/dash
 export LESSKEY=$xdgcfg/less/lesskey.compiled
 export PRINTER=poco
 export QT_IM_MODULE=xim
-export TCL_USE_VERSION=9.0
+export TCL_USE_VERSION=8.6
 export XCOMPOSEFILE=$xdgcfg/x11/Compose.tw
 export XDIALOG_NO_GMSGS=1	# Xdialog Gdk/GLib/Gtk will not g_log()
 export XMODIFIERS='@im=none'

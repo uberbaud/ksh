@@ -81,15 +81,16 @@ function check-flags-for-writability { # {{{1
 	((flags&SAPPND))&&	flagstr=$flagstr,sappnd
 	die "File is flagged ^B${flagstr#,}^b. It is not writable."
 } # }}}1
+function file-is-valid-utf8 { # {{{1
+	iconv -f UTF-8 "${1:?}" >/dev/null 2>&1
+} # }}}1
 function verify-file-is-editable { # {{{1
-	local ftype
 	[[ -f $f_fullpath ]]||	die "^B$1^b is ^Bnot^b a file."
 	[[ $f_fullpath == *,v ]]&&
-		warnOrDie "Seems to be an ^BRCS archive^b file."
-	ftype=$(/usr/bin/file -b "$f_fullpath")
-
-	[[ $ftype == *text* || $ftype == *XML* ]]||
-		warnOrDie "Does not seem to be a text file."
+		warnOrDie "File seems to be an ^BRCS archive^b file."
+	
+	file-is-valid-utf8 "$f_fullpath" ||
+		warnOrDie "File is not valid UTF-8 text."
 } # }}}1
 
 # TODO: test 'checked-out'ness with something like	

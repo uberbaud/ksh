@@ -13,25 +13,24 @@ function usage {
 	===SPARKLE===
 	^F{4}Usage^f: ^T$PGM^t ^[^T-x^t^]
 	         Print current bill amounts.
-	           ^T-x^t  print organizations who need contact updates.
+	           ^T-e^t  Edit the file first.
+	           ^T-x^t  Print organizations who need contact updates.
 	       ^T$PGM -h^t
 	         Show this help message.
 	===SPARKLE===
 	exit 0
 } # }}}
 # process -options {{{1
-function bad_programmer {	# {{{2
-	die 'Programmer error:'	\
-		"  No getopts action defined for [1m-$1[22m."
-  };	# }}}2
 ALT=false
-while getopts ':xh' Option; do
+EDIT=false
+while getopts ':exh' Option; do
 	case $Option in
-		x)	ALT=true;											;;
-		h)	usage;												;;
-		\?)	die "Invalid option: ^B-$OPTARG^b.";				;;
-		\:)	die "Option ^B-$OPTARG^b requires an argument.";	;;
-		*)	bad_programmer "$Option";							;;
+		e)	EDIT=true;														;;
+		x)	ALT=true;														;;
+		h)	usage;															;;
+		\?)	die "Invalid option: ^B-$OPTARG^b.";							;;
+		\:)	die "Option ^B-$OPTARG^b requires an argument.";				;;
+		*)	bad-programmer "No getopts action defined for ^T-$Option^t.";	;;
 	esac
 done
 # remove already processed arguments
@@ -39,10 +38,18 @@ shift $((OPTIND-1))
 # ready to process non '-' prefixed arguments
 # /options }}}1
 
+needs needs-file
+
 TAB='	'
 [[ -n ${SYSDATA:-} ]]|| die '^S$SYSDATA^s is not set.'
 fDATA=$SYSDATA/recurring
-[[ -f $fDATA ]]|| die "Could not find ^B^S\$SYSDATA^s/recurring^b."
+needs-file -or-die "$fDATA"
+
+$EDIT && {
+	V=$HOME/bin/ksh/v
+	needs-file -or-die $V
+	$V "$fDATA"
+  }
 
 print
 if $ALT; then

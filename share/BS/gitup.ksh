@@ -119,7 +119,7 @@ function handle-standard { # {{{1
 		warn 'Unchanged, quitting.'
 		return 1
 	  }
-	GIT merge "$trunk"
+	GIT merge -m "Merge with $trunk" "$trunk"
 } # }}}1
 function convert-and-move-repo-to-bare { # {{{1
 	local awkpgm origin basedir newrepo branch

@@ -1,0 +1,11 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2022-02-02,20.03.33z/8e0244>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Ufile^u
+#:   Tests for UTF-8/ASCII conformance.
+
+function file-is-valid-utf8 {
+	iconv -f UTF-8 -t UTF-8 "${1:?}" >/dev/null 2>&1
+}
+
+# Copyright © 2022 by Tom Davis <tom@greyshirt.net>.

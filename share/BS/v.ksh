@@ -81,9 +81,6 @@ function check-flags-for-writability { # {{{1
 	((flags&SAPPND))&&	flagstr=$flagstr,sappnd
 	die "File is flagged ^B${flagstr#,}^b. It is not writable."
 } # }}}1
-function file-is-valid-utf8 { # {{{1
-	iconv -f UTF-8 "${1:?}" >/dev/null 2>&1
-} # }}}1
 function verify-file-is-editable { # {{{1
 	[[ -f $f_fullpath ]]||	die "^B$1^b is ^Bnot^b a file."
 	[[ $f_fullpath == *,v ]]&&
@@ -96,8 +93,8 @@ function verify-file-is-editable { # {{{1
 # TODO: test 'checked-out'ness with something like	
 #       [[ -n $(rlog -L -l bobslunch.rem) ]]		
 
-needs $ED ci co get-exclusive-lock rcsdiff trackfile needs-cd needs-path	\
-	release-exclusive-lock warnOrDie
+needs $ED ci co file-is-valid-utf8 get-exclusive-lock needs-cd needs-path	\
+	rcsdiff release-exclusive-lock trackfile warnOrDie
 
 (($#))|| exec "$ED" # We don't have a file, so short circut all the rest.
 

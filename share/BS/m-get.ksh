@@ -129,6 +129,7 @@ group obugs     --list-id 'bugs\.openbsd\.org'
 group otech     --list-id 'tech\.openbsd\.org'
 group omisc     --list-id 'misc\.openbsd\.org'
 group obsd      --list-id 'source-changes\.openbsd\.org'
+group zig       --list-id '/ziglang\.lists\.sr\.ht'
 
 m-list-new
 

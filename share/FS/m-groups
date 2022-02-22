@@ -7,15 +7,18 @@
 needs notify whence show
 : ${MMH:?}
 function m-groups {
-	local G
+	local G after
 	set -- $(<"${MMH:?}"/groupmail)
 	for G; do
-		notify "$G"
+		notify $G
 		if [[ $(whence $G) == $G ]]; then
-			$G
+			after="${after-} $G"
 		else
 			show +inbox $G -form mhl.group
 		fi
+	done
+	for G in $after; do
+		"$G"
 	done
 }
 

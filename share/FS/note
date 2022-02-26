@@ -37,8 +37,11 @@ function note {(
 	/bin/rm "$TMPFILE"
 	$setnoglob && set -f
 	((tries>=0))|| die 'Could not create ^Bnote^b.'
-	new -nz note "$*"
-	xclip -out -selection clipboard >$seqnote
+	>$seqnote (
+		mk-stemma-header; print # mk-stemma-header doesn't output a newline
+		date -u +'%Y-%m-%d %H:%M:%S Z'
+		print -r -- "$*"
+	  )
 	repolink="$noterepo/$(date -u +'%Y-%m-%dz')-${OLDPWD##*/}-$seqnum"
 	tries=0
 	while ! ln -s "$PWD/$seqnote" "$repolink" 2>/dev/null; do
@@ -56,4 +59,4 @@ function note {(
 	  }
 )}
 
-# Copyright © 2017 by Tom Davis,,, <tom@greyshirt.net>.
+# Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

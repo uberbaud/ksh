@@ -55,7 +55,7 @@ function p {
 	[[ -n $choice ]]|| return
 	needs-path -or-warn "$choice/RCS"
 
-	cd "$choice"
+	builtin cd "$choice"
 	fUSE=.created
 	if [[ -f $fUSE  ]]; then
 		first=$(<$fUSE)
@@ -69,8 +69,9 @@ function p {
 			"Isn't it time to do something permanent with it?"
 	else
 		date +%s >$fUSE
-		mk-stemma-header \# >README.rem
-		v README.rem
+		mk-stemma-header \# >README
+		ci -i -q -t-"$choice README" -u README
+		v README 'Initial edit'
 	fi
 
 	true # leave on a good note

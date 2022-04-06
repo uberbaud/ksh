@@ -212,15 +212,15 @@ function update-screen { # {{{1
 	print -n -- "$colorPlayed"
 	i=0
 	while ((i<$lastRowPLAYED)); do
-		L=${BUFFER[i]:-~}
+		L=${BUFFER[i]:-\~}
 		((i++))
 		print -n -- "\033[$i;1H $L "
 	done
-	L=${BUFFER[i]:-~}
+	L=${BUFFER[i]:-\~}
 	((i++))
 	print -n -- "\033[$i;1H $colorPlaying$L$colorNext "
 	while ((i<(LINES-1))); do
-		L=${BUFFER[i]:-~}
+		L=${BUFFER[i]:-\~}
 		((i++))
 		print -n -- "\033[$i;1H $L "
 	done

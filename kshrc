@@ -264,7 +264,8 @@ fi
 alias no2='2>/dev/null '
 alias noerr='2>/dev/null '
 alias noglob='set -f;noglob '; function noglob { set +f; ("$@"); }
-alias prn="printf '  \e[35m｢\e[39m%s\e[35m｣\e[39m\n'"
+alias p="/usr/bin/printf '%s\n'"
+alias prn="/usr/bin/printf '  \e[35m｢\e[39m%s\e[35m｣\e[39m\n'"
 
 [[ -n $KDOTDIR ]]&& {
 	KCOMPLETE=$KU/C

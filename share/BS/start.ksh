@@ -53,6 +53,16 @@ function setup-app-framework { # {{{1
 
 	/home/tw/config/ksh/share/BS/start:init.ksh "$1"
 } # }}}1
+function mktempdir { # {{{1
+	local d
+	d=$(date +'%Y%m%d') ||
+		die 'Could not ^Tdate^t'
+	t=$(mktemp -qd ~/public/tmp/"${appUser:?}-$d-XXXXXX") ||
+		die 'Could not ^Tmktemp^t'
+	sparkle-path "$t"
+	notify "Moving files to: $REPLY."
+	print -r -- "$t"
+} # }}}1
 function publicify-files { # {{{1
 	local i a t
 	# move files as necessary to a publicly accessible place.
@@ -60,8 +70,7 @@ function publicify-files { # {{{1
 	for a; do
 		# if it's a file but not in the public directory
 		if [[ -a $a && $a != ~/public/* ]]; then
-			f=${t:="$(mktemp -qd ~/public/tmp/start.XXXXXXXXX)"}/${a##*/} ||
-				die 'Could not ^Tmktemp^t'
+			f=${t:="$(mktempdir)"}/${a##*/}
 			cp "$a" "$f" || die "Could not ^Tcp^t ^B$a^b."
 			o[i++]=$f
 		else
@@ -75,6 +84,7 @@ function publicify-files { # {{{1
 		chmod g+x "$t"			# mark ONLY the directory browsable
 	}
 } # }}}1
+needs die notify sparkle-path warn
 
 if [[ $shortcall != $shortbin ]]; then
 	appUser=${shortcall#start-}

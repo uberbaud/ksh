@@ -5,7 +5,7 @@
 #:   ^Tmkdir^t if necessary unless ^T-no-create^t, possibly warn or die, optionally
 #:   notifying if it is created.
 
-needs notify warn die bad-programmer
+needs bad-programmer die notify sparkle-path warn
 function needs-path {
 	local or_what notice v r create errmsg w_warn w_die
 

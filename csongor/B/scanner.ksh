@@ -1,0 +1,1 @@
+/home/tw/config/ksh/share/BS/scanner.ksh

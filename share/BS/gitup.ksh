@@ -45,6 +45,7 @@ function get-local-to-remote-branch { # {{{1
 	# git-remote-links outputs "%(local)\t%(upstream)\n"*, so two (2) words
 	# per local-to-remote-branch
 	set -- $(git-remote-links)
+	(($#))|| return 1
 	# prefer trunk if available, otherwise balk
 	if (($#>2)); then
 		found=false

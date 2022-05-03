@@ -1,0 +1,165 @@
+#!/bin/ksh
+# <@(#)tag:tw.csongor.greyshirt.net,2017-12-04,23.28.15z/2cb94ce>
+# idea from anacron
+
+NAME=plan-b
+HOLD=/var/cache/$NAME
+JOBFNAME=${NAME}-tab
+JOBF=/etc/$JOBFNAME
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+set -u
+integer errs=0 lineno=0
+function syntax		{ print -ru2 "$NAME: $* (line $lineno)"; ((errs++)); }
+function fullstop	{ print -ru2 "$NAME: $*"; exit 1; }
+
+(($#))&& {
+	${PAGER:-less} <<-\
+	===
+    PLANB
+
+    $NAME is designed to be run from the root crontab (perhaps every
+    five (5) minutes or so), and is useful on laptops or other machines
+    which are not powered on constantly, and so which might miss an
+    exact time.
+
+    $NAME expects a job file ($JOBF) containing directives and
+    possibly blank lines and comments. $NAME will also check for
+    user job files at /home/*/.$JOBFNAME and will run any jobs therein
+    as the user name given after /home/ in the user job file path.
+
+    Comments are lines whose first non-space character is an octothorpe
+    ('#', aka 'pound sign').
+
+    Directives are of the form INTERVAL (space) COMMAND.
+
+    The INTERVAL can be one of a WEEKDAY-NAME (e.g. Monday, only the
+    first two characters are considered), DAY-OF-MONTH (an ordinal
+    number, e.g. 1st, 2nd, 23rd, etc), or a NUMBER-OF-DAYS (e.g. 1).
+
+    The COMMAND is everything after the intervening blank and can itself
+    contain spaces.
+
+    Example:
+    # My excellent $NAME config file
+    1       /usr/sbin/syspatch -c
+    1       /bin/sh /etc/daily
+    Mon     /bin/sh /etc/weekly
+    1st     /bin/sh /etc/monthly
+
+    When run, $NAME will check every directive in the job file, and for
+    any directive whose INTERVAL has passed, $NAME will run that
+    COMMAND.
+
+    $NAME maintains state with files it creates in $HOLD.
+
+    $NAME sets the PATH to
+        $PATH
+
+    $NAME uses the local time ($TZ) for date comparisons.
+
+    $NAME was inspired by the ANACRON utility, but is intentionally 
+    simpler.
+	===
+	exit 0
+}
+
+[[ $(id -un) == root ]]|| fullstop 'needs root privileges'
+[[ -a $JOBF ]]|| fullstop "$JOBF not found"
+[[ -f $JOBF ]]|| fullstop "$JOBF is not a file"
+[[ -d $HOLD ]]|| mkdir -p $HOLD || fullstop "cannot make $HOLD"
+cd $HOLD || fullstop "cannot cd to $HOLD"
+
+#               ┌─date─┐ ┌─time─┐ ┌┬─seconds since epoch
+set -- $(date +'%Y %m %d %H %M %S %s')
+typeset -Z2 MON DOM H M S # zero padded vars of width 2
+YEAR=$1;    MON=$2;     DOM=$3
+H=$4;       M=$5;       S=$6
+TODAY=$YEAR$MON$DOM
+todayE=$(($7-(((H*60)+M)*60)+S))
+
+function have-x-days-passed {
+	local nextrunE=$((tsE+($1*(24*60*60))))
+	((nextrunE <= todayE))
+}
+function has-dow-passed {
+	local pass x
+	case $1 in
+		mo*)	pass=1;	;;
+		tu*)	pass=2;	;;
+		we*)	pass=3;	;;
+		th*)	pass=4;	;;
+		fr*)	pass=5;	;;
+		sa*)	pass=6;	;;
+		su*)	pass=7;	;;
+	esac
+	x=$(((pass+7-tsDOW)%7)); ((x))||x=7
+	have-x-days-passed $x
+}
+function has-dom-passed {
+	typeset -Z2 dom="${1%%+([dnrst])}"
+	((++MON>12))&& { ((YEAR++)); MON=1; }
+	(($YEAR$MON$dom <= TODAY))
+}
+function do-execute {
+	local tsF ts when="$1" cmd="$2" as="$3"
+	# name of timestamp file
+	tsF="$(print -n "${as:+$as-}$when-$cmd" | tr ' /' '_%')"
+	[[ -f $tsF ]]&& {							# if it exists
+		ts="$(<$tsF)"							# get the last run time
+		set -- $(date -j +'%s %u' $ts'0000')
+		tsE=$1					# seconds since epoch of last run time
+		tsDOW=$2				# weekday when command was last run
+		case $when in
+			+([0-9]))
+				have-x-days-passed $when		|| return 0
+				;;
+			@(su|mo|tu|we|th|fr|sa)*)
+				has-dow-passed $when			|| return 0
+				;;
+			@([0-9]|[012][0-9]|3[01])@(st|nd|rd|th))
+				has-dom-passed $when			|| return 0
+				;;
+			+([0-9])@(st|nd|rd|th))
+				syntax 'day of month is too big'
+				;;
+			*)
+				fullstop 'This should be impossible.'
+				;;
+		esac
+	  }
+	print $TODAY>$tsF			# write the new timestamp to the file
+	eval "${as:+doas -u $as }$cmd"
+}
+
+typeset -l when
+function do-one-plan-b {
+	local as=${1-}
+	while read -r when cmd; do
+		((lineno++))
+		[[ ${when:-#} == \#* ]]&& continue		# comments and blank lines
+		[[ -n ${cmd:-} ]]|| { syntax "syntax error"; continue; }
+		[[ $when == @(+([0-9])?(st|nd|rd|th)|@(su|mo|tu|we|th|fr|sa)*) ]]||{
+			syntax "syntax: bad interval"
+			continue
+		  }
+		do-execute $when "$cmd" "$as"
+	done
+}
+
+function main {
+	local T U
+	do-one-plan-b <$JOBF # main file
+	set -- /home/*/.$JOBFNAME
+	[[ $1 == /home/\*/.$JOBFNAME ]]&& return
+	for T; do
+		U=${T#/home/}
+		U=${U%/."$JOBFNAME"}
+		do-one-plan-b $U <$T # main file
+	done
+}
+
+main; exit $errs
+
+# Copyright (C) 2017 by Tom Davis <tom@greyshirt.net>.
+# vim: ft=ksh

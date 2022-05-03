@@ -101,6 +101,7 @@ app-framework-exists "$appUser" ||
 
 xauth list $DISPLAY		>/home/apps/xauth-add
 print -r -- "$DISPLAY"	>/home/apps/display
+print -r -- "$(<~/.sndio/cookie)" >/home/apps/sndio
 
 (($#))&& { publicify-files "$@"; set -- "${o[@]}"; }
 

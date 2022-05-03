@@ -100,6 +100,7 @@ function reload	 { #{{{1
 	reset-volume
 } #}}}1
 function main { # {{{1
+print "$0: in"
 	reset-volume
 
 	case "${1:-}" in
@@ -116,9 +117,10 @@ function main { # {{{1
 	esac
 
 	sndioctl output.level >$sndiorc
+print "$0: out"
 } # }}}1
 
-needs amuse:env
+needs amuse:env needs-file
 amuse:env
 fAudDev=${AMUSE_RUN_DIR:?}/audiodevice
 [[ -z ${AUDIODEVICE:-} && -s $fAudDev ]]&&
@@ -134,6 +136,8 @@ fAudDev=${AMUSE_RUN_DIR:?}/audiodevice
   }
 
 
+[[ -a $sndiorc ]]|| : >$sndiorc
+needs-file -or-die "$sndiorc"
 [[ -w $sndiorc ]]|| chmod u+w $sndiorc
 main "$@"; exit
 

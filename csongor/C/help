@@ -68,6 +68,7 @@ f-locate
 f-m-done
 f-m-get
 f-r
+f-rcctl
 f-reboot
 f-syspatch
 f-tclsh

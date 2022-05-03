@@ -47,7 +47,7 @@ function f-v {
 		F=$USR_PLIB/$F.pm
 		[[ -f $F ]]&& filexp=$F
 	  }
-	set -- trnsxtrm "$edit" "${opts[@]}" "$filexp" "$@"
+	set -- trnsxtrm "$edit" ${opts[*]:+"${opts[@]}"} "$filexp" "$@"
 	# remove trnsxtrm if there's no WINDOWID
 	[[ -n ${WINDOWID:-} ]]|| shift
 	"$@"

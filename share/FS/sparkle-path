@@ -22,8 +22,8 @@ function sparkle-path {
 		r=$REPLY
 	fi
 
-	[[ -n $r ]]&& gsub / "^$E^/^$S" "$r" r
-	REPLY=${v:+"^O\$^o^V${v#\$}^v"}${r:+"${r#^$E}^$E"}
+	[[ -n $r ]]&& gsub / "^$E^/^$S" "^$S$r^$E" r
+	REPLY=${v:+"^O\$^o^V${v#\$}^v"}${r:+"${r#"^$S^$E"}"}
 }
 
 # Copyright © 2021 by Tom Davis <tom@greyshirt.net>.

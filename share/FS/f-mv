@@ -1,0 +1,11 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2022-05-03,09.06.53z/38e93dc>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^GAny args valid for^g ^Tmv^t^G.^g
+#:   Wrapper using ^Trcs-file-cmds^t.
+
+function f-mv {
+	${BS:?}/rcs-file-cmds.ksh mv "$@"
+}
+
+# Copyright © 2022 by Tom Davis <tom@greyshirt.net>.

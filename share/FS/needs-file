@@ -6,7 +6,7 @@
 
 needs warn die sparkle-path
 function needs-file {
-	local or_what REPLY reqwod
+	local or_what REPLY reqwod msg
 
 	(($#<2))&& bad-programmer "$0: Missing required ^T-or-^t^O{^o^Twarn^t^O,^o^Tdie^t^O}^o."
 	(($#>2))&& bad-programmer "$0: Too man parameters."
@@ -21,7 +21,12 @@ function needs-file {
 	[[ -f $2 ]]&& return
 
 	sparkle-path "$2"
-	$or_what "No such file: $REPLY."
+	if [[ -a $2 ]]; then
+		msg="$REPLY exists but is not a file."
+	else
+		msg="No such file: $REPLY."
+	fi
+	$or_what "$msg"
 }
 
 # Copyright © 2021 by Tom Davis <tom@greyshirt.net>.

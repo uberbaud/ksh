@@ -17,7 +17,7 @@ backroot=$backvol/backups
 backbase=$backroot/${HOST:?}
 onlycheck_mounted=false
 onlycheck_attached=false
-stop_after_mount=false
+want_stop_after_mount=false
 quiet=false
 
 desparkle "$backbase"
@@ -55,7 +55,7 @@ while getopts ':cCmqh' Option; do
 	case $Option in
 		C)	onlycheck_attached=true;								;;
 		c)	onlycheck_mounted=true;									;;
-		m)	stop_after_mount=true;									;;
+		m)	want_stop_after_mount=true;								;;
 		q)	quiet=true;												;;
 		h)	usage;													;;
 		\?)	die "Invalid option: [1m-$OPTARG[22m.";				;;
@@ -69,21 +69,19 @@ shift $(($OPTIND - 1))
 # /options }}}1
 (($#))&& die 'Unexpected arguments.'
 
-needs awk egrep mount rsync usb-mnt needs-path needs-cd
+needs awk egrep mount rsync usb-mnt needs-path needs-cd new-array
 
-rsync_opts=$(awk '{print $1}') <<-\
-	===
-	--relative			# store with full path appended to destination
-	--delete			# delete files on destination not on source
-	--recursive			# recurse into directories
-	--links				# copy symlinks AS symlinks
-	--perms				# preserve permissions
-	--keep-dirlinks		# use symlinks on dest if link is valid
-	--times				# preserve modification times
-	--group				# preserve groups
-	--owner				# preserve owners
-	--whole-file		# don't use delta-xfer (faster on local hd)
-	===
+new-array rsync_opts
++rsync_opts --relative			# store with full path appended to destination
++rsync_opts --delete			# delete files on destination not on source
++rsync_opts --recursive			# recurse into directories
++rsync_opts --links				# copy symlinks AS symlinks
++rsync_opts --perms				# preserve permissions
++rsync_opts --keep-dirlinks		# use symlinks on dest if link is valid
++rsync_opts --times				# preserve modification times
++rsync_opts --group				# preserve groups
++rsync_opts --owner				# preserve owners
++rsync_opts --whole-file		# don't use delta-xfer (faster on local hd)
 
 function dieQuietly { #{{{1
 	$quiet && exit 1
@@ -92,7 +90,7 @@ function dieQuietly { #{{{1
 function Now { date -u +'%Y-%m-%d_%H:%M:%SZ'; }
 function do-rsync { # {{{1
 	notify 'BEGIN COPY'
-	rsync $rsync_opts "$@" "$realhome" "$backto"
+	rsync "${rsync_opts[@]}" "$@" "$realhome" "$backto"
 } # }}}1
 function initial-backup { # {{{1
 	set -A glob -- *
@@ -142,13 +140,12 @@ function try-mounting { #{{{1
 	check-mounted ||
 		die "Could not mount ^S$diskname^s at ^S$backvol^s."
 } #}}}1
-
-function main { # {{{1
+function backup-to-local { # {{{1
 	check-attached
 	check-mounted || try-mounting
 
 	needs-path -or-die "$backbase"
-	$stop_after_mount && return
+	$want_stop_after_mount && return
 
 	splitstr : "$(getent passwd $(id -un))"
 	readonly realhome=${reply[5]}
@@ -178,6 +175,14 @@ function main { # {{{1
 	notify 'Syncing disks'
 	sync
 	notify 'Done.'
+} # }}}1
+
+function main { # {{{1
+	if $use_local_store; then
+		backup-to-local "$@"
+	else
+		backup-to-lan "$@"
+	fi
 } # }}}1
 
 main "$@"; exit

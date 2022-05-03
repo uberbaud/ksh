@@ -8,7 +8,7 @@
 
 set -o errexit -o nounset;: ${FPATH:?Run from within KSH}
 
-KEEPENVS='AUDIODEVICE START_OPTIONS'
+KEEPENVS='AUDIODEVICE DBUS_SESSION_BUS_ADDRESS START_OPTIONS'
 AUTHOR='Tom Davis <tom@greyshirt.net>'
 CFG=$XDG_CONFIG_HOME/start
 PUB=$HOME/public/start
@@ -241,6 +241,30 @@ function create-app-starter { # {{{1
 	# edit
 	(set +u +e; f-v "$F" "Starter app for $APP")
 
+} # }}}1
+function copy-file { # {{{1
+	local src dst pDst fDst
+
+	src=${1:?'Missing _src_ parameter (1) to `copy-file`.'}
+	dst=${2:?'Missing _dst_ parameter (2) to `copy-file`.'}
+
+	[[ $dst == $APP_HOME/* ]]||
+		warn "^Tcopy-file^t destination is not ^B$APP_HOME^b."
+
+	fDst=${dst##*/}
+	pDst=${dst%"$fDst"}
+	! [[ -z $pDst || -d $pDst ]]&&
+		@ mkdir -p "$pDst"
+	@ cp "$src" "$dst"
+	@ chown -R $APP:$GRPNAME "$pDst"
+
+} # }}}1
+function create-auth-files { # {{{1
+	local F
+	F=.sndio/cookie # sharing a cookie allows applications to share access
+					# to sndio, otherwise only one user's app can play
+					# sound at a given time.
+	copy-file $HOME/$F $APP_HOME/$F
 } # }}}1
 function create-user-links { # {{{1
 	local D

@@ -1,0 +1,12 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2022-04-26,20.14.58z/31f7bc6>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^G(no arguments)^g
+#:   Wrapper
+
+needs as-root
+function f-rcctl {
+	as-root /usr/sbin/rcctl "$@"
+}
+
+# Copyright © 2022 by Tom Davis <tom@greyshirt.net>.

@@ -38,6 +38,7 @@ nfsd
 npppd
 nsd
 ntpd
+obsdfreqd
 ospf6d
 ospfd
 pflogd

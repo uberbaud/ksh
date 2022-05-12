@@ -23,6 +23,7 @@ function usage {
 	^F{4}Usage^f: ^T$PGM^t ^[^Uvolume^u^|^T+^t^|^T-^t^|^T-m^t^|^Tmute^t^|^T-t^t^|^Ttoggle-mute^t^]
 	         Change the volume. ^Uvolume^u can be as a percent, or a
 	         float between 0 and 1, or a ^T+^t or ^T-^t to increase or decrease.
+	           ^T-l^t               Use ^Blocal device^b regardless of ^VAUDIODEVICE^v, etc.
 	           ^T-m^t^|^Tmute^t^*         mute on
 	           ^T-t^t^|^Ttoggle-mute^t^*  toggle mute
 	               ^*^/ everything after the initial ^Tm^t or ^Tt^t is ignored
@@ -36,12 +37,14 @@ function usage {
 	exit 0
 } # }}}
 # process -options {{{1
+USE_LOCAL_DEVICE=false
 function bad_programmer {	# {{{2
 	die 'Programmer error:'	\
 		"  No getopts action defined for [1m-$1[22m."
   };	# }}}2
-while getopts ':mrth' Option; do
+while getopts ':lmrth' Option; do
 	case $Option in
+		l)	USE_LOCAL_DEVICE=true;								;;
 		m)	set mute;											;;
 		t)	set toggle-mute;									;;
 		r)	set reload;											;;
@@ -100,7 +103,7 @@ function reload	 { #{{{1
 	reset-volume
 } #}}}1
 function main { # {{{1
-print "$0: in"
+	notify "Using ^B${AUDIODEVICE:-"^G^Idefault local sndio device^i^g"}^b"
 	reset-volume
 
 	case "${1:-}" in
@@ -117,14 +120,19 @@ print "$0: in"
 	esac
 
 	sndioctl output.level >$sndiorc
-print "$0: out"
 } # }}}1
 
-needs amuse:env needs-file
-amuse:env
-fAudDev=${AMUSE_RUN_DIR:?}/audiodevice
-[[ -z ${AUDIODEVICE:-} && -s $fAudDev ]]&&
-	export AUDIODEVICE=$(<$fAudDev)
+needs needs-file
+
+if $USE_LOCAL_DEVICE; then
+	unset AUDIODEVICE
+else
+	needs amuse:env
+	amuse:env
+	fAudDev=${AMUSE_RUN_DIR:?}/audiodevice
+	[[ -z ${AUDIODEVICE:-} && -s $fAudDev ]]&&
+		export AUDIODEVICE=$(<$fAudDev)
+fi
 
 # give each snd@machine/device its own rc file
 [[ ${AUDIODEVICE:-} == *@* ]]&& {

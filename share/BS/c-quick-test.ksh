@@ -12,7 +12,10 @@ function usage {
 	sparkle >&2 <<-\
 	===SPARKLE===
 	^F{4}Usage^f: ^T$PGM^t
-	         Opens a very simple C skeleton file, makes, runs, and deletes it.
+	         Opens a very simple C skeleton file in ^O\$^o^VVISUAL^v or ^O\$^o^VEDITOR^v,
+	         On every save ^Tmake^ts and runs it (saving an unchanged version
+	             will clear the ^Imake^i screen,
+	         and when the editor is exited, deletes the ^SC^s file.
 	       ^T$PGM -h^t
 	         Show this help message.
 	===SPARKLE===
@@ -68,19 +71,27 @@ function write-file { #{{{1
 	===
 } # }}}1
 function get-set-vars { # {{{1
-	local TAB='	'
+	local TAB='	' key value
 	while IFS== read -r key value; do
 		[[ $key == //:* ]]|| continue
 		key=${key##//:*([ $TAB])}
 		if [[ $key == *+ ]]; then
 			key=${key%%*([ $TAB])+}
-			eval "$key=\${$key:+\"\$$key \"}\$value"
+			eval value="\${$key:+\"\$$key \"}\$value"
 		else
 			key=${key%%*([ $TAB])}
-			eval $key=\$value
 		fi
+		eval $key=\$value
+
+		[[ -n $DEBUG ]]&& notify "$key" "$value"
 		export $key
 	done <$1
+	[[ -z $PACKAGES ]]|| {
+		pkg-config --exists $PACKAGES || return
+		CFLAGS=${CFLAGS:+"$CFLAGS "}$(pkg-config --cflags $PACKAGES)
+		LDFLAGS=${LDFLAGS:+"$LDFLAGS "}$(pkg-config --libs $PACKAGES)
+		export CFLAGS LDFLAGS
+	  }
 } # }}}1
 function edit-c-file { #{{{1
 	local F
@@ -108,8 +119,7 @@ function main { #{{{1
 		fi
 		set -- $(date +'%H:%M on %A, %B %e')
 		h1 "$*"
-		get-set-vars "$CFILE"
-		make "$EXE" && {
+		get-set-vars "$CFILE" && make "$EXE" && {
 			h2 "running $EXE"
 			./"$EXE"
 		  }

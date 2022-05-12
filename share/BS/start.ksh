@@ -64,12 +64,12 @@ function mktempdir { # {{{1
 	print -r -- "$t"
 } # }}}1
 function publicify-files { # {{{1
-	local i a t
+	local i a t f
 	# move files as necessary to a publicly accessible place.
 	i=0
 	for a; do
 		# if it's a file but not in the public directory
-		if [[ -a $a && $a != ~/public/* ]]; then
+		if [[ -a $a && $(readlink -fn "$a" 2>/dev/null) != $dPublic/* ]]; then
 			f=${t:="$(mktempdir)"}/${a##*/}
 			cp "$a" "$f" || die "Could not ^Tcp^t ^B$a^b."
 			o[i++]=$f

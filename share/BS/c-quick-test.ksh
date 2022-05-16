@@ -11,19 +11,22 @@ function usage {
 	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
-	^F{4}Usage^f: ^T$PGM^t
+	^F{4}Usage^f: ^T$PGM^t ^[^T-v^t^[
 	         Opens a very simple C skeleton file in ^O\$^o^VVISUAL^v or ^O\$^o^VEDITOR^v,
 	         On every save ^Tmake^ts and runs it (saving an unchanged version
 	             will clear the ^Imake^i screen,
 	         and when the editor is exited, deletes the ^SC^s file.
+	         ^T-v^t  Increase verbosity.
 	       ^T$PGM -h^t
 	         Show this help message.
 	===SPARKLE===
 	exit 0
 } # }}}
 # process -options {{{1
-while getopts ':h' Option; do
+verbose=false
+while getopts ':vh' Option; do
 	case $Option in
+		v)	verbose=true;													;;
 		h)	usage;															;;
 		\?)	die USAGE "Invalid option: ^B-$OPTARG^b.";						;;
 		\:)	die USAGE "Option ^B-$OPTARG^b requires an argument.";			;;
@@ -34,18 +37,23 @@ done
 shift $((OPTIND-1))
 # ready to process non '-' prefixed arguments
 # /options }}}1
+MARK=' + --------------------------------------------------------------------'
 function write-file { #{{{1
-	cat <<-\===
-		/* -------------------------------------------------------------------- *\
-		|*  Lines beginning with //: (comments) will be treated as `make` style *|
-		|*  variable assignments ('=' or '+=', no quotes needed nor supported). *|
-		|*  Variable expansion is NOT supported in assignments.                 *|
-		|*  The variable $PACKAGES, if not empty, will be fed to `pkg-config`   *|
-		|*  and LDFLAGS and CFLAGS will be appended with that output.           *|
-		\* -------------------------------------------------------------------- */
-		//: PACKAGES =
-		//: CFLAGS  += -std=c11
-		//: CFLAGS  += -Weverything -fdiagnostics-show-option -fcolor-diagnostics
+	cat <<-===
+		/* --------------------------------------------------------------------
+		 |  Lines in the following comment will be treated as \`make\` style 
+		 |    variable assignments ('=' or '+=').
+		 |  Quotes are neither needed nor supported.
+		 |  Variable expansion is NOT supported in assignments.
+		 |  Lines can be commented out by prefixing them with '#'.
+		 |  The variable \$PACKAGES, if not empty, will be fed to \`pkg-config\`
+		 |    and LDFLAGS and CFLAGS will be appended with that output.
+		$MARK
+		    PACKAGES =
+		    CFLAGS  += -std=c11
+		    CFLAGS  += -Weverything -fdiagnostics-show-option -fcolor-diagnostics
+		    # LDFLAGS  += $FROMPWD/my.o
+		$MARK */
 
 		#include <notify_usr.h> /* sparkle(),message(),inform(),caution(),die() */
 		
@@ -71,10 +79,20 @@ function write-file { #{{{1
 	===
 } # }}}1
 function get-set-vars { # {{{1
-	local TAB='	' key value
+	local TAB='	' line key value
+
+	# skip to actual variable declarations
+	while IFS== read -r line; do
+		[[ $line == $MARK ]]&& break
+	done
+
+	# process variables
 	while IFS== read -r key value; do
-		[[ $key == //:* ]]|| continue
-		key=${key##//:*([ $TAB])}
+		[[ $key == $MARK* ]]&& break
+
+		key=${key##*([ $TAB])}
+		[[ $key == \#* ]]&& continue
+
 		if [[ $key == *+ ]]; then
 			key=${key%%*([ $TAB])+}
 			eval value="\${$key:+\"\$$key \"}\$value"
@@ -83,10 +101,10 @@ function get-set-vars { # {{{1
 		fi
 		eval $key=\$value
 
-		[[ -n ${DEBUG:-} ]]&& notify "$key" "$value"
+		$verbose && notify "$key" "$value"
 		export $key
-	done <$1
-	[[ -z $PACKAGES ]]|| {
+	done
+	[[ -z ${PACKAGES:-} ]]|| {
 		pkg-config --exists $PACKAGES || return
 		CFLAGS=${CFLAGS:+"$CFLAGS "}$(pkg-config --cflags $PACKAGES)
 		LDFLAGS=${LDFLAGS:+"$LDFLAGS "}$(pkg-config --libs $PACKAGES)
@@ -108,6 +126,15 @@ function show-header { # {{{1
 } # }}}1
 function get-term-size { eval "$(/usr/X11R6/bin/resize)"; }
 function clear-screen { print -u2 '\033[H\033[2J\033[3J\033[H\c'; }
+function build-and-run { # {{{2
+	show-header
+	get-set-vars <$CFILE	|| return # die if pkg-config error
+	make "$EXE"				|| return
+
+	hh "running $EXE"
+	time ./"$EXE"
+	hh "$EXE completed // rc = $?"
+} # }}}2
 function main { #{{{1
 	local cksum_previous cksum_current CFILE EXE
 	EXE=test
@@ -119,18 +146,15 @@ function main { #{{{1
 		[[ -f $CFILE ]]|| break
 		cksum_current=$(cksum "$CFILE")
 		[[ $cksum_current == $cksum_previous ]]&& clear-screen
-		show-header
-		get-set-vars "$CFILE" && make "$EXE" && {
-			hh "running $EXE"
-			./"$EXE"
-			hh "$EXE completed // rc = $?"
-		  }
+		(build-and-run) # in a subshell so variables are "reset"
 		cksum_previous=$cksum_current
 	done
 	true
 } #}}}1
 
 needs clearout hN h2 needs-cd shquote sparkle-path subst-pathvars watch-file
+
+FROMPWD=$PWD
 
 trap get-term-size WINCH
 

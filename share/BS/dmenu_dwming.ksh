@@ -14,6 +14,18 @@ NL='
 # we're seeing tons that we don't use. And many of those are cli only,
 # so those don't make sense either. Those probably need a terminal.
 
+function list-start-apps { #{{{1
+	needs-cd -or-warn /home/apps || return 1
+	for app in *; do
+		[[ -d $app ]]&& print -rn -- "$app "
+	done
+} # }}}1
+function list-amuse-commands { # {{{1
+	amuse:env
+	for a in ${AMUSE_COMMANDS:?}; do
+		print -rn -- "@$a "
+	done
+} # }}}1
 function ws-get-amazon-search  { #{{{1
 	REPLY="http://smile.amazon.com/s?k=$1"
 } #}}}1
@@ -76,7 +88,6 @@ function browse-the-web  { #{{{1
 	${BROWSER:-$USRBIN/surf} "$scheme://$url"
 } #}}}1
 function handle-cmd { # {{{
-set -x
 	local cmd qARGS
 	read -r req args
 	[[ -z $req ]]&& { st & return; }
@@ -109,6 +120,12 @@ set -x
 		return
 	  }
 
+# special
+	[[ $req == amuse || $req == amuse-ui ]]&& {
+		trnsxtrm amuse-ui
+		return
+	  }
+
 	shquote "$args" qARGS
 	if [[ $req == !* ]]; then
 		cmd="${req#!*( )} $qARGS"
@@ -116,15 +133,8 @@ set -x
 		cmd="lockdown z"
 	elif [[ " $starts " == *" $req "* ]]; then
 		cmd="start $req $qARGS"
-# amuse
-	elif [[ " amuse " == *" $req "* ]]; then
-		trnsxtrm amuse-ui
-		cmd="amuse:send-cmd ${req#@}"
-# special
 	elif [[ " $amuse " == *" $req "* ]]; then
-		print -u2 -- "$req: not implemented yet."
-		return 1
-# others, web, or x11
+		cmd="amuse:send-cmd ${req#@}"
 	elif [[ " $others $web $x11 " == *" $req "* ]]; then
 		cmd="$req $qARGS"
 	else
@@ -135,17 +145,9 @@ set -x
 } # }}}1
 
 needs amuse:env dmenu dwm_dmenu_completion grep sort trnsxtrm
-starts=''
-for n in ${XDG_CONFIG_HOME:-~/config}/start/*.ini; do
-	n=${n##*/}
-	n=${n%.ini}
-	starts="$starts $n"
-done
 
-amuse:env
-amuse=''
-for a in $AMUSE_COMMANDS; do amuse="$amuse @$a"; done; amuse=${amuse# }
-
+starts=$(list-start-apps)
+amuse=$(list-amuse-commands)
 websearch='g a w amazon book cpan google imdb map synonyms translate wikipedia'
 x11='display ghb glxgears oclock showrgb soffice xcalc xclock xmag xwd'
 others='amuse weather wordnet wnb'
@@ -153,6 +155,16 @@ web='h s http https www chrome surf'
 special='task'
 
 dypgm=dwm_dmenu_completion
+
+# print -u2 -- "===== SUPPORTED COMMANDS ====="
+# print -u2 -- "  starts:    $starts"
+# print -u2 -- "  websearch: $websearch"
+# print -u2 -- "  others:    $others"
+# print -u2 -- "  x11:       $x11"
+# print -u2 -- "  amuse:     $amuse"
+# print -u2 -- "  web:       $web"
+# print -u2 -- "  special:   $special"
+# print -u2 -- "=============================="
 
 for w in '' $starts $websearch $others $x11 $amuse $web $special; do
 	print -r -- "$w";

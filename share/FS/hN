@@ -9,7 +9,7 @@
 #:     ^Uprefix^u, and ^Usuffix^u will only be used if ^Sstdout^s is ^Bnot^b
 #:               a terminal.
 
-needs downgrade-color gsub term-does-utf8 term-has-256-colors
+needs downgrade-color gsub resize term-does-utf8 term-has-256-colors
 function hN {
 	local IFS=' ' attr prefix suffix text
 	attr=${1:?Missing required ANSI escape attribute}
@@ -25,7 +25,7 @@ function hN {
 	gsub \\ \\\\ "$*" text
 	[[ -z $text ]]&& text='This header left (un)intentionally blank'
 	if [[ -t 1 ]]; then
-		: ${COLUMNS:=$(tput columns)}
+		eval $(resize)
 		typeset -R$((COLUMNS+2)) setline='\r'
 		(((COLUMNS-6)<${#text}))&& {
 			typeset -L$((COLUMNS-7)) chopped=$text

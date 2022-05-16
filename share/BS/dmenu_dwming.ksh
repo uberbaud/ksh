@@ -117,7 +117,8 @@ set -x
 	elif [[ " $starts " == *" $req "* ]]; then
 		cmd="start $req $qARGS"
 # amuse
-	elif [[ " $amuse " == *" $req "* ]]; then
+	elif [[ " amuse " == *" $req "* ]]; then
+		trnsxtrm amuse-ui
 		cmd="amuse:send-cmd ${req#@}"
 # special
 	elif [[ " $amuse " == *" $req "* ]]; then
@@ -133,7 +134,7 @@ set -x
 	ksh -c "$cmd" &
 } # }}}1
 
-needs amuse:env dmenu dwm_dmenu_completion grep sort
+needs amuse:env dmenu dwm_dmenu_completion grep sort trnsxtrm
 starts=''
 for n in ${XDG_CONFIG_HOME:-~/config}/start/*.ini; do
 	n=${n##*/}

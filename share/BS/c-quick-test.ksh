@@ -83,7 +83,7 @@ function get-set-vars { # {{{1
 		fi
 		eval $key=\$value
 
-		[[ -n $DEBUG ]]&& notify "$key" "$value"
+		[[ -n ${DEBUG:-} ]]&& notify "$key" "$value"
 		export $key
 	done <$1
 	[[ -z $PACKAGES ]]|| {
@@ -99,44 +99,46 @@ function edit-c-file { #{{{1
 	${X11TERM:-xterm} -e ksh -c "${VISUAL:-${EDITOR:-vi}} $F" >/dev/null 2>&1
 	rm -f $CFILE
 } #}}}1
+function hh { # {{{1
+	hN '33;48;5;238' + + "$*"
+} # }}}1
+function show-header { # {{{1
+	# remove leading spaces using set and $*
+	hh "$prnTmpDir @ " $(date +'%H:%M on %A, %B %e')
+} # }}}1
 function get-term-size { eval "$(/usr/X11R6/bin/resize)"; }
 function clear-screen { print -u2 '\033[H\033[2J\033[3J\033[H\c'; }
 function main { #{{{1
-	local cksum_A cksum_B CFILE EXE
+	local cksum_previous cksum_current CFILE EXE
 	EXE=test
 	CFILE=$EXE.c
 	write-file >$CFILE
 	edit-c-file "$CFILE" &
-	cksum_A=$(cksum "$CFILE")
+	cksum_previous=$(cksum "$CFILE")
 	while watch-file "$CFILE" 2>/dev/null; do
 		[[ -f $CFILE ]]|| break
-		cksum_B=$(cksum "$CFILE")
-		if [[ $cksum_A == $cksum_B ]]; then
-			clear-screen
-			h1 "$TMPDIR"
-		else
-			cksum_A=$cksum_B
-		fi
-		set -- $(date +'%H:%M on %A, %B %e')
-		h1 "$*"
+		cksum_current=$(cksum "$CFILE")
+		[[ $cksum_current == $cksum_previous ]]&& clear-screen
+		show-header
 		get-set-vars "$CFILE" && make "$EXE" && {
-			h2 "running $EXE"
+			hh "running $EXE"
 			./"$EXE"
+			hh "$EXE completed // rc = $?"
 		  }
+		cksum_previous=$cksum_current
 	done
+	true
 } #}}}1
 
-needs clearout h1 h2 shquote sparkle-path watch-file
+needs clearout hN h2 needs-cd shquote sparkle-path subst-pathvars watch-file
 
 trap get-term-size WINCH
 
-TMPDIR=$(mktemp -d) || die 'Could not ^Tmktemp^t.'
-builtin cd "$TMPDIR" || {
-	sparkle-path "$TMPDIR"
-	die "Could not ^Tcd^t to $REPLY."
-  }
-trap 'clearout -f' EXIT
-h1 "$TMPDIR"
+TmpDir=$(mktemp -d) || die 'Could not ^Tmktemp^t.'
+subst-pathvars "$TmpDir" prnTmpDir
+needs-cd -or-die "$TmpDir"
+trap 'clearout' EXIT
+show-header
 
 main; exit
 

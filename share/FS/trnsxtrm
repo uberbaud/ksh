@@ -1,17 +1,25 @@
 # <@(#)tag:tw.csongor.greyshirt.net,2021-01-23,10.29.16z/2dd9eb>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^G(no arguments)^g
-#:   Start a new x11 terminal
+#: FUNCTION ^Ucmd^u ^[^Uargs^u ^S…^s^]
+#:   Start a new x11 terminal with ^Ucmd args^u passed to a ^Ishell^i.
+#:   ^GENVIRONMENT:^g
+#:       ^GUses^g
+#:           ^VX11TERM^v ^Gas the terminal program, ^Txterm^t ^Gif not set.^g
+#:           ^VUSR_SH^v ^Gas the shell,^g
+#:           ^VSHELL^v ^Gif^g ^VUSR_SH^v ^Gis not set, or^g ^Tsh^t ^Gif neither is set.^g
+#:       ^GSets^g
+#:           ^VSHORTWAIT^v ^Gwill be set to^g ^O${^o^VSHORTWAIT^v^O:-^o^T1^t^O}^o^G and ^Iexported^i.^g
+#:           ^GSee also:^g ^Twait-before-leaving^t^G which uses^g ^VSHORTWAIT^v^G.^g
 
 needs ${X11TERM:-xterm} wait-before-leaving shquote
 function trnsxtrm {
-	local a i cmdln xterm
-	set -A xterm -- nohup ${X11TERM:-xterm} -e ksh -c
+	local a i cmdln x11term
+	set -A x11term -- nohup ${X11TERM:-xterm} -e ${USR_SH:-"${SHELL:-sh}"} -c
 	i=0
 	cmdln[i++]=wait-before-leaving
 	for a { shquote "$a"; cmdln[i++]="$REPLY"; }
-	(SHORTWAIT=1 "${xterm[@]}" "${cmdln[*]}" &) >/dev/null 2>&1
+	(SHORTWAIT=${SHORTWAIT:-1} "${x11term[@]}" "${cmdln[*]}" &) >/dev/null 2>&1
 }
 
 # Copyright © 2021 by Tom Davis <tom@greyshirt.net>.

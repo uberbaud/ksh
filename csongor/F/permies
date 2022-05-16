@@ -1,0 +1,18 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2022-05-13,23.15.03z/1b95230>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Umsg#^u
+#:   Opens all links from mail ^Umsg#^u in ^Tchrome^t.
+
+function permies {
+	
+    [[ ${1:?} == +([0-9]) ]] || {
+		warn "bad \$1" 
+		return 1
+	  }
+	# permies/e/ links are about updating account info, so skip them
+    chrome $(s $1|awk '/\/e\// {next} /^ *http/ {print $1}') 
+
+}
+
+# Copyright © 2022 by Tom Davis <tom@greyshirt.net>.

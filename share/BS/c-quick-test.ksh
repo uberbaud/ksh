@@ -11,12 +11,16 @@ function usage {
 	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
-	^F{4}Usage^f: ^T$PGM^t ^[^T-v^t^[
+	^F{4}Usage^f: ^T$PGM^t ^[^T-v^t^] ^[^T-p^t ^Upath^u^] ^[^T-n^t ^Uname^u^] ^[^Upkg-config names^u^]
 	         Opens a very simple C skeleton file in ^O\$^o^VVISUAL^v or ^O\$^o^VEDITOR^v,
 	         On every save ^Tmake^ts and runs it (saving an unchanged version
-	             will clear the ^Imake^i screen,
-	         and when the editor is exited, deletes the ^SC^s file.
-	         ^T-v^t  Increase verbosity.
+	             will clear the ^Imake^i screen, and
+	         when the editor is exited, deletes the ^SC^s file.
+	         ^T-v^t       Increase verbosity.
+	         ^T-p^t ^Upath^u  Use ^Upath^u instead of ^O\$(^o^Tmktemp^t^O)^o. And do not delete
+	                  the source file or executable on editor exit.
+	         ^T-n^t ^Uname^u  Use this ^Uname^u instead of ^Ttest^t. If ^Uname^u contains a path
+	                  implies ^T-p^t with that path.
 	       ^T$PGM -h^t
 	         Show this help message.
 	===SPARKLE===
@@ -24,8 +28,12 @@ function usage {
 } # }}}
 # process -options {{{1
 verbose=false
-while getopts ':vh' Option; do
+filename=test
+pathname=
+while getopts ':n:p:vh' Option; do
 	case $Option in
+		n)  filename=$OPTARG;												;;
+		p)  pathname=$OPTARG;												;;
 		v)	verbose=true;													;;
 		h)	usage;															;;
 		\?)	die USAGE "Invalid option: ^B-$OPTARG^b.";						;;
@@ -37,23 +45,22 @@ done
 shift $((OPTIND-1))
 # ready to process non '-' prefixed arguments
 # /options }}}1
-MARK=' + --------------------------------------------------------------------'
 function write-file { #{{{1
 	cat <<-===
 		/* --------------------------------------------------------------------
-		 |  Lines in the following comment will be treated as \`make\` style 
-		 |    variable assignments ('=' or '+=').
+		 |  Lines in this comment which look like \`make\` style variable 
+		 |    assignments ('=' or '+=') will be treated as such.
 		 |  Quotes are neither needed nor supported.
 		 |  Variable expansion is NOT supported in assignments.
-		 |  Lines can be commented out by prefixing them with '#'.
+		 |  Lines that don't look like assignments will be ignored.
 		 |  The variable \$PACKAGES, if not empty, will be fed to \`pkg-config\`
 		 |    and LDFLAGS and CFLAGS will be appended with that output.
-		$MARK
+		 + --------------------------------------------------------------------
 		    PACKAGES =
 		    CFLAGS  += -std=c11
 		    CFLAGS  += -Weverything -fdiagnostics-show-option -fcolor-diagnostics
-		    # LDFLAGS  += $FROMPWD/my.o
-		$MARK */
+		    # LDLIBS   += $FROMPWD/obj/my.o
+		 + -------------------------------------------------------------------- */
 
 		#include <notify_usr.h> /* sparkle(),message(),inform(),caution(),die() */
 		
@@ -78,67 +85,21 @@ function write-file { #{{{1
 		// vim: nofoldenable
 	===
 } # }}}1
-function get-set-vars { # {{{1
-	local TAB='	' line key value
-
-	# skip to actual variable declarations
-	while IFS== read -r line; do
-		[[ $line == $MARK ]]&& break
-	done
-
-	# process variables
-	while IFS== read -r key value; do
-		[[ $key == $MARK* ]]&& break
-
-		key=${key##*([ $TAB])}
-		[[ $key == \#* ]]&& continue
-
-		if [[ $key == *+ ]]; then
-			key=${key%%*([ $TAB])+}
-			eval value="\${$key:+\"\$$key \"}\$value"
-		else
-			key=${key%%*([ $TAB])}
-		fi
-		eval $key=\$value
-
-		$verbose && notify "$key" "$value"
-		export $key
-	done
-	[[ -z ${PACKAGES:-} ]]|| {
-		pkg-config --exists $PACKAGES || return
-		CFLAGS=${CFLAGS:+"$CFLAGS "}$(pkg-config --cflags $PACKAGES)
-		LDFLAGS=${LDFLAGS:+"$LDFLAGS "}$(pkg-config --libs $PACKAGES)
-		export CFLAGS LDFLAGS
-	  }
-} # }}}1
 function edit-c-file { #{{{1
 	local F
 	shquote "$1" F
 	${X11TERM:-xterm} -e ksh -c "${VISUAL:-${EDITOR:-vi}} $F" >/dev/null 2>&1
-	rm -f $CFILE
+	mv $CFILE $HOLD
 } #}}}1
-function hh { # {{{1
-	hN '33;48;5;238' + + "$*"
-} # }}}1
-function show-header { # {{{1
-	# remove leading spaces using set and $*
-	hh "$prnTmpDir @ " $(date +'%H:%M on %A, %B %e')
-} # }}}1
+function hh { hN '33;48;5;238' + + "$*"; }
+function show-header { hh "$prnPathName @ " $(date +'%H:%M on %A, %B %e'); }
 function get-term-size { eval "$(/usr/X11R6/bin/resize)"; }
 function clear-screen { print -u2 '\033[H\033[2J\033[3J\033[H\c'; }
-function build-and-run { # {{{2
-	show-header
-	get-set-vars <$CFILE	|| return # die if pkg-config error
-	make "$EXE"				|| return
-
-	hh "running $EXE"
-	time ./"$EXE"
-	hh "$EXE completed // rc = $?"
-} # }}}2
 function main { #{{{1
-	local cksum_previous cksum_current CFILE EXE
-	EXE=test
+	local cksum_previous cksum_current CFILE EXE HOLD
+	EXE=$filename
 	CFILE=$EXE.c
+	HOLD=$(mktemp src-XXXXXX)
 	write-file >$CFILE
 	edit-c-file "$CFILE" &
 	cksum_previous=$(cksum "$CFILE")
@@ -146,22 +107,35 @@ function main { #{{{1
 		[[ -f $CFILE ]]|| break
 		cksum_current=$(cksum "$CFILE")
 		[[ $cksum_current == $cksum_previous ]]&& clear-screen
-		(build-and-run) # in a subshell so variables are "reset"
+		show-header
+		VERBOSE=$verbose build-and-run "$CFILE"
 		cksum_previous=$cksum_current
 	done
-	true
+	mv $HOLD $CFILE
 } #}}}1
 
-needs clearout hN h2 needs-cd shquote sparkle-path subst-pathvars watch-file
+needs build-and-run clearout hN needs-cd shquote sparkle-path subst-pathvars watch-file
 
 FROMPWD=$PWD
 
 trap get-term-size WINCH
 
-TmpDir=$(mktemp -d) || die 'Could not ^Tmktemp^t.'
-subst-pathvars "$TmpDir" prnTmpDir
-needs-cd -or-die "$TmpDir"
-trap 'clearout' EXIT
+[[ $filename == */* ]]&& {
+	[[ -n ${pathname:-} ]]&&
+		die 'Used flags ^T-p^t and ^T-n^t with an included path.'
+	pathname=${filename%/*}
+	filename=${filename#"$pathname/"}
+}
+
+if [[ -z ${pathname:-} ]]; then
+	TmpDir=$(mktemp -d) || die 'Could not ^Tmktemp^t.'
+	subst-pathvars "$TmpDir" prnPathName
+	needs-cd -or-die "$TmpDir"
+	trap 'clearout' EXIT
+else
+	subst-pathvars "$pathname" prnPathName
+	needs-cd -or-die "$pathname"
+fi
 show-header
 
 main; exit

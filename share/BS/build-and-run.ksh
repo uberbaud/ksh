@@ -68,10 +68,11 @@ function get-set-vars { # {{{1
 		else
 			key=${key%%*([ $TAB])}
 		fi
-		eval $key=\$value
+		gsub '"' '\"' "$value" value
+		eval value=\"$value\"
+		export $key="$value"
 
 		$showvar_fn "$key" "$value"
-		export $key
 	done
 	[[ -z ${PACKAGES:-} ]]|| {
 		pkg-config --exists $PACKAGES || return

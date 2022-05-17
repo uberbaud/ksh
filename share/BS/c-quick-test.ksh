@@ -46,20 +46,22 @@ shift $((OPTIND-1))
 # ready to process non '-' prefixed arguments
 # /options }}}1
 function write-file { #{{{1
+	local ldLibsPath=${FROMPWD:?}
+	[[ -d $ldLibsPath/obj ]]&& ldLibsPath=$ldLibsPath/obj
 	cat <<-===
 		/* --------------------------------------------------------------------
-		 |  Lines in this comment which look like \`make\` style variable 
-		 |    assignments ('=' or '+=') will be treated as such.
-		 |  Quotes are neither needed nor supported.
-		 |  Variable expansion is NOT supported in assignments.
-		 |  Lines that don't look like assignments will be ignored.
+		 |  Lines in this comment which look like assignments ('=' or '+=')
+		 |    will be treated as such. Other lines are ignored.
+		 |  Spaces around '=' or '+=' are not part of the key or value.
+		 |  Quote characters have no special meaning.
+		 |  Variable expansion in assignments uses shell style (via eval)
 		 |  The variable \$PACKAGES, if not empty, will be fed to \`pkg-config\`
 		 |    and LDFLAGS and CFLAGS will be appended with that output.
 		 + --------------------------------------------------------------------
 		    PACKAGES =
 		    CFLAGS  += -std=c11
 		    CFLAGS  += -Weverything -fdiagnostics-show-option -fcolor-diagnostics
-		    # LDLIBS   += $FROMPWD/obj/my.o
+		    # LDLIBS   += $ldLibsPath/my.o
 		 + -------------------------------------------------------------------- */
 
 		#include <notify_usr.h> /* sparkle(),message(),inform(),caution(),die() */

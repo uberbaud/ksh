@@ -86,9 +86,16 @@ function main { # {{{1
 	hh "make $EXE"
 	make "$EXE"				|| return
 
-	hh "running $EXE"
-	time ./"$EXE"
-	hh "$EXE completed // rc = $?"
+	[[ -f obj/$EXE ]]&& EXE=obj/$EXE
+	if [[ -x $EXE ]]; then
+		hh "running $EXE"
+		time ./"$EXE"
+		hh "$EXE completed // rc = $?"
+	elif [[ -a $EXE ]]; then
+		warn "Weirdly, ^B$EXE^b is not executable."
+	else
+		warn "^Tmake^t completed successfully, but cannot find ^B$EXE^b."
+	fi
 } # }}}1
 
 (($#))|| die 'Missing required argument ^Usrc^u.'

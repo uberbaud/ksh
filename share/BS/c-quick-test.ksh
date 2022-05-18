@@ -102,9 +102,12 @@ function main { #{{{1
 	EXE=$filename
 	CFILE=$EXE.c
 	HOLD=$(mktemp src-XXXXXX)
-	write-file >$CFILE
+	[[ -a $CFILE ]]|| write-file >$CFILE
 	edit-c-file "$CFILE" &
 	cksum_previous=$(cksum "$CFILE")
+	# nvim opening CFILE can trigger watch-file, so wait a moment to
+	# avoid a spurious run
+	sleep 0.1
 	while watch-file "$CFILE" 2>/dev/null; do
 		[[ -f $CFILE ]]|| break
 		cksum_current=$(cksum "$CFILE")
@@ -113,7 +116,7 @@ function main { #{{{1
 		VERBOSE=$verbose build-and-run "$CFILE"
 		cksum_previous=$cksum_current
 	done
-	mv $HOLD $CFILE
+	mv $HOLD $CFILE || die "Could not ^Tmv^t ^U$HOLD^u ^U$CFILE^u."
 } #}}}1
 
 needs build-and-run clearout hN needs-cd shquote sparkle-path subst-pathvars watch-file

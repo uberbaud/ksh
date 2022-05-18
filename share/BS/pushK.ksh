@@ -49,7 +49,11 @@ function GIT { # {{{1
 	h1 "$cmd"
 	git $cmd || die "${2:-^B$cmd^b}"
 } # }}}1
-function git-branch-name { git rev-parse --abbrev-ref HEAD 2>/dev/null; }
+function git-branch-name { # {{{1
+	git rev-parse --abbrev-ref HEAD 2>/dev/null && return
+	sparkle-path "$PWD"
+	die "$REPLY is not a ^Bgit^b repository."
+} # }}}1
 function commit-everything { # {{{1
 	local branch
 	branch=$1
@@ -70,7 +74,7 @@ function commit-everything { # {{{1
 
 (($#))&& die 'Unexpected arguments. Expected ^Bnone^b.'
 
-needs git h1 i-can-haz-inet needs-cd
+needs git h1 i-can-haz-inet needs-cd sparkle-path
 
 needs-cd -or-die "${KDOTDIR:?}"
 

@@ -49,18 +49,7 @@ function GIT { # {{{1
 	h1 "$cmd"
 	git $cmd || die "${2:-^B$cmd^b}"
 } # }}}1
-
-(($#))&& die 'Unexpected arguments. Expected ^Bnone^b.'
-
-needs git h1 i-can-haz-inet needs-cd
-
-i-can-haz-inet	|| die 'No internet' "$REPLY"
-needs-cd -or-die "${KDOTDIR:?}"
-
-branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
-[[ $branch == trunk ]]&& die 'On branch ^Etrunk^e!!!'
-
-function commit-everything {
+function commit-everything { # {{{1
 	local branch
 	branch=$1
 	h1 "Committing on <$branch>"
@@ -76,13 +65,28 @@ function commit-everything {
 	# check for uncommitted changes in the index
 	git diff-index --cached --quiet HEAD ||
 		GIT 2 commit -av	 msg "did not commit ^B$branch^b"
-}
+} # }}}1
 
-commit-everything $HOST
-GIT 1 checkout trunk --quiet
-GIT 1 merge $HOST --quiet
-commit-everything trunk
-GIT 1 push
-GIT 1 checkout $HOST --quiet
+(($#))&& die 'Unexpected arguments. Expected ^Bnone^b.'
+
+needs git h1 i-can-haz-inet needs-cd
+
+needs-cd -or-die "${KDOTDIR:?}"
+if [[ -z $(git status --short) ]]; then
+	notify 'Nothing to commit. Exiting.'
+	return
+else
+	i-can-haz-inet	|| die 'No internet' "$REPLY"
+
+	branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
+	[[ $branch == trunk ]]&& die 'On branch ^Etrunk^e!!!'
+
+	commit-everything $HOST
+	GIT 1 checkout trunk --quiet
+	GIT 1 merge $HOST --quiet
+	commit-everything trunk
+	GIT 1 push
+	GIT 1 checkout $HOST --quiet
+fi; exit
 
 # Copyright (C) 2017 by Tom Davis <tom@greyshirt.net>.

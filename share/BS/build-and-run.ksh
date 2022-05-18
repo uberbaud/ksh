@@ -87,7 +87,7 @@ function edit-c-file { #{{{1
 	local F
 	shquote "$1" F
 	${X11TERM:-xterm} -e ksh -c "${VISUAL:-${EDITOR:-vi}} $F" >/dev/null 2>&1
-	mv $CFILE $HOLD
+	pkill -HUP -lf " -i $UUID"
 } #}}}1
 function make+run { # {{{1
 	get-set-vars <$CFILE	|| return # die if pkg-config error
@@ -105,31 +105,27 @@ function make+run { # {{{1
 		warn "^Tmake^t completed successfully, but cannot find ^B$EXE^b."
 	fi
 } # }}}1
-function get-term-size { eval "$(/usr/X11R6/bin/resize)"; }
 function clear-screen { print -u2 '\033[H\033[2J\033[3J\033[H\c'; }
 function loop { #{{{1
-	local cksum_previous cksum_current HOLD
+	local cksum_previous cksum_current UUID
 
-	needs shquote subst-pathvars watch-file
-	trap get-term-size WINCH
+	needs pkill shquote subst-pathvars uuidgen watch-file
 
 	subst-pathvars "$PWD" prnPathName
 
-	HOLD=$(mktemp src-XXXXXX)
+	UUID=$(uuidgen) # so edit-c-file can signal ONLY THIS watch-file
 	edit-c-file "$CFILE" &
 	cksum_previous=unedited
-	# nvim opening CFILE can trigger watch-file, so wait a moment to
-	# avoid a spurious run
-	sleep 0.1
-	while watch-file "$CFILE" 2>/dev/null; do
+	hh "$prnPathName / $UUID"
+	while watch-file -i "$UUID" "$CFILE" 2>/dev/null; do
 		[[ -f $CFILE ]]|| break
 		cksum_current=$(cksum "$CFILE")
 		[[ $cksum_current == $cksum_previous ]]&& clear-screen
-		hh "$prnPathName @ " $(date +'%H:%M on %A, %B %e')
+		# date is outside quotes to eliminate extra spaces
+		hh "$prnPathName" / $(date +'%H:%M on %A, %B %e') / "$UUID"
 		(make+run) # use subshell, don't dirty the ENVIRONMENT
 		cksum_previous=$cksum_current
 	done
-	mv $HOLD $CFILE || die "Could not ^Tmv^t ^U$HOLD^u ^U$CFILE^u."
 } #}}}1
 
 (($#))|| die 'Missing required argument ^Usrc^u.'

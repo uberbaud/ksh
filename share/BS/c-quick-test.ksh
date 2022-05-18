@@ -87,39 +87,8 @@ function write-file { #{{{1
 		// vim: nofoldenable
 	===
 } # }}}1
-function edit-c-file { #{{{1
-	local F
-	shquote "$1" F
-	${X11TERM:-xterm} -e ksh -c "${VISUAL:-${EDITOR:-vi}} $F" >/dev/null 2>&1
-	mv $CFILE $HOLD
-} #}}}1
-function hh { hN '33;48;5;238' + + "$*"; }
-function show-header { hh "$prnPathName @ " $(date +'%H:%M on %A, %B %e'); }
-function get-term-size { eval "$(/usr/X11R6/bin/resize)"; }
-function clear-screen { print -u2 '\033[H\033[2J\033[3J\033[H\c'; }
-function main { #{{{1
-	local cksum_previous cksum_current CFILE EXE HOLD
-	EXE=$filename
-	CFILE=$EXE.c
-	HOLD=$(mktemp src-XXXXXX)
-	[[ -a $CFILE ]]|| write-file >$CFILE
-	edit-c-file "$CFILE" &
-	cksum_previous=$(cksum "$CFILE")
-	# nvim opening CFILE can trigger watch-file, so wait a moment to
-	# avoid a spurious run
-	sleep 0.1
-	while watch-file "$CFILE" 2>/dev/null; do
-		[[ -f $CFILE ]]|| break
-		cksum_current=$(cksum "$CFILE")
-		[[ $cksum_current == $cksum_previous ]]&& clear-screen
-		show-header
-		VERBOSE=$verbose build-and-run "$CFILE"
-		cksum_previous=$cksum_current
-	done
-	mv $HOLD $CFILE || die "Could not ^Tmv^t ^U$HOLD^u ^U$CFILE^u."
-} #}}}1
 
-needs build-and-run clearout hN needs-cd shquote sparkle-path subst-pathvars watch-file
+needs build-and-run clearout needs-cd
 
 FROMPWD=$PWD
 
@@ -133,16 +102,21 @@ trap get-term-size WINCH
 }
 
 if [[ -z ${pathname:-} ]]; then
-	TmpDir=$(mktemp -d) || die 'Could not ^Tmktemp^t.'
-	subst-pathvars "$TmpDir" prnPathName
-	needs-cd -or-die "$TmpDir"
+	pathname=$(mktemp -d) || die 'Could not ^Tmktemp^t.'
+	needs-cd -or-die "$pathname"
 	trap 'clearout' EXIT
 else
-	subst-pathvars "$pathname" prnPathName
 	needs-cd -or-die "$pathname"
 fi
-show-header
 
-main; exit
+filename=${filename%.c}.c
+
+[[ -a $filename ]]&& {
+	sparkle-path "$PWD/$filename"
+	die "$REPLY already exists." "See: ^Tbuild-and-run -e^t"
+  }
+
+write-file >$filename
+build-and-run -e "$filename"; exit
 
 # Copyright (C) 2022 by Tom Davis <tom@greyshirt.net>.

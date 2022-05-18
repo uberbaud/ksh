@@ -11,18 +11,20 @@ function usage {
 	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
-	^F{4}Usage^f: ^T$PGM^t ^Usrc^u
+	^F{4}Usage^f: ^T$PGM^t ^[^T-e^t^] ^Usrc^u
 	         Uses header information in C file to set build environment,
-	         runs ^Tmake^t ^O\${^o^Vsrc^v^O%^o^T.c^t^O}^o, and
-	         runs the resulting executable.
+	         runs ^Tmake^t ^O\${^o^Vsrc^v^O%^o^T.c^t^O}^o, and runs the resulting executable.
+	         ^T-e^t  Open an editor and do make+run on saves.
 	       ^T$PGM -h^t
 	         Show this help message.
 	===SPARKLE===
 	exit 0
 } # }}}
 # process -options {{{1
-while getopts ':h' Option; do
+MAIN=make+run
+while getopts ':eh' Option; do
 	case $Option in
+		e)	MAIN=loop;														;;
 		h)	usage;															;;
 		\?)	die USAGE "Invalid option: ^B-$OPTARG^b.";						;;
 		\:)	die USAGE "Option ^B-$OPTARG^b requires an argument.";			;;
@@ -81,7 +83,13 @@ function get-set-vars { # {{{1
 		export CFLAGS LDFLAGS
 	  }
 } # }}}1
-function main { # {{{1
+function edit-c-file { #{{{1
+	local F
+	shquote "$1" F
+	${X11TERM:-xterm} -e ksh -c "${VISUAL:-${EDITOR:-vi}} $F" >/dev/null 2>&1
+	mv $CFILE $HOLD
+} #}}}1
+function make+run { # {{{1
 	get-set-vars <$CFILE	|| return # die if pkg-config error
 	hh "make $EXE"
 	make "$EXE"				|| return
@@ -97,6 +105,32 @@ function main { # {{{1
 		warn "^Tmake^t completed successfully, but cannot find ^B$EXE^b."
 	fi
 } # }}}1
+function get-term-size { eval "$(/usr/X11R6/bin/resize)"; }
+function clear-screen { print -u2 '\033[H\033[2J\033[3J\033[H\c'; }
+function loop { #{{{1
+	local cksum_previous cksum_current HOLD
+
+	needs shquote subst-pathvars watch-file
+	trap get-term-size WINCH
+
+	subst-pathvars "$PWD" prnPathName
+
+	HOLD=$(mktemp src-XXXXXX)
+	edit-c-file "$CFILE" &
+	cksum_previous=unedited
+	# nvim opening CFILE can trigger watch-file, so wait a moment to
+	# avoid a spurious run
+	sleep 0.1
+	while watch-file "$CFILE" 2>/dev/null; do
+		[[ -f $CFILE ]]|| break
+		cksum_current=$(cksum "$CFILE")
+		[[ $cksum_current == $cksum_previous ]]&& clear-screen
+		hh "$prnPathName @ " $(date +'%H:%M on %A, %B %e')
+		(make+run) # use subshell, don't dirty the ENVIRONMENT
+		cksum_previous=$cksum_current
+	done
+	mv $HOLD $CFILE || die "Could not ^Tmv^t ^U$HOLD^u ^U$CFILE^u."
+} #}}}1
 
 (($#))|| die 'Missing required argument ^Usrc^u.'
 (($#==1))|| die 'Too many arguments. Expected only ^Usrc^u.'
@@ -122,6 +156,6 @@ filename=$1
 EXE=${filename%.c}
 CFILE=$EXE.c
 
-main; exit
+$MAIN; exit
 
 # Copyright (C) 2022 by Tom Davis <tom@greyshirt.net>.

@@ -49,6 +49,7 @@ function GIT { # {{{1
 	h1 "$cmd"
 	git $cmd || die "${2:-^B$cmd^b}"
 } # }}}1
+function git-branch-name { git rev-parse --abbrev-ref HEAD 2>/dev/null; }
 function commit-everything { # {{{1
 	local branch
 	branch=$1
@@ -72,14 +73,16 @@ function commit-everything { # {{{1
 needs git h1 i-can-haz-inet needs-cd
 
 needs-cd -or-die "${KDOTDIR:?}"
+
+branch=$(git-branch-name)
+[[ $branch == trunk ]]&& die 'On branch ^Etrunk^e!!!'
+[[ $branch != $HOST ]]&& die "On branch ^E$branch^e, not branch ^E$HOST^e!!!"
+
 if [[ -z $(git status --short) ]]; then
 	notify 'Nothing to commit. Exiting.'
 	return
 else
 	i-can-haz-inet	|| die 'No internet' "$REPLY"
-
-	branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
-	[[ $branch == trunk ]]&& die 'On branch ^Etrunk^e!!!'
 
 	commit-everything $HOST
 	GIT 1 checkout trunk --quiet

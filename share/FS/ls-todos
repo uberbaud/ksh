@@ -67,7 +67,7 @@ function ls-todos {
 			  }
 		done
 	  } | sparkle
-	unset REPLY
+	unset todo
 }
 
 

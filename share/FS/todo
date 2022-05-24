@@ -24,8 +24,11 @@ function todo {
 	# save the item in the prefered format
 	>>TODO (
 		date -u +'@ %Y-%m-%d %H:%M:%S Z'
-		printf '    %s\n' "${todo[@]}"
+		for t in "${todo[@]}"; do
+			print -r -- "    $t"
+		done
 	  )
+	unset todo # local doesn't seem to work on arrays
 
 	# VCMS CHECK-IN
 	if [[ -f RCS/TODO,v ]]; then

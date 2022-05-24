@@ -130,7 +130,6 @@ m-groups
 m-list-new
 m-msgcount
 m-save
-make-on-filechange
 man-sections
 markdown-to-html
 matching-commands
@@ -164,6 +163,7 @@ pkg
 pre-prompt
 predefined-aliases
 present
+press-any-key
 print
 prn-cmd
 pwd

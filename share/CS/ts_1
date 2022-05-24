@@ -1,0 +1,12 @@
+--help
+--version
+build-wasm
+dump-languages
+generate
+highlight
+init-config
+parse
+playground
+query
+tags
+test

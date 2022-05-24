@@ -19,10 +19,10 @@ function new-array {
 	for V; do
 		eval N="NEXT_${V}_ID"
 		eval "$N=0"
-		eval "function +$V { local I; for I { $V[$N++]=\"\$I\"; } }"
+		eval "function +$V { local I; for I { $V[$N++]=\$I; } }"
 		eval "function $V-reset { set -A $V --; $N=0; }"
-		eval "function $V-is-empty { ( set +o nounset; ((!\${#$V[*]})); ); }"
-		eval "function $V-not-empty { ( set +o nounset; ((\${#$V[*]})); ); }"
+		eval "function $V-is-empty { ! let \"\${$V[*]+1}\"; }"
+		eval "function $V-not-empty { let \"\${$V[*]+1}\"; }"
 		$V-reset
 	done
 }

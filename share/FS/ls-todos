@@ -15,14 +15,14 @@ function ls-todos {
 
 	# it is, so list it
 	: ${NL:?}
-	local Body Head Lines Sep ShowIt TODO H
+	local Sep ShowIt TODO todo
 	ShowIt=false
 	Sep="@ "
 	TODO=$(<TODO)
 	TODO=${TODO#$Sep}
 	splitstr "$NL$Sep" "$TODO" todo
 	: Pipe to sparkle; {
-		local ln first last s1 sF sN sL
+		local Body H Head N first last ln lndx s1 sB sF sL sN
 		if term-does-utf8; then
 			sB='━━'; s1='⊂'; sF='┌'; sN='│'; sL='└'
 		else

@@ -28,7 +28,7 @@ function usage {
 } # }}}
 # process -options {{{1
 verbose=false
-filename=test
+filename=
 pathname=
 while getopts ':n:p:vh' Option; do
 	case $Option in
@@ -50,6 +50,8 @@ function write-file { #{{{1
 	[[ -d $ldLibsPath/obj ]]&& ldLibsPath=$ldLibsPath/obj
 	cat <<-===
 		/* --------------------------------------------------------------------
+		 | $(mk-stemma-header)
+		 | --------------------------------------------------------------------
 		 |  Lines in this comment which look like assignments ('=' or '+=')
 		 |    will be treated as such. Other lines are ignored.
 		 |  Spaces around '=' or '+=' are not part of the key or value.
@@ -58,10 +60,12 @@ function write-file { #{{{1
 		 |  The variable \$PACKAGES, if not empty, will be fed to \`pkg-config\`
 		 |    and LDFLAGS and CFLAGS will be appended with that output.
 		 + --------------------------------------------------------------------
+		    # OBJPATH  = $ldLibsPath
+		    # OBJS     = my.o
+		    # ^equivalent to: LDLIBS   += \$OPATH/my.o
 		    PACKAGES =
 		    CFLAGS  += -std=c11
 		    CFLAGS  += -Weverything -fdiagnostics-show-option -fcolor-diagnostics
-		    # LDLIBS   += $ldLibsPath/my.o
 		 + -------------------------------------------------------------------- */
 
 		#include <notify_usr.h> /* sparkle(),message(),inform(),caution(),die() */
@@ -94,12 +98,16 @@ FROMPWD=$PWD
 
 trap get-term-size WINCH
 
-[[ $filename == */* ]]&& {
+if [[ -z ${filename:-} ]]; then
+	filename=test
+elif [[ $filename == */* ]]; then
 	[[ -n ${pathname:-} ]]&&
 		die 'Used flags ^T-p^t and ^T-n^t with an included path.'
 	pathname=${filename%/*}
 	filename=${filename#"$pathname/"}
-}
+else # -n with bare filename (no path)
+	pathname=$PWD
+fi
 
 if [[ -z ${pathname:-} ]]; then
 	pathname=$(mktemp -d) || die 'Could not ^Tmktemp^t.'

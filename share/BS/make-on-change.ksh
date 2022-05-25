@@ -22,44 +22,31 @@ function usage {
 	===SPARKLE===
 	exit 0
 } # }}}
-# process -options {{{1
-while getopts ':h' Option; do
-	case $Option in
-		h)	usage;															;;
-		\?)	die USAGE "Invalid option: ^B-$OPTARG^b.";						;;
-		\:)	die USAGE "Option ^B-$OPTARG^b requires an argument.";			;;
-		*)	bad-programmer "No getopts action defined for ^T-$Option^t.";	;;
-	esac
-done
-# remove already processed arguments
-shift $((OPTIND-1))
-# ready to process non '-' prefixed arguments
-# /options }}}1
-function CleanUp { # {{{1
-	builtin cd "${1:?}" || return
-	pwd
-	clearout
-} # }}}1
 function get-dependencies { # {{{1
-	local f D o
-	D=$TmpPath/DEPENDS
-	for f; do
-		[[ $f == *[$HSP]* ]]&& die "Filename contains spaces:" "^U$f^u."
-		[[ -a $f ]]|| die "^U$f^u does not exist."
-		[[ -f $f ]]|| die "^U$f^u is not a file."
-		[[ $f == *.c ]]|| continue
-		o=$TmpPath/${f%.[ch]}.o
-		mkdep -f $D $f
-		tr ' ' '\n' <$D |
-			sed -E -e '1,2d' -e '/\\/d' -e '/^$/d' -e '/\/usr\//d' >$o
-	done
-	rm $D
+	local obj src deps d dlist
+	h2 "updating dependency information"
+	# `mkdep` calls $CC, so lets do it directly like it does, but without
+	# creating a file.
+	# Without -r, `read` concats lines ending with a backslash ('\').
+	${CC:-clang} -M -w "$@" | while read obj src deps; do
+		[[ $src == *.h ]]&& continue
+		dlist=''
+		for d in $src $deps; do
+			[[ $d == /usr/* ]]|| dlist="$dlist $d"
+		done
+		[[ -n $dlist ]]&& print -r -- "${obj%:}$dlist"
+	done >$TmpFile
 } # }}}1
 function prn-dependent-oes { # {{{1
-	fgrep -l "$1" $TmpPath/* |
-		while IFS= read l; do
-			print -- "${l#"$TmpPath"/}"
-		done
+	local ofile deps
+	while IFS=' ' read -r ofile deps; do
+		[[ " $deps " == *" ${1:?} "* ]]&&
+			print -r -- "$ofile"
+	done <$TmpFile
+} # }}}1
+function watch-file-w-h2 { # {{{1
+	h2 "watching files $*" 1>&2
+	watch-file -v "$@"
 } # }}}1
 
 needs fgrep h2 mkdep watch-file
@@ -69,14 +56,15 @@ needs fgrep h2 mkdep watch-file
 	die "Could not find files matching ^O*^o^T.^t^O[^o^Tch^t^O]^o."
 HSP=' 	'
 
-TmpPath=$(mktemp -d) || die "Could not ^Tmktemp^t."
-trap "CleanUp ${TmpPath}" EXIT
+TmpFile=$(mktemp -t DEPENDS.XXXXXX) || die "Could not ^Tmktemp^t"
+trap "rm $TmpFile" EXIT
+h2 "Using $TmpFile"
 
 get-dependencies "$@"
 
-while f=$(watch-file -v "$@"); do
-	h2 "$f changed"
-	for o in ${f%.[ch]}.o $(prn-dependent-oes "$f"); do
+while f=$(watch-file-w-h2 "$@"); do
+	print -r -- "$f changed"
+	for o in $(prn-dependent-oes "$f"); do
 		h2 "making $o"
 		make "$o"
 	done

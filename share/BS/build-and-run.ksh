@@ -123,10 +123,14 @@ function loop { #{{{1
 		[[ $cksum_current == $cksum_previous ]]&& clear-screen
 		# date is outside quotes to eliminate extra spaces
 		hh "$prnPathName" / $(date +'%H:%M on %A, %B %e') / "$UUID"
-		(make+run) # use subshell, don't dirty the ENVIRONMENT
+		(make+run) # use subshell, don't dirty the ENVIRONMENT¹
 		cksum_previous=$cksum_current
 	done
 } #}}}1
+# ¹/ if we only ever use += and run it more than once we're adding
+#    everything twice or more. For example, 
+#    CFLAGS += -I.. run twice would yield CFLAGS='-I.. -I..', three
+#    times CFLAGS='-I.. -I.. -I..', etc.
 
 (($#))|| die 'Missing required argument ^Usrc^u.'
 (($#==1))|| die 'Too many arguments. Expected only ^Usrc^u.'

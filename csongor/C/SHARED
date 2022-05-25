@@ -1,4 +1,5 @@
 # files listed here will be linked from $KDOTDIR/share/C
+cargo_1
 chflags
 dwmc_1
 getent_1

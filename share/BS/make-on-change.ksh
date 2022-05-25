@@ -11,17 +11,28 @@ function usage {
 	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
-	^F{4}Usage^f: ^T$PGM^t 
-	         Watches several ^Ufiles^u and ^Tmakes^t things when one changes.
+	^F{4}Usage^f: ^T$PGM^t ^[^Usource files^u^]
+	         Gets ^Utarget^: dependency^u information for ^Usource files^u and ^Tmake^ts
+	             any targets when one of its watched dependencies changes.
 	         Defaults to watching ^O*^o^T.^t^O[^o^Tch^t^O]^o
-	         If the changed file is a ^O*^o^T.h^t file, ^Tgrep^ts all ^O*^o^T.c^t files
-	             for the included ^Bh^b file and makes the object for those.
-	         If it's a ^O*^o^T.c^t file, makes only the object fot that one.
 	       ^T$PGM -h^t
 	         Show this help message.
 	===SPARKLE===
 	exit 0
 } # }}}
+# process -options {{{1
+while getopts ':h' Option; do
+	case $Option in
+		h)	usage;															;;
+		\?)	die USAGE "Invalid option: ^B-$OPTARG^b.";						;;
+		\:)	die USAGE "Option ^B-$OPTARG^b requires an argument.";			;;
+		*)	bad-programmer "No getopts action defined for ^T-$Option^t.";	;;
+	esac
+done
+# remove already processed arguments
+shift $((OPTIND-1))
+# ready to process non '-' prefixed arguments
+# /options }}}1
 function get-dependencies { # {{{1
 	local obj src deps d dlist
 	h2 "updating dependency information"
@@ -49,7 +60,7 @@ function watch-file-w-h2 { # {{{1
 	watch-file -v "$@"
 } # }}}1
 
-needs fgrep h2 mkdep watch-file
+needs h2 ${CC:-clang} watch-file
 
 (($#))|| set -- *.[ch]
 [[ $1 == \*.\[ch\] ]]&&

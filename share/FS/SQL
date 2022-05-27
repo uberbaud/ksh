@@ -14,9 +14,11 @@
 
 needs sqlite3
 function SQL {
-	local sql response READY='\007\007\007' # three bells
-	local verbose=${SQL_VERBOSE:-${verbose:-false}}
-	local autodie=${SQL_AUTODIE:-true} autowarn=false
+	local sql response READY verbose autodie autowarn
+	READY='\007\007\007' # three bells
+	verbose=${SQL_VERBOSE:-${verbose:-false}}
+	autodie=${SQL_AUTODIE:-true}
+	autowarn=false
 	[[ $autodie == ?(true|false|warn) ]]|| {
 		warn '^BSQL_AUTODIE^b is set incorrectly (^O$^o^Vautodie^v).' \
 			 'Resetting ^BAUTODIE^b to ^Btrue^b.'
@@ -29,6 +31,7 @@ function SQL {
 	set -A sqlreply --
 	((${SQLFD[0]:-}))|| {
 		sqlite3 -noheader -batch -list -separator "$SQLSEP" 2>&1 |&
+		SQLPID=$%
 		nextfd || die 'No available file descriptor.'; SQLFD[0]="$REPLY"
 		eval "exec ${SQLFD[0]}<&p"
 		nextfd || die 'No available file descriptor.'; SQLFD[1]="$REPLY"
@@ -36,9 +39,10 @@ function SQL {
 		add-exit-action "print -u${SQLFD[1]} '.quit'"
 		# clear the SQLite3 init output
 		print -ru${SQLFD[1]} "SELECT '$READY';" ||
-			die 'Could not read from ^SSQLFD^s.'
+			die 'Could not print to ^SSQLFD^s.'
 		while :; do
-			read -ru${SQLFD[0]} response
+			read -ru${SQLFD[0]} response ||
+				die 'Could not read from ^SSQLFD^s.'
 			[[ $response == $READY ]]&& break
 		done
 	  }
@@ -48,7 +52,8 @@ function SQL {
 	print -ru${SQLFD[1]} -- "SELECT '$READY';"
 	integer i=0
 	while :; do
-		read -ru${SQLFD[0]} response
+		read -ru${SQLFD[0]} response ||
+			die 'Could not read from ^SSQLFD^s.'
 		[[ $response == $READY ]]&& break
 		sqlreply[i++]="$response"
 		$verbose && print -ru2 -- "$response"

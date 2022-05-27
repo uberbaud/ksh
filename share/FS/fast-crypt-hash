@@ -1,0 +1,22 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2022-05-26,03.25.05z/5d60c61>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Ufile^u
+#:   Wrap ^Tcksum -qa sha1b^t for memories sake.
+
+# SHA1 is the fastest on my system (amd64) of any of the cksum
+# algorithms, more than twice as fast as sha224 or sha256, and nearly
+# twice as fast as the 64 bit SHAs (384, 512/256, 512). But it's even
+# faster than md5, or the traditional cksum algorithm. It is also faster
+# than b3sum, which is faster than the others and a better choice for
+# crypt-hashes which will be used as file system names, or when security
+# is an issue.
+
+needs /bin/cksum
+function fast-crypt-hash {
+	(($#>1))&& die "Too many arguments"
+	[[ -f ${1:?} ]]|| die "^B$1^b is not a file"
+	/bin/cksum -qa sha1b "$1"
+}
+
+# Copyright © 2022 by Tom Davis <tom@greyshirt.net>.

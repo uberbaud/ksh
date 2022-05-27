@@ -6,7 +6,7 @@
 #:   Stores notes to ^B^O$^o^VPWD^v/NOTES^b and links in ^B^O$^o^VSYSDATA^v/notes^b.
 #:   ^GList notes with^g ^Tls-notes^t.
 
-needs xclip needs-path $BS/v.ksh
+needs xclip needs-path $BS/v.ksh fast-crypt-hash
 function note {(
 	local NOTES=$PWD/NOTES OLDPWD=$PWD setnoglob=false
 	local noterepo=${SYSDATA:?}/notes
@@ -26,7 +26,7 @@ function note {(
 		done
 	# just in case everyone is trying to create a new note in the same 
 	# directory!
-	local TMPFILE=$(mktemp note-XXXXXXXXX) tries=5 repolink SHA384
+	local TMPFILE=$(mktemp note-XXXXXXXXX) tries=5 repolink CRYPTHASH
 	while ((tries--)); do
 		((seqnum++))
 		seqnote=$seqnum.note
@@ -49,9 +49,9 @@ function note {(
 		repolink="${repolink%%,+([0-9])},$((tries++))"
 	done
 	(($#))|| {
-		SHA384=$(cksum -qa sha384b "$seqnote")
+		CRYPTHASH=$(fast-crypt-hash "$seqnote")
 		$BS/v.ksh $seqnote '.'
-		[[ $SHA384 == $(cksum -qa sha384b "$seqnote") ]]&& {
+		[[ $CRYPTHASH == $(fast-crypt-hash "$seqnote") ]]&& {
 			# no changes, so delete everything.
 			warn "Discarding empty note."
 			/bin/rm -f "$seqnote" "RCS/$seqnote,v" "$repolink"

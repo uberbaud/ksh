@@ -1,3 +1,4 @@
+#!/usr/local/bin/ksh93
 #!/bin/ksh
 # <@(#)tag:tw.csongor.greyshirt.net,2022-05-23,21.14.09z/2c44a1c>
 # vim: ft=ksh ts=4 tw=72 noexpandtab nowrap foldmethod=marker
@@ -33,49 +34,77 @@ done
 shift $((OPTIND-1))
 # ready to process non '-' prefixed arguments
 # /options }}}1
-function get-dependencies { # {{{1
-	local obj src deps d dlist
+function init-database { # {{{1
+	SQL_AUTODIE=warn
+	SQL 'CREATE TEMPORARY TABLE deps (src,obj);'
+	SQL 'CREATE TEMPORARY TABLE givens (src);'
+	notify "sqlite3 pid: $SQLPID"
+} # }}}1
+function check-files { # {{{1
+	for f in "$@"; do
+		[[ $f == *\'* ]]&& {
+			warn "The filename ^B$f^b contains a single quote and will be ignored."
+			continue
+	  	}
+		needs-file -or-warn "$f" || continue
+		SQL "INSERT INTO givens (src) VALUES ('$f');"
+	done
+} # }}}1
+function init-dependencies { # {{{1
+	local obj src deps d
 	h2 "updating dependency information"
 	# `mkdep` calls $CC, so lets do it directly like it does, but without
 	# creating a file.
 	# Without -r, `read` concats lines ending with a backslash ('\').
-	${CC:-clang} -M -w "$@" | while read obj src deps; do
+	SQL "SELECT DISTINCT src FROM givens WHERE src LIKE '%.c';"
+	${CC:-clang} -MM -w "${sqlreply[@]}" | while read obj src deps; do
 		[[ $src == *.h ]]&& continue
-		dlist=''
+		obj=${obj%:}
 		for d in $src $deps; do
-			[[ $d == /usr/* ]]|| dlist="$dlist $d"
+			SQL "INSERT INTO deps (src,obj) VALUES ('$d','$obj');"
 		done
-		[[ -n $dlist ]]&& print -r -- "${obj%:}$dlist"
-	done >$TmpFile
+	done
 } # }}}1
-function prn-dependent-oes { # {{{1
-	local ofile deps
-	while IFS=' ' read -r ofile deps; do
-		[[ " $deps " == *" ${1:?} "* ]]&&
-			print -r -- "$ofile"
-	done <$TmpFile
+function regenerate-dependencies { # {{{1
+	NOT-IMPLEMENTED
 } # }}}1
 function watch-file-w-h2 { # {{{1
+	SQL 'SELECT DISTINCT src FROM deps;' || {
+		print -ru1 -- 'SQLERROR'
+		return 0
+	  }
+	set -- "${sqlreply[@]}"
 	h2 "watching files $*" 1>&2
-	watch-file -v "$@"
+	watch-file -v "$@"; rc=$?
+	(($rc==130))&& { print -ru1 -- 'SIGINT'; rc=0; }
+	return $rc
 } # }}}1
 
-needs h2 ${CC:-clang} watch-file
+needs h2 ${CC:-clang} needs-file uuid85 watch-file
 
 (($#))|| set -- *.[ch]
 [[ $1 == \*.\[ch\] ]]&&
 	die "Could not find files matching ^O*^o^T.^t^O[^o^Tch^t^O]^o."
-HSP=' 	'
 
-TmpFile=$(mktemp -t DEPENDS.XXXXXX) || die "Could not ^Tmktemp^t"
-trap "rm $TmpFile" EXIT
-h2 "Using $TmpFile"
+add-exit-action 'stty sane'
+stty -echo -echoctl
 
-get-dependencies "$@"
+init-database
+check-files "$@"
+init-dependencies "$@"
 
-while f=$(watch-file-w-h2 "$@"); do
+# TODO: update deps without regenerating the whole thing.
+while f=$(watch-file-w-h2); do
+	[[ -z $f ]]&& break
+	[[ $f == SQLERROR ]]&& break
+	[[ $f == SIGINT ]]&& {
+		warn 'Use ^BCtrl+\^b to quit'
+		regenerate-dependencies
+		continue
+	  }
 	print -r -- "$f changed"
-	for o in $(prn-dependent-oes "$f"); do
+	SQL "SELECT DISTINCT obj FROM deps WHERE src = '$f';"
+	for o in "${sqlreply[@]}"; do
 		h2 "making $o"
 		make "$o"
 	done

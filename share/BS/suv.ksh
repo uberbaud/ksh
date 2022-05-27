@@ -6,6 +6,7 @@ set -o nounset;: ${FPATH:?Run from within KSH}
 ED=${VISUAL:-${EDITOR:?Neither VISUAL nor EDITOR is set}}
 set -A vopts --
 
+
 # Usage {{{1
 typeset -- this_pgm=${0##*/}
 desparkle "$this_pgm"
@@ -66,8 +67,101 @@ function mk-linked-rcs { # {{{1
 	ln -s "$rcs_path" "$link_to" ||
 		die "Could not ^Tln -s^t" "^U$rcs_path^u" "^U$link_to^u"
 } # }}}1
+function main { # {{{1
+	holdbase=$HOLD_PATH/$(uname -r)/sys-files
+
+	workingpath=$holdbase$filepath
+	[[ -d $workingpath/RCS ]]||
+		mk-linked-rcs "$filepath" "$workingpath"
+
+	needs-cd "$workingpath"
+
+	workfile=${filename##*/}
+	rcsFile=RCS/$workfile,v
+	[[ -a $workfile ]]&& {
+		[[ -f $workfile ]]||
+			die "working file (^B$workfile^b) exits in"	\
+				"^B$workingpath^b"							\
+				"but is not a file."
+	  }
+
+	[[ -f $workfile ]]&& {
+		[[ -f $rcsFile ]]||
+			ci -q -u -i -t"-Existing hold/sys-file" ./"$workfile"
+		co -q -l ./"$workfile" || die "^Tco^t error."
+	}
+	PREF=''
+	if [[ -f $filename ]]; then
+		fowner=$(stat -f'%Su' "$filename")
+		fgroup=$(stat -f'%Sg' "$filename")
+		fperm=$(stat -f'%#Lp' "$filename")
+		touch ./"$workfile"
+		[[ -r $filename ]]|| PREF=as-root
+		if [[ -s $filename ]]; then
+			$PREF cat $filename >$workfile
+		else
+			echo >$workfile
+		fi
+		CRYPTHASH=$($CKSUM ./"$workfile")
+		[[ -f $rcsFile ]]&& {
+			set -A errMsg "System file and archived file have diverged."
+			[[ $warnOrDie == die ]]&&
+				errMsg[1]="Do an RCS ^Tci^t and rerun, or"
+			rcsdiff -q ./"$workfile" || warnOrDie "${errMsg[@]}"
+			unset errMsg
+		  }
+	else
+		CRYPTHASH=''
+		fowner=root
+		fgroup=wheel
+		fperm=0644
+		echo >$workfile
+	fi
+
+	[[ -f $rcsFile ]]|| {
+		# check in an existing copy so we don't lose that
+		ci -q -u -i -t"-$CI_INITIAL_DESCRIPTION" ./"$workfile"
+		# but then check it out so we can actually edit it
+		co -l ./"$workfile"
+	  }
+
+	$ED ./"$workfile"
+	trackfile ./"$workfile" # track the copy in case weirdness ensues below
+	if [[ -f $rcsFile ]]; then
+		# previously checked in
+		rcsdiff -q ./"$workfile" ||
+			ci -q -u -j ${1:+-m"$*"} ./"$workfile"
+	else
+		ci -q -u -i -t"-${*:-$CI_INITIAL_DESCRIPTION}" ./"$workfile"
+	fi
+	[[ -n $CRYPTHASH ]]&& {
+		[[ $CRYPTHASH == $($CKSUM ./"$workfile") ]]&& {
+			notify 'There were no changes made.' 'Exiting.'
+			exit 0
+		  }
+		[[ $CRYPTHASH != $($PREF $CKSUM "$filename") ]]&& {
+			warn "^B$filenameD^b has changed since reading."
+			desparkle "$workingpath/$workfile"
+			yes-or-no Continue ||
+				die "You must manually copy"	\
+					"  ^B$REPLY^b"				\
+					"to"						\
+					"  ^B$filenameD^b"
+		  }
+	  }
+	if [[ -w $filename ]]; then
+		cat ./"$workfile" >"$filename"
+	else
+		set -- -p -F -o "$fowner" -g "$fgroup" -m $fperm -S
+		as-root install "$@" ./"$workfile" "$filename"
+	fi
+} # }}}1
 
 (($#))|| die 'Missing required argument ^Ufile^u.'
+
+CKSUM=$(which b3sum) || CKSUM="$(which cksum) -qa sha384b" ||
+	die 'Could not find ^Tb3sum^t or ^Tcksum^t.'
+
 needs as-root ci co desparkle get-exclusive-lock $ED needs-cd needs-path	\
 	release-exclusive-lock warnOrDie
 
@@ -112,95 +206,6 @@ HOLD_PATH=$HOME/hold
 RCS_BASE=$HOLD_PATH/common-rcs/sys-files
 needs-path -or-die "$RCS_BASE"
 
-function main {
-	holdbase=$HOLD_PATH/$(uname -r)/sys-files
-
-	workingpath=$holdbase$filepath
-	[[ -d $workingpath/RCS ]]||
-		mk-linked-rcs "$filepath" "$workingpath"
-
-	needs-cd "$workingpath"
-
-	workfile=${filename##*/}
-	rcsFile=RCS/$workfile,v
-	[[ -a $workfile ]]&& {
-		[[ -f $workfile ]]||
-			die "working file (^B$workfile^b) exits in"	\
-				"^B$workingpath^b"							\
-				"but is not a file."
-	  }
-
-	[[ -f $workfile ]]&& {
-		[[ -f $rcsFile ]]||
-			ci -q -u -i -t"-Existing hold/sys-file" ./"$workfile"
-		co -q -l ./"$workfile" || die "^Tco^t error."
-	}
-	PREF=''
-	if [[ -f $filename ]]; then
-		fowner=$(stat -f'%Su' "$filename")
-		fgroup=$(stat -f'%Sg' "$filename")
-		fperm=$(stat -f'%#Lp' "$filename")
-		touch ./"$workfile"
-		[[ -r $filename ]]|| PREF=as-root
-		if [[ -s $filename ]]; then
-			$PREF cat $filename >$workfile
-		else
-			echo >$workfile
-		fi
-		SHA384=$(cksum -qa sha384b ./"$workfile")
-		[[ -f $rcsFile ]]&& {
-			set -A errMsg "System file and archived file have diverged."
-			[[ $warnOrDie == die ]]&&
-				errMsg[1]="Do an RCS ^Tci^t and rerun, or"
-			rcsdiff -q ./"$workfile" || warnOrDie "${errMsg[@]}"
-			unset errMsg
-		  }
-	else
-		SHA384=''
-		fowner=root
-		fgroup=wheel
-		fperm=0644
-		echo >$workfile
-	fi
-
-	[[ -f $rcsFile ]]|| {
-		# check in an existing copy so we don't lose that
-		ci -q -u -i -t"-$CI_INITIAL_DESCRIPTION" ./"$workfile"
-		# but then check it out so we can actually edit it
-		co -l ./"$workfile"
-	  }
-
-	$ED ./"$workfile"
-	trackfile ./"$workfile" # track the copy in case weirdness ensues below
-	if [[ -f $rcsFile ]]; then
-		# previously checked in
-		rcsdiff -q ./"$workfile" ||
-			ci -q -u -j ${1:+-m"$*"} ./"$workfile"
-	else
-		ci -q -u -i -t"-${*:-$CI_INITIAL_DESCRIPTION}" ./"$workfile"
-	fi
-	[[ -n $SHA384 ]]&& {
-		[[ $SHA384 == $(cksum -qa sha384b ./"$workfile") ]]&& {
-			notify 'There were no changes made.' 'Exiting.'
-			exit 0
-		  }
-		[[ $SHA384 != $($PREF cksum -qa sha384b "$filename") ]]&& {
-			warn "^B$filenameD^b has changed since reading."
-			desparkle "$workingpath/$workfile"
-			yes-or-no Continue ||
-				die "You must manually copy"	\
-					"  ^B$REPLY^b"				\
-					"to"						\
-					"  ^B$filenameD^b"
-		  }
-	  }
-	if [[ -w $filename ]]; then
-		cat ./"$workfile" >"$filename"
-	else
-		set -- -p -F -o "$fowner" -g "$fgroup" -m $fperm -S
-		as-root install "$@" ./"$workfile" "$filename"
-	fi
-}
 
 (main "$@"); release-exclusive-lock "$lockfile" "$LOCKBASE"; exit
 

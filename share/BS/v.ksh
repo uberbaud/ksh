@@ -94,7 +94,7 @@ function verify-file-is-editable { # {{{1
 #       [[ -n $(rlog -L -l bobslunch.rem) ]]		
 
 needs $ED ci co file-is-valid-utf8 get-exclusive-lock needs-cd needs-path	\
-	rcsdiff release-exclusive-lock trackfile warnOrDie
+	rcsdiff release-exclusive-lock trackfile warnOrDie fast-crypt-hash
 
 (($#))|| exec "$ED" # We don't have a file, so short circut all the rest.
 
@@ -123,11 +123,6 @@ needs-cd -or-die "$f_path"
 # BUT then the vim process would not have a command including the path, 
 # which we can use for finding the X11 window, SO, let's use $f_fullpath
 
-# SHA1 is the fastest on my system (amd64) of any of the cksum
-# algorithms, more than twice as fast as sha224 or sha256, and nearly
-# twice as fast as the 64 bit SHAs (384, 512/256, 512). But it's even
-# faster than md5, or the traditional cksum algorithm.
-
 function do-vcms-checkout { warn "^T$0^t is not implemented."; }
 function do-vcms-checkin  { warn "^T$0^t is not implemented."; }
 
@@ -147,11 +142,11 @@ function main {
 	  }
 	# ------->8---------------->8-------------->8---------------->8-------
 
-	CKSUM_BEFORE=$(cksum -qa sha1b "$f_fullpath")
+	CKSUM_BEFORE=$(fast-crypt-hash "$f_fullpath")
 
 	$ED "$f_fullpath"
 
-	CKSUM_AFTER=$(cksum -qa sha1b "$f_fullpath")
+	CKSUM_AFTER=$(fast-crypt-hash "$f_fullpath")
 	[[ $CKSUM_BEFORE != $CKSUM_AFTER ]]&& {
 		trackfile "$f_fullpath"
 		[[ -f .LAST_UPDATED ]]&& date -u +"$ISO_DATE" >.LAST_UPDATED

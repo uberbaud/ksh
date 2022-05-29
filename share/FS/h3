@@ -1,0 +1,12 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2022-05-29,04.38.02z/34bab85>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Umsg_word1^u ^[^Umsg_word…N^u^]
+#:   Prints a tertiary level banner with given text.
+
+needs hN
+function h3 {
+	hN '48;5;238;33' + + "$@"
+}
+
+# Copyright © 2022 by Tom Davis <tom@greyshirt.net>.

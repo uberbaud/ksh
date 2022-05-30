@@ -5,14 +5,9 @@
 #:   Saves the named function as a file to the first path in ^O$^o^VFPATH^v.
 
 function fsave {
-	local fName fText P NL='
-'
+	local fName fText P tsp='    ' TAB='	'
 	fName=${1:?Missing required function name}; shift
-	fText=$(typeset -f $fName|sed -E -e 's/ $//') ||
-		die 'No such function'
-	fText=${fText%"$NL}"*}
-	fText=${fText#*"{$NL"}
-	fText=${fText##+( )}
+	fText=$(typeset -f $fName) || die 'No such function'
 	# if we want to rename it.
 	[[ ${1:?Missing required function description} == [Aa][Ss] ]]&& {
 		fName=${2:?Missing required new function name}
@@ -21,6 +16,20 @@ function fsave {
 	: ${1:-Missing required function description}
 	P=${FPATH:-.}; P=${P%%:*}
 	[[ $P == */$HOST/F ]]&& P=${P%/"$HOST"/F}/share/FS
+
+	# reformat 8sp-tabs -> 4sp-tabs, remove trailing SP
+	fText=${fText#*"{$NL"}	# remove function prefix
+	fText=${fText%"$NL}"*}	# remove function suffix
+	fText=$(print -r -- "$fText" | expand | while IFS= read -r ln; do
+			T=''
+			while [[ $ln == $tsp* ]]; do
+				ln=${ln#"$tsp"}
+				T="$T$TAB"
+			done
+			print -r -- "$T${ln% }"
+		done
+	  )
+	fText=${fText##"$TAB"}	# remove initial TAB because TEMPLATE has one
 	FBODY=$fText new -t ksh -x function $P/$fName "$*"
 }
 

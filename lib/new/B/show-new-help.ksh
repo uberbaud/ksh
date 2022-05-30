@@ -7,8 +7,9 @@ pager=${PAGER:-less}
 
 [[ -n ${1:-} ]]|| die 'Missing required parameter ^Ufile^u.'
 
-needs cat $pager sparkle tput
+needs cat $pager sparkle tput use-app-paths
 
+use-app-paths new
 : ${APP_PATH:?}
 
 HELP_PATH=$APP_PATH/help

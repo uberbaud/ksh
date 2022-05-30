@@ -1,0 +1,17 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2022-05-30,18.29.53z/3f7b17>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Ufunction name^u
+#:   Tests whether ^Ufunction name^u is loaded, or merely in ^VFPATH^v.
+
+function is-function-loaded {
+    typeset fndef fnunset
+    fndef=$(typeset +fp "${1:?}")
+    [[ -n $fndef ]] || die "No such function ^B$1^b."
+
+    fndef=${fndef% }
+    fnunset="$1()"
+    [[ $fndef != $fnunset ]]
+}
+
+# Copyright © 2022 by Tom Davis <tom@greyshirt.net>.

@@ -46,21 +46,23 @@ shift $((OPTIND-1))
 # ready to process non '-' prefixed arguments
 # /options }}}1
 function write-file { #{{{1
-	local ldLibsPath=${FROMPWD:?}
-	[[ -d $ldLibsPath/obj ]]&& ldLibsPath=$ldLibsPath/obj
+	subst-pathvars $CURDIR CURDIR
+	subst-pathvars $OBJDIR OBJDIR
 	cat <<-===
 		/* --------------------------------------------------------------------
 		 | $(mk-stemma-header)
 		 | --------------------------------------------------------------------
 		 |  Lines in this comment which look like assignments ('=' or '+=')
 		 |    will be treated as such. Other lines are ignored.
-		 |  Spaces around '=' or '+=' are not part of the key or value.
+		 |  Spaces around '=' or '+=' are also ignored.
 		 |  Quote characters have no special meaning.
 		 |  Variable expansion in assignments uses shell style (via eval)
 		 |  The variable \$PACKAGES, if not empty, will be fed to \`pkg-config\`
-		 |    and LDFLAGS and CFLAGS will be appended with that output.
+		 |    and \$LDFLAGS and \$CFLAGS will be appended with that output.
+		 |  Files named in \$OBJS and found in \$OPATH will be added to \$LDLIBS
 		 + --------------------------------------------------------------------
-		    # OBJPATH  = $ldLibsPath
+		    # SRCPATH  = ${CURDIR:-}
+		    # OBJPATH  = ${OBJDIR:-}
 		    # OBJS     = my.o
 		    # ^equivalent to: LDLIBS   += \$OPATH/my.o
 		    PACKAGES =
@@ -92,11 +94,7 @@ function write-file { #{{{1
 	===
 } # }}}1
 
-needs build-and-run clearout needs-cd
-
-FROMPWD=$PWD
-
-trap get-term-size WINCH
+needs build-and-run clearout needs-cd use-app-paths
 
 if [[ -z ${filename:-} ]]; then
 	filename=test
@@ -109,6 +107,7 @@ else # -n with bare filename (no path)
 	pathname=$PWD
 fi
 
+ORIGINAL_PWD=$PWD
 if [[ -z ${pathname:-} ]]; then
 	pathname=$(mktemp -d) || die 'Could not ^Tmktemp^t.'
 	needs-cd -or-die "$pathname"
@@ -118,11 +117,14 @@ else
 fi
 
 filename=${filename%.c}.c
-
 [[ -a $filename ]]&& {
 	sparkle-path "$PWD/$filename"
 	die "$REPLY already exists." "See: ^Tbuild-and-run -e^t"
   }
+
+use-app-paths build-tools
+needs build-paths
+build-paths "$ORIGINAL_PWD"
 
 write-file >$filename
 build-and-run -e "$filename"; exit

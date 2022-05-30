@@ -24,6 +24,7 @@ export JDK_PATH=/usr/local/jdk-1.8.0/bin
 export TCLLIBPATH=$xdgdata/tcl
 export RLWRAP_HOME=$xdgcfg/rlwrap
 export ROFFTOOLS_PATH=/usr/local/heirloom-doctools/bin
+export PKG_CONFIG_PATH=$xdgcfg/pkgconfig
 
 # default apps
 export BROWSER="$(<$xdgcfg/etc/browser)"

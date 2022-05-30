@@ -1,0 +1,30 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2022-05-30,02.57.41z/356c2c0>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^[^Upath^u^]
+#:   Use ^Tmake^t to get variables ^V.CURDIR^v and ^V.OBJDIR^v.
+#:   Sets shell variables ^VCURDIR^v and ^VOBJDIR^v.
+
+needs SQL needs-cd
+function build-paths {
+	local r k sqlreply
+	[[ -n ${1:-} ]]&& needs-cd -or-die "$1"
+
+	SQL "CREATE TEMPORARY TABLE kv (key,value);"
+	integer i=0
+	make -p ${1:+-C "$1"} | while IFS== read key val; do
+		key=${key%%+( )}
+		[[ $key == .@(CUR|OBJ)DIR ]] || continue
+		SQL "INSERT INTO kv (key,value) VALUES ('${key#.}','${val##+( )}');"
+		((++i==2)) && break
+	done
+
+	SQL 'SELECT key, value FROM kv;'
+	for r in "${sqlreply[@]}"; do
+		k=${r%%$SQLSEP*}
+		eval $k="\${r#\"$k$SQLSEP\"}"
+	done
+}
+
+
+# Copyright © 2022 by Tom Davis <tom@greyshirt.net>.

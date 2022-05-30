@@ -1,0 +1,21 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2022-05-30,17.54.47z/5ed14a4>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Ufunc name^u
+#:   Searches ^VFPATH^v for ^O$^o^V1^v and if it finds it, sources it.
+
+needs path warnOrDie
+function load-function {
+	local found=false warnOrDie=${warnOrDie:-die} FORCE_MSG
+    for P in $(path "$FPATH"); do
+	[[ -f $P/${1:?} ]] || continue
+		. $P/$1
+		found=true
+		break
+    done
+	$found && return
+	FORCE_MSG='Set ^VwarnOrDie^v^O=^o^Twarn^t to not die here.'
+	warnOrDie "Could not find definition of ^B$1^b in ^O\$^o^VFPATH^v."
+}
+
+# Copyright © 2022 by Tom Davis <tom@greyshirt.net>.

@@ -98,6 +98,7 @@ git-remote-links
 gsub
 h1
 h2
+h3
 hN
 hash
 hex
@@ -161,6 +162,7 @@ pc
 permies
 pipedit
 pkg
+play
 pre-prompt
 predefined-aliases
 present

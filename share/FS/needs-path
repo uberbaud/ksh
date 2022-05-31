@@ -1,7 +1,7 @@
 # <@(#)tag:tw.csongor.greyshirt.net,2021-10-19,16.44.57z/ebcd74>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^[^T-or-warn^t^|^T-or-die^t^] ^[^T-no-create^t^] ^[^T-with-notice^t^] ^Udir name^u
+#: FUNCTION ^[^T-or-warn^t^|^T-or-die^t^] ^[^T-no-create^t^|^T-with-notice^t^] ^Udir name^u
 #:   ^Tmkdir^t if necessary unless ^T-no-create^t, possibly warn or die, optionally
 #:   notifying if it is created.
 

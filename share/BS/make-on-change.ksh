@@ -37,45 +37,37 @@ function init-database { # {{{1
 	SQL_AUTODIE=warn
 	SQL 'CREATE TEMPORARY TABLE deps (src,obj);'
 	SQL 'CREATE TEMPORARY TABLE givens (src);'
+	SQL 'CREATE TEMPORARY TABLE targets (obj);'
 	notify "sqlite3 pid: $SQLPID"
 } # }}}1
 function check-files { # {{{1
 	for f in "$@"; do
-		[[ $f == *\'* ]]&& {
-			warn "The filename ^B$f^b contains a single quote and will be ignored."
-			continue
-	  	}
 		needs-file -or-warn "$f" || continue
-		SQL "INSERT INTO givens (src) VALUES ('$f');"
+		SQLify f
+		SQL "INSERT INTO givens (src) VALUES ($f);"
 	done
 } # }}}1
 function init-dependencies { # {{{1
 	local obj src deps d
 	h2 "updating dependency information"
-	# `mkdep` calls $CC, so lets do it directly like it does, but without
-	# creating a file.
 	# Without -r, `read` concats lines ending with a backslash ('\').
 	SQL "SELECT DISTINCT src FROM givens WHERE src LIKE '%.c';"
 	${CC:-clang} -MM -w "${sqlreply[@]}" | while read obj src deps; do
-		[[ $src == *.h ]]&& continue
+		[[ $src != *.c ]]&& continue
 		obj=${obj%:}
+		SQLify obj
 		for d in $src $deps; do
-			SQL "INSERT INTO deps (src,obj) VALUES ('$d','$obj');"
+			SQLify d
+			SQL "INSERT INTO deps (src,obj) VALUES ($d,$obj);"
 		done
 	done
+	SQL 'INSERT INTO temp.targets (obj) SELECT DISTINCT obj FROM temp.deps;'
 } # }}}1
-function regenerate-dependencies { # {{{1
-	NOT-IMPLEMENTED
-} # }}}1
-function make-dependencies-for { # {{{1
-	local src obj
-	src=${1:?}
-	print -r -- "$src changed"
-	SQL "SELECT DISTINCT obj FROM deps WHERE src = '$src';"
-	for obj in "${sqlreply[@]}"; do
-		h2 "making $obj"
-		make "$obj"
-	done
+function do-make { # {{{1
+	[[ ${1:?} != SIG* ]]&&
+		notify "^B$1^b changed"
+	SQL "SELECT obj FROM temp.targets;"
+	make "${sqlreply[@]}"
 } # }}}1
 function signum-to-name { # {{{1
 	local signame rc=${1:?}
@@ -117,20 +109,20 @@ function signum-to-name { # {{{1
 	return $rc
 } # }}}1
 function watch-file-w-h2 { # {{{1
-	SQL 'SELECT DISTINCT src FROM deps;' || { print 'SQLERROR'; return 0 }
+	SQL 'SELECT DISTINCT src FROM deps;' || { print 'SQLERROR'; return 0; }
 	set -- "${sqlreply[@]}"
 	h2 "watching files $*" 1>&2
 	watch-file -v "$@"
 	S=$(signum-to-name $?); rc=$?
-	[[ -n $S ]]&& print -ru1 "SIG$signame"
+	[[ -n $S ]]&& print -ru1 "SIG$S"
 	return $rc
 } # }}}1
 
 needs h2 ${CC:-clang} needs-file uuid85 watch-file
 
-(($#))|| set -- *.[ch]
-[[ $1 == \*.\[ch\] ]]&&
-	die "Could not find files matching ^O*^o^T.^t^O[^o^Tch^t^O]^o."
+(($#))|| set -- *.c
+[[ $1 == \*.c ]]&&
+	die "Could not find ^BC^b source code files (^O*^o^T.c^t)."
 
 #     I'd like to use Ctrl+C (interupt) to force a regeneration of the
 #  dependencies tables, but the Korn Shell (at least pdKSH), keeps
@@ -152,14 +144,10 @@ init-dependencies "$@"
 # TODO: update deps without regenerating the whole thing.
 while f=$(watch-file-w-h2); do
 	[[ -z $f ]]&& break
-	[[ $f == SIGINFO ]]&& {
-		warn 'Use ^BCtrl+\^b to quit'
-		regenerate-dependencies
-		continue
-	  }
-	[[ $f == SQLERROR || $f == SIG* ]]&& { print $f; break; }
+	[[ -f $f || $f == SIGINFO ]]|| { print "$f"; break; }
 
-	make-dependencies-for "$f"
+	[[ $f == SIGINFO ]]&& warn 'Use ^BCtrl+\^b to quit'
+	do-make "$f"
 
 done; exit
 

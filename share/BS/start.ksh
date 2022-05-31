@@ -53,13 +53,13 @@ function setup-app-framework { # {{{1
 
 	/home/tw/config/ksh/share/BS/start:init.ksh "$1"
 } # }}}1
-function mktempdir { # {{{1
-	local d
-	d=$(date +'%Y%m%d') ||
-		die 'Could not ^Tdate^t'
-	t=$(mktemp -qd ~/public/tmp/"${appUser:?}-$d-XXXXXX") ||
-		die 'Could not ^Tmktemp^t'
+function mk-cache-dir { # {{{1
+	local d t rc REPLY
+	t=$(mkdir -p $dPublic/app-cache/${appUser:?})
+	rc=$?
 	sparkle-path "$t"
+	((rc))&& die UNAVAILABLE "Could not ^Tmkdir^t $REPLY"
+
 	notify "Moving files to: $REPLY."
 	print -r -- "$t"
 } # }}}1
@@ -70,8 +70,8 @@ function publicify-files { # {{{1
 	for a; do
 		# if it's a file but not in the public directory
 		if [[ -a $a && $(readlink -fn "$a" 2>/dev/null) != $dPublic/* ]]; then
-			f=${t:="$(mktempdir)"}/${a##*/}
-			cp "$a" "$f" || die "Could not ^Tcp^t ^B$a^b."
+			f=${t:="$(mk-cache-dir)"}/${a##*/}
+			cp "$a" "$f" || die UNAVAILABLE "Could not ^Tcp^t ^B$a^b."
 			o[i++]=$f
 		else
 			o[i++]=$a
@@ -91,13 +91,14 @@ if [[ $shortcall != $shortbin ]]; then
 elif [[ ${1-} == +(-)h?(elp) ]]; then
 	usage
 else
-	(($#))|| die 'Missing required parameter ^Uapp-name^u.'
+	(($#))|| die USAGE 'Missing required parameter ^Uapp-name^u.'
 	appUser=$1
 	shift
 fi
 
 app-framework-exists "$appUser" ||
-	setup-app-framework "$appUser" || die "Cannot run ^T$REPLY^t."
+	setup-app-framework "$appUser" ||
+	die UNAVAILABLE "Cannot run ^T$REPLY^t."
 
 xauth list $DISPLAY		>/home/apps/xauth-add
 print -r -- "$DISPLAY"	>/home/apps/display

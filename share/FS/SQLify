@@ -1,10 +1,9 @@
 # <@(#)tag:csongor.greyshirt.net,2017-11-05:tw/21.36.42z/558310c>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^Uvarname^u …
-#:   Single quote the value of a variable, or if it is empty set it
-#:     to NULL.
-#:   Cannot ^TSQLify^t variables named ^Sn^s, ^So^s, ^Sp^s, or ^St^s.
+#: FUNCTION ^Uvarname^u ^S…^s
+#:   Single quote the value of variables ^Uvarname^u, or set empty variables
+#:     to ^TNULL^t.
 
 function SQLifyOne {
 	eval "set -- '$1' '' \"\$$1\""

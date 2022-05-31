@@ -94,7 +94,7 @@ function write-file { #{{{1
 	===
 } # }}}1
 
-needs build-and-run clearout needs-cd use-app-paths
+needs add-exit-action build-and-run clearout needs-cd use-app-paths
 
 if [[ -z ${filename:-} ]]; then
 	filename=test
@@ -111,7 +111,7 @@ ORIGINAL_PWD=$PWD
 if [[ -z ${pathname:-} ]]; then
 	pathname=$(mktemp -d) || die 'Could not ^Tmktemp^t.'
 	needs-cd -or-die "$pathname"
-	trap 'clearout' EXIT
+	add-exit-action 'clearout'
 else
 	needs-cd -or-die "$pathname"
 fi

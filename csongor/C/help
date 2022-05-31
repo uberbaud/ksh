@@ -109,6 +109,7 @@ i-can-haz-inet
 in-ancestor-path
 integer
 is-exclusive-lock-valid
+is-function-loaded
 is-known-host
 jobs
 kill
@@ -116,6 +117,7 @@ let
 libtw
 list-known-hosts
 list-path-vars
+load-function
 local
 localize-shared
 log

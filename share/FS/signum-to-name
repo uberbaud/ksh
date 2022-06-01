@@ -1,0 +1,48 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2022-06-01,16.18.33z/4b87a4b>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Usigrc^u
+#:   Subtracts 128 from ^Usigrc^u and prints its name without the ^BSIG^b prefix.
+#:   Returns ^T0^t if ^Usigrc^u is a valid signal return, or ^Usigrc^u otherwise.
+
+function signum-to-name {
+	local signame rc=${1:?}
+	case $rc in
+		129) signame=HUP;		rc=0;	;;
+		130) signame=INT;		rc=0;	;;
+		131) signame=QUIT;		rc=0;	;;
+		132) signame=ILL;		rc=0;	;;
+		133) signame=TRAP;		rc=0;	;;
+		134) signame=ABRT;		rc=0;	;;
+		135) signame=EMT;		rc=0;	;;
+		136) signame=FPE;		rc=0;	;;
+		137) signame=KILL;		rc=0;	;;
+		138) signame=BUS;		rc=0;	;;
+		139) signame=SEGV;		rc=0;	;;
+		140) signame=SYS;		rc=0;	;;
+		141) signame=PIPE;		rc=0;	;;
+		142) signame=ALRM;		rc=0;	;;
+		143) signame=TERM;		rc=0;	;;
+		144) signame=URG;		rc=0;	;;
+		145) signame=STOP;		rc=0;	;;
+		146) signame=TSTP;		rc=0;	;;
+		147) signame=CONT;		rc=0;	;;
+		148) signame=CHLD;		rc=0;	;;
+		149) signame=TTIN;		rc=0;	;;
+		150) signame=TTOU;		rc=0;	;;
+		151) signame=IO;		rc=0;	;;
+		152) signame=XCPU;		rc=0;	;;
+		153) signame=XFSZ;		rc=0;	;;
+		154) signame=VTALRM;	rc=0;	;;
+		155) signame=PROF;		rc=0;	;;
+		156) signame=WINCH;		rc=0;	;;
+		157) signame=INFO;		rc=0;	;;
+		158) signame=USR1;		rc=0;	;;
+		159) signame=USR2;		rc=0;	;;
+		160) signame=THR;		rc=0;	;;
+	esac
+	[[ -n ${signame:-} ]]&& print -r -- $signame
+	return $rc
+}
+
+# Copyright © 2022 by Tom Davis <tom@greyshirt.net>.

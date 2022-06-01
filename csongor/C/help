@@ -199,6 +199,7 @@ shell-tips
 shift
 showvar
 shquote
+signum-to-name
 sparkle
 sparkle-path
 splitstr

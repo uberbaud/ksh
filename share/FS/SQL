@@ -31,12 +31,12 @@ function SQL {
 	set -A sqlreply --
 	((${SQLFD[0]:-}))|| {
 		sqlite3 -noheader -batch -list -separator "$SQLSEP" 2>&1 |&
-		SQLPID=$%
+		SQLPID=$!
 		nextfd || die 'No available file descriptor.'; SQLFD[0]="$REPLY"
 		eval "exec ${SQLFD[0]}<&p"
 		nextfd || die 'No available file descriptor.'; SQLFD[1]="$REPLY"
 		eval "exec ${SQLFD[1]}>&p"
-		add-exit-action "print -u${SQLFD[1]} '.quit'"
+		add-exit-action "(trap '' PIPE; print -u${SQLFD[1]} '.quit')"
 		# clear the SQLite3 init output
 		print -ru${SQLFD[1]} "SELECT '$READY';" ||
 			die 'Could not print to ^SSQLFD^s.'

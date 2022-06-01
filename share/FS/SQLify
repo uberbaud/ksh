@@ -6,6 +6,10 @@
 #:     to ^TNULL^t.
 
 function SQLifyOne {
+	[[ ${1:?} == [A-Za-z_]*([A-Za-z0-9_]) ]]|| {
+		warn "^V$1^v is not a valid variable name."
+		return 1
+	  }
 	eval "set -- '$1' '' \"\$$1\""
 	[[ -z $3 ]]&& { eval $1=NULL; return; }
 	while [[ $3 == *\'* ]]; do

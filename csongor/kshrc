@@ -84,7 +84,6 @@ for i in $(grep '\.' $KU/C/ssh); do
 	alias "$i=ssh $i"
 done
 alias i-can-haz-inet='i-can-haz-inet;E=$?;print -r -- "  $REPLY";(return $E)&&:'
-alias sam-vnc='vncviewer -x11cursor -noraiseonbeep sam.lan'
 for s in $(getent shells); do
 	[[ $s == $SHELL ]]&& continue
 	alias ${s##*/}="reshell $s"

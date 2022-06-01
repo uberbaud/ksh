@@ -1,0 +1,18 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2022-06-01,01.08.43z/254a619>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^G(no arguments)^g
+#:   Connect to sam.lan's Virtual Network Computing server.
+
+needs readkeys vncviewer
+function sam-vnc {
+	local mnukey=Insert
+	warn "Use ^B$mnukey^b key to activate VNC menu." \
+		 "Press any key to continue."
+	# `readkeys` sends header, `read` reads it and exits, `readkeys` sends
+	# key info on keypress, but there's no reader so it dies on SIGPIPE
+	readkeys|read
+	vncviewer -MenuKey=$mnukey -FullScreen sam.lan
+}
+
+# Copyright © 2022 by Tom Davis <tom@greyshirt.net>.

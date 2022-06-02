@@ -5,7 +5,7 @@
 #:   Check ^O$^o^VK^v, ^O$^o^VB^v, ^O$^o^VF^v, and ^O$^o^VHOST^v variants for ^Ucmd_name^u
 
 function cmd-in-use {(
-	local cmd eopts f link alt
+	local cmd eopts f link alt IFS
 	: ${NL:?} ${TAB:?} "${1:?Missing required parameter _cmd_name_}"
 	IFS=$NL
 	# pop cmd from args.

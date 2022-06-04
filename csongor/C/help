@@ -179,6 +179,7 @@ read
 readonly
 realbin
 recode-to-ogg-vorbis
+relative-to-pwd
 release-exclusive-lock
 reshell
 resolve-alias

@@ -102,7 +102,7 @@ function present {
 	if [[ -z ${1:-} ]]; then
 		PresPath=$PWD
 	else
-		PresPath=$(readlink -fn "$1")
+		PresPath=$(realpath "$1")
 		desparkle "$1"
 		[[ -n $PresPath ]]||
 			die "^B$REPLY^b does not resolve to a file system object."

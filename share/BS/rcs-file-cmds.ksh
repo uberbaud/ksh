@@ -50,7 +50,7 @@ function get-source-files { # {{{1
 	typeset -i i=0
 	while (($#>1)); do
 		needs-file -or-warn "$1" || ((s_errs++))
-		sources[i++]=$(readlink -fn "$1")
+		sources[i++]=$(realpath "$1")
 		shift
 	done
 	((s_errs!=1))&& ess=s
@@ -61,20 +61,20 @@ function get-destinations { # {{{1
 	local realpath
 	if [[ -d $1 ]]; then
 		# given destination is a directory
-		realpath=$(readlink -fn "$1")/
+		realpath=$(realpath "$1")/
 	elif [[ -f $1 ]]; then
 		# given destination is an existing file
-		realpath=$(readlink -fn "$1")
+		realpath=$(realpath "$1")
 	elif [[ $1 == */* ]]; then
 		# given destination does not exist,
 		# but could be a file with a path
-		realpath=$(readlink -fn "${1%/*}")/${1##*/} ||
+		realpath=$(realpath "${1%/*}")/${1##*/} ||
 			err-path "${1%/*}" "Destination directory %% does not exist."
 	else
 		# given destination doesn't exist
 		# but would have to be a file in the current directory,
-		# we use readlink for consistency
-		realpath=$(readlink -fn "$PWD")/$1
+		# we use realpath for consistency
+		realpath=$(realpath "$PWD")/$1
 	fi
 	DPATH=${realpath%/*}
 	DFILE=${realpath##*/}

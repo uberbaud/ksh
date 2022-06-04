@@ -19,7 +19,7 @@ function trackfile {
 		return 0
 	  }
 
-	T=$(readlink -nf "$1")
+	T=$(realpath "$1")
 	[[ -n $T ]]|| { warn 'File disappeared!'; return 1; }
 
 	[[ $T == /tmp/* ]]&&										istemp=true

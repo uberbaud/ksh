@@ -7,7 +7,7 @@
 #:     ^T-f^t  Force even if it's not recognized shell.
 #:     ^T-n^t  Don't set or export ^SENV^s.
 
-needs getent readlink /usr/bin/env
+needs getent realpath /usr/bin/env
 function reshell {
 	local k keepvars s setenvs v x force=false doenv=true useenv ENV
 	set -A keepvars	FCEDIT HOME TERM USER		\
@@ -32,7 +32,7 @@ function reshell {
 	(($#))|| die 'Missing required argument ^Bshell^b'
 	desparkle "$1"; sD=$REPLY
 	if $force; then
-		s=$(readlink -fn "$1")
+		s=$(realpath "$1")
 		[[ -n $s ]]|| die "^B$sD^b does not exist."
 		[[ -f $s ]]|| die "^B$sD^b is not a file."
 		[[ -x $s ]]|| die "^B$sD^b is not executable."
@@ -46,7 +46,7 @@ function reshell {
 	$doenv && {
 		ENV=${useenv:-"${XDG_CONFIG_HOME:-$HOME/config}/${s##*/}/env"}
 		[[ -f $ENV ]]&& {
-			ENV=$(readlink -fn $ENV)
+			ENV=$(realpath $ENV)
 			if [[ -f $ENV ]]; then
 				keepvars[${#keepvars[*]}]=ENV
 			else

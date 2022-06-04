@@ -100,8 +100,8 @@ needs $ED ci co file-is-valid-utf8 get-exclusive-lock needs-cd needs-path	\
 
 
 [[ -a $1 ]]|| die "No such file ^B$1^b."
-f_fullpath=$(readlink -fn -- "$1" 2>/dev/null) ||
-	die "Could not ^Treadlink^t ^B$1^b."
+f_fullpath=$(realpath -q -- "$1") ||
+	die "Could not ^Trealpath^t ^B$1^b."
 shift
 
 verify-file-is-editable "$f_fullpath"
@@ -112,7 +112,7 @@ hasmsg=false
 rcsmsg=''
 (($#))&& { hasmsg=true; rcsmsg=$*; }
 
-# because we've `readlink`ed the arg, it's guaranteed to have at least 
+# because we've `realpath`ed the arg, it's guaranteed to have at least 
 # one (1) forward slash ('/') as (and at) the root.
 f_path=${f_fullpath%/*}
 f_name=${f_fullpath##*/}

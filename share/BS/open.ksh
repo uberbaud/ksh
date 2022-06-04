@@ -59,7 +59,7 @@ function get-handler-for-filetype { # {{{1
 function exec-handler { # {{{1
 	local handler=$1 arg=$2
 	[[ $handler == *%f ]]&& {
-		arg=$(readlink -nf $arg)
+		arg=$(realpath $arg)
 		gsub %f %s "$handler"
 		handler=$REPLY
 	  }
@@ -78,7 +78,7 @@ function open-one-file { # {{{1
 		is_remote=true
 		file=$1
 	else
-		file=$(readlink -nf "$1" 2>/dev/null)
+		file=$(realpath -q "$1")
 		desparkle "$file"
 		[[ -n $file ]]|| { warn "^B$REPLY^b: No such path."; return 1; }
 		[[ -a $file ]]|| { warn "^B$REPLY^b: No such file."; return 1; }

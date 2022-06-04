@@ -8,7 +8,7 @@
 function in-ancestor-path {
 	local chkpath
 	: ${1:?Missing required parameter: lookingFor}
-	chkpath=$(readlink -nf "${2:-$PWD}")
+	chkpath=$(realpath "${2:-$PWD}")
 	while [[ -n $chkpath ]]; do
 		[[ -e $chkpath/$1 ]]&& return 0
 		chkpath=${chkpath%/*}

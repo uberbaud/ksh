@@ -8,7 +8,7 @@ initialURL="file://$XDG_DOCUMENTS_DIR/presentations/uberbaud-logo.html"
 Title='uberbaud-presentation' # <title>...</title> in html file
 Display1='eDP-1'
 
-PGMBIN=$(readlink -fn "$0")
+PGMBIN=$(realpath "$0")
 PGMDIR=${PGMBIN%/*}
 desparkle "$PGMDIR"
 dPGMDIR=$REPLY

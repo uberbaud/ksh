@@ -1,0 +1,26 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2022-06-03,01.26.44z/5f16b3d>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Upath^u
+#:   Given a ^Upath^u, print the relative version (relative to ^O$^o^VPWD^v).
+
+needs realpath
+function relative-to-pwd {
+	local p abs diff common=/ backtrack IFS=/
+	: ${1:?}
+	[[ -a "$1" ]]|| die "No such file or path."
+	abs=$(realpath -- "$1" 2>&1)
+	diff=${PWD#/}
+	for p in ${abs#/}; do
+		[[ $diff/ == $p/* ]]|| break
+		diff=${diff##"$p"?(/)}
+		common=$common$p/
+	done
+	for p in $diff; do
+		backtrack=../$backtrack
+	done
+	p=${backtrack%/}${abs#"${common%/}"}
+	print -r -- "${p%/}"
+}
+
+# Copyright © 2022 by Tom Davis <tom@greyshirt.net>.

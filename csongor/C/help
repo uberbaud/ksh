@@ -3,6 +3,7 @@ S
 SQL
 SQLify
 [
+_p
 add-exit-action
 alias
 amuse:create-cmd-wrappers

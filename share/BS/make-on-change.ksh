@@ -35,16 +35,33 @@ shift $((OPTIND-1))
 # /options }}}1
 function init-database { # {{{1
 	SQL_AUTODIE=warn
+	SQL 'CREATE TEMPORARY TABLE files (name,ext,type);'
+
 	SQL 'CREATE TEMPORARY TABLE deps (src,obj);'
 	SQL 'CREATE TEMPORARY TABLE givens (src);'
 	SQL 'CREATE TEMPORARY TABLE targets (obj);'
 	notify "sqlite3 pid: $SQLPID"
 } # }}}1
 function check-files { # {{{1
+	local f o c ext
 	for f in "$@"; do
 		needs-file -or-warn "$f" || continue
-		SQLify f
+		ext=${f##*.}
+		SQLify f ext
 		SQL "INSERT INTO givens (src) VALUES ($f);"
+		SQL "INSERT INTO files (name,ext,type) VALUES ($f,$ext,'G');"
+	done
+	SQL "SELECT name FROM files WHERE name LIKE '%.o';"
+	for o in "${sqlreply[@]}"; do
+		c=${o%.o}.c
+		if [[ -f $c ]]; then
+			SQLify c
+			SQL "INSERT INTO files (name,ext,type) VALUES ($c,'c','C');"
+		elif [[ -f ${p:+"$p"/}../$f ]]; then
+			f=$(realpath -q -- "${p:+"$p"/}../$f")
+			f=$(relative-to-pwd "$f")
+		else
+		fi
 	done
 } # }}}1
 function init-dependencies { # {{{1

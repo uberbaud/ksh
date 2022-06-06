@@ -9,7 +9,7 @@ function relative-to-pwd {
 	local p abs diff common=/ backtrack IFS=/
 	: ${1:?}
 	[[ -a "$1" ]]|| die "No such file or path."
-	abs=$(realpath -- "$1" 2>&1)
+	abs=$(realpath -- "$1" 2>&1) || die "$abs"
 	diff=${PWD#/}
 	for p in ${abs#/}; do
 		[[ $diff/ == $p/* ]]|| break

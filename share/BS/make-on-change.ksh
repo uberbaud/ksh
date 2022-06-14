@@ -60,7 +60,6 @@ function check-files { # {{{1
 		elif [[ -f ${p:+"$p"/}../$f ]]; then
 			f=$(realpath -q -- "${p:+"$p"/}../$f")
 			f=$(relative-to-pwd "$f")
-		else
 		fi
 	done
 } # }}}1

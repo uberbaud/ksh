@@ -19,7 +19,7 @@ function reshell {
 					LD_LIBRARY_PATH NLSPATH
 	while getopts ':e:fn' Opt; do
 		case $Opt in
-			e)	useenv=$OPTARG;									;;
+			e)	useenv=$OPTARG;										;;
 			f)	force=true;											;;
 			n)	doenv=false;										;;
 			\?)	die "Invalid option: ^B-$OPTARG^b.";				;;
@@ -55,11 +55,12 @@ function reshell {
 		  }
 	  }
 
-	set -A setenvs -- SHELL=$s
+	set -A setenvs -- SHELL=$s PATH=$(getconf PATH)
+	integer i=${#setenvs[*]}
 	for k in "${keepvars[@]}"; do
 		eval v=\$$k
 		[[ -n $v ]]|| continue
-		setenvs[${#setenvs[*]}]="$k=\$$k"
+		setenvs[i++]="$k=\$$k"
 	done
 
 	COLUMNS=$(tput cols)
@@ -69,6 +70,7 @@ function reshell {
 	eval "/usr/bin/env -i ${setenvs[*]} \"\$s\" -l \"\$@\""
 
 	# when we're done, let the user know
+	set -A setenvs -- SHELL=$s
 	printf "\e[1;43;37m%${COLUMNS}s\r = %s =\e[0m\n" '' "$SHELL" # banner
 	$HOST-colors
 }

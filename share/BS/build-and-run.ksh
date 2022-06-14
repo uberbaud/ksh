@@ -83,10 +83,25 @@ function get-set-vars { # {{{1
 	  }
 } # }}}1
 function edit-c-file { #{{{1
-	local F
+	local E F T Cmd2 c2f
 	shquote "$1" F
-	${X11TERM:-xterm} -e ksh -c "${VISUAL:-${EDITOR:-vi}} $F" >/dev/null 2>&1
-	pkill -HUP -lf " -i $UUID"
+	E=${VISUAL:-${EDITOR:-vi}}
+	[[ -e RCS/$F,v ]]&& {
+		co -l -q "$F"
+		T=$(mktemp)
+		c2f=$KDOTDIR/share/BS/cat-to-file.ksh
+		[[ -x $c2f ]]&&
+			Cmd2="rcsdiff '$F'; rlwrap -s 0 $c2f -p 'ci> ' '$T'"
+	  }
+
+	${X11TERM:-xterm} -e ksh -c "$E $F${Cmd2:+; $Cmd2}" >/dev/null 2>&1
+	pkill -HUP -lf -- "^watch-file -i $UUID"
+	# For some reason, ci before kill makes kill not work
+	[[ -e RCS/$F,v ]]&& {
+		local rcsmsg='build-and-run'
+		[[ -f $T ]]&& { rcsmsg=$(<$T); rm "$T"; }
+		ci -u -q -m"$rcsmsg" "$F"
+	  }
 } #}}}1
 function make+run { # {{{1
 	get-set-vars <$CFILE	|| return # die if pkg-config error
@@ -134,7 +149,7 @@ function loop { #{{{1
 (($#))|| die 'Missing required argument ^Usrc^u.'
 (($#==1))|| die 'Too many arguments. Expected only ^Usrc^u.'
 
-needs h3 needs-cd
+needs h3 needs-cd rlwrap
 
 # HANDLE VERBOSITY
 typeset -l verbose=${VERBOSE:-false}

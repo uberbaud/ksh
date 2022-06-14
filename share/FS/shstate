@@ -1,0 +1,17 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2022-06-13,16.13.36z/14d73d1>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^G(no arguments)^g
+#:   Show history for /etc/profile and kshrc reading.
+
+function shstate {
+	local pids p
+	set -A pids -- $SHSTATE
+	integer i=${#pids[*]}
+	while ((i--)); do
+		p=${pids[i]%:*}
+		print -r -- "$i. $p"
+	done
+}
+
+# Copyright © 2022 by Tom Davis <tom@greyshirt.net>.

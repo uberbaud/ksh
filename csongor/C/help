@@ -66,6 +66,7 @@ f-halt
 f-help
 f-host
 f-locate
+f-luarocks
 f-m-done
 f-m-get
 f-r
@@ -201,6 +202,7 @@ shell-tips
 shift
 showvar
 shquote
+shstate
 signum-to-name
 sparkle
 sparkle-path

@@ -65,7 +65,7 @@ function write-file { #{{{1
 		    # OBJPATH  = ${OBJDIR:-}
 		    # OBJS     = my.o
 		    # ^equivalent to: LDLIBS   += \$OPATH/my.o
-		    PACKAGES =
+		    PACKAGES = notify_usr
 		    CFLAGS  += -std=c11
 		    CFLAGS  += -Weverything -fdiagnostics-show-option -fcolor-diagnostics
 		 + -------------------------------------------------------------------- */

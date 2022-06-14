@@ -11,8 +11,6 @@ export IAM=tw:tom
 HOLD_SYSBASE=~/hold/$(uname -r)
 [[ -d $HOLD_SYSBASE ]]|| mkdir -p $HOLD_SYSBASE
 # paths
-export CPATH=$xdgdata/c/api
-export LDFLAGS="-L$xdgdata/c/lib -ltw"
 export PERL_CPANM_HOME=$xdgdata/cpanm
 #export PERLBREW_ROOT=$xdgdata/perlbrew
 #export PERLBREW_HOME=$xdgcache/perlbrew
@@ -90,7 +88,9 @@ for s in $(getent shells); do
 done
 unset s
 VISED=/usr/local/bin/vis
-[[ -x $VISED ]]&& alias vised="VISUAL=\"$VISED\" v" || unset VISED
+#[[ -x ${KDOTDIR:-}/share/BS/v.ksh ]]&&
+#	VISUAL=$KDOTDIR/share/BS/v.ksh
+
 
 LOGPS1='\n'\
 '%:KSH:% \D{%Y.%m.%d.%H.%M.%S.%z} \w\n'\

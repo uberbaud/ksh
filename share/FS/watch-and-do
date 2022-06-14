@@ -1,0 +1,27 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2022-06-13,17.39.12z/4b38cf7>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Ucmd^u ^[^Uwatch-file flags^u^] ^Ufile1^u ^[^Ufile2^u ^S[…^s ^UfileN^u^]^]
+#:     Watches a set of ^Ufile^us and then ^Teval^ts ^Ucmd^u with the 
+#:     final parameter the name of the changed file.
+#:   ^G----8<--------8<----^g
+#:     ^Vcmd^v^O=$^o^V1^v^; ^Tshift^t
+#:     while ^Vchanged^v^O=$(^U^owatch-file ^T-v^t ^"^O$^o^V@^v^"^O^u)^o^; do
+#:         eval ^"^U^O$^o^Vcmd^v ^\^T"^t^\^T$^t^Vchanged^v^\^T"^t^u^" ^O||^o break
+#:     done
+#:   ^G---->8-------->8----^g
+#:   ^GSee^g ^Twatch-file -h^t ^Gfor more information.^g
+
+function watch-and-do {
+	local cmd changed
+	# command
+	(($#))|| die 'Missing required parameter ^Ucmd^u.'
+	cmd=$1
+	shift
+	(($#))|| die 'Missing ^Uwatch list^u.'
+	while changed=$(watch-file -v "$@"); do
+		eval "$cmd \"\$changed\"" || break
+	done
+}
+
+# Copyright © 2022 by Tom Davis <tom@greyshirt.net>.

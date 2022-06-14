@@ -3,6 +3,10 @@
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
 
 set -o nounset;: ${FPATH:?Run from KSH}
+
+BIN=$(realpath -q "$0")
+[[ $VISUAL == $BIN ]]&& unset VISUAL
+[[ $EDITOR == $BIN ]]&& unset EDITOR
 ED=${VISUAL:-${EDITOR:?Neither VISUAL nor EDITOR is set.}}
 
 [[ -n $LOCALBIN ]] || die '^S$LOCALBIN^s is not set.'

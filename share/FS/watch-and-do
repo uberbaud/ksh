@@ -5,8 +5,8 @@
 #:     Watches a set of ^Ufile^us and then ^Teval^ts ^Ucmd^u with the 
 #:     final parameter the name of the changed file.
 #:   ^G----8<--------8<----^g
-#:     ^Vcmd^v^O=$^o^V1^v^; ^Tshift^t
-#:     while ^Vchanged^v^O=$(^U^owatch-file ^T-v^t ^"^O$^o^V@^v^"^O^u)^o^; do
+#:     ^Vcmd^v^O=$^o^V1^v^; ^Tshift^t^; set -A ^VwatchList^v -- ^"^O$^o^V@^v^"
+#:     while ^Vchanged^v^O=$(^U^owatch-file ^T-v^t ^"^O${^o^VwatchList^v^[^O@^o^]^O}^o^"^O^u)^o^; do
 #:         eval ^"^U^O$^o^Vcmd^v ^\^T"^t^\^T$^t^Vchanged^v^\^T"^t^u^" ^O||^o break
 #:     done
 #:   ^G---->8-------->8----^g
@@ -19,7 +19,9 @@ function watch-and-do {
 	cmd=$1
 	shift
 	(($#))|| die 'Missing ^Uwatch list^u.'
-	while changed=$(watch-file -v "$@"); do
+	set -A watchList -- "$@"
+	while changed=$(watch-file -v "${watchList[@]}"); do
+		h3 "$cmd \"$changed\""
 		eval "$cmd \"\$changed\"" || break
 	done
 }

@@ -100,7 +100,7 @@ function edit-c-file { #{{{1
 	[[ -e RCS/$F,v ]]&& {
 		local rcsmsg='build-and-run'
 		[[ -f $T ]]&& { rcsmsg=$(<$T); rm "$T"; }
-		ci -u -q -m"$rcsmsg" "$F"
+		ci -u -q -m"${rcsmsg:-'~'}" "$F"
 	  }
 } #}}}1
 function make+run { # {{{1

@@ -2,10 +2,6 @@
 # ksh local profile
 # vim: ts=4 ft=ksh
 
-DBUS_BIN=/usr/local/bin/dbus-launch
-[[ -x $DBUS_BIN && -z ${DBUS_SESSION_BUS_ADDRESS:-} ]]&&
-	eval "$($DBUS_BIN --sh-syntax --exit-with-session)"
-
 export IAM=tw:tom
 # special
 HOLD_SYSBASE=~/hold/$(uname -r)
@@ -127,5 +123,7 @@ export PS4=\
 '${0##*/}'\
 "$ps4b $E[\$(($PS4W-\${#LINENO}))G \$LINENO "\
 "$ps4c"
+
+#[[ -o login ]]&& PS1='[$$]\$ '
 
 true

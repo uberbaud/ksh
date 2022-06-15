@@ -12,7 +12,7 @@ s=''
 export SHSTATE=${SHSTATE:+$SHSTATE\ }$$${s:+:$s}
 unset s
 
-RC_HAS_RUN=true
+# ${RC_HAS_RUN:-false} && return
 # we are NOT sourcing /etc/ksh.kshrc because it does way too much stuff we 
 # don't need. But these come from there.
 export SHORTPATH=${SHORTPATH:-$(getconf PATH)}
@@ -302,4 +302,5 @@ alias prn="/usr/bin/printf '  \e[35m｢\e[39m%s\e[35m｣\e[39m\n'"
 	. $KCOMPLETE/completions.ksh
   }
 
+export RC_HAS_RUN=true
 # fin

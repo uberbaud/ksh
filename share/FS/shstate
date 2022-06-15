@@ -18,7 +18,6 @@ function shstate {
 			print -r -- "  $p $cmd"
 			p=${psout%% *}
 		done
-		#print -r -- '  ---'
 	done
 }
 

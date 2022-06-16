@@ -105,9 +105,9 @@ fi
 export HISTCONTROL=ignoredups:ignorespace
 export HISTFILE=$fhist
 export HISTSIZE=8191
-CFLAGS='-std=c11 -Weverything -fdiagnostics-show-option -fcolor-diagnostics'
-export CFLAGS
 export LOCALBIN=$xdgdata/bin
+# C
+export CFLAGS='-Weverything -fdiagnostics-show-option -fcolor-diagnostics'
 # LUA 5.1
 export LUA_PATH='/usr/local/share/lua/5.1/?.lua;./?.lua;/usr/local/share/lua/5.1/?/init.lua;/usr/local/lib/lua/5.1/?.lua;/usr/local/lib/lua/5.1/?/init.lua;/home/tw/local/luarocks/share/lua/5.1/?.lua;/home/tw/local/luarocks/share/lua/5.1/?/init.lua'
 export LUA_CPATH='./?.so;/usr/local/lib/lua/5.1/?.so;/usr/local/lib/lua/5.1/loadall.so;/home/tw/local/luarocks/lib/lua/5.1/?.so'

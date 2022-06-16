@@ -45,7 +45,7 @@ function note {(
 	repolink="$noterepo/$(date -u +'%Y-%m-%dz')-${OLDPWD##*/}-$seqnum"
 	tries=0
 	while ! ln -s "$PWD/$seqnote" "$repolink" 2>/dev/null; do
-		[[ $(readlink "$repolink") == $PWD/$seqnote ]]&& break
+		[[ $(readpath "$repolink") == $PWD/$seqnote ]]&& break
 		repolink="${repolink%%,+([0-9])},$((tries++))"
 	done
 	(($#))|| {

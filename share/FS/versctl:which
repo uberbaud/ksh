@@ -6,7 +6,7 @@
 #:   Sets ^SVCMS_BASE_DIR^s to the base directory 
 
 function versctl:which {
-	local P=$(readlink -f "${1:-$PWD}") verbose=false
+	local P=$(realpath -- "${1:-$PWD}") verbose=false
 	typeset -l L
 	# handle per directory VCMSes
 	set -- "$P"/@(CVS|RCS|HEAD)

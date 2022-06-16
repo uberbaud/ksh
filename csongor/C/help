@@ -3,6 +3,7 @@ S
 SQL
 SQLify
 [
+_p
 add-exit-action
 alias
 amuse:create-cmd-wrappers
@@ -65,6 +66,7 @@ f-halt
 f-help
 f-host
 f-locate
+f-luarocks
 f-m-done
 f-m-get
 f-r
@@ -84,7 +86,6 @@ file-is-valid-utf8
 find-function
 flash-parent-window-of-pid
 fmark
-forceline
 fpop
 fpush
 fsave
@@ -179,6 +180,7 @@ read
 readonly
 realbin
 recode-to-ogg-vorbis
+relative-to-pwd
 release-exclusive-lock
 reshell
 resolve-alias
@@ -199,6 +201,8 @@ shell-tips
 shift
 showvar
 shquote
+shstate
+signum-to-name
 sparkle
 sparkle-path
 splitstr
@@ -244,6 +248,7 @@ wait
 wait-before-leaving
 warn
 warnOrDie
+watch-and-do
 whence
 with-defaults
 x11-windowid-for-pid

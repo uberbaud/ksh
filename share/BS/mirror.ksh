@@ -53,7 +53,7 @@ needs new-array is-known-host desparkle
 function sendem {
 	local fullpath
 	for p; do
-		fullpath=$(readlink -fn "$p")
+		fullpath=$(realpath "$p")
 		notify "scp -r \"$fullpath\" $AWAY:\"$fullpath\""
 		scp -r "$fullpath" $AWAY:"$fullpath"
 	done

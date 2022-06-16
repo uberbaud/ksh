@@ -11,7 +11,7 @@ function shquote {
 	REPLY=${1:-}
 
 	# it needs surrounding quotes
-	if [[ $REPLY == *[\<\|\>\;\(\&\)\\\"[:space:]]* ]]; then
+	if [[ $REPLY == *[\<\|\>\;\(\&\)\\\"\`[:space:]]* ]]; then
 		gsub "'" "'\\''" "$REPLY"
 		REPLY="'$REPLY'"
 	# it only needs single quotes to be escaped

@@ -177,8 +177,8 @@ REPO_NAME=$REPLY
   }
 
 # since we're going to change directories, lets get full paths
-for r { full_paths[i++]=$(readlink -fn "$r"); }
-MAINV=$(readlink -fn "$MAINV")
+for r { full_paths[i++]=$(realpath "$r"); }
+MAINV=$(realpath "$MAINV")
 
 # set up temp folder and move there
 dTMP=$(mktemp -d)	|| die 'Could not ^Tmktemp^t.'

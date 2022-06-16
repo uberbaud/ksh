@@ -47,7 +47,7 @@ function hCleanup { # {{{1
 needs cscope tceetree dot
 
 (($#))|| set -- .
-SRC_PATH=$(readlink -fn "$1")
+SRC_PATH=$(realpath "$1")
 TEMP_PATH=$(mktemp -d)
 trap hCleanup EXIT
 

@@ -9,7 +9,7 @@ function realbin {
 		set -- "$(which $1 2>/dev/null)"
 		[[ -n $1 ]]|| return 1
 	  }
-	readlink -f "$1"
+	realpath "$1"
 }
 
 # Copyright © 2017 by Tom Davis,,, <tom@greyshirt.net>.

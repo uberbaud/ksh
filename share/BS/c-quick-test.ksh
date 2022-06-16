@@ -65,7 +65,7 @@ function write-file { #{{{1
 		    # OBJPATH  = ${OBJDIR:-}
 		    # OBJS     = my.o
 		    # ^equivalent to: LDLIBS   += \$OPATH/my.o
-		    PACKAGES =
+		    PACKAGES = notify_usr${*+ "$*"}
 		    CFLAGS  += -std=c11
 		    CFLAGS  += -Weverything -fdiagnostics-show-option -fcolor-diagnostics
 		 + -------------------------------------------------------------------- */
@@ -93,10 +93,28 @@ function write-file { #{{{1
 		// vim: nofoldenable
 	===
 } # }}}1
+function validate-packages { # {{{1
+	local p i
 
-needs add-exit-action build-and-run clearout needs-cd use-app-paths
+	(($#==0))&& return
 
-if [[ -z ${filename:-} ]]; then
+	pkg-config --exists "$@" || {
+		i=0
+		set -A badPackages --
+		for p; do
+			pkg-config --exists "$p" || badPackages[i++]=$p
+		done
+		die "Unknown packages:" "${badPackages[@]}"
+	  }
+
+	return $i
+} # }}}1
+
+needs add-exit-action build-and-run clearout needs-cd use-app-paths pkg-config
+
+validate-packages "$@"
+
+if [[ -z ${filename-} ]]; then
 	filename=test
 elif [[ $filename == */* ]]; then
 	[[ -n ${pathname:-} ]]&&
@@ -123,10 +141,10 @@ filename=${filename%.c}.c
   }
 
 use-app-paths build-tools
-needs build-paths
-build-paths "$ORIGINAL_PWD"
+needs get-build-paths
+get-build-paths "$ORIGINAL_PWD"
 
-write-file >$filename
+write-file "$@" >$filename
 build-and-run -e "$filename"; exit
 
 # Copyright (C) 2022 by Tom Davis <tom@greyshirt.net>.

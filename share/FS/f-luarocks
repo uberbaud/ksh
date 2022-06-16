@@ -1,0 +1,11 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2022-06-12,00.30.10z/bf875e>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^S…^s
+#:   Wrapper
+
+function f-luarocks {
+	/usr/local/bin/luarocks-5.1 "$@"
+}
+
+# Copyright © 2022 by Tom Davis <tom@greyshirt.net>.

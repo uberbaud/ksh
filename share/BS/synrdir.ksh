@@ -5,7 +5,7 @@
 set -o nounset; : ${KSH_VERSION:?Run from with KSH}
 
 # Usage {{{1
-full_pgm_path=$(readlink -nf "$0")
+full_pgm_path=$(realpath "$0")
 : ${full_pgm_path:?}
 this_pgm=${0##*/}
 LOGLEVELS='^Bnone^b, ^Bnormal^b, or ^Ball^b.'
@@ -76,7 +76,7 @@ shift $(($OPTIND - 1))
 # ready to process non '-' prefixed arguments
 # /options }}}1
 
-MYNAME=$(readlink -fn "$0")
+MYNAME=$(realpath "$0")
 CKSUM=$(cksum -qa sha384b "$MYNAME")
 DIR_IS_SET=false
 

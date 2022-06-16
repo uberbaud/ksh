@@ -11,8 +11,8 @@ function recode-to-ogg-vorbis {
 	: ${1:?}
 	local ain='' oga='' ainD=''
 	[[ -f $1 ]]|| die "^B$1^b is not a file"
-	ain=$(readlink -fn "$1")
-	[[ -n $ain ]]|| die "^BWeirdly, ^Treadlink ^U$1^u fails."
+	ain=$(realpath "$1")|| die "^BWeirdly, ^Trealpath ^U$1^u fails."
+	[[ -n $ain ]]|| die "^BWeirdly, ^Trealpath ^U$1^u returns \"\"."
 
 	oga="${ain%.*}.oga"
 	desparkle "$ain"

@@ -1,0 +1,9 @@
+^Bp^b
+
+    Prints any arguments given, one per line,
+      ^IOR^i, if no arguments are given
+    prints ^T"^t^O$^o^V@^v^T"^t
+
+    This is implemented as an alias which wraps the function ^T_p^t
+        ^Talias^t ^Vp^v^T='^t^B_p^b ^O$^o^V#^v "^O$^o^V@^v"^T'^t
+

@@ -102,7 +102,7 @@ set -A cfgs -- $wifi_config/[0-9][0-9],$1*
 [[ ${cfgs[0]} == *\* ]]&& die 'Could not find a matching wifi configuration file.'
 ((${#cfgs[@]}>1))&& { set -A cfgs -- "$(omenu "${cfgs[@]}")" || exit 0; }
 
-cfg=$(readlink -nf "${cfgs[0]}")
+cfg=$(realpath "${cfgs[0]}")
 [[ -n $cfg ]]|| die 'IMPOSSIBLE THING #1'
 
 nwid=${cfg#$wifi_config/[0-9][0-9],}

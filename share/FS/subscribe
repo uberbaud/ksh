@@ -12,7 +12,7 @@ function subscribe {
 	local fname
 	typeset -u signal
 	[[ -d $1 ]]|| return 1
-	fname=$(readlink -fn $1)/$$
+	fname=$(realpath $1)/$$
 	signal=${2#SIG}
 	# verify $2 is a valid signal
 	[[ $signal == @(KILL|STOP|9|17) ]]&&

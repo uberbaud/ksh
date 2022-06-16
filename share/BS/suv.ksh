@@ -172,12 +172,12 @@ needs-path -or-die "$LOCKBASE"
 filename=$1; shift
 desparkle "$filename"
 filenameD=$REPLY
-file_or_error=$(readlink -fn "$filename" 2>&1)
-[[ $file_or_error == 'readlink: '*': Permission denied' ]]&& {
+file_or_error=$(realpath "$filename" 2>&1)
+[[ $file_or_error == 'realpath: '*': Permission denied' ]]&& {
 	: here is where we do **doas $K/suvX.ksh**
   }
-[[ $file_or_error == readlink:* ]]&& {
-	errmsg=${file_or_error##readlink: *: }
+[[ $file_or_error == realpath:* ]]&& {
+	errmsg=${file_or_error##realpath: *: }
 	die "$errmsg: ^B$filenameD^b."
   }
 [[ -a $file_or_error ]]&& {

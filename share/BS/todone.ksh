@@ -79,7 +79,7 @@ function mark-as-done {
 }
 
 function handle-donelist {
-	local taskNum
+	local taskNum task
 	(($#))|| die 'No matching tasks.'
 	(($# == 1)) && {
 		mark-as-done $1
@@ -89,7 +89,8 @@ function handle-donelist {
 	[[ -n ${COLUMNS-} ]]|| eval "$(resize -u)"
 	W=$((COLUMNS-4))
 	for taskNum; do
-		splitstr "$NL    " "${body[taskNum]#    }" lines
+		gsub '\' '\\' "${body[taskNum]#    }" task
+		splitstr "$NL    " "$task" lines
 		print -u2 '\033[36m        ┌────────────────────────────────────\033[0m'
 		message '  Task ^F{6}─┤^f' '        ^F{6}│^f' "${lines[@]}"
 		print -u2 '\033[36m        └────────────────────────────────────\033[0m'
@@ -102,7 +103,7 @@ function update-TODO-file {
 	local Task i=0
 	[[ -f RCS/TODO,v ]]&& co -q -l TODO
 	while ((i<$1)); do
-		print -- "@ ${head[i]}$NL${body[i]}"
+		print -r -- "@ ${head[i]}$NL${body[i]}"
 		((i++))
 	done >TODO
 	if [[ -f RCS/TODO,v ]]; then

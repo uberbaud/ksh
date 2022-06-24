@@ -1,0 +1,21 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2022-06-20,04.18.20z/3295806>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Upackage1^u ^[^Upackage2^u ^[… ^Upackage^IN^i^u^]^]
+#:   Given a list of packages, dies with names of any that don't exist, if any.
+
+needs pkg-config
+function show-bad-packages {
+	local p i=0
+	set -A badpks --
+	for p in $*; do
+		pkg-config --exists $p || badpks[i++]=$p
+	done
+	((i==0))&& return
+
+	local s=s
+	((i==1))&& s=
+	die "No package$s named:" "^S${badpks[@]}^s"
+}
+
+# Copyright © 2022 by Tom Davis <tom@greyshirt.net>.

@@ -2,14 +2,12 @@
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
 #: FUNCTION ^G(no arguments)^g
-#:   Wrapper around $BS/m-done.ksh
+#:   Wrapper around $BS/m-get.ksh
 
-function f-m-done {
-	${BS:?}/m-done.ksh "$@"
-	[[ -n ${PRE_MAIL_PWD-} ]]&& {
-		builtin cd "$PRE_MAIL_PWD"
-		unset PRE_MAIL_PWD
-	  }
+function m-get {
+	PRE_MAIL_PWD=$PWD
+	builtin cd ${XDG_PUBLICSHARE_DIR:?}/mail
+	${BS:?}/m-get.ksh "$@"
 }
 
 # Copyright © 2021 by Tom Davis <tom@greyshirt.net>.

@@ -1,0 +1,88 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2022-06-20,04.11.35z/23859be>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^G(no arguments)^g
+#:   Prints variables from initial multiline header on ^SSTDIN^s in
+#:       ^Ishell^i assignment form, with a final line ^Texport^ting them.
+#:   ^GNOTE:^G ^T+=^t ^Gdoes not honor environment variables.^g
+#:   ^G      A workaround is^g ^UVAR^u ^O= $^o^UVAR^u ^Gwhich will^g
+#:         ^Gbe expanded.^g
+
+needs show-bad-packages bad-programmer SQL SQLify
+function get-header-vars {
+	local SpTab line key val pkglst tuple varlist
+	[[ -t 0 ]]&& die "Expected a ^BC^b source code file on ^SSTDIN^s."
+	SpTab=' 	'
+
+	function insert_kv { # {{{2
+		local k=${2?} v=${3?} conflict
+		case $1 in
+			append)		conflict="v || ' ' || excluded.v";	;;
+			overwrite)	conflict="v";						;;
+			*)	bad-programmer \
+				"^Uconflict^u (^T$1^t) is neither ^Bappend^b nor ^Boverwrite^b."
+				;;
+		esac
+		[[ -z ${v:-} || $v == *([$SpTab]) ]]&& return
+		SQLify k v
+		SQL <<----
+			INSERT INTO temp.buildvars (k,v) VALUES ($k,$v)
+				ON CONFLICT (k) DO
+					UPDATE SET v = $conflict
+				;
+			---
+	} # }}}2
+
+	IFS=$SpTab read -r line || die "Bad read on ^SSTDIN^s."
+	[[ $line == /\** ]]|| die \
+			"In order to ^Bget^b and ^Bset^b variables, the first line"	\
+			"^BMUST^b be the opening of a multi-line comment, but it"	\
+			"isn't."
+
+	SQL 'DROP TABLE IF EXISTS temp.buildvars;'
+	SQL 'CREATE TABLE temp.buildvars (k NOT NULL PRIMARY KEY, v);' ||
+		die 'Could not ^BCREATE TABLE^b ^Vtemp.buildvars^v.'
+	# process header for variables
+	integer i=0
+	while :; do
+		[[ $line == *\*/* ]]&& break # end of comment
+		[[ $line == [A-Za-z_]*([A-Za-z0-9_])*([$SpTab])?(+)=* ]]&& {
+			((i++))
+			# There's an equals sign, we tested. That's how we're here.
+			key=${line%%=*}
+			val=${line##"$key="*([$SpTab])}
+			if [[ $key == *+ ]]; then
+				insert_kv append "${key%%*([$SpTab])+}" "$val"
+			else
+				insert_kv overwrite "${key%%*([$SpTab])}" "$val"
+			fi
+		  }
+		# next line
+		IFS=$SpTab read -r line || break
+	done
+	((i))|| return 0 # no variables were set, but that's not an error
+
+	SQL "SELECT v FROM temp.buildvars WHERE k = 'PACKAGES';"
+	[[ -n ${sqlreply[0]:-} ]]&& {
+		pkglst=${sqlreply[0]}
+		pkg-config --exists $pkglst || show-bad-packages "$pkglst"
+		insert_kv append CFLAGS "$(pkg-config --cflags $pkglst)"
+		insert_kv append LDFLAGS "$(pkg-config --libs $pkglst)"
+	  }
+
+	SQL "SELECT k, v FROM temp.buildvars ORDER BY k;"
+	for tuple in "${sqlreply[@]}"; do
+		key=${tuple%%"$SQLSEP"*}
+		val=${tuple#"$key$SQLSEP"}
+		gsub '"' '\"' "$val" val
+		#gsub '\' '\\' "$val" val
+		eval val="\"$val\""
+		shquote "$val" val
+		print -r -- "$key=$val;"
+		varlist=${varlist:+"$varlist" }$key
+	done
+	print -r -- "export $varlist;"
+	SQL 'DROP TABLE IF EXISTS temp.vars;'
+}
+
+# Copyright © 2022 by Tom Davis <tom@greyshirt.net>.

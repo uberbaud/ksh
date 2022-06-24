@@ -95,9 +95,9 @@ man: $(PKG_LOG) $(MAN_CONF)
 
 MAIL_ACCT_DIR=$(XDG_CONFIG_HOME)/fetchmail
 MAIL_ACCOUNTS=$(MAIL_ACCT_DIR)/accounts
-mget: $(MAIL_ACCOUNTS)
+m_2: $(MAIL_ACCOUNTS)
 	@echo $@
-	@$(MAIL_ACCT_DIR)/listAccts.ksh -r >$@
+	@$(MAIL_ACCT_DIR)/listAccts.ksh -r | sort >$@
 
 SSH_HOSTS=$(XDG_CONFIG_HOME)/ssh/known_hosts
 ssh: $(SSH_HOSTS)

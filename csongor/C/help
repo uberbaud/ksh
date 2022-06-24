@@ -67,8 +67,6 @@ f-help
 f-host
 f-locate
 f-luarocks
-f-m-done
-f-m-get
 f-r
 f-rcctl
 f-reboot
@@ -131,6 +129,8 @@ ls-lan
 ls-redirs
 ls-todos
 m
+m-done
+m-get
 m-groups
 m-list-new
 m-msgcount

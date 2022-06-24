@@ -2,27 +2,33 @@
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
 #: FUNCTION ^Ucmd^u ^[^Uwatch-file flags^u^] ^Ufile1^u ^[^Ufile2^u ^S[…^s ^UfileN^u^]^]
-#:     Watches a set of ^Ufile^us and then ^Teval^ts ^Ucmd^u with the 
-#:     final parameter the name of the changed file.
+#:     Watches a set of ^Ufile^us and then ^Teval^ts ^Ucmd^u with either 
+#:     doubled percent signs ^(^B%%^b^) replaced with ^O$^o^Vchanged^v, or
+#:     ^O$^o^Vchanged^v added as a final parameter.
 #:   ^G----8<--------8<----^g
-#:     ^Vcmd^v^O=$^o^V1^v^; ^Tshift^t^; set -A ^VwatchList^v -- ^"^O$^o^V@^v^"
-#:     while ^Vchanged^v^O=$(^U^owatch-file ^T-v^t ^"^O${^o^VwatchList^v^[^O@^o^]^O}^o^"^O^u)^o^; do
-#:         eval ^"^U^O$^o^Vcmd^v ^\^T"^t^\^T$^t^Vchanged^v^\^T"^t^u^" ^O||^o break
+#:     ^VCONTINUE^v^O=^otrue^; ^Vcmd^v^O=$^o^V1^v^; ^Tshift^t^; set -A ^VwatchList^v -- ^"^O$^o^V@^v^"
+#:     while ^O$^o^VCONTINUE^v^; do
+#:         ^Vchanged^v^O=$(^U^owatch-file ^T-v^t ^"^O${^o^VwatchList^v^[^O@^o^]^O}^o^"^O^u)^o
+#:         eval ^"^U^O$^o^Vcmd^v ^\^T"^t^\^T$^t^Vchanged^v^\^T"^t^u^"
 #:     done
 #:   ^G---->8-------->8----^g
 #:   ^GSee^g ^Twatch-file -h^t ^Gfor more information.^g
 
 function watch-and-do {
-	local cmd changed
+	local c changed cmd CONTINUE=true
 	# command
 	(($#))|| die 'Missing required parameter ^Ucmd^u.'
 	cmd=$1
 	shift
-	(($#))|| die 'Missing ^Uwatch list^u.'
 	set -A watchList -- "$@"
-	while changed=$(watch-file -v "${watchList[@]}"); do
-		h3 "$cmd \"$changed\""
-		eval "$cmd \"\$changed\"" || break
+	while $CONTINUE; do
+		h3 "watching: ${watchList[*]:-}"
+		changed=$(watch-file -v ${watchList[*]:+"${watchList[@]}"}) || break
+		[[ $cmd == *%%* ]]|| cmd="$cmd %%"
+		gsub '%%' "\"\$changed\"" "$cmd" c
+		h3 "$c"
+		eval "$c" && continue
+		print -- '\033[48;5;175;31m['"$?"']\033[49;39m'
 	done
 }
 

@@ -63,7 +63,6 @@ export TZ=EST5EDT
 
 alias ts=tree-sitter
 alias s=show
-alias m=m-part
 alias lua=lua53
 # and some special love for amuse: bits
 amuse:create-cmd-wrappers

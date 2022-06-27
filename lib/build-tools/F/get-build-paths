@@ -13,7 +13,6 @@ function get-build-paths {
 	(($#==2))|| die "$0: Unexpected result from ^Tmake -V^t."
 	CURDIR=$1
 	OBJDIR=$2
-	local curdir objdir
 }
 
 

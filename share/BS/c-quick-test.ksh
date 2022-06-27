@@ -62,7 +62,7 @@ function write-file { #{{{1
 		 |  Files named in \$OBJS and found in \$OPATH will be added to \$LDLIBS
 		 + --------------------------------------------------------------------
 		    # SRCPATH  = ${CURDIR:-}
-		    # OBJPATH  = ${OBJDIR:-}
+		    # OPATH    = ${OBJDIR:-}
 		    # OBJS     = my.o
 		    # ^equivalent to: LDLIBS   += \$OPATH/my.o
 		    PACKAGES = notify_usr${*+ "$*"}

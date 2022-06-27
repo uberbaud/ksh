@@ -4,9 +4,6 @@
 #: FUNCTION ^G(no arguments)^g
 #:   Prints variables from initial multiline header on ^SSTDIN^s in
 #:       ^Ishell^i assignment form, with a final line ^Texport^ting them.
-#:   ^GNOTE:^G ^T+=^t ^Gdoes not honor environment variables.^g
-#:   ^G      A workaround is^g ^UVAR^u ^O= $^o^UVAR^u ^Gwhich will^g
-#:         ^Gbe expanded.^g
 
 needs show-bad-packages bad-programmer SQL SQLify
 function get-header-vars {
@@ -17,16 +14,22 @@ function get-header-vars {
 	function insert_kv { # {{{2
 		local k=${2?} v=${3?} conflict
 		case $1 in
-			append)		conflict="v || ' ' || excluded.v";	;;
-			overwrite)	conflict="v";						;;
+			append)
+				a='+'
+				conflict="v || ' ' || excluded.v"
+				;;
+			overwrite)
+				a='='
+				conflict="v, a = a";
+				;;
 			*)	bad-programmer \
 				"^Uconflict^u (^T$1^t) is neither ^Bappend^b nor ^Boverwrite^b."
 				;;
 		esac
 		[[ -z ${v:-} || $v == *([$SpTab]) ]]&& return
-		SQLify k v
+		SQLify k a v
 		SQL <<----
-			INSERT INTO temp.buildvars (k,v) VALUES ($k,$v)
+			INSERT INTO temp.buildvars (k,a,v) VALUES ($k,$a,$v)
 				ON CONFLICT (k) DO
 					UPDATE SET v = $conflict
 				;
@@ -40,7 +43,7 @@ function get-header-vars {
 			"isn't."
 
 	SQL 'DROP TABLE IF EXISTS temp.buildvars;'
-	SQL 'CREATE TABLE temp.buildvars (k NOT NULL PRIMARY KEY, v);' ||
+	SQL 'CREATE TABLE temp.buildvars (k NOT NULL PRIMARY KEY,a,v);' ||
 		die 'Could not ^BCREATE TABLE^b ^Vtemp.buildvars^v.'
 	# process header for variables
 	integer i=0
@@ -69,15 +72,34 @@ function get-header-vars {
 		insert_kv append CFLAGS "$(pkg-config --cflags $pkglst)"
 		insert_kv append LDFLAGS "$(pkg-config --libs $pkglst)"
 	  }
+	SQL "DELETE FROM temp.buildvars WHERE k = 'PACKAGES';"
 
+	SQL "SELECT v FROM temp.buildvars WHERE k = 'OPATH';"
+	((${sqlreply[*]+1}))&& {
+		local o p
+		eval p=${sqlreply[0]}
+		SQL "SELECT v FROM temp.buildvars WHERE k = 'OBJS';"
+		((${sqlreply[*]+1}))&& for o in ${sqlreply[0]}; do
+			o=$p/$o
+			needs-file -or-warn "$o" &&
+				insert_kv append LDLIBS "$o"
+		done
+		SQL "DELETE FROM temp.buildvars WHERE k IN ('OPATH','OBJS');"
+	  }
+
+	SQL <<-\---
+		UPDATE temp.buildvars
+			SET v = '${' || k || '} ' || v
+			WHERE a = '+'
+			;
+		---
 	SQL "SELECT k, v FROM temp.buildvars ORDER BY k;"
 	for tuple in "${sqlreply[@]}"; do
 		key=${tuple%%"$SQLSEP"*}
 		val=${tuple#"$key$SQLSEP"}
 		gsub '"' '\"' "$val" val
-		#gsub '\' '\\' "$val" val
-		eval val="\"$val\""
-		shquote "$val" val
+		eval val=\"$val\"
+		shquote "${val# }" val
 		print -r -- "$key=$val;"
 		varlist=${varlist:+"$varlist" }$key
 	done

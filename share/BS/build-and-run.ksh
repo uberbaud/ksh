@@ -111,7 +111,8 @@ function make+run { # {{{1
 	[[ -f obj/$EXE ]]&& EXE=obj/$EXE
 	if [[ -x $EXE ]]; then
 		h3 "running $EXE"
-		time ./"$EXE"
+		time (./"$EXE"; print -n '\n\033[A\033[48;5;238;36m\033[K')
+		print -n '\033[0m'
 		h3 "$EXE completed // rc = $?"
 	elif [[ -a $EXE ]]; then
 		warn "Weirdly, ^B$EXE^b is not executable."

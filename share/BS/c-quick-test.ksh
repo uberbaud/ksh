@@ -46,28 +46,29 @@ shift $((OPTIND-1))
 # ready to process non '-' prefixed arguments
 # /options }}}1
 function write-file { #{{{1
+	local o objs OBJS
+	objs=$OBJDIR/*.o
+	[[ $objs == $OBJDIR/\*.o ]]|| for o in $objs; do
+		OBJS=${OBJS:+"$OBJS "}${o##*/}
+	done
 	subst-pathvars $CURDIR CURDIR
 	subst-pathvars $OBJDIR OBJDIR
 	cat <<-===
 		/* --------------------------------------------------------------------
 		 | $(mk-stemma-header)
 		 | --------------------------------------------------------------------
-		 |  Lines in this comment which look like assignments ('=' or '+=')
-		 |    will be treated as such. Other lines are ignored.
-		 |  Spaces around '=' or '+=' are also ignored.
-		 |  Quote characters have no special meaning.
-		 |  Variable expansion in assignments uses shell style (via eval)
+		 |  Lines in this comment which look like make assignments ([+:?!]=)
+		 |    will be passed to \`make\`.
 		 |  The variable \$PACKAGES, if not empty, will be fed to \`pkg-config\`
 		 |    and \$LDFLAGS and \$CFLAGS will be appended with that output.
 		 |  Files named in \$OBJS and found in \$OPATH will be added to \$LDLIBS
 		 + --------------------------------------------------------------------
 		    # SRCPATH  = ${CURDIR:-}
 		    # OPATH    = ${OBJDIR:-}
-		    # OBJS     = my.o
+		    # OBJS     = ${OBJS:-my.o}
 		    # ^equivalent to: LDLIBS   += \$OPATH/my.o
 		    PACKAGES = notify_usr${*+ "$*"}
 		    CFLAGS  += -std=c11
-		    CFLAGS  += -Weverything -fdiagnostics-show-option -fcolor-diagnostics
 		 + -------------------------------------------------------------------- */
 
 		#include <notify_usr.h> /* sparkle(),message(),inform(),caution(),die() */

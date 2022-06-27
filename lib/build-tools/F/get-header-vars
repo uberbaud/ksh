@@ -5,36 +5,21 @@
 #:   Prints variables from initial multiline header on ^SSTDIN^s in
 #:       ^Ishell^i assignment form, with a final line ^Texport^ting them.
 
-needs show-bad-packages bad-programmer SQL SQLify
+needs show-bad-packages bad-programmer
 function get-header-vars {
-	local SpTab line key val pkglst tuple varlist
+	local SpTab line key val
 	[[ -t 0 ]]&& die "Expected a ^BC^b source code file on ^SSTDIN^s."
 	SpTab=' 	'
 
-	function insert_kv { # {{{2
-		local k=${2?} v=${3?} conflict
-		case $1 in
-			append)
-				a='+'
-				conflict="v || ' ' || excluded.v"
-				;;
-			overwrite)
-				a='='
-				conflict="v, a = a";
-				;;
-			*)	bad-programmer \
-				"^Uconflict^u (^T$1^t) is neither ^Bappend^b nor ^Boverwrite^b."
-				;;
-		esac
-		[[ -z ${v:-} || $v == *([$SpTab]) ]]&& return
-		SQLify k a v
-		SQL <<----
-			INSERT INTO temp.buildvars (k,a,v) VALUES ($k,$a,$v)
-				ON CONFLICT (k) DO
-					UPDATE SET v = $conflict
-				;
-			---
-	} # }}}2
+	set -- $(typeset +t)
+	[[ -n ${1:-} ]]&& {
+		bad-programmer \
+			"Var(s) ^V$*^v is/are tagged."			\
+			'Cannot untag them locally'				\
+			'Use'									\
+			"    ^Ttypeset +t \$(typeset +t)^t"		\
+			"to remove tag before calling ^B$0^b."
+	  }
 
 	IFS=$SpTab read -r line || die "Bad read on ^SSTDIN^s."
 	[[ $line == /\** ]]|| die \
@@ -42,69 +27,54 @@ function get-header-vars {
 			"^BMUST^b be the opening of a multi-line comment, but it"	\
 			"isn't."
 
-	SQL 'DROP TABLE IF EXISTS temp.buildvars;'
-	SQL 'CREATE TABLE temp.buildvars (k NOT NULL PRIMARY KEY,a,v);' ||
-		die 'Could not ^BCREATE TABLE^b ^Vtemp.buildvars^v.'
 	# process header for variables
-	integer i=0
 	while :; do
 		[[ $line == *\*/* ]]&& break # end of comment
 		[[ $line == [A-Za-z_]*([A-Za-z0-9_])*([$SpTab])?(+)=* ]]&& {
-			((i++))
 			# There's an equals sign, we tested. That's how we're here.
 			key=${line%%=*}
 			val=${line##"$key="*([$SpTab])}
 			if [[ $key == *+ ]]; then
-				insert_kv append "${key%%*([$SpTab])+}" "$val"
+				key=${key%%*([$SpTab])+}
+				eval val="\${$key:+\$$key }\$val"
 			else
-				insert_kv overwrite "${key%%*([$SpTab])}" "$val"
+				key=${key%%*([$SpTab])}
 			fi
+			typeset -t $key="$val"
 		  }
 		# next line
 		IFS=$SpTab read -r line || break
 	done
-	((i))|| return 0 # no variables were set, but that's not an error
+	[[ -n $(typeset +t) ]]||
+		return 0 # no variables were set, but that's not an error
 
-	SQL "SELECT v FROM temp.buildvars WHERE k = 'PACKAGES';"
-	[[ -n ${sqlreply[0]:-} ]]&& {
-		pkglst=${sqlreply[0]}
-		pkg-config --exists $pkglst || show-bad-packages "$pkglst"
-		insert_kv append CFLAGS "$(pkg-config --cflags $pkglst)"
-		insert_kv append LDFLAGS "$(pkg-config --libs $pkglst)"
-	  }
-	SQL "DELETE FROM temp.buildvars WHERE k = 'PACKAGES';"
-
-	SQL "SELECT v FROM temp.buildvars WHERE k = 'OPATH';"
-	((${sqlreply[*]+1}))&& {
-		local o p
-		eval p=${sqlreply[0]}
-		SQL "SELECT v FROM temp.buildvars WHERE k = 'OBJS';"
-		((${sqlreply[*]+1}))&& for o in ${sqlreply[0]}; do
-			o=$p/$o
-			needs-file -or-warn "$o" &&
-				insert_kv append LDLIBS "$o"
-		done
-		SQL "DELETE FROM temp.buildvars WHERE k IN ('OPATH','OBJS');"
+	[[ -n $PACKAGES ]]&& {
+		eval PACKAGES="\"$PACKAGES\""
+		pkg-config --exists $PACKAGES || show-bad-packages "$PACKAGES"
+		typeset -t CFLAGS="${CFLAGS:+$CFLAGS }$(pkg-config --cflags $PACKAGES)"
+		typeset -t LDFLAGS="${LDFLAGS:+$LDFLAGS }$(pkg-config --libs $PACKAGES)"
 	  }
 
-	SQL <<-\---
-		UPDATE temp.buildvars
-			SET v = '${' || k || '} ' || v
-			WHERE a = '+'
-			;
-		---
-	SQL "SELECT k, v FROM temp.buildvars ORDER BY k;"
-	for tuple in "${sqlreply[@]}"; do
-		key=${tuple%%"$SQLSEP"*}
-		val=${tuple#"$key$SQLSEP"}
-		gsub '"' '\"' "$val" val
-		eval val=\"$val\"
-		shquote "${val# }" val
-		print -r -- "$key=$val;"
-		varlist=${varlist:+"$varlist" }$key
+	[[ -n ${OPATH:-} ]]&& eval OPATH=$OPATH
+	OPATH=${OPATH:+$OPATH/}
+	local o
+	for o in ${OBJS:-}; do
+		eval o="\"$o\""
+		o=$OPATH$o
+		needs-file -or-warn "$o" &&
+			typeset -t LDLIBS="${LDLIBS:+$LDLIBS }$o"
 	done
-	print -r -- "export $varlist;"
-	SQL 'DROP TABLE IF EXISTS temp.vars;'
+	typeset +t OBJS OPATH PACKAGES
+
+	set -- $(typeset +t)
+	for key; do
+		eval val=\$$key
+		gsub '"' '\"' "$val" val
+		eval val="\"$val\""
+		shquote "$val" val
+		print -r -- "$key=$val;"
+	done
+	print -r -- "VARLIST='$*';"
 }
 
 # Copyright © 2022 by Tom Davis <tom@greyshirt.net>.

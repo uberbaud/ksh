@@ -94,26 +94,12 @@ function write-file { #{{{1
 		// vim: nofoldenable
 	===
 } # }}}1
-function validate-packages { # {{{1
-	local p i
 
-	(($#==0))&& return
+needs add-exit-action build-and-run clearout needs-cd pkg-config use-app-paths
+use-app-paths build-tools
+needs get-build-paths show-bad-packages
 
-	pkg-config --exists "$@" || {
-		i=0
-		set -A badPackages --
-		for p; do
-			pkg-config --exists "$p" || badPackages[i++]=$p
-		done
-		die "Unknown packages:" "${badPackages[@]}"
-	  }
-
-	return $i
-} # }}}1
-
-needs add-exit-action build-and-run clearout needs-cd use-app-paths pkg-config
-
-validate-packages "$@"
+(($#))|| pkg-config --exists "$@" || show-bad-packages "$@"
 
 if [[ -z ${filename-} ]]; then
 	filename=test
@@ -141,8 +127,6 @@ filename=${filename%.c}.c
 	die "$REPLY already exists." "See: ^Tbuild-and-run -e^t"
   }
 
-use-app-paths build-tools
-needs get-build-paths
 get-build-paths "$ORIGINAL_PWD"
 
 write-file "$@" >$filename

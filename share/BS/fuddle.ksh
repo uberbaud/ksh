@@ -13,11 +13,17 @@ function usage {
 	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
-	^F{4}Usage^f: ^T$PGM^t ^[^T-p^t^] ^Uc source^u
-	         ^Tmake^t with ^Teval^t ^O\$(^o^Tget-header-vars^t^O)^o
+	^F{4}Usage^f: ^T$PGM^t ^[^T-p^t^] ^UC source^u
+	         Ignoring any ^Imakefile^i, ^Tmake^t using vars from the ^UC source^u header.^N*^n
 	           ^T-p^t  Pass ^T-p^t to ^Tmake^t
 	       ^T$PGM -h^t
 	         Show this help message.
+	   ^G____^g
+	   ^N*^n^GLines in the ^UC source^u header comment that look like^g ^Tmake^t ^Gassignments^g
+	    ^Gare used as such. Plus, for convenience,^g
+	    ^G1) the variable^g ^O\$^o^VPACKAGES^v^G, if not empty, will be fed to^g ^Tpkg-config^t^G,^g
+	       ^Gand^g ^O\$^o^VLDFLAGS^v ^Gand^g ^O\$^o^VCFLAGS^v ^Gwill be appended with that output; and^g
+	    ^G2) Files named in^g ^O\$^o^VOBJS^v^G, found in^g ^O\$^o^VOPATH^v ^Gwill be added to^g ^O\$^o^VLDLIBS^v^G.^g
 	===SPARKLE===
 	exit 0
 } # }}}

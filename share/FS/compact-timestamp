@@ -1,0 +1,71 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2022-06-28,21.59.55z/2963375>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^[
+#:   Prints a very compact form of ^Ilocal now^i or the given time using one
+#:   character per ^UYmd-HMS^u translated to ^[^TZ1^t^O-^o^T9A^t^O-^o^TY^t^] without ^TJ^t, ^TO^t, or ^TU^t.
+#:
+#:   ^BYear^b modulo 32, ^Bmonth^b A-M (no J), ^Bday^b 1-Y (no J,O, or U)
+#:   ^BHour^b 0-P, ^BMinutes^b resolution of 2, ^Bseconds^b plus the missing minute but
+#:   only a resolution of 4 seconds.
+#: ^GExample: ^I2022-06-28 19:24:10 EDT^i^g ^= ^G^I6FW-KC2^i^g
+
+
+needs bad-programmer date
+function compact-timestamp {
+	local y m d H M S zVar TMSTMP ARGV
+	typeset -i10 i=0 atoms=0
+	ARGV=
+	set -A t -- Z 1 2 3 4 5 6 7 8 9 A B C D E F G H I K L M N P Q R S T V W TMSTMP Y
+	case $# in
+		0)
+			TMSTMP=
+			;;
+		5|6)
+			ARGV=
+			for zVar; do
+				((i++))
+				[[ $zVar == +([0-9]) ]]|| ARGV="$ARGV $i"
+			done
+			[[ -n $ARGV ]]&& {
+				local s=s v=are a= d=
+				a=${ARGV%??}
+				ARGV=${ARGV#"$a"}
+				[[ -z $a ]]&&
+					{ s=; v=is; d=an; }
+				die "Argument$s ${a:+${a# } and }${ARGV# } $v not ${d:+$d }integer$s."
+			  }
+			ARGV="$1-$2-$3 $4:$5${6:+:$6}"
+			typeset -R4 zVar
+			zVar=0000$1;	y=$zVar
+			typeset -R2 zVar
+			zVar=00$2;		m=$zVar
+			zVar=00$3;		d=$zVar
+			zVar=00$4;		H=$zVar
+			zVar=00$5;		M=$zVar
+			[[ -n ${6:-} ]]&& { zVar=00$6; S=$zVar; }
+			TMSTMP=$y$m$d$H$M${S:+.$S}
+			;;
+		*)
+			TMSTMP="Expected five (5) or six (6) args:"
+			TMSTMP="$TMSTMP ^Uy^u ^Um^u ^Ud^u ^UH^u ^UM^u ^[^US^u^]."
+			bad-programmer "$TMSTMP"
+			;;
+	esac
+	set -- $(date -j +'%Y %m %e %k %M %S' $TMSTMP) ||
+		die "Bad date ^B$ARGV^b ^= ^B$TMSTMP^b."
+	atoms=${#t[*]}
+	y=${t[(${1#0}%atoms)]}	# year modulo sizeof t array
+	m=${t[(${2#0}+9)]}	# month - 1 + 10, zeroify but only use letters
+	d=${t[(${3#0}+1)]}	# day of month +1 is less than or equal to 32
+	H=${t[(${4#0})]}	# hours fits into 32 slots
+	i=${5#0}			# minutes without zero (0) prefix
+	M=${t[(i/2)]}		# minutes could be 0-59, so use resolution of 2 minutes
+	# Add the extra minute resolution as possibly 60 seconds to the seconds
+	i=$((${6#0}+((i%2)*60)))
+	S=${t[(i/4)]}		# i could be 0-120 (because of leap seconds),
+						#   so use resolution of four (4) seconds.
+	print -r -- "$y$m$d-$H$M$S"
+}
+
+# Copyright © 2022 by Tom Davis <tom@greyshirt.net>.

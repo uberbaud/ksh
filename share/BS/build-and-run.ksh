@@ -4,6 +4,8 @@
 
 set -o nounset;: ${FPATH:?Run from within KSH}
 
+NL='
+'
 # Usage {{{1
 this_pgm=${0##*/}
 function usage {
@@ -63,15 +65,34 @@ function edit-c-file { #{{{1
 	  }
 } #}}}1
 function make+run { # {{{1
+	local T rc
 	h3 "make $EXE"
 	fuddle "$CFILE" || return
 
 	[[ -f obj/$EXE ]]&& EXE=obj/$EXE
 	if [[ -x $EXE ]]; then
 		h3 "running $EXE"
-		time (./"$EXE"; print -n '\n\033[A\033[48;5;238;36m\033[K')
-		print -n '\033[0m'
+
+		#----------------------------------------------------------------
+		#  COMPLICATED REDIRECTION AHEAD
+		#----------------------------------------------------------------
+		# We're duping STDOUT and STDERR so, through redirection in the
+		# inner subshell, we can undo the redirections of the outer
+		# subshell, and thus avoid capturing the output of `$EXE`.
+		#
+		# We're redirecting STDERR in the outer subshell so we can
+		# capture the output of `time` as explained in KSH(1).
+		#
+		# We close both of the dups in that innermost subshell because
+		# we don't need them and potentially `$EXE` might be looking to
+		# do something with them if we leave them open.
+
+		8>&1 9>&2 T=$( (time ./"$EXE" "$@" 1>&8 2>&9 8>&- 9>&-) 2>&1)
+
 		h3 "$EXE completed // rc = $?"
+		eval $(resize)
+		typeset -L$COLUMNS L=' '
+		print -u2 -- "\033[48;5;238;36m$L\r$T\033[39;49m"
 	elif [[ -a $EXE ]]; then
 		warn "Weirdly, ^B$EXE^b is not executable."
 	else
@@ -96,13 +117,12 @@ function loop { #{{{1
 		[[ $cksum_current == $cksum_previous ]]&& clear-screen
 		# date is outside quotes to eliminate extra spaces
 		h3 "$prnPathName" / $(date +'%H:%M on %A, %B %e') / "$UUID"
-		make+run
+		make+run "$@"
 		cksum_previous=$cksum_current
 	done
 } #}}}1
 
 (($#))|| die 'Missing required argument ^Usrc^u.'
-(($#==1))|| die 'Too many arguments. Expected only ^Usrc^u.'
 
 needs h3 needs-cd rlwrap
 
@@ -115,7 +135,7 @@ else
 fi
 
 # HANDLE OTHERWHERE source file
-filename=$1
+filename=$1; shift
 [[ $filename == */* ]]&& {
 	pathname=${filename%/*}
 	filename=${filename#"$pathname/"}
@@ -125,6 +145,6 @@ filename=$1
 EXE=${filename%.c}
 CFILE=$EXE.c
 
-$MAIN; exit
+$MAIN "$@"; exit
 
 # Copyright (C) 2022 by Tom Davis <tom@greyshirt.net>.

@@ -13,9 +13,9 @@ function usage {
 	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
-	^F{4}Usage^f: ^T$PGM^t ^[^T-p^t^] ^UC source^u
+	^F{4}Usage^f: ^T$PGM^t ^[^Umake opts^u^] ^UC source^u ^[^T-^t^]
 	         Ignoring any ^Imakefile^i, ^Tmake^t using vars from the ^UC source^u header.^N*^n
-	           ^T-p^t  Pass ^T-p^t to ^Tmake^t
+	           ^T-^t Print created ^Imakefile^i but do not ^Tmake^t.
 	       ^T$PGM -h^t
 	         Show this help message.
 	   ^G____^g
@@ -27,22 +27,7 @@ function usage {
 	===SPARKLE===
 	exit 0
 } # }}}
-# process -options {{{1
-opts=
-while getopts ':ph' Option; do
-	case $Option in
-		p)	opts=-p;														;;
-		h)	usage;															;;
-		\?)	die USAGE "Invalid option: ^B-$OPTARG^b.";						;;
-		\:)	die USAGE "Option ^B-$OPTARG^b requires an argument.";			;;
-		*)	bad-programmer "No getopts action defined for ^T-$Option^t.";	;;
-	esac
-done
-# remove already processed arguments
-shift $((OPTIND-1))
-# ready to process non '-' prefixed arguments
-# /options }}}1
-function get-make-header { # {{{1
+function get-header-assignments { # {{{1
 	local SpTab
 	SpTab=' 	'
 
@@ -57,40 +42,88 @@ function get-make-header { # {{{1
 	done
 } # }}}1
 
-needs needs-file
+dryrun=false
+[[ ${1:-} == -h ]]&& usage
+
+needs needs-file header-line
 
 (($#))||	die 'Missing required parameter ^Uc source^u.'
-(($#>1))&&	die 'Too many parameters. Expected only ^Uc source^u.'
 
-target=${1%.c}
-source=$target.c
+# move everything but the last into mkopts
+set -A mkopts --
+mkopt_count=0
+while (($#>1)); do
+	mkopts[mkopt_count++]=$1
+	shift
+done
+# if the last thing is the dry-run dash, use the next-to-last as the
+# last and note that we want a dry-run
+[[ $1 == - ]]&& {
+	dryrun=true
+	((mkopt_count--))
+	set -- "${mkopts[mkopt_count]}"
+	unset mkopts[mkopt_count]
+}
+
+# allow for a source or target as the file name
+if [[ $1 == *.c ]]; then
+	target=${1%.c}
+	source=$1
+else
+	target=$1
+	source=${target%.*}.c
+fi
 needs-file -or-die "$source"
 
-# use environment CFLAGS, BUT don't duplicate the bits we set in the
-# heredoc makefile.
-cflags=
-for c in ${CFLAGS:-}; do
-	[[ ${c#-} == @(Weverything|fdiagnostics-show-option|fcolor-diagnostics) ]]&&
-		continue
-	cflags="${cflags+ }$c"
-done
-unset CFLAGS
+# Remove from CFLAGS the bits we set in the heredoc makefile.
+[[ -n ${CFLAGS:-} ]]&& {
+	cflags=
+	for c in ${CFLAGS:-}; do
+		[[ ${c#-} == @(Weverything|fdiagnostics-show-option|fcolor-diagnostics) ]]&&
+			continue
+		cflags="${cflags+ }$c"
+	done
+	CFLAGS=${cflags:-}
+	[[ -z $CFLAGS ]]&& unset CFLAGS
+  }
 
-$MAKE -f - $opts $target <<----
-	CFLAGS = -Weverything -fdiagnostics-show-option -fcolor-diagnostics ${cflags-}
-	$(get-make-header <$source)
-	.ifdef OPATH
+# what are we doing, and what are we doing it with
+hhhSource=" From <$source> header"
+hhhStandard=" The standard bits"
+if $dryrun; then
+	set -- cat
+	hhhSource=$(header-line 67 ═ ╡ ╞ "$hhhSource ")
+	hhhStandard=$(header-line 67 ═ ╡ ╞ "$hhhStandard ")
+elif ((mkopt_count)); then
+	set $MAKE -f - "${mkopts[@]}" "$target"
+else
+	set $MAKE -f - "$target"
+fi
+
+# Well then, do it.
+"$@" <<- ───────────
+	#${hhhSource-}
+	$(get-header-assignments <$source)
+
+	#${hhhStandard-}
+	# Definitely show all the bits and in color
+	CFLAGS += -Weverything -fdiagnostics-show-option -fcolor-diagnostics
+
+	# handle OPATH/OBJS
+	.if defined(OPATH) && !empty(OPATH)
 	OBJS         := \$(OBJS:S|^|\$(OPATH)/|)
 	.endif
-	.ifdef OBJS
+	.if defined(OBJS) && !empty(OBJS)
 	LDLIBS      +:= \$(OBJS)
 	.endif
-	.ifdef PACKAGES
+
+	# handle PACKAGES
+	.if defined(PACKAGES) && !empty(PACKAGES)
 	PKG_CFLAGS  +!= pkg-config --cflags \$(PACKAGES)
 	PKG_LDFLAGS +!= pkg-config --libs \$(PACKAGES)
-	.endif
 	CFLAGS      +:= \$(PKG_CFLAGS)
 	LDFLAGS     +:= \$(PKG_LDFLAGS)
-	---
+	.endif
+───────────
 
 # Copyright (C) 2022 by Tom Davis <tom@greyshirt.net>.

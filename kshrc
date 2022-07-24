@@ -179,6 +179,7 @@ export INPUTRC=$xdgcfg/init/input.rc
 # init files and paths
 export BC_ENV_ARG=$xdgcfg/etc/bc.rc
 export BZR_HOME=$xdgcfg/bzr
+export CABAL_DIR=$xdgcfg/cabal
 export HGRCPATH=$xdgcfg/hg
 
 # ==== DEFAULT APPS

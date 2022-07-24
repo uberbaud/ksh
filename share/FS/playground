@@ -6,7 +6,7 @@
 #:     ^T!^t  Use exact ^Uname^u (don't attempt to match a fragment).
 
 needs needs-path
-function play {
+function playground {
 	needs-path -or-die ~/play
 	builtin cd ~/play
 	(($#))|| return 0 # no directory given so we're done

@@ -61,6 +61,7 @@ export MANPAGER='nvim -M +Man!'
 
 export TZ=EST5EDT
 
+alias pg=playground
 alias ts=tree-sitter
 alias s=show
 alias lua=lua53

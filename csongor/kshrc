@@ -7,7 +7,6 @@ export IAM=tw:tom
 HOLD_SYSBASE=~/hold/$(uname -r)
 [[ -d $HOLD_SYSBASE ]]|| mkdir -p $HOLD_SYSBASE
 # paths
-export PERL_CPANM_HOME=$xdgdata/cpanm
 #export PERLBREW_ROOT=$xdgdata/perlbrew
 #export PERLBREW_HOME=$xdgcache/perlbrew
 #export PERLBREW_SKIP_INIT=''

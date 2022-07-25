@@ -124,6 +124,7 @@ export CARGO_HOME=$xdgdata/cargo
 export TEMPLATES_FOLDER=$xdgdata/templates
 export TMPDIR=$xdgcache/temp
 export USRBIN=$HOME/bin/ksh
+export PERL_CPANM_HOME=$xdgdata/cpanm
 export PERL_UNICODE=AS
 export PERLDOC='-MPod::Perldoc::ToTerm'
 export PERLDOC_SRC_PAGER=$VISUAL

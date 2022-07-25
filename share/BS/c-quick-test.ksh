@@ -46,28 +46,29 @@ shift $((OPTIND-1))
 # ready to process non '-' prefixed arguments
 # /options }}}1
 function write-file { #{{{1
+	local o objs OBJS
+	objs=$OBJDIR/*.o
+	[[ $objs == $OBJDIR/\*.o ]]|| for o in $objs; do
+		OBJS=${OBJS:+"$OBJS "}${o##*/}
+	done
 	subst-pathvars $CURDIR CURDIR
 	subst-pathvars $OBJDIR OBJDIR
 	cat <<-===
 		/* --------------------------------------------------------------------
 		 | $(mk-stemma-header)
 		 | --------------------------------------------------------------------
-		 |  Lines in this comment which look like assignments ('=' or '+=')
-		 |    will be treated as such. Other lines are ignored.
-		 |  Spaces around '=' or '+=' are also ignored.
-		 |  Quote characters have no special meaning.
-		 |  Variable expansion in assignments uses shell style (via eval)
+		 |  Lines in this comment which look like make assignments ([+:?!]=)
+		 |    will be passed to \`make\`.
 		 |  The variable \$PACKAGES, if not empty, will be fed to \`pkg-config\`
 		 |    and \$LDFLAGS and \$CFLAGS will be appended with that output.
 		 |  Files named in \$OBJS and found in \$OPATH will be added to \$LDLIBS
 		 + --------------------------------------------------------------------
 		    # SRCPATH  = ${CURDIR:-}
-		    # OBJPATH  = ${OBJDIR:-}
-		    # OBJS     = my.o
+		    # OPATH    = ${OBJDIR:-}
+		    # OBJS     = ${OBJS:-my.o}
 		    # ^equivalent to: LDLIBS   += \$OPATH/my.o
 		    PACKAGES = notify_usr${*+ "$*"}
 		    CFLAGS  += -std=c11
-		    CFLAGS  += -Weverything -fdiagnostics-show-option -fcolor-diagnostics
 		 + -------------------------------------------------------------------- */
 
 		#include <notify_usr.h> /* sparkle(),message(),inform(),caution(),die() */
@@ -93,26 +94,12 @@ function write-file { #{{{1
 		// vim: nofoldenable
 	===
 } # }}}1
-function validate-packages { # {{{1
-	local p i
 
-	(($#==0))&& return
+needs add-exit-action build-and-run clearout needs-cd pkg-config use-app-paths
+use-app-paths build-tools
+needs get-build-paths show-bad-packages
 
-	pkg-config --exists "$@" || {
-		i=0
-		set -A badPackages --
-		for p; do
-			pkg-config --exists "$p" || badPackages[i++]=$p
-		done
-		die "Unknown packages:" "${badPackages[@]}"
-	  }
-
-	return $i
-} # }}}1
-
-needs add-exit-action build-and-run clearout needs-cd use-app-paths pkg-config
-
-validate-packages "$@"
+(($#))|| pkg-config --exists "$@" || show-bad-packages "$@"
 
 if [[ -z ${filename-} ]]; then
 	filename=test
@@ -140,8 +127,6 @@ filename=${filename%.c}.c
 	die "$REPLY already exists." "See: ^Tbuild-and-run -e^t"
   }
 
-use-app-paths build-tools
-needs get-build-paths
 get-build-paths "$ORIGINAL_PWD"
 
 write-file "$@" >$filename

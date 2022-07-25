@@ -9,8 +9,8 @@
 
 function warnOrDie {
 	case $warnOrDie in
-		die)	die "$@" \
-				"${FORCE_MSG:-Use ^T-f^t to force action.}"
+		die)	FORCE_MSG=${FORCE_MSG-Use ^T-f^t to force action.}
+				die "$@" ${FORCE_MSG:+"$FORCE_MSG"}
 				;;
 		warn)	warn "$@"
 				;;

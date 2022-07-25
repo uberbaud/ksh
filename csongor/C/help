@@ -32,6 +32,7 @@ clang
 clearout
 cmd-in-use
 command
+compact-timestamp
 cond-rlwrap
 continue
 count-down
@@ -100,6 +101,7 @@ h2
 h3
 hN
 hash
+header-line
 hex
 histmark
 history
@@ -150,6 +152,7 @@ needs-path
 new-array
 newest
 nextfd
+nodark
 nohup
 note
 notify
@@ -165,7 +168,7 @@ pc
 permies
 pipedit
 pkg
-play
+playground
 pre-prompt
 predefined-aliases
 present

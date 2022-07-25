@@ -4,6 +4,8 @@
 
 set -o nounset;: ${FPATH:?Run from within KSH}
 
+NL='
+'
 # Usage {{{1
 this_pgm=${0##*/}
 function usage {
@@ -41,47 +43,6 @@ function first-time-get-set { # {{{1
 	show-get-set "$1" "$2"
 	showvar_fn=show-get-set
 } # }}}1
-function get-set-vars { # {{{1
-	local TAB='	' line key value
-
-	IFS= read line
-	[[ $line == /\** ]]|| {
-		warn \
-			"In order to ^Bget^b and ^Bset^b variables, the first line"	\
-			"^BMUST^b be the opening of a multi-line comment, but it"	\
-			"isn't, so we're not setting the ^Tmake^t environment."
-		return 0 # not a FATAL ERROR, so return OK
-	  }
-
-	# process variables
-	while IFS=" $TAB" read -r line; do
-		[[ $line == *\*/* ]]&& break # end of comment
-		[[ $line == [A-Za-z_]*([A-Za-z0-9_])*([ $TAB])?(+)=* ]]|| continue
-
-		# there's definitely an equals sign, we just tested, so we're
-		# good
-		key=${line%%=*}
-		value=${line##"$key="*([ $TAB])}
-
-		if [[ $key == *+ ]]; then
-			key=${key%%*([ $TAB])+}
-			eval value="\${$key:+\"\$$key \"}\$value"
-		else
-			key=${key%%*([ $TAB])}
-		fi
-		gsub '"' '\"' "$value" value
-		eval value=\"$value\"
-		export $key="$value"
-
-		$showvar_fn "$key" "$value"
-	done
-	[[ -z ${PACKAGES:-} ]]|| {
-		pkg-config --exists $PACKAGES || return
-		CFLAGS=${CFLAGS:+"$CFLAGS "}$(pkg-config --cflags $PACKAGES)
-		LDFLAGS=${LDFLAGS:+"$LDFLAGS "}$(pkg-config --libs $PACKAGES)
-		export CFLAGS LDFLAGS
-	  }
-} # }}}1
 function edit-c-file { #{{{1
 	local E F T Cmd2 c2f
 	shquote "$1" F
@@ -104,15 +65,34 @@ function edit-c-file { #{{{1
 	  }
 } #}}}1
 function make+run { # {{{1
-	get-set-vars <$CFILE	|| return # die if pkg-config error
+	local T rc
 	h3 "make $EXE"
-	make "$EXE"				|| return
+	fuddle "$CFILE" || return
 
 	[[ -f obj/$EXE ]]&& EXE=obj/$EXE
 	if [[ -x $EXE ]]; then
 		h3 "running $EXE"
-		time ./"$EXE"
+
+		#----------------------------------------------------------------
+		#  COMPLICATED REDIRECTION AHEAD
+		#----------------------------------------------------------------
+		# We're duping STDOUT and STDERR so, through redirection in the
+		# inner subshell, we can undo the redirections of the outer
+		# subshell, and thus avoid capturing the output of `$EXE`.
+		#
+		# We're redirecting STDERR in the outer subshell so we can
+		# capture the output of `time` as explained in KSH(1).
+		#
+		# We close both of the dups in that innermost subshell because
+		# we don't need them and potentially `$EXE` might be looking to
+		# do something with them if we leave them open.
+
+		8>&1 9>&2 T=$( (time ./"$EXE" "$@" 1>&8 2>&9 8>&- 9>&-) 2>&1)
+
 		h3 "$EXE completed // rc = $?"
+		eval $(resize)
+		typeset -L$COLUMNS L=' '
+		print -u2 -- "\033[48;5;238;36m$L\r$T\033[39;49m"
 	elif [[ -a $EXE ]]; then
 		warn "Weirdly, ^B$EXE^b is not executable."
 	else
@@ -123,7 +103,7 @@ function clear-screen { print -u2 '\033[H\033[2J\033[3J\033[H\c'; }
 function loop { #{{{1
 	local cksum_previous cksum_current UUID
 
-	needs pkill shquote subst-pathvars uuidgen watch-file
+	needs fuddle pkill shquote subst-pathvars uuidgen watch-file
 
 	subst-pathvars "$PWD" prnPathName
 
@@ -137,17 +117,12 @@ function loop { #{{{1
 		[[ $cksum_current == $cksum_previous ]]&& clear-screen
 		# date is outside quotes to eliminate extra spaces
 		h3 "$prnPathName" / $(date +'%H:%M on %A, %B %e') / "$UUID"
-		(make+run) # use subshell, don't dirty the ENVIRONMENT¹
+		make+run "$@"
 		cksum_previous=$cksum_current
 	done
 } #}}}1
-# ¹/ if we only ever use += and run it more than once we're adding
-#    everything twice or more. For example, 
-#    CFLAGS += -I.. run twice would yield CFLAGS='-I.. -I..', three
-#    times CFLAGS='-I.. -I.. -I..', etc.
 
 (($#))|| die 'Missing required argument ^Usrc^u.'
-(($#==1))|| die 'Too many arguments. Expected only ^Usrc^u.'
 
 needs h3 needs-cd rlwrap
 
@@ -160,7 +135,7 @@ else
 fi
 
 # HANDLE OTHERWHERE source file
-filename=$1
+filename=$1; shift
 [[ $filename == */* ]]&& {
 	pathname=${filename%/*}
 	filename=${filename#"$pathname/"}
@@ -170,6 +145,6 @@ filename=$1
 EXE=${filename%.c}
 CFILE=$EXE.c
 
-$MAIN; exit
+$MAIN "$@"; exit
 
 # Copyright (C) 2022 by Tom Davis <tom@greyshirt.net>.

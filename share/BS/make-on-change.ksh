@@ -120,6 +120,11 @@ add-exit-action 'stty echo echoctl intr ^C status ^-'
 stty -echo -echoctl intr ^- status ^C
 trap '' INFO QUIT # ignore SIGINFO and SIGQUIT, let watch-file deal with it.
 
+# TODO: USE `$make_or_build` instead of hard coding `make` #
+make_or_build=build
+[[ -f makefile || -f Makefile ]]&&
+	make_or_build=make
+
 init-database
 check-files "$@"
 init-dependencies "$@"

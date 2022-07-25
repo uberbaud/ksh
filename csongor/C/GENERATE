@@ -1,4 +1,6 @@
 # Include files that need to be built on this machine
+cabal_1
+elm_1
 git_1
 got_1
 help

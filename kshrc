@@ -108,6 +108,11 @@ export HISTSIZE=8191
 export LOCALBIN=$xdgdata/bin
 # C
 export CFLAGS='-Weverything -fdiagnostics-show-option -fcolor-diagnostics'
+export MAKECONF=${MAKECONF:-$xdgcfg/etc/ports-settings.mk}
+[[ -f $MAKECONF ]]|| unset MAKECONF
+USER_MK=$xdgcfg/etc/user.mk
+export EXTRA_SYS_MK_INCLUDES="<$USER_MK>"
+[[ -f $USER_MK ]]|| unset EXTRA_SYS_MK_INCLUDES USER_MK
 # LUA 5.1
 export LUA_PATH='/usr/local/share/lua/5.1/?.lua;./?.lua;/usr/local/share/lua/5.1/?/init.lua;/usr/local/lib/lua/5.1/?.lua;/usr/local/lib/lua/5.1/?/init.lua;/home/tw/local/luarocks/share/lua/5.1/?.lua;/home/tw/local/luarocks/share/lua/5.1/?/init.lua'
 export LUA_CPATH='./?.so;/usr/local/lib/lua/5.1/?.so;/usr/local/lib/lua/5.1/loadall.so;/home/tw/local/luarocks/lib/lua/5.1/?.so'
@@ -174,6 +179,7 @@ export INPUTRC=$xdgcfg/init/input.rc
 # init files and paths
 export BC_ENV_ARG=$xdgcfg/etc/bc.rc
 export BZR_HOME=$xdgcfg/bzr
+export CABAL_DIR=$xdgcfg/cabal
 export HGRCPATH=$xdgcfg/hg
 
 # ==== DEFAULT APPS

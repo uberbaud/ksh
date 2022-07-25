@@ -5,6 +5,7 @@
 #:   Show current timestamp in the local timezone.
 #:   ^T-u^t  Show the UTC version.
 #:   ^T-c^t  Compact format for filename parts. Implies ^T-u^t
+#: ^GSee also:^g ^Tcompact-timestamp^t
 
 function now {
 	local fmt utc

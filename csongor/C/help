@@ -254,6 +254,7 @@ warnOrDie
 watch-and-do
 whence
 with-defaults
+x11
 x11-windowid-for-pid
 xat
 xget

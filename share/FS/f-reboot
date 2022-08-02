@@ -5,7 +5,6 @@
 #:   Wrapper with bells
 
 function f-reboot {
-	/usr/bin/pkill '^xlogo$'
 	/usr/bin/doas /sbin/reboot
 }
 

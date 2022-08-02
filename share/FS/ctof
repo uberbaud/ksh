@@ -1,0 +1,13 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2022-08-02,05.30.10z/57310f5>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Ucelsius^u
+#:   Convert ^Ucelsius^u value to farhenheit.
+
+function ctof {
+	c=${1:?Missing celsius temperature to convert}
+	[[ $c == +([0-9]?(.*([0-9]))) ]] || die "Not a number."
+	dc -e "2k $c 9* 5/ 32+ps."
+}
+
+# Copyright © 2022 by Tom Davis <tom@greyshirt.net>.

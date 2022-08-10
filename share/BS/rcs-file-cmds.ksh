@@ -84,7 +84,6 @@ function get-destinations { # {{{1
 	[[ ${#sources[*]} -gt 1 && -n $DFILE ]]&&
 		die 'Multiple sources but destination is a file, not a directory.'
 	DRCS=$DPATH/RCS
-	needs-path -with-notice "$DRCS"
 } # }}}1
 function get-rcs-repo-and-dest { # {{{1
 	local reponame
@@ -95,11 +94,13 @@ function get-rcs-repo-and-dest { # {{{1
 	else
 		RCS_DEST=$DPATH/RCS/$reponame
 	fi
+	[[ -f $RCS_SRC ]]
 } # }}}1
 function do-one { # {{{1
 	# source file ($1) has already been verified to exist
 	# AND `realpath`ed in `get-source-files`
 	get-rcs-repo-and-dest "$1" &&
+		needs-path -or-warn -with-notice "$DRCS" &&
 		"$CMD" ${flags[*]:+"${flags[@]}"} "$RCS_SRC" "$RCS_DEST"
 	"$CMD" ${flags[*]:+"${flags[@]}"} "$1" "$DPATH/$DFILE"
 } # }}}1

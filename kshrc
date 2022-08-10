@@ -95,7 +95,7 @@ else
 	}
 	===
 	eval "$T"
-	add-exit-action ShHistCleanUp
+	add-exit-actions ShHistCleanUp
 	tail -n 127 $KHIST>$fhist
 	print "$histmark" >>$fhist
 	HISTFILE="$fhist"

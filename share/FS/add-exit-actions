@@ -1,0 +1,19 @@
+# <@(#)tag:csongor.greyshirt.net,2017-10-13:tw/01.41.49z/6f9b8f>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Uaction^u ^S[…^s ^Uaction N^u^]
+#:   The list of ^Uaction^us is pushed in the order given to the front 
+#:   of the queue so actions are handed to trap in last in first out by 
+#:   call to this function.
+#:
+#:   ^GNote: Uses^g ^O$^o^VTrapOnExit^v ^Garray.^g
+
+needs new-array
+function add-exit-actions {
+	# add new commands at the beginning of the array, FIFO
+	set -A TrapOnExit -- "$@" ${TrapOnExit[*]:+"${TrapOnExit[@]}"}
+	local IFS=;
+	trap "${TrapOnExit[*]}" EXIT
+}
+
+# Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

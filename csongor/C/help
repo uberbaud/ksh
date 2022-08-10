@@ -4,7 +4,7 @@ SQL
 SQLify
 [
 _p
-add-exit-action
+add-exit-actions
 alias
 amuse:create-cmd-wrappers
 amuse:device

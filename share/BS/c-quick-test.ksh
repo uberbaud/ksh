@@ -95,7 +95,7 @@ function write-file { #{{{1
 	===
 } # }}}1
 
-needs add-exit-action build-and-run clearout needs-cd pkg-config use-app-paths
+needs add-exit-actions build-and-run clearout needs-cd pkg-config use-app-paths
 use-app-paths build-tools
 needs get-build-paths show-bad-packages
 
@@ -116,7 +116,7 @@ ORIGINAL_PWD=$PWD
 if [[ -z ${pathname:-} ]]; then
 	pathname=$(mktemp -d) || die 'Could not ^Tmktemp^t.'
 	needs-cd -or-die "$pathname"
-	add-exit-action 'clearout'
+	add-exit-actions 'clearout'
 else
 	needs-cd -or-die "$pathname"
 fi

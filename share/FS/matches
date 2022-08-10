@@ -1,0 +1,30 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2022-08-06,22.16.03z/f22aca>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Upattern^u ^Utext^u  ^=  ^O$^o^Vmatches^v
+#:   Find all non-overlapping substrings in ^Utext^u which match the ^IKSH^i ^Upattern^u.
+
+function matches {
+	local pattern text prefix suffix i
+	pattern=${1:?Missing required 1st parameter: pattern}
+	text=${2:?Missing required 2nd parameter: text}
+	[[ -n $pattern ]]||	bad-programmer "$0: Empty pattern."
+	[[ -n $text ]]||	bad-programmer "$0: Empty text string."
+
+	set -A reply
+	eval "[[ \$text == *$pattern* ]]" || return 1
+	
+	i=0
+	while :; do
+		eval prefix="\${text%%$pattern*}" || bad-programmer "$0: bad pattern"
+		text=${text#"$prefix"}		# remove any chars before the 1st match
+		[[ -n $text ]]|| break
+		eval suffix="\${text##$pattern}"
+		reply[i++]=${text%"$suffix"}
+		[[ -n $suffix ]]|| break
+		text=$suffix
+	done
+	return 0
+}
+
+# Copyright © 2022 by Tom Davis <tom@greyshirt.net>.

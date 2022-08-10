@@ -1,20 +1,31 @@
 # <@(#)tag:csongor.greyshirt.net,2017-08-15:tw/07.58.21z/2951f07>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^[^Unote_text^u^]
+#: FUNCTION ^[^T-^t^Udir^u^] ^[^Unote_text^u^]
 #:   Jot a quick note.
-#:   Stores notes to ^B^O$^o^VPWD^v/NOTES^b and links in ^B^O$^o^VSYSDATA^v/notes^b.
-#:   ^GList notes with^g ^Tls-notes^t.
+#:   Stores notes to ^B^O$^o^VPWD^v/^O$^o^{^VDEPO^v^:^-^TNOTES^t^}^b and
+#:   links in ^B^O$^o^VSYSDATA^v/notes^b ^Bif^b ^O$^o^VDEPO^v ^O==^o ^TNOTES^t.
+#:       ^GList notes with^g ^Tls-notes^t.
 
 needs xclip needs-path $BS/v.ksh fast-crypt-hash
 function note {(
-	local NOTES=$PWD/NOTES OLDPWD=$PWD setnoglob=false
-	local noterepo=${SYSDATA:?}/notes
-	[[ $PWD == */NOTES ]]&& NOTES=$PWD
-	[[ $NOTES == $HOME ]]&& NOTES=${XDG_DOCUMENTS_DIR:-$HOME/docs}/NOTES
-	needs-path -or-die "$noterepo"
-	needs-path -or-die "$NOTES"/RCS
-	cd "$NOTES"
+	typeset DEPO OLDPWD setnoglob noterepo syslink
+	# handle alternate repository
+	typeset -u dNAME
+	[[ ${1:-} == -* ]]&&  { dNAME=${1#-}; shift; }
+	[[ -z $dNAME ]]&&		dNAME=NOTES
+	[[ $dNAME == +([A-Za-z0-9_-]) ]]||
+		die "^O$^o^VDEPO^v can only contain ^[^TA^t^O-^o^TZ^t^Ta^t^O-^o^Tz^t^T0^t^O-^o^T9_-^t^]."
+
+	[[ $dNAME == NOTES ]]&& syslink=true || syslink=false
+	DEPO="$PWD/$dNAME"; OLDPWD="$PWD"; setnoglob=false
+	$syslink && noterepo=${SYSDATA:?}/notes
+
+	[[ $PWD == */$dNAME ]]&& DEPO=$PWD
+	[[ $DEPO == $HOME ]]&& DEPO=${XDG_DOCUMENTS_DIR:-$HOME/docs}/$dNAME
+	$syslink && needs-path -or-die "$noterepo"
+	needs-path -or-die "$DEPO"/RCS
+	cd "$DEPO"
 	[[ -o noglob ]]&& { setnoglob=true; set +f; }
 	set -A Q -- *.note
 	local seqnum=0
@@ -42,19 +53,21 @@ function note {(
 		date -u +'%Y-%m-%d %H:%M:%S Z'
 		print -r -- "$*"
 	  )
-	repolink="$noterepo/$(date -u +'%Y-%m-%dz')-${OLDPWD##*/}-$seqnum"
-	tries=0
-	while ! ln -s "$PWD/$seqnote" "$repolink" 2>/dev/null; do
-		[[ $(readpath "$repolink") == $PWD/$seqnote ]]&& break
-		repolink="${repolink%%,+([0-9])},$((tries++))"
-	done
+	$syslink && {
+		repolink="$noterepo/$(date -u +'%Y-%m-%dz')-${OLDPWD##*/}-$seqnum"
+		tries=0
+		while ! ln -s "$PWD/$seqnote" "$repolink" 2>/dev/null; do
+			[[ $(readpath "$repolink") == $PWD/$seqnote ]]&& break
+			repolink="${repolink%%,+([0-9])},$((tries++))"
+		done
+	  }
 	(($#))|| {
 		CRYPTHASH=$(fast-crypt-hash "$seqnote")
 		$BS/v.ksh $seqnote '.'
 		[[ $CRYPTHASH == $(fast-crypt-hash "$seqnote") ]]&& {
 			# no changes, so delete everything.
 			warn "Discarding empty note."
-			/bin/rm -f "$seqnote" "RCS/$seqnote,v" "$repolink"
+			/bin/rm -f "$seqnote" "RCS/$seqnote,v" ${$repolink:+"$repolink"}
 		  }
 	  }
 )}

@@ -38,6 +38,7 @@ continue
 count-down
 cowmath
 csongor-colors
+ctof
 dark
 desparkle
 die
@@ -192,7 +193,6 @@ roll
 ruler
 s2hms
 sam-vnc
-save-function
 scheme
 search-path
 sel-from-list
@@ -254,6 +254,7 @@ warnOrDie
 watch-and-do
 whence
 with-defaults
+x11
 x11-windowid-for-pid
 xat
 xget

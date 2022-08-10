@@ -12,7 +12,7 @@ needs new-array
 function add-exit-actions {
 	# add new commands at the beginning of the array, FIFO
 	set -A TrapOnExit -- "$@" ${TrapOnExit[*]:+"${TrapOnExit[@]}"}
-	local IFS=;
+	local IFS=\;
 	trap "${TrapOnExit[*]}" EXIT
 }
 

@@ -16,7 +16,7 @@ function needs-path {
 	while (($#>1)); do
 		case $1 in
 			-or-warn)		w_warn=true;	or_what=warn;					;;
-			-or-die)		w_die=true;	or_what=die;						;;
+			-or-die)		w_die=true;		or_what=die;					;;
 			-no-create)		create=false;									;;
 			-with-notice)	notice=true;									;;
 			-*)				bad-programmer "^T$0^t: Unknown flag ^T$1^t.";	;;

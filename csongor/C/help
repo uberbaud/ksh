@@ -26,6 +26,7 @@ bind
 break
 builtin
 c
+c-changes
 cd
 chomp
 clang
@@ -89,6 +90,7 @@ fmark
 fpop
 fpush
 fsave
+ftoc
 ftry
 fullstop
 functions
@@ -124,6 +126,7 @@ local
 localize-shared
 log
 log-stderr
+log-stderr-to
 login
 lolcow
 lpeg
@@ -140,8 +143,10 @@ m-msgcount
 m-save
 man-sections
 markdown-to-html
+matches
 matching-commands
 math
+math-a-list
 maxlimits
 mcd
 message
@@ -190,6 +195,7 @@ reshell
 resolve-alias
 return
 roll
+rotate-logfiles
 ruler
 s2hms
 sam-vnc

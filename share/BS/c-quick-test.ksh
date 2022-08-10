@@ -57,8 +57,8 @@ function write-file { #{{{1
 		/* --------------------------------------------------------------------
 		 | $(mk-stemma-header)
 		 | --------------------------------------------------------------------
-		 |  Lines in this comment which look like make assignments ([+:?!]=)
-		 |    will be passed to \`make\`.
+		 |  Lines in THIS comment which look like make assignments ([+:?!]*=)
+		 |    will be passed to \`make\` (stripped of leading whitespace).
 		 |  The variable \$PACKAGES, if not empty, will be fed to \`pkg-config\`
 		 |    and \$LDFLAGS and \$CFLAGS will be appended with that output.
 		 |  Files named in \$OBJS and found in \$OPATH will be added to \$LDLIBS
@@ -68,7 +68,7 @@ function write-file { #{{{1
 		    # OBJS     = ${OBJS:-my.o}
 		    # ^equivalent to: LDLIBS   += \$OPATH/my.o
 		    PACKAGES = notify_usr${*+ "$*"}
-		    CFLAGS  += -std=c11
+		    CFLAGS  += -std=c17
 		 + -------------------------------------------------------------------- */
 
 		#include <notify_usr.h> /* sparkle(),message(),inform(),caution(),die() */

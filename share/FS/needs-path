@@ -30,6 +30,7 @@ function needs-path {
 	$w_warn && $w_die && bad-programmer \
 		'^T-or-warn^t and ^T-or-die^t are mutually exclusive.'
 
+	[[ -z $1 ]]&& return
 	[[ -d $1 ]]&& return
 
 	sparkle-path "$1"

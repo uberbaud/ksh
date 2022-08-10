@@ -1,0 +1,28 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2022-08-10,03.00.15z/4d44adf>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Ulog file^u
+#:   Coprocess but on STDERR, output to ^Ulog file^u, with timestamp
+#:   and with log file rotation.
+
+needs rotate-logfiles
+function log-stderr-to {
+	local logfile logname logpath
+	logfile=${1:?Missing parameter 1: logfile}
+	logname=${logfile##*/}
+	logpath=${logfile%"$logname"}
+	needs-path -or-die "${logpath#/}"
+
+	rotate-logfiles "$logfile"
+	
+	while IFS= read -r ln; do
+		print -r -- "$(date +'%Y-%m-d %H:%M:%S %Z'): $ln"
+	done >$logfile 2>&1 |&
+
+	exec 2>&p
+	nextfd
+	eval "exec $REPLY<&p"
+	eval "exec $REPLY<&-"
+}
+
+# Copyright © 2022 by Tom Davis <tom@greyshirt.net>.

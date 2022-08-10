@@ -16,7 +16,7 @@ function compact-timestamp {
 	local y m d H M S zVar TMSTMP ARGV
 	typeset -i10 i=0 atoms=0
 	ARGV=
-	set -A t -- Z 1 2 3 4 5 6 7 8 9 A B C D E F G H I K L M N P Q R S T V W TMSTMP Y
+	set -A t -- Z 1 2 3 4 5 6 7 8 9 A B C D E F G H I K L M N P Q R S T V W Y
 	case $# in
 		0)
 			TMSTMP=
@@ -58,7 +58,7 @@ function compact-timestamp {
 	y=${t[(${1#0}%atoms)]}	# year modulo sizeof t array
 	m=${t[(${2#0}+9)]}	# month - 1 + 10, zeroify but only use letters
 	d=${t[(${3#0}+1)]}	# day of month +1 is less than or equal to 32
-	H=${t[(${4#0})]}	# hours fits into 32 slots
+	H=${t[(${4})]}		# hours fits into 32 slots
 	i=${5#0}			# minutes without zero (0) prefix
 	M=${t[(i/2)]}		# minutes could be 0-59, so use resolution of 2 minutes
 	# Add the extra minute resolution as possibly 60 seconds to the seconds

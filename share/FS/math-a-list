@@ -12,7 +12,7 @@
 
 needs matches
 function math-a-list {
-	local cmdseq i n r c
+	local cmdseq i n r c errs
 	(($#))|| bad-programmer "Missing ^Udc cmd seq^u."
 	[[ -n $1 ]]|| die 'Empty ^Udc cmd seq^u.'
 	[[ $1 == *\$?([0-9])* ]]||
@@ -22,7 +22,6 @@ function math-a-list {
 
 	# check that placeholders proceed from $1 sequentially
 	matches '\$[1-9]' "$cmdseq" || die "No placeholders in ^Udc cmd seq^u."
-
 	set -s -A reply -- "${reply[@]}" # sort the list
 	i=0
 	for n in "${reply[@]}"; do
@@ -37,10 +36,29 @@ function math-a-list {
 	# check that cmdseq is exactly divisible by number of placeholders 
 	(($#%n))&& bad-programmer "^Uval^us and placeholder numbers don't work."
 
+	# validate and "dc-ify" the list
+	errs=false
+	set -A L --
+	i=0
+	for c; do
+		if [[ $c != ?([+-])+([0-9])?(.*([0-9])) ]]; then
+			warn "^B$c^b is not a number."
+			errs=true
+			L[i++]=$c
+		elif [[ $c == -* ]]; then
+			L[i++]=_${c#-}
+		else
+			L[i++]=${c#+}
+		fi
+	done
+	$errs && return 1
+	set -- "${L[@]}"
+
 	# process the list
 	set -A reply
 	i=0
 	while (($#)); do
+
 		eval "c=\"$cmdseq\""
 		r=$(dc -e "$c") || r=''
 		reply[i++]=$r

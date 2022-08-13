@@ -6,18 +6,11 @@
 
 needs math-a-list
 function ftoc {
-	local convert errs f i
+	local convert f i
 	convert='1k $1 32- 5* 9/ps.'
 	errs=false
 
 	: ${1:?Missing farenheit temperature to convert}
-
-	for f; do
-		[[ $f == +([0-9])?(.*([0-9])) ]]&& continue
-		warn "^B$f^b is not a number."
-		errs=true
-	done
-	$errs && return 1
 
 	math-a-list "$convert" "$@"
 	i=0

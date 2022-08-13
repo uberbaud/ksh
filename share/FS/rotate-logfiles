@@ -1,0 +1,33 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2022-08-10,03.16.12z/1039430>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Ulogfile^u ^[^Usave count^u^]
+#:   Saves up to ^Usave count^u (default is five (5)) gzipped files.
+
+needs needs-path gzip
+function rotate-logfiles {
+	local L B P N i
+	L=${1:?Missing parameter 1: logfile}
+	N=${2:-5}
+	[[ $N == [1-9]*([0-9]) ]]||
+		die "Parameter 2 ^(^Ucount^u^) is not an integer"
+	((--N))
+	B=${L##*/}
+	P=${L%"$B"}; P=${P%/}
+	[[ -n $P && $P != . ]]&& needs-path -or-die "$P"
+
+	# don't save an empty log file
+	[[ -s $L ]]|| return 0
+
+	# move only if needed, that is if there's a file that will be moved
+	# to an existing one.
+	# find the first non-existing slot and only move the ones below that
+	i=0; while ((i<N)) { [[ -f $L.$((i+1)).gz ]]|| break; ((i++)); }
+
+	# do the moves from greatest to least to avoid overwriting
+	while ((i)) { mv -f "$L".$i.gz "$L".$((i+1)).gz; ((i--)); }
+	# do the not zipped log file
+	gzip -f -o "$L".1.gz "$L"
+}
+
+# Copyright © 2022 by Tom Davis <tom@greyshirt.net>.

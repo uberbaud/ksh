@@ -108,7 +108,7 @@ function initial-backup { # {{{1
 function standard-backup { # {{{1
 	[[ -h $backbase/current ]]||
 		die "^B$backbase/current^b is not a ^Slink^s."
-	readonly lastback=$(readlink -fn $backbase/current)
+	readonly lastback=$(realpath "$backbase"/current)
 	[[ -n $lastback ]]|| die 'Could not find link for ^Ucurrent^u.'
 	[[ -d $lastback ]]|| die '^Ucurrent^u does not link to a valid directory.'
 

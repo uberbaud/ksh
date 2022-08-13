@@ -50,7 +50,7 @@ function get-source-files { # {{{1
 	typeset -i i=0
 	while (($#>1)); do
 		needs-file -or-warn "$1" || ((s_errs++))
-		sources[i++]=$(readlink -fn "$1")
+		sources[i++]=$(realpath "$1")
 		shift
 	done
 	((s_errs!=1))&& ess=s
@@ -61,20 +61,20 @@ function get-destinations { # {{{1
 	local realpath
 	if [[ -d $1 ]]; then
 		# given destination is a directory
-		realpath=$(readlink -fn "$1")/
+		realpath=$(realpath "$1")/
 	elif [[ -f $1 ]]; then
 		# given destination is an existing file
-		realpath=$(readlink -fn "$1")
+		realpath=$(realpath "$1")
 	elif [[ $1 == */* ]]; then
 		# given destination does not exist,
 		# but could be a file with a path
-		realpath=$(readlink -fn "${1%/*}")/${1##*/} ||
+		realpath=$(realpath "${1%/*}")/${1##*/} ||
 			err-path "${1%/*}" "Destination directory %% does not exist."
 	else
 		# given destination doesn't exist
 		# but would have to be a file in the current directory,
-		# we use readlink for consistency
-		realpath=$(readlink -fn "$PWD")/$1
+		# we use realpath for consistency
+		realpath=$(realpath "$PWD")/$1
 	fi
 	DPATH=${realpath%/*}
 	DFILE=${realpath##*/}
@@ -84,7 +84,6 @@ function get-destinations { # {{{1
 	[[ ${#sources[*]} -gt 1 && -n $DFILE ]]&&
 		die 'Multiple sources but destination is a file, not a directory.'
 	DRCS=$DPATH/RCS
-	needs-path -with-notice "$DRCS"
 } # }}}1
 function get-rcs-repo-and-dest { # {{{1
 	local reponame
@@ -95,11 +94,13 @@ function get-rcs-repo-and-dest { # {{{1
 	else
 		RCS_DEST=$DPATH/RCS/$reponame
 	fi
+	[[ -f $RCS_SRC ]]
 } # }}}1
 function do-one { # {{{1
 	# source file ($1) has already been verified to exist
 	# AND `realpath`ed in `get-source-files`
 	get-rcs-repo-and-dest "$1" &&
+		needs-path -or-warn -with-notice "$DRCS" &&
 		"$CMD" ${flags[*]:+"${flags[@]}"} "$RCS_SRC" "$RCS_DEST"
 	"$CMD" ${flags[*]:+"${flags[@]}"} "$1" "$DPATH/$DFILE"
 } # }}}1

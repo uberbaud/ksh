@@ -78,7 +78,7 @@ function main {
 				warn "^B$want^b is not a mount point(1)."
 				continue
 			  }
-			want=$(readlink -nf "$want")
+			want=$(realpath "$want")
 			for have in "${haves[@]}"; do
 				[[ ${want#/vol/} == $have ]]|| continue 1
 				+wants "$want"

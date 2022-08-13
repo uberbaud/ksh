@@ -1,17 +1,27 @@
 # <@(#)tag:tw.csongor.greyshirt.net,2021-10-29,00.59.44z/29cc894>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^Uname^u
-#:   Sets ^VAPP_PATH^v to ^O$^o^VKDOTDIR^v^T/share/lib/^t^O$^o^Vname^v
+#: FUNCTION ^[^T-or-warn^t^|^T-or-die^t^] ^Uname^u
+#:   Sets ^VAPP_PATH^v to ^O$^o^VKDOTDIR^v^T/share/lib/^t^Uname^u
 #:   Prefixes ^VPATH^v and ^VFPATH^v with ^O$^o^VAPP_PATH^v^T/^t^O{^o^TB^t^O,^o^TF^T^O}^o respectively, if they exist.
+#:   ^Twarn^ts or ^Tdie^ts (default) if ^Uname^u is not found.
 
 function use-app-paths {
-	local A I
+	local A I warnOrDie=die
+	while [[ ${1:-} == -* ]]; do
+		case $1 in
+			-or-die)	warnOrDie=die;								;;
+			-or-warn)	warnOrDie=warn;								;;
+			*)			bad-programmer "Unknown option ^B$1^b.";	;;
+		esac
+		shift
+	done
 	I=lib
 	[[ -n ${1:-} ]]|| bad-programmer "^T$0^t: missing parameter ^Uname^u."
 	A=${KDOTDIR:?}/$I/$1
 	[[ -d $A ]]|| {
-		warn "No private path ^O\$^o^VKDOTDIR^v^T/$I/^t^B$1^b."
+		FORCE_MSG=
+		warnOrDie "No private path ^O\$^o^VKDOTDIR^v^T/$I/^t^B$1^b."
 		return
 	  }
 	[[ -d $A/F && :$FPATH: != *:$A/F:* ]]&&

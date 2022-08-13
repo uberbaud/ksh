@@ -5,10 +5,10 @@
 #:   Output an error message to ^SSTDERR^s and ^Texit^t ^F{3}${^f^Nerrno^n^F{3}:-^f^B1^b^F{3}}^f.
 
 needs message
-function bad-programmer {
+bad-programmer() {
 	local EX_SOFTWARE=70
 
-	message '  ^WBAD PROGRAMMER^w:' '                 ' "$@"
+	message "  ^B$0^b:" '        ' "^WBAD PROGRAMMER^w" "$@"
 
 	# don't exit a user's shell, just get back to the prompt
 	[[ -o interactive ]]&& kill -s TERM $$

@@ -56,7 +56,7 @@ function tidy-repeat { # {{{1
 } # }}}1
 function clean-html {( # {{{1
 	local file tdir ferr fhtml
-	file=$(readlink -fn "${1:?}")
+	file=$(realpath "${1:?}")
 	tdir=$(mktemp -d)
 	needs-cd -or-die $tdir
 	ln "$file" 0.html	|| die "Could not ^Tln^t to ^S$file^s."

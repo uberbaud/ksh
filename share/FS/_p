@@ -1,0 +1,20 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2022-06-06,16.46.23z/442551>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^O$^o^V#^v ^T"^t^O$^o^V@^v^T"^t ^[^U…^u^]
+#:   Prints ^U…^u if any, otherwise prints "^O$^o^V@^v^T"^t
+#:   ^GUse:^g ^Talias p='^t_p ^O$^o^V#^v "^O$^o^V@^v"^T'^t
+
+function _p {
+	local i
+	[[ ${1:?} == +([0-9]) ]]|| bad-programmer "See ^Thelp ^B_p^b^t"
+	if (($#==($1+1))); then
+		# we're printing "$@"
+		shift 1
+	else
+		shift $(($1+1))
+	fi
+	for i { print -r -- "$i"; }
+}
+
+# Copyright © 2022 by Tom Davis <tom@greyshirt.net>.

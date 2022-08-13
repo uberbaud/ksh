@@ -1,0 +1,44 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2022-06-28,20.17.45z/192ba6b>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Ulen^u ^Uc0^u ^Uc1^u ^Uc2^u ^Ulabel^u
+#:   Print as many ^Uc0^u, followed by one ^Uc1^u, the ^Ulabel^u, one ^Uc2^u, and
+#:   three more ^Uc0^u will print a total of length ^Ulen^u.
+#:     ^BOR^b, if ^Ulabel^u is empty or missing
+#:   Print all ^Uc0^us to give a length of ^Ulen^u.
+#: ^GNote: ^Uc1^u, ^Uc2^u, and ^Ulabel^u can be empty.^g
+#:       ^G^Uc0^u, ^Uc1^u, and ^Uc2^u are each treated as one multibyte character.^g
+
+needs bad-programmer
+function header-line {
+	local r lr c0 c1 c2 len lbl l0 l1 l2
+	len=${1:?Missing required args len and c0}
+	c0=${2:?Missing required arg c0}
+	c1=${3:-}; c2=${4:-}; lbl=${5:-} # any can be empty
+
+	[[ $len == +([0-9]) ]]||
+		bad-programmer "^Vlen^v is not an integer: ^Vlen^v^O=^o^T$len^t."
+
+	l0=${#c0}; l1=${#c1}; l2=${#c2}; lt=${#lbl}
+	if ((lt)); then
+		#          [ xx ] ===
+		lr=$(((len-((l1>0)+lt+(l2>0)+3))))
+	else
+		lr=$len
+	fi
+	lr=$((lr*l0))
+
+	r=$c0
+	while [[ ${#r} -lt $lr ]]; do
+		r=$r$r
+	done
+	typeset -L$lr r=$r
+
+	if ((lt)); then
+		print -r -- "$r$c1$lbl$c2$c0$c0$c0"
+	else
+		print -r -- "$r"
+	fi
+}
+
+# Copyright © 2022 by Tom Davis <tom@greyshirt.net>.

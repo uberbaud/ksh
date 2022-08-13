@@ -28,16 +28,16 @@ function SQL {
 
 	SQLSEP=${SQLSEP:-"$(print '\034')"} # ^\ -> field separator
 	(($#))&& sql="$*" || sql=$(</dev/stdin)
-	set -A sqlreply --
 	((${SQLFD[0]:-}))|| {
 		sqlite3 -noheader -batch -list -separator "$SQLSEP" 2>&1 |&
-		SQLPID=$%
-		nextfd || die 'No available file descriptor.'; SQLFD[0]="$REPLY"
+		SQLPID=$!
+		nextfd || die 'No available file descriptor.'; SQLFD[0]=$REPLY
 		eval "exec ${SQLFD[0]}<&p"
-		nextfd || die 'No available file descriptor.'; SQLFD[1]="$REPLY"
+		nextfd || die 'No available file descriptor.'; SQLFD[1]=$REPLY
 		eval "exec ${SQLFD[1]}>&p"
-		add-exit-action "print -u${SQLFD[1]} '.quit'"
+		add-exit-actions "(trap '' PIPE; print -u${SQLFD[1]} '.quit')"
 		# clear the SQLite3 init output
+		print -ru${SQLFD[1]} 'PRAGMA foreign_keys = ON;'
 		print -ru${SQLFD[1]} "SELECT '$READY';" ||
 			die 'Could not print to ^SSQLFD^s.'
 		while :; do
@@ -51,11 +51,12 @@ function SQL {
 	print -ru${SQLFD[1]} -- ";"
 	print -ru${SQLFD[1]} -- "SELECT '$READY';"
 	integer i=0
+	set -A sqlreply --
 	while :; do
 		read -ru${SQLFD[0]} response ||
 			die 'Could not read from ^SSQLFD^s.'
 		[[ $response == $READY ]]&& break
-		sqlreply[i++]="$response"
+		sqlreply[i++]=$response
 		$verbose && print -ru2 -- "$response"
 	done
 

@@ -1,0 +1,5 @@
+^BX11 USEFUL TIPS^b
+
+    ^T-geometry^t ^T=^t^Uwidth^u^Tx^t^Uheight^u^T+^t^U^{^T-^t^}xoffset^u^T+^t^U^{^T-^t^}yoffset^u
+        A ^Bnegative offset^b may be from the ^Iright^i or ^Ibottom^i instead of ^Itop^i ^Ileft^i.
+

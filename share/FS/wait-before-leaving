@@ -10,6 +10,7 @@
 
 function wait-before-leaving {
 	local rc
+	( now; /usr/bin/printf '  %s\n' "$@"; )>>~/log/wait-before-leaving.log
 	"$@"
 	rc=$?
 	[[ ($rc -eq 0) && (-n ${SHORTWAIT:-}) && ($SHORTWAIT -le $SECONDS) ]]&&

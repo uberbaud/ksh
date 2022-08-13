@@ -1,0 +1,19 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2022-05-30,02.57.41z/356c2c0>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^[^Upath^u^]
+#:   Use ^Tmake^t to get variables ^V.CURDIR^v and ^V.OBJDIR^v.
+#:   Sets shell variables ^VCURDIR^v and ^VOBJDIR^v.
+
+needs SQL needs-path
+function get-build-paths {
+	[[ -n ${1:-} ]]&& needs-path -or-die -no-create "$1"
+
+	set -- $(make ${1:+-C "$1"} -D NO_MKDEP -V .CURDIR -V .OBJDIR)
+	(($#==2))|| die "$0: Unexpected result from ^Tmake -V^t."
+	CURDIR=$1
+	OBJDIR=$2
+}
+
+
+# Copyright © 2022 by Tom Davis <tom@greyshirt.net>.

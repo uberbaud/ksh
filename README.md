@@ -26,7 +26,7 @@ I'm using OpenBSD, and on OpenBSD you need to modify `/etc/profile` to
 set `ENV=$HOME/config/ksh/kshrc`. I put mine behind a test, so
 
 ---
-    [[ -n $KSH_VERSION ]]&& export ENV=$HOME/config/ksh/kshrc
+    [ -n ${KSH_VERSION:-} ] && export ENV=$HOME/config/ksh/kshrc
 ---
 
 In which case, clone this repository to `$XDG_CONFIG_HOME/ksh`.

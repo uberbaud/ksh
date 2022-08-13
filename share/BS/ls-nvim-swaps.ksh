@@ -72,8 +72,8 @@ showAll=true; file=''
 	showAll=false
 	[[ -a $1 ]]|| die "^B$1^b does not exist."
 	[[ -f $1 ]]|| die "^B$1^b is not a file."
-	file=$(readlink -fn "$1")
-	[[ -n $file ]]|| die 'Total weirdness, ^Treadlink^t fails.'
+	file=$(realpath "$1") || die 'Total weirdness, ^Trealpath^t fails.'
+	[[ -n $file ]]|| die 'Total weirdness, ^Trealpath^t returns "".'
   }
 
 PID='-'

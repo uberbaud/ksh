@@ -67,13 +67,13 @@ shift $((OPTIND-1))
 if [[ -z ${1:-} ]]; then
 	PRESPATH=$PWD
 elif [[ -f $1 ]]; then
-	PRESPATH=$(readlink -fn $1)
+	PRESPATH=$(realpath $1)
 	desparkle "$1"
 	[[ -z $PRESPATH ]]&& die "^B$REPLY^b is not a valid link."
 	SRC=${PRESPATH##*/}
 	PRESPATH=${PRESPATH%$SRC}
 elif [[ -d $1 ]]; then
-	PRESPATH=$(readlink -fn "$1")
+	PRESPATH=$(realpath "$1")
 else
 	desparkle "$1"
 	die "^B$REPLY^b is not a file nor a path."

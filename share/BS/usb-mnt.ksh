@@ -66,9 +66,12 @@ function mount-fs-ondev-at { # {{{1
 	devpart=$2
 	mntpnt=$3
 
+
 	case "$fstype" in
 		MSDOS)		mnt-fs "$devpart" "$mntpnt" $fatopts;		;;
 		4.2BSD)		mnt-fs "$devpart" "$mntpnt" $ffsopts;		;;
+		NTFS)		WANT_FSCK=false
+					mnt-fs "$devpart" "$mntpnt" $ntfsopts;		;;
 		ISO9660)	WANT_FSCK=false
 					mnt-fs "$devpart" "$mntpnt" $cdopts
 					;;
@@ -102,10 +105,12 @@ function mnt-drv {
 		warn 'Too many drives, bailing.'
 		return 1
 	  }
+	gsub ' ' _ "$label" label
 
 	part=${diskinfo%: *}
 	fstype=${diskinfo#*: }
 	WANT_FSCK=true
+
 	mount-fs-ondev-at "$fstype" "$dev$part" /vol/"$label"
 
 	# rename mount point IF there's a non-empty devname.txt file
@@ -123,11 +128,12 @@ function mnt-drv {
 } # }}}1
 
 : ${USER:?}
-needs df awk egrep as-root needs-path
+needs as-root awk df egrep gsub needs-path
 
 ffsopts='-t ffs -s -o rw,noexec,nodev,sync,softdep'
 fatopts="-t msdos -s -o rw,noexec,nosuid,-g=$USER,-u=$USER"
 cdopts="-t cd9660 -s -o rw,noexec,nosuid,-g"
+ntfsopts="-t ntfs"
 
 #function as-root { "$@"; }
 function main {

@@ -3,7 +3,7 @@
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
 
 set -o nounset;: ${FPATH:?Run from within KSH}
-REPO="NOTES"
+DEPO="NOTES"
 SUFFIX=".note"
 
 # Usage {{{1
@@ -13,10 +13,11 @@ function usage {
 	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
-	^F{4}Usage^f: ^T$PGM^t^[^T-a^t^] ^[^T-c^t^]
+	^F{4}Usage^f: ^T$PGM^t^[^T-a^t^] ^[^T-c^t^] ^[^T-^t^?^Udepo^u^]
 	         List all notes for a directory.
 	           ^T-a^t  List ALL notes from everywhere!
 	           ^T-c^t  Compact (don't list dates)
+	           If ^Udepo^u is given, use that instead of NOTES.
 	       ^T$PGM -h^t
 	         Show this help message.
 	===SPARKLE===
@@ -24,29 +25,37 @@ function usage {
 } # }}}
 # process -options {{{1
 WANT_DATES=true
-function bad_programmer {	# {{{2
-	die 'Programmer error:'	\
-		"  No getopts action defined for [1m-$1[22m."
-  };	# }}}2
-while getopts ':ach' Option; do
-	case $Option in
-		a)	REPO="${SYSDATA:?}/notes"; SUFFIX="";					;;
-		c)	WANT_DATES=false;										;;
+A=false
+N=false
+while [[ ${1:-} == -* ]]; do
+	SYSDEPO=${SYSDATA:?}/notes
+	case ${1#-} in
 		h)	usage;													;;
-		\?)	die "Invalid option: [1m-$OPTARG[22m.";				;;
-		\:)	die "Option [1m-$OPTARG[22m requires an argument.";	;;
-		*)	bad_programmer "$Option";								;;
+		c)	WANT_DATES=false;										;;
+		a)	A=true; DEPO=$SYSDEPO; SUFFIX="";						;;
+		ac)	A=true; DEPO=$SYSDEPO; SUFFIX=""; WANT_DATES=false;		;;
+		ca)	A=true; DEPO=$SYSDEPO; SUFFIX=""; WANT_DATES=false;		;;
+		*)	N=true; typeset -u DEPO=${1#-}; D=$1;					;;
 	esac
+	shift
 done
-# remove already processed arguments
-shift $(($OPTIND - 1))
-# ready to process non '-' prefixed arguments
+if $N; then
+	(($#))&& die "Unexpected parameters. None expected with ^T$D^t."
+else
+	(($#>1))&& die "Too many parameters. Expected at most one (1)."
+	[[ -n ${1:-} ]]&& {
+		N=true
+		typeset -u DEPO=$1
+		D=$1
+	  }
+fi
+$A && $N && die "Cannot use ^T-a^t ^Band^b ^T$D^t at the same time."
 # /options }}}1
 
 needs awk less sparkle needs-cd
 
-[[ -d $REPO ]]|| exit 0		#empty
-needs-cd -or-die "$REPO"
+[[ -d $DEPO ]]|| exit 0		#empty
+needs-cd -or-die "$DEPO"
 
 TAB='	'
 NL='

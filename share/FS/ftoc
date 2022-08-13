@@ -1,0 +1,22 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2022-08-07,01.00.44z/81a806>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^U°F^u ^S…^s
+#:   Convert from Farhenheit to Celsius.
+
+needs math-a-list
+function ftoc {
+	local convert f i
+	convert='1k $1 32- 5* 9/ps.'
+	errs=false
+
+	: ${1:?Missing farenheit temperature to convert}
+
+	math-a-list "$convert" "$@"
+	i=0
+	for f; do
+		print -r "    $f°F -> ${reply[i++]}°C"
+	done
+}
+
+# Copyright © 2022 by Tom Davis <tom@greyshirt.net>.

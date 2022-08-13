@@ -2,10 +2,20 @@
 # ksh profile
 # vim: ts=4 ft=ksh
 
-RC_HAS_RUN=true
+s=''
+[[ ${SHSTATE:-} == ?(* )$$:P ]]&& {
+	SHSTATE=${SHSTATE%%?( )$$:P}
+	s=P
+  }
+[[ -o login ]]&& 		s=${s:-}l
+[[ -o interactive ]]&&	s=${s:-}i
+export SHSTATE=${SHSTATE:+$SHSTATE\ }$$${s:+:$s}
+unset s
+
+# ${RC_HAS_RUN:-false} && return
 # we are NOT sourcing /etc/ksh.kshrc because it does way too much stuff we 
 # don't need. But these come from there.
-export SHORTPATH=${SHORTPATH:-$PATH}
+export SHORTPATH=${SHORTPATH:-$(getconf PATH)}
 export UID=${UID:-$(id -u)}
 export USER=${USER:-$(id -un)}
 export LOGNAME=$USER
@@ -85,7 +95,7 @@ else
 	}
 	===
 	eval "$T"
-	add-exit-action ShHistCleanUp
+	add-exit-actions ShHistCleanUp
 	tail -n 127 $KHIST>$fhist
 	print "$histmark" >>$fhist
 	HISTFILE="$fhist"
@@ -95,11 +105,18 @@ fi
 export HISTCONTROL=ignoredups:ignorespace
 export HISTFILE=$fhist
 export HISTSIZE=8191
-#export USR_C_BASE=$xdgdata/c
-#export LD_LIBRARY_PATH=$USR_C_BASE/lib
-#export USR_CLIB=$USR_C_BASE/lib
-#export USR_INCL=$USR_C_BASE/api
 export LOCALBIN=$xdgdata/bin
+# C
+export CFLAGS='-Weverything -fdiagnostics-show-option -fcolor-diagnostics'
+export MAKECONF=${MAKECONF:-$xdgcfg/etc/ports-settings.mk}
+[[ -f $MAKECONF ]]|| unset MAKECONF
+USER_MK=$xdgcfg/etc/user.mk
+export EXTRA_SYS_MK_INCLUDES="<$USER_MK>"
+[[ -f $USER_MK ]]|| unset EXTRA_SYS_MK_INCLUDES USER_MK
+# LUA 5.1
+export LUA_PATH='/usr/local/share/lua/5.1/?.lua;./?.lua;/usr/local/share/lua/5.1/?/init.lua;/usr/local/lib/lua/5.1/?.lua;/usr/local/lib/lua/5.1/?/init.lua;/home/tw/local/luarocks/share/lua/5.1/?.lua;/home/tw/local/luarocks/share/lua/5.1/?/init.lua'
+export LUA_CPATH='./?.so;/usr/local/lib/lua/5.1/?.so;/usr/local/lib/lua/5.1/loadall.so;/home/tw/local/luarocks/lib/lua/5.1/?.so'
+# LUA 5.3
 # LUA wants SEMICOLON separated PATTERNS, empty item is default
 export LUA_PATH_5_3="$xdgdata/lua/5.3/?.lua;$xdgdata/lua/5.3/?/init.lua;;"
 export LUA_CPATH_5_3="$xdgdata/lua/5.3/?.so;;"
@@ -107,6 +124,7 @@ export CARGO_HOME=$xdgdata/cargo
 export TEMPLATES_FOLDER=$xdgdata/templates
 export TMPDIR=$xdgcache/temp
 export USRBIN=$HOME/bin/ksh
+export PERL_CPANM_HOME=$xdgdata/cpanm
 export PERL_UNICODE=AS
 export PERLDOC='-MPod::Perldoc::ToTerm'
 export PERLDOC_SRC_PAGER=$VISUAL
@@ -135,16 +153,17 @@ function wantpath { # {{{1
 	fi
 } # }}}1
 # PREPEND, so in reverse order
-wantpath "$LOCALBIN"			PREPEND
-wantpath "$HOME"/bin			PREPEND
-wantpath "$USRBIN"				PREPEND
+wantpath "$LOCALBIN"				PREPEND
+wantpath "$HOME"/bin				PREPEND
+wantpath "$USRBIN"					PREPEND
 # APPEND, so in order
-wantpath "$MMH_BIN_PATH"		APPEND
-wantpath /usr/games				APPEND
-wantpath "$PERL5LIB/bin"		APPEND
-wantpath "$JDK_PATH"			APPEND
-wantpath $ROFFTOOLS_PATH		APPEND
-wantpath "$CARGO_HOME/bin"		APPEND
+wantpath "$MMH_BIN_PATH"			APPEND
+wantpath /usr/games					APPEND
+wantpath "$PERL5LIB/bin"			APPEND
+wantpath "$JDK_PATH"				APPEND
+wantpath "$ROFFTOOLS_PATH"			APPEND
+wantpath "$xdgdata/luarocks/bin"	APPEND
+wantpath "$CARGO_HOME/bin"			APPEND
 
 # input, locale, and such
 set -o vi -o vi-tabcomplete
@@ -161,6 +180,7 @@ export INPUTRC=$xdgcfg/init/input.rc
 # init files and paths
 export BC_ENV_ARG=$xdgcfg/etc/bc.rc
 export BZR_HOME=$xdgcfg/bzr
+export CABAL_DIR=$xdgcfg/cabal
 export HGRCPATH=$xdgcfg/hg
 
 # ==== DEFAULT APPS
@@ -264,7 +284,7 @@ fi
 alias no2='2>/dev/null '
 alias noerr='2>/dev/null '
 alias noglob='set -f;noglob '; function noglob { set +f; ("$@"); }
-alias p="/usr/bin/printf '%s\n'"
+alias p='_p $# "$@"'
 alias prn="/usr/bin/printf '  \e[35m｢\e[39m%s\e[35m｣\e[39m\n'"
 
 [[ -n $KDOTDIR ]]&& {
@@ -289,4 +309,5 @@ alias prn="/usr/bin/printf '  \e[35m｢\e[39m%s\e[35m｣\e[39m\n'"
 	. $KCOMPLETE/completions.ksh
   }
 
+export RC_HAS_RUN=true
 # fin

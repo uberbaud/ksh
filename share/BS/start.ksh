@@ -69,7 +69,7 @@ function publicify-files { # {{{1
 	i=0
 	for a; do
 		# if it's a file but not in the public directory
-		if [[ -a $a && $(readlink -fn "$a" 2>/dev/null) != $dPublic/* ]]; then
+		if [[ -a $a && $(realpath -q "$a") != $dPublic/* ]]; then
 			f=${t:="$(mk-cache-dir)"}/${a##*/}
 			cp "$a" "$f" || die UNAVAILABLE "Could not ^Tcp^t ^B$a^b."
 			o[i++]=$f

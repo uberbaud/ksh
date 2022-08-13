@@ -92,8 +92,10 @@ else
 	GIT 1 checkout trunk --quiet
 	GIT 1 merge $HOST --quiet
 	commit-everything trunk
+	GIT 1 pull
 	GIT 1 push
 	GIT 1 checkout $HOST --quiet
+	GIT 1 merge trunk --quiet
 fi; exit
 
 # Copyright (C) 2017 by Tom Davis <tom@greyshirt.net>.

@@ -1,0 +1,17 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2022-08-10,13.55.20z/5318253>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Uline^u ^Ucolumn^u
+#:   Moves cursor to ^Uline^u and ^Ucolumn^u position.
+#:   Both are one (1) based.
+#:
+#:   ^GNote: Wrapper around ansi escape.^g
+
+needs bad-programmer
+function cursor-to-line-col {
+	[[ ${1:-} == [1-9]*([0-9]) && ${2:-} == [1-9]*([0-9]) ]]||
+		bad-programmer "^Uline^u and ^Ucolumn^u must be positive integers."
+	print -n -- "\\033[${1};${2}H"
+}
+
+# Copyright © 2022 by Tom Davis <tom@greyshirt.net>.

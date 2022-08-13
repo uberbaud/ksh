@@ -1,0 +1,71 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2022-08-05,20.56.37z/554d013>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Udc cmd seq^u ^Uval_1^u ^S[…^s ^Uval_N^u^] ^= ^O$^o^Vreply^v^[^]
+#:   Runs a ^Tdc^t command sequence (^Udc cmd seq^u) on each set of its
+#:   numeric parameters.
+#:
+#:   ^Udc cmd seq^u ^BMUST^b contain placeholders of the form ^T$^t^U#^u which will
+#:   be replaced with the values passed to this function, consequently the
+#:   number of ^Uval^us must be evenly divisible by the number of unique
+#:   placeholders.
+
+needs matches
+function math-a-list {
+	local cmdseq i n r c errs
+	(($#))|| bad-programmer "Missing ^Udc cmd seq^u."
+	[[ -n $1 ]]|| die 'Empty ^Udc cmd seq^u.'
+	[[ $1 == *\$?([0-9])* ]]||
+		bad-programmer "^Udc cmd seq^u does not contain any parameters."
+
+	cmdseq=$1; shift
+
+	# check that placeholders proceed from $1 sequentially
+	matches '\$[1-9]' "$cmdseq" || die "No placeholders in ^Udc cmd seq^u."
+	set -s -A reply -- "${reply[@]}" # sort the list
+	i=0
+	for n in "${reply[@]}"; do
+		n=${n#\$}
+		((n==i))&&		continue
+		((n==(i+1)))&&	{ i=$n; continue; }
+
+		bad-programmer "^Udc cmd seq^u error"		\
+			"Placeholders skip from ^O\$^o^V$i^v to ^O\$^o^V$n^v."
+	done
+
+	# check that cmdseq is exactly divisible by number of placeholders 
+	(($#%n))&& bad-programmer "^Uval^us and placeholder numbers don't work."
+
+	# validate and "dc-ify" the list
+	errs=false
+	set -A L --
+	i=0
+	for c; do
+		if [[ $c != ?([+-])+([0-9])?(.*([0-9])) ]]; then
+			warn "^B$c^b is not a number."
+			errs=true
+			L[i++]=$c
+		elif [[ $c == -* ]]; then
+			L[i++]=_${c#-}
+		else
+			L[i++]=${c#+}
+		fi
+	done
+	$errs && return 1
+	set -- "${L[@]}"
+
+	# process the list
+	set -A reply
+	i=0
+	while (($#)); do
+
+		eval "c=\"$cmdseq\""
+		r=$(dc -e "$c") || r=''
+		reply[i++]=$r
+		shift $n
+	done
+
+	true
+}
+
+# Copyright © 2022 by Tom Davis <tom@greyshirt.net>.

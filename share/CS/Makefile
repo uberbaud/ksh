@@ -71,6 +71,18 @@ $(TARGET): $(GENERATE) $(SHARED) Makefile
 	@echo $@           >>$(GIT_IGN)
 	@echo make.out     >>$(GIT_IGN)
 
+CABAL_AWK  = /^Commands:$$/ {p=1;next}
+CABAL_AWK += p && /^[^[:space:]]/ {exit}
+CABAL_AWK += p && $$1 ~ /^[a-z]/ {print $$1}
+cabal_1:
+	@echo $@
+	@cabal --help |awk '$(CABAL_AWK)' >$@
+
+ELM_AWK    = /^    elm [^[:space:]]+[[:space:]]+--help$$/ {print $$2}
+elm_1:
+	@echo $@
+	@elm --help 2>&1|awk '$(ELM_AWK)' >$@
+
 GIT_CONFIG=/home/tw/config/git/config
 git_1: $(GIT_CONFIG)
 	@echo $@
@@ -95,9 +107,9 @@ man: $(PKG_LOG) $(MAN_CONF)
 
 MAIL_ACCT_DIR=$(XDG_CONFIG_HOME)/fetchmail
 MAIL_ACCOUNTS=$(MAIL_ACCT_DIR)/accounts
-mget: $(MAIL_ACCOUNTS)
+m_2: $(MAIL_ACCOUNTS)
 	@echo $@
-	@$(MAIL_ACCT_DIR)/listAccts.ksh -r >$@
+	@$(MAIL_ACCT_DIR)/listAccts.ksh -r | sort >$@
 
 SSH_HOSTS=$(XDG_CONFIG_HOME)/ssh/known_hosts
 ssh: $(SSH_HOSTS)

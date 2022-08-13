@@ -8,13 +8,13 @@ function RCS-mv-one {
 	local f sF sP tF tP SETOPTS=: rc=0
 	[[ -f $1 ]]|| { warn "^B$1^b is not a file"; return 1; }
 	[[ $- == *u* ]]|| { set -u; SETOPTS='set +u'; }
-	f=$(readlink -nf "$1")
+	f=$(realpath "$1")
 	sF=${f##*/}; sP=${f%$sF}
 	if [[ -d $2 ]]; then
 		tF=$sF
-		tP=$(readlink -nf "$2")
+		tP=$(realpath "$2")
 	else
-		f=$(readlink -nf "$2")
+		f=$(realpath "$2")
 		tF=${f##*/}
 		tP=${f%$tF}
 	fi

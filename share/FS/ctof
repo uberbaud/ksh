@@ -1,0 +1,21 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2022-08-02,05.30.10z/57310f5>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Ucelsius^u ^S[…^s ^UcelsiusN^u^]
+#:   Convert ^Ucelsius^u values to farhenheit.
+
+needs math-a-list
+function ctof {
+	local convert errs c i
+	convert='1k $1 9* 5/ 32+ps.'
+
+	: ${1:?Missing celsius temperature to convert}
+
+	math-a-list "$convert" "$@"
+	i=0
+	for c; do
+		print -r "    $c°C -> ${reply[i++]}°F"
+	done
+}
+
+# Copyright © 2022 by Tom Davis <tom@greyshirt.net>.

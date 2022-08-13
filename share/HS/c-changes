@@ -1,0 +1,59 @@
+^BCHANGES BETWEEN C STANDARDS^b
+
+^BK&R -> C89^b
+
+    ^BFunction Prototypes^b
+    ^Bvoid pointers^b
+
+
+^BC95 Addendum^b
+
+    Added ^Bdigraphs^b and ^Bwide character^b support.
+    Added standard macros ^T__STDC_VERSION__^t and others like ^Tand^t.
+
+^BC89 -> C99^b
+
+    ^BLine comments^b (^T//^t)
+    ^BIdentifier length^b expanded from 31 to 63, and external identifiers 
+        length expanded from 6 to 31 and become case sensitive.
+    New ^Bkeywords^b: ^Tinline^t, ^Trestrict^t, ^T_Bool^t, ^T_Complex^t, 
+        ^T_Imaginary^t, plus ^Tlong long^t.
+    Require ^Btruncating toward zero (0)^b of integer division (^T/^t) and 
+        modulo (^T%^t) operators. In C89 this is undefined.
+    ^BVariable declarations^b may be intermingled with code and are allowed 
+        in the first statement of a ^Ifor^i loop.
+    New ^Barray^b features: ^Idesignated initializers^i, 
+        ^Icompoundr literals^i, and ^Ivariable length^i and 
+        ^Iflexible arrays^i (unsized) at the end of structures.
+    ^BVariadic macros^b and ^B__func__^b macro.
+    ^BConversion specification^b is changed for ^Tprintf^t^(^) and 
+        ^Tscanf^t^(^).
+    ^BNew includes^b: ^Tstdbool.h^t, ^Tstdint.h^t, ^Tinttypes.h^t, 
+        ^Tcomplex.h^t, ^Ttgmath.h^t, and ^Tfenv.h^t.
+    Allows ^BUnicode Identifiers^b. Example ^Tint ∆ = 1;^t. Some compilers 
+        may require an escaped form which would be written as
+            ^Tint \u0394 = 1;^t.
+    Removed implicit function definitions and implicit ^Tint^t.
+    Trailing comma allowed in enum declarations.
+
+^BC99 -> C11^b
+
+    ^BMemory Alignment^b: ^T_Alignas^t, ^T_Alignof^t, and
+        ^Taligned_alloc^t, ^<^Tstdalign.h^t^>
+    ^BType-generic macros^b
+    New ^Bkeywords^b: ^T_Generic^t, ^T_Noreturn^t
+    ^BThreads^b support.
+    ^<^Tstdatomic.h^t^> uninterruptible objects access
+    ^BAnonymous^b structs and unions
+    ^BUnicode^b support through <uchar.h>
+    ^BSafer^b ^Tstrcat_s^t^^(^), ^Tstrncpy_s^t^(^), ^Tgets_s^t^(^), (removed 
+        ^Tgets^t^(^)), and ^Tfopen_s^t^(^).
+    ^Tfopen^t^(^) has exclusive create-and-open mode ("..x")
+
+^BC11 -> C17^b
+
+    ^BC17^b revises ^BC11^b to resolve defects but neither introduces nor 
+        deprecates language features.
+
+^BSEE ALSO^b
+    ^Uhttps://clang.llvm.org/c_status.html^u

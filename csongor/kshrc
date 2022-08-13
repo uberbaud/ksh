@@ -2,18 +2,11 @@
 # ksh local profile
 # vim: ts=4 ft=ksh
 
-DBUS_BIN=/usr/local/bin/dbus-launch
-[[ -x $DBUS_BIN && -z ${DBUS_SESSION_BUS_ADDRESS:-} ]]&&
-	eval "$($DBUS_BIN --sh-syntax --exit-with-session)"
-
 export IAM=tw:tom
 # special
 HOLD_SYSBASE=~/hold/$(uname -r)
 [[ -d $HOLD_SYSBASE ]]|| mkdir -p $HOLD_SYSBASE
 # paths
-export CPATH=$xdgdata/c/api
-export LDFLAGS="-L$xdgdata/c/lib -ltw"
-export PERL_CPANM_HOME=$xdgdata/cpanm
 #export PERLBREW_ROOT=$xdgdata/perlbrew
 #export PERLBREW_HOME=$xdgcache/perlbrew
 #export PERLBREW_SKIP_INIT=''
@@ -67,9 +60,9 @@ export MANPAGER='nvim -M +Man!'
 
 export TZ=EST5EDT
 
+alias pg=playground
 alias ts=tree-sitter
 alias s=show
-alias m=m-part
 alias lua=lua53
 # and some special love for amuse: bits
 amuse:create-cmd-wrappers
@@ -90,7 +83,9 @@ for s in $(getent shells); do
 done
 unset s
 VISED=/usr/local/bin/vis
-[[ -x $VISED ]]&& alias vised="VISUAL=\"$VISED\" v" || unset VISED
+#[[ -x ${KDOTDIR:-}/share/BS/v.ksh ]]&&
+#	VISUAL=$KDOTDIR/share/BS/v.ksh
+
 
 LOGPS1='\n'\
 '%:KSH:% \D{%Y.%m.%d.%H.%M.%S.%z} \w\n'\
@@ -127,5 +122,7 @@ export PS4=\
 '${0##*/}'\
 "$ps4b $E[\$(($PS4W-\${#LINENO}))G \$LINENO "\
 "$ps4c"
+
+#[[ -o login ]]&& PS1='[$$]\$ '
 
 true

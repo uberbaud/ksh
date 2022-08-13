@@ -8,16 +8,8 @@ needs math-a-list
 function ctof {
 	local convert errs c i
 	convert='1k $1 9* 5/ 32+ps.'
-	errs=false
 
 	: ${1:?Missing celsius temperature to convert}
-
-	for c; do
-		[[ $c == +([0-9])?(.*([0-9])) ]]&& continue
-		warn "^B$c^b is not a number."
-		errs=true
-	done
-	$errs && return 1
 
 	math-a-list "$convert" "$@"
 	i=0

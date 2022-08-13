@@ -35,7 +35,7 @@ function SQL {
 		eval "exec ${SQLFD[0]}<&p"
 		nextfd || die 'No available file descriptor.'; SQLFD[1]=$REPLY
 		eval "exec ${SQLFD[1]}>&p"
-		add-exit-action "(trap '' PIPE; print -u${SQLFD[1]} '.quit')"
+		add-exit-actions "(trap '' PIPE; print -u${SQLFD[1]} '.quit')"
 		# clear the SQLite3 init output
 		print -ru${SQLFD[1]} 'PRAGMA foreign_keys = ON;'
 		print -ru${SQLFD[1]} "SELECT '$READY';" ||

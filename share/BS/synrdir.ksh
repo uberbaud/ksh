@@ -285,7 +285,7 @@ $i_am_the_local && { # {{{1
 		die "Could not cd to ^Tcd^t ^B$local_dir^b."
 
 	tmppath=$(mktemp -d)
-	add-exit-action l-cleanup
+	add-exit-actions l-cleanup
 
 	rlst=$tmppath/r.lst
 	llst=$tmppath/l.lst

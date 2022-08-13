@@ -14,7 +14,7 @@
 
 needs ${X11TERM:-xterm} wait-before-leaving shquote
 function trnsxtrm {
-	local a i cmdln x11term
+	local a i cmdln x11term IFS=' '
 	set -A x11term -- nohup ${X11TERM:-xterm} -e ${USR_SH:-"${SHELL:-sh}"} -c
 	i=0
 	cmdln[i++]=wait-before-leaving

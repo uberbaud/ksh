@@ -1,0 +1,45 @@
+# <@(#)tag:csongor.greyshirt.net,2017-10-13:tw/01.41.49z/6f9b8f>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Uaction^u ^S[…^s ^Uaction N^u^]
+#:   The list of ^Uaction^us is pushed in the order given to the front 
+#:   of the queue so actions are handed to trap in last in first out by 
+#:   call to this function.
+
+function add-exit-actions {
+	local ftmp oldTrap oldFunc fnExit=fnTrapOnExit TAB='	'
+	(($#))|| bad-programmer 'Missing ^Uaction^u to ^Ttrap^t.'
+
+	# HANDLE trap set other than with this function
+	local IFS=' '
+	ftmp=$(mktemp -t trap-XXXXXX)					### CREATE  TEMP FILE
+	trap >$ftmp										### WRITE   TEMP FILE
+	while read kwTrap kwDash oldTrap sigName; do	### PROCESS TEMP FILE
+		[[ $sigName == EXIT ]]|| continue
+		[[ $kwTrap  == trap ]]|| warn "Weirdness/ kwTrap: $kwTrap"
+		[[ $kwDash  == --   ]]|| warn "Weirdness/ kwDash: $kwDash"
+		break
+	done <$ftmp
+	rm "$ftmp"										### DELETE  TEMP FILE
+
+	# discard if otherwise we would repeat ourselves
+	[[ $oldTrap == $fnExit ]]&& oldTrap=
+
+	# HANDLE existing instance of this function
+	local fnStart fnEnd
+	fnStart="function $fnExit {"
+	fnEnd='}'
+	oldFunc=$(
+		typeset -f $fnExit| while IFS=" $TAB" read -r ln; do
+				[[ $ln == $fnStart ]]&& continue
+				[[ $ln == $fnEnd   ]]&& continue
+				print -r -- "$ln"
+			done
+	  )
+
+	local IFS=\;
+	eval "function $fnExit { $*;${oldTrap:+$oldTrap;}${oldFunc:+$oldFunc\;} }"
+	trap "$fnExit" EXIT
+}
+
+# Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

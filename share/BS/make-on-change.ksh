@@ -116,7 +116,7 @@ needs h2 h3 ${CC:-clang} needs-file signum-to-name uuid85 watch-file
 #  sqlite3, so we're good.
 #     We also stop echoing key presses since we're not reading them
 #  anyway. And undo that on EXIT.
-add-exit-action 'stty echo echoctl intr ^C status ^-'
+add-exit-actions 'stty echo echoctl intr ^C status ^-'
 stty -echo -echoctl intr ^- status ^C
 trap '' INFO QUIT # ignore SIGINFO and SIGQUIT, let watch-file deal with it.
 

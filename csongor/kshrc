@@ -13,10 +13,10 @@ HOLD_SYSBASE=~/hold/$(uname -r)
 #export PERLBREW_CURRENT=$PERLBREW_ROOT/perls/current
 #export PERLBREW_LIB=$PERLBREW_CURRENT/lib
 export GOPATH=$xdgdata/go
-export JDK_PATH=/usr/local/jdk-1.8.0/bin
+export JDK_PATH=$xdgdata/jdk-1.8.0/bin
 export TCLLIBPATH=$xdgdata/tcl
 export RLWRAP_HOME=$xdgcfg/rlwrap
-export ROFFTOOLS_PATH=/usr/local/heirloom-doctools/bin
+export ROFFTOOLS_PATH=$xdgdata/heirloom-doctools/bin
 export PKG_CONFIG_PATH=$xdgcfg/pkgconfig
 
 # default apps

@@ -29,35 +29,39 @@ export SYSLOCAL=/usr/local
 export URI_AUTHORITY='greyshirt.net'
 
 # parse ENV to find out where we are
-[[ -d ${ENV%/*} ]]&& KDOTDIR="${ENV%/*}"
-export KDOTDIR
+KDOTDIR=${KDOTDIR:-$(realpath -q "$ENV")}
 
 # XDG paths
-if [[ -d ${XDG_CONFIG_HOME:-~/config} ]]; then
-	XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-~/config}
-	if [[ -f $XDG_CONFIG_HOME/user-dirs.dirs ]]; then
-		. $XDG_CONFIG_HOME/user-dirs.dirs
-	fi
-	for v in $(typeset +); do [[ $v == XDG_* ]]&& export $v; done
-
-	[[ -z $KDOTDIR && -d $XDG_CONFIG_HOME/ksh ]]&&
-		KDOTDIR=$XDG_CONFIG_HOME/ksh
-
-else
-	XDG_CONFIG_HOME=$HOME/config
-	XDG_DATA_HOME=$HOME/local
-	XDG_CACHE_HOME=$HOME/local/cache
-
-	[[ -d $XDG_CONFIG_HOME ]]|| mkdir -p $XDG_CONFIG_HOME
-	[[ -d $XDG_DATA_HOME   ]]|| mkdir -p $XDG_DATA_HOME
-	[[ -d $XDG_CACHE_HOME  ]]|| mkdir -p $XDG_CACHE_HOME
-fi
-xdgdata=$XDG_DATA_HOME
+[[ -f ~/.xdg-base-dirs ]]&& . ~/.xdg-base-dirs
+# per spec:
+# https://specifications.freedesktop.org/basedir-spec/latest/ar01s02.html
+# accessed: 2022-08-16 16:09:25 -0400
+[[ -n $XDG_CACHE_HOME   ]]|| XDG_CACHE_HOME=$HOME/.cache
+[[ -n $XDG_CONFIG_HOME  ]]|| XDG_CONFIG_HOME=$HOME/.config
+[[ -n $XDG_DATA_HOME    ]]|| XDG_DATA_HOME=$HOME/.local/share
+[[ -n $XDG_STATE_HOME   ]]|| XDG_STATE_HOME=$HOME/.local/state
+[[ -n $XDG_DATA_DIRS    ]]|| XDG_DATA_DIRS=/usr/local/share:/usr/share
+[[ -n $XDG_CONFIG_DIRS  ]]|| XDG_CONFIG_DIRS=/etc/xdg
 xdgcfg=$XDG_CONFIG_HOME
+xdglocal=${xdglocal:-${XDG_DATA_HOME%/share}}
+xdgdata=$XDG_DATA_HOME
 xdgcache=$XDG_CACHE_HOME
+
+[[ -f $xdgcfg/user-dirs.dirs ]]|| xdg-user-dirs-update
+[[ -f $xdgcfg/user-dirs.dirs ]]&& . $xdgcfg/user-dirs.dirs
+
+for v in $(typeset +); do
+    [[ $v == XDG_* ]]|| continue
+    export $v
+    [[ $v == XDG_*_DIRS ]]&& continue
+    eval D=\$$v
+    [[ -d $D ]]|| mkdir -p "$D"
+done
+
 SYSDATA=$xdgdata/sysdata
 [[ -d $SYSDATA ]]&& export SYSDATA || unset SYSDATA
 
+[[ -z $KDOTDIR && -d $xdgcfg/ksh ]]&& KDOTDIR=$xdgcfg/ksh
 [[ -n $KDOTDIR ]]&& {
 	
 	K=$KDOTDIR;			KU=$KDOTDIR/$HOST;		KS=$KDOTDIR/share
@@ -69,6 +73,7 @@ SYSDATA=$xdgdata/sysdata
 	export FPATH=$F
 	KHIST=$KU/history
   }
+export KDOTDIR
 
 export GIT_BARE_REPOS=$xdgdata/repos
 

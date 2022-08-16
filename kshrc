@@ -29,7 +29,7 @@ export SYSLOCAL=/usr/local
 export URI_AUTHORITY='greyshirt.net'
 
 # parse ENV to find out where we are
-KDOTDIR=${KDOTDIR:-$(realpath -q "$ENV")}
+KDOTDIR=${KDOTDIR:-$(dirname $(realpath -q "$ENV"))}
 
 # XDG paths
 [[ -f ~/.xdg-base-dirs ]]&& . ~/.xdg-base-dirs

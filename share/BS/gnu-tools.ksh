@@ -6,7 +6,7 @@ set -o nounset;: ${FPATH:?Run from within KSH}
 
 needs needs-path
 
-P=/home/tw/local/gnu-tools
+P=${XDG_DATA_HOME:?}/gnu-tools
 
 # PROCESS OPTIONS # {{{1
 VERBOSE=true

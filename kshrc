@@ -105,7 +105,7 @@ fi
 export HISTCONTROL=ignoredups:ignorespace
 export HISTFILE=$fhist
 export HISTSIZE=8191
-export LOCALBIN=$xdgdata/bin
+export LOCALBIN=~/local/bin
 # C
 export CFLAGS='-Weverything -fdiagnostics-show-option -fcolor-diagnostics'
 export MAKECONF=${MAKECONF:-$xdgcfg/etc/ports-settings.mk}

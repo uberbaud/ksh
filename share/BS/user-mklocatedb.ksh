@@ -6,12 +6,14 @@ set -o nounset
 
 PGM=${0##*/}
 LOG=${HOME:?}/log/${PGM%.ksh}.log
-XDG_DATA_HOME=$HOME/local
-XDG_CACHE_HOME=$XDG_DATA_HOME/cache
-DOCSTORE=$HOME/hold/DOCSTORE
-TMPDIR=$XDG_CACHE_HOME/temp; export TMPDIR
+LOCAL_BASE=$HOME/local
+XDG_DATA_HOME=${XDG_DATA_HOME:-$LOCAL_BASE/share}
+XDG_CACHE_HOME=${XDG_CACHE_HOME:-$LOCAL_BASE/cache}			#!!!
+DOCSTORE=$HOME/hold/DOCSTORE								#!!!
+TMPDIR=${TMPDIR:-$XDG_CACHE_HOME/temp}; export TMPDIR		#!!!
+AMUSE_DATA_HOME=${AMUSE_DATA_HOME:-$XDG_DATA_HOME/amuse}	#!!!
+
 USRDB=$XDG_CACHE_HOME/locate.db
-AMUSE_DATA_HOME=$HOME/local/amuse
 TRAPSIGS='EXIT HUP INT QUIT TRAP BUS TERM'
 NL='
 ' # ^ <- capture a newline

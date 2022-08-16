@@ -30,6 +30,7 @@ export URI_AUTHORITY='greyshirt.net'
 
 # parse ENV to find out where we are
 KDOTDIR=${KDOTDIR:-$(dirname $(realpath -q "$ENV"))}
+export KDOTDIR
 
 # XDG paths
 [[ -f ~/.xdg-base-dirs ]]&& . ~/.xdg-base-dirs

@@ -173,7 +173,7 @@ elif [[ -n $domain ]]; then
 		'when saving to ^Udomain^u.pwd'
 fi
 
-pwdFile="$HOME/local/secrets/$domain.pwd"
+pwdFile=${XDG_DATA_HOME}/secrets/$domain.pwd
 if $updatePassword; then
 	[[ -a $pwdFile ]]|| die 'Password file for ^B$domain^b does not exists.'
 else

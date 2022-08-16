@@ -36,7 +36,7 @@ function get-header-assignments { # {{{1
 
 	while :; do
 		[[ $line == *\*/* ]]&& break # end of comment
-		[[ $line == ?(.)[A-Za-z_]*([A-Za-z0-9_])*([$SpTab])?(+)=* ]]&&
+		[[ $line == ?(.)[A-Za-z_]*([A-Za-z0-9_])*([$SpTab])*([+:?!])=* ]]&&
 			print -r -- "$line"
 		IFS=$SpTab read -r line || break
 	done

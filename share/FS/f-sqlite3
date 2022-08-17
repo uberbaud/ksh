@@ -1,0 +1,18 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2022-08-17,13.05.46z/424a105>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^S…^s
+#:   Wraps ^Tsqlite3^t to use defaults.
+
+needs needs-file
+function f-sqlite3 {
+	local SQLite3 fINIT
+	SQLite3=/usr/local/bin/sqlite3
+	fINIT=${SQLITE_INIT-${XDG_CONFIG_HOME:?}/sqlite3/init.sql}
+	
+	needs-file -or-die "$SQLite3"
+	needs-file -or-warn "$fINIT" || fINIT=
+	"$SQLite3" ${fINIT+-init "$fINIT"} "$@"
+}
+
+# Copyright © 2022 by Tom Davis <tom@greyshirt.net>.

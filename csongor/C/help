@@ -74,6 +74,7 @@ f-luarocks
 f-r
 f-rcctl
 f-reboot
+f-sqlite3
 f-syspatch
 f-tclsh
 f-v

@@ -5,6 +5,7 @@
 #:   ^Tunset -f ^t^$^N1^n^T; "^t^$^N@^n^T";^t
 #:     ^T-x^t sets ^Strace^s on function.
 
+# TODO use load-function, follow aliases
 function ftry {
 	local trace=
 	[[ ${1:-} == -x ]]&& { trace=t; shift; }

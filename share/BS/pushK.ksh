@@ -39,14 +39,14 @@ function GIT { # {{{1
 	local cmd= o hlevel
 	hlevel=$1
 	shift
-	[[ $hlevel == [12] ]]||
+	[[ $hlevel == [123] ]]||
 		die "GIT parameter #2 is not a level indicator" "^S$lnum^s: ^U$*^u"
 	for o; do
 		[[ $o == msg ]]&& break
 		cmd="${cmd:+$cmd }$1"
 		shift
 	done
-	h1 "$cmd"
+	h$hlevel "$cmd"
 	git $cmd || die "${2:-^B$cmd^b}"
 } # }}}1
 function git-branch-name { # {{{1
@@ -77,11 +77,11 @@ function diffstat { # {{{1
 	git diff --shortstat "$1"
 } # }}}1
 function handle-github-ssh-password { # {{{1
-	local pid
+	local agent
 	WE_STARTED_SSH_AGENT=false
 
-	pid=${SSH_AGENT_PID:-}
-	[[ -n $pid && $(ps -p $pid -ocommand=) == *ssh-agent* ]]&& return
+	agent=${SSH_AGENT_PID:-}
+	[[ -n $agent && $(ps -p $agent -ocommand=) == *ssh-agent* ]]&& return
 
 	eval "$(ssh-agent)" 2>/dev/null || return
 
@@ -131,19 +131,19 @@ else
 	[[ $(git rev-parse trunk) == $(git rev-parse FETCH_HEAD) ]]|| {
 		# merge trunk with origin/trunk
 		GIT 1 checkout trunk --quiet
-		GIT 1 merge FETCH_HEAD --quiet
+		GIT 3 merge FETCH_HEAD --quiet
 
 		# merge newly fetched with origin/trunk (via trunk)
 		GIT 1 checkout $HOST --quiet
-		GIT 1 merge trunk
+		GIT 3 merge trunk
 	  }
 
 	# merge our work into trunk (should never have conflicts)
 	GIT 1 checkout trunk --quiet
-	GIT 1 merge $HOST --quiet
+	GIT 3 merge $HOST
 
 	# merge our work into origin (via trunk)
-	GIT 1 push
+	GIT 3 push
 
 	# get back to where you once belonged
 	GIT 1 checkout $HOST --quiet

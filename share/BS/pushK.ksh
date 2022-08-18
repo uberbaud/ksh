@@ -77,8 +77,13 @@ function diffstat { # {{{1
 	git diff --shortstat "$1"
 } # }}}1
 function handle-github-ssh-password { # {{{1
+	local pid
 	WE_STARTED_SSH_AGENT=false
-	eval "$(ssh-agent)" 2>/dev/null || return 1
+
+	pid=${SSH_AGENT_PID:-}
+	[[ -n $pid && $(ps -p $pid -ocommand=) == *ssh-agent* ]]&& return
+
+	eval "$(ssh-agent)" 2>/dev/null || return
 
 	WE_STARTED_SSH_AGENT=true
 	AWKPGM=$(</dev/stdin) <<-\

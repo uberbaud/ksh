@@ -100,6 +100,7 @@ generate-exclusive-lock-name
 get-exclusive-lock
 getopts
 git-remote-links
+golang
 gsub
 h1
 h2

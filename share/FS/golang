@@ -1,0 +1,12 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2022-08-18,04.16.49z/d0f4b4>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^G(no arguments)^g
+#:   Wraps go
+
+needs /usr/local/bin/go
+function golang {
+	/usr/local/bin/go "$@"
+}
+
+# Copyright © 2022 by Tom Davis <tom@greyshirt.net>.

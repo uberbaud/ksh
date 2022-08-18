@@ -9,7 +9,7 @@ function load-function {
 	local found=false warnOrDie=${warnOrDie:-die} FORCE_MSG
     for P in $(path "$FPATH"); do
 	[[ -f $P/${1:?} ]] || continue
-		. $P/$1
+		. $P/$1 || return
 		found=true
 		break
     done

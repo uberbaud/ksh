@@ -7,11 +7,12 @@
 
 # TODO use load-function, follow aliases
 function ftry {
-	local trace=
-	[[ ${1:-} == -x ]]&& { trace=t; shift; }
-    unset -f "$1"
-	typeset -fu$trace "$1"
-    "$@"
+	local trace=false warnOrDie=warn
+	[[ ${1:-} == -x ]]&& { trace=true; shift; }
+
+	load-function "$1" || return
+	$trace && typeset -ft "$1"
+   	"$@"
 }
 
 # Copyright © 2020 by Tom Davis <tom@greyshirt.net>.

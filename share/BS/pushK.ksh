@@ -71,10 +71,34 @@ function commit-everything { # {{{1
 	git diff-index --cached --quiet HEAD ||
 		GIT 2 commit -av	 msg "did not commit ^B$branch^b"
 } # }}}1
+function diffstat { # {{{1
+	(($#<1))&& bad-programmer "Missing required parameter ^Ubranch^u."
+	(($#>1))&& bad-programmer "Unexpected parameters. Wanted ^Ubranch^u."
+	git diff --shortstat "$1"
+} # }}}1
+function handle-github-ssh-password { # {{{1
+	WE_STARTED_SSH_AGENT=false
+	eval "$(ssh-agent)" 2>/dev/null || return 1
+
+	WE_STARTED_SSH_AGENT=true
+	AWKPGM=$(</dev/stdin) <<-\
+	===AWK===
+	/^Host github\.com/				{p=1;next}
+	/^Host /						{p=0;next}
+	/^[[:space:]]+IdentityFile/		{print $NF;exit}
+	===AWK===
+
+	fID=$(awk "$AWKPGM" ~/.ssh/config)
+	ssh-add ${fID+"$fID"}
+} # }}}1
+function finit-github-ssh-password { # {{{1
+	$WE_STARTED_SSH_AGENT &&
+		ssh-agent -k >/dev/null 2>&1
+} # }}}1
 
 (($#))&& die 'Unexpected arguments. Expected ^Bnone^b.'
 
-needs git h1 i-can-haz-inet needs-cd sparkle-path
+needs git h1 i-can-haz-inet needs-cd sparkle-path message
 
 needs-cd -or-die "${KDOTDIR:?}"
 
@@ -82,20 +106,45 @@ branch=$(git-branch-name)
 [[ $branch == trunk ]]&& die 'On branch ^Etrunk^e!!!'
 [[ $branch != $HOST ]]&& die "On branch ^E$branch^e, not branch ^E$HOST^e!!!"
 
-if [[ -z $(git status --short) ]]; then
+#if [[ -z $(git status --short) ]]; then
+DIFFSTAT=$(diffstat trunk) ||
+	die "Weirdly, ^Tgit diff --shortstat trunk^t failed."
+if [[ -z $DIFFSTAT ]]; then
 	notify 'Nothing to commit. Exiting.'
 	return
 else
+	message ' ^Nstatus^n:' '        ' "$DIFFSTAT"
 	i-can-haz-inet	|| die 'No internet' "$REPLY"
+	handle-github-ssh-password
 
+	# save our work
 	commit-everything $HOST
+
+	# get the latest from origin
+	GIT 1 fetch --all
+
+	[[ $(git rev-parse trunk) == $(git rev-parse FETCH_HEAD) ]]|| {
+		# merge trunk with origin/trunk
+		GIT 1 checkout trunk --quiet
+		GIT 1 merge FETCH_HEAD --quiet
+
+		# merge newly fetched with origin/trunk (via trunk)
+		GIT 1 checkout $HOST --quiet
+		GIT 1 merge trunk
+	  }
+
+	# merge our work into trunk (should never have conflicts)
 	GIT 1 checkout trunk --quiet
 	GIT 1 merge $HOST --quiet
-	commit-everything trunk
-	GIT 1 pull
+
+	# merge our work into origin (via trunk)
 	GIT 1 push
+
+	# get back to where you once belonged
 	GIT 1 checkout $HOST --quiet
-	GIT 1 merge trunk --quiet
+
+	# we're done with the ssh bits
+	finit-github-ssh-password 
 fi; exit
 
 # Copyright (C) 2017 by Tom Davis <tom@greyshirt.net>.

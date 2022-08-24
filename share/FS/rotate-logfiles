@@ -14,7 +14,7 @@ function rotate-logfiles {
 	((--N))
 	B=${L##*/}
 	P=${L%"$B"}; P=${P%/}
-	[[ -n $P && $P != . ]]&& needs-path -or-die "$P"
+	[[ -n $P && $P != . ]]&& needs-path -create -or-die "$P"
 
 	# don't save an empty log file
 	[[ -s $L ]]|| return 0

@@ -40,7 +40,7 @@ function rcs-decompose { # {{{1
 	print -u2 -- " >>> $vORIGIN"
 
 	ln -sf "$2" "$V"
-	needs-path -or-die $vID
+	needs-path -create -or-die $vID
 
 	# file1 depends on split options: -a# and name (last parameter), so
 	# let's compute it
@@ -97,7 +97,7 @@ shift $((OPTIND-1))
 (($#<1))&& die 'Missing required parameter ^Urcs-repo,v^u.'
 (($#>2))&& die 'Too many parameters. Expected two (2).'
 
-needs dir-is-empty needs-file rlog split
+needs dir-is-empty needs-file needs-path rlog split
 
 needs-file -or-die "$1"
 rcs-decompose "${2:?}" "$1"; exit

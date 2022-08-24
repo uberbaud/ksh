@@ -33,7 +33,7 @@ function xat {
 	[[ $(date -r $NOW +%d) == $(date -r $THEN +%d) ]]|| DAY=tomorrow
 
 	local alarms=${XDG_DATA_HOME:?}/alarms
-	needs-path -or-die "$alarms"
+	needs-path -create -or-die "$alarms"
 
 	local fmt='  \e[34m>>>\e[39m Setting message for \e[1m%s\e[22m %s.\n'
 	local HHMM=$(date -r $THEN +%H:%M)

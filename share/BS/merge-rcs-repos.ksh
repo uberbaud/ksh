@@ -172,7 +172,7 @@ REPO_NAME=$REPLY
 			die "^T-m^t points to ^S${MAINV##*/}^s, not ^S$REPO_NAME^s."
 		MAINV=${MAINV%/*}
 	fi
-	needs-path "$MAINV" ||
+	needs-path -create -or-false "$MAINV" ||
 		die "^T-m^t path $REPLY does not exist and could not be created."
   }
 

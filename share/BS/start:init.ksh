@@ -216,7 +216,7 @@ function skelout { # {{{1
 } # }}}1
 function mk-app-starter { # {{{1
 	[[ -f $USER_START ]]&& return 0 # ~$APP/bin/$S already exists
-	needs-path -or-warn "$PUB/$APP" || return
+	needs-path -create -or-warn "$PUB/$APP" || return
 	[[ -s $1 ]]&& return 0 # specialized $S already exists
 
 	skelout >$1 || {
@@ -233,7 +233,7 @@ function create-app-starter { # {{{1
 	local F P S
 
 	P=$PUB/$APP
-	needs-path -or-die "$P/RCS"
+	needs-path -create -or-die "$P/RCS"
 
 	F=$P/$START_SCRIPT
 	mk-app-starter "$F" || die "Could not create ^Bstart-app.ksh^b."
@@ -272,7 +272,7 @@ function create-user-links { # {{{1
 	ln -sf "$KDOTDIR/share/BS/start.ksh" "$USRBIN/$APP"
 
 	D=$XDG_DOCUMENTS_DIR/$APP
-	needs-path "$D" || return
+	needs-path -create -or-false "$D" || return
 
 	[[ $(stat -f %Sg "$D") == $GRPNAME ]]||
 		chgrp -R $GRPNAME "$D" ||
@@ -319,7 +319,7 @@ USER_START=$APP_HOME/bin/$START_SCRIPT
 
 HOLD=~/hold/$(uname -r)/sys-files/etc
 
-needs-path -or-die "$HOLD/RCS"
+needs-path -create -or-die "$HOLD/RCS"
 needs-cd -or-die "$HOLD"
 
 fTEMP=$(mktemp)

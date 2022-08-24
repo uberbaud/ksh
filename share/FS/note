@@ -23,8 +23,8 @@ function note {(
 
 	[[ $PWD == */$dNAME ]]&& DEPO=$PWD
 	[[ $DEPO == $HOME ]]&& DEPO=${XDG_DOCUMENTS_DIR:-$HOME/docs}/$dNAME
-	$syslink && needs-path -or-die "$noterepo"
-	needs-path -or-die "$DEPO"/RCS
+	$syslink && needs-path -create -or-die "$noterepo"
+	needs-path -create -or-die "$DEPO"/RCS
 	cd "$DEPO"
 	[[ -o noglob ]]&& { setnoglob=true; set +f; }
 	set -A Q -- *.note

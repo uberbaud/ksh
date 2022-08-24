@@ -72,7 +72,7 @@ function show-message { # {{{1
 
 } # }}}1
 function make-gnu-links { # {{{1
-	needs-path -or-die "$P"
+	needs-path -create -or-die "$P"
 	typeset -i founds
 	for c in make {,s}diff diff3 {,e,f}grep; do
 		g=$(whence -p g$c) || {

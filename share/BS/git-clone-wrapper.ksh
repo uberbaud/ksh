@@ -73,7 +73,7 @@ function main { # {{{1
 	# git worktree directory
 	WORKTREE_PATH=$PWD/$newdir
 	[[ -d $WORKTREE_PATH ]]|| {
-		needs-path -or-die "$WORKTREE_PATH"
+		needs-path -create -or-die "$WORKTREE_PATH"
 		shquote "$WORKTREE_PATH"
 		+remove_on_die "rmdir $REPLY"
 	  }
@@ -83,7 +83,7 @@ function main { # {{{1
 	REPOSITORY_PATH=$GIT_BARE_REPOS/$R
 	repo_base=${REPOSITORY_PATH%/*}
 	[[ -d $repo_base ]]|| {
-		needs-path -or-die "$repo_base"
+		needs-path -create -or-die "$repo_base"
 		shquote "$repo_base"
 		+remove_on_die "rmdir $repo_base"
 	  }

@@ -44,7 +44,7 @@ function mnt-fs { # {{{1
 	desparkle "$mntpnt";	mntpntD=$REPLY
 	desparkle "$dev";		devD=$REPLY
 	df -P | egrep -q "^$dev " && return 0 # already mounted
-	needs-path -or-warn "$mntpnt" || return
+	needs-path -create -or-warn "$mntpnt" || return
 	
 	$WANT_FSCK && {
 		notify fsck

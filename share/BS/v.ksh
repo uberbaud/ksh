@@ -68,7 +68,7 @@ function safe-to-edit { #{{{1
 	gsub / %  "$REPLY"
 	LOCKNAME=$REPLY
 	V_CACHE=$XDG_CACHE_HOME/v
-	needs-path -or-die "$V_CACHE"
+	needs-path -create -or-die "$V_CACHE"
 	get-exclusive-lock -no-wait "$LOCKNAME" $V_CACHE ||
 		already-in-edit "$REPLY"
 }

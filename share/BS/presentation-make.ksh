@@ -97,7 +97,7 @@ function mkAndCleanDir { # {{{1
 	[[ $1 == */* ]]&&
 		die '^WBad Programmer^w: Directory name contains ^/.'
 
-	needs-path -or-die -with-notice "$1"
+	needs-path -create -with-notice -or-die "$1"
 
 	notify "Cleaning ^S$1^s directory."
 	rm -rf $1/*

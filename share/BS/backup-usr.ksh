@@ -144,7 +144,7 @@ function backup-to-local { # {{{1
 	check-attached
 	check-mounted || try-mounting
 
-	needs-path -or-die "$backbase"
+	needs-path -create -or-die "$backbase"
 	$want_stop_after_mount && return
 
 	splitstr : "$(getent passwd $(id -un))"

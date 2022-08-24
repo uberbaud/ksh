@@ -7,7 +7,7 @@
 
 needs needs-path
 function playground {
-	needs-path -or-die ~/play
+	needs-path -create -or-die ~/play
 	builtin cd ~/play
 	(($#))|| return 0 # no directory given so we're done
 	(($#>2))&& fail 'Unexpected arguments. Wanted 1 or 2.'
@@ -53,7 +53,7 @@ function playground {
 	fi
 
 	[[ -n $choice ]]|| return
-	needs-path -or-warn "$choice/RCS"
+	needs-path -create -or-warn "$choice/RCS"
 
 	builtin cd "$choice"
 	fUSE=.created

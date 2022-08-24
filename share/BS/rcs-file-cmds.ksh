@@ -100,7 +100,7 @@ function do-one { # {{{1
 	# source file ($1) has already been verified to exist
 	# AND `realpath`ed in `get-source-files`
 	get-rcs-repo-and-dest "$1" &&
-		needs-path -or-warn -with-notice "$DRCS" &&
+		needs-path -create -with-notice -or-warn "$DRCS" &&
 		"$CMD" ${flags[*]:+"${flags[@]}"} "$RCS_SRC" "$RCS_DEST"
 	"$CMD" ${flags[*]:+"${flags[@]}"} "$1" "$DPATH/$DFILE"
 } # }}}1

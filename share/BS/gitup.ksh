@@ -138,7 +138,7 @@ function convert-and-move-repo-to-bare { # {{{1
 		die "^Sorigin^s isn't in an expected format." "$origin"
 	basedir=$REPODIR/$basedir
 
-	needs-path -or-die "$basedir"
+	needs-path -create -or-die "$basedir"
 
 	newrepo=$basedir/${newrepo%.git}.git
 

@@ -16,7 +16,7 @@ needs needs-path rotate-logfiles
 		logpath=~/log
 		logfile=$logpath/$logname
 	fi
-	needs-path -or-die "${logpath#/}"
+	needs-path -create -or-die "${logpath#/}"
 
 	rotate-logfiles "$logfile"
 	

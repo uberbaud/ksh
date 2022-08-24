@@ -82,7 +82,7 @@ needs tidy needs-cd needs-path
 
 work=${XDG_PUBLICSHARE_DIR:?}/mail
 
-needs-path -or-die "$work"
+needs-path -create -or-die "$work"
 needs-cd -or-die "$work"
 printf 'In \e[35m$XDG_CACHE_HOME/mail\e[39m\n'
 

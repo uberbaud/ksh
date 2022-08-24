@@ -56,7 +56,7 @@ function do-one {
 	zcat "$1" |&
 	read -rp restname
 	restdir=${restname%/*}
-	needs-path -or-warn "$restdir" || return
+	needs-path -create -or-warn "$restdir" || return
 
 	cat <&p >"$restname"
 }

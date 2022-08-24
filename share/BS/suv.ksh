@@ -61,8 +61,8 @@ function mk-linked-rcs { # {{{1
 	rcs_path=$RCS_BASE$1
 	link_to=$2/RCS
 
-	needs-path -or-die "$rcs_path"
-	needs-path -or-die "$link_to"
+	needs-path -create -or-die "$rcs_path"
+	needs-path -create -or-die "$link_to"
 
 	ln -s "$rcs_path" "$link_to" ||
 		die "Could not ^Tln -s^t" "^U$rcs_path^u" "^U$link_to^u"
@@ -167,7 +167,7 @@ needs as-root ci co desparkle get-exclusive-lock $ED needs-cd needs-path	\
 
 CI_INITIAL_DESCRIPTION='OpenBSD system file'
 LOCKBASE=${XDG_CACHE_HOME:?}/suv/locks
-needs-path -or-die "$LOCKBASE"
+needs-path -create -or-die "$LOCKBASE"
 
 filename=$1; shift
 desparkle "$filename"
@@ -204,7 +204,7 @@ print $$>"$LOCKBASE/$lockfile"
 
 HOLD_PATH=$HOME/hold
 RCS_BASE=$HOLD_PATH/common-rcs/sys-files
-needs-path -or-die "$RCS_BASE"
+needs-path -create -or-die "$RCS_BASE"
 
 
 (main "$@"); release-exclusive-lock "$lockfile" "$LOCKBASE"; exit

@@ -36,6 +36,7 @@ command
 compact-timestamp
 cond-rlwrap
 continue
+coproc-w-fds
 count-down
 cowmath
 csongor-colors

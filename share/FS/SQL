@@ -2,17 +2,29 @@
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
 
 #: FUNCTION ^[^USQL_statement(s)^u^] ^= sqlreply
-#:   Co-processicize sqlite3 and sugar the interaction. If no SQL statement
-#:     is given on the command line, reads it from ^Sstdin^s.
-#:   Starts the co-process if it isn't already going.
-#:   Sets array ^O$^o^VSQLFD^v to the co-process file descriptors.
-#:   Exports ^O$^o^VSQLSEP^v as field separator, but uses user set value if
-#:     it's set before the initial call to SQL.
-#:   Uses ^O$^o^VSQL_AUTODIE^v (^Itrue^i, ^Iwarn^i, or ^Ifalse^i). Defaults to ^Itrue^i.
-#:   Uses ^O$^o^VSQL_VERBOSE^v (^Itrue^i or ^Ifalse^i). Defaults to ^O${^o^Vverbose^v^O:-^o^Tfalse^t^O}^o.
-#:   ^NSee also: SQLify^n
+#:   Passes ^USQL statment^u to an ^Isqlite3^i co-process and returns 
+#:     the result in the array ^O$^o^Vsqlreply^v. If no ^USQL statement^u
+#:     parameter is given, it will be read from ^Sstdin^s.
+#:   If there is not already an ^Isqlite3^i co-process running:
+#:     1) Starts the co-process,
+#:     2) Sets the array ^O$^o^VSQLFD^v to the co-process file 
+#:        descriptors,
+#:     3) Sets ^O$^o^VSQLSEP^v (the field separator) to ^O\^o^S034^s if 
+#:        it is not already set, and
+#:     4) Sets ^O$^o^VSQLPID^v to the process id of the ^Isqlite3^i 
+#:        co-process instance.
+#:
+#: FUNCTION respects the variables
+#:   ^O$^o^VSQL_AUTODIE^v (^Itrue^i, ^Iwarn^i, or ^Ifalse^i). Defaults to ^Itrue^i.
+#:   ^O$^o^VSQL_VERBOSE^v (^Itrue^i or ^Ifalse^i). Defaults to ^O${^o^Vverbose^v^O:-^o^Tfalse^t^O}^o.
+#:
+#: ^GSee also: ^BSQLify^b, ^Bsql-reply^b, and ^Bsql-fields^b^g
+#: ^GNote:^g FUNCTION ^Gdelineates ^Isqlite3^i responses with a line consisting
+#:       solely of ^O\^o^S007^s^O\^o^S007^s^O\^o^S007^s ^G(three bells). Consequently,
+#:       if an ^Isqlite3^i ^Gresponse contains such a line, it will 
+#:       cause^g FUNCTION ^Gto lose its place.^g
 
-needs sqlite3
+needs add-exit-actions coproc-w-fds die get-unused-fds sqlite3 warn
 function SQL {
 	local sql response READY verbose autodie autowarn
 	READY='\007\007\007' # three bells
@@ -28,13 +40,12 @@ function SQL {
 
 	SQLSEP=${SQLSEP:-"$(print '\034')"} # ^\ -> field separator
 	(($#))&& sql="$*" || sql=$(</dev/stdin)
-	((${SQLFD[0]:-}))|| {
-		sqlite3 -noheader -batch -list -separator "$SQLSEP" 2>&1 |&
+	((${SQLFD[0]:-}))|| { # BEGIN CO-PROCESS START-UP
+		get-unused-fds 2 SQLFD
+		coproc-w-fds ${SQLFD[0]} ${SQLFD[1]}	\
+			sqlite3 -noheader -batch -list -separator "$SQLSEP"
 		SQLPID=$!
-		nextfd || die 'No available file descriptor.'; SQLFD[0]=$REPLY
-		eval "exec ${SQLFD[0]}<&p"
-		nextfd || die 'No available file descriptor.'; SQLFD[1]=$REPLY
-		eval "exec ${SQLFD[1]}>&p"
+
 		add-exit-actions "(trap '' PIPE; print -u${SQLFD[1]} '.quit')"
 		# clear the SQLite3 init output
 		print -ru${SQLFD[1]} 'PRAGMA foreign_keys = ON;'
@@ -45,7 +56,7 @@ function SQL {
 				die 'Could not read from ^SSQLFD^s.'
 			[[ $response == $READY ]]&& break
 		done
-	  }
+	  } # END CO-PROCESS START-UP
 	$verbose && print -ru2 -- "SQL> $sql"
 	print -ru${SQLFD[1]} -- "$sql"
 	print -ru${SQLFD[1]} -- ";"

@@ -13,7 +13,7 @@ use-app-paths new
 : ${APP_PATH:?}
 
 HELP_PATH=$APP_PATH/help
-needs-path -or-die -no-create "$HELP_PATH"
+needs-path -or-die "$HELP_PATH"
 
 H=$HELP_PATH/$1
 [[ -f $H ]]|| die "Could not find file ^U$1^u."

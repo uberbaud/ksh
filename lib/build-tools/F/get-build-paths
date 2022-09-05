@@ -7,7 +7,7 @@
 
 needs SQL needs-path
 function get-build-paths {
-	[[ -n ${1:-} ]]&& needs-path -or-die -no-create "$1"
+	[[ -n ${1:-} ]]&& needs-path -or-die "$1"
 
 	set -- $(make ${1:+-C "$1"} -D NO_MKDEP -V .CURDIR -V .OBJDIR)
 	(($#==2))|| die "$0: Unexpected result from ^Tmake -V^t."

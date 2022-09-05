@@ -1,0 +1,22 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2022-09-05,19.41.14z/126c26a>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Ucount^u ^[^Uretvar^u^]
+#:   Return ^Ucount^u available file descriptors in ^O$^o^{^Uretvar^u^O:-^o^Treply^t^}.
+
+needs die nextfd
+function get-unused-fds {
+	local i REPLY fds
+	i=${1:?Missing required parameter: count}
+	[[ $i == [1-7] ]]||
+		die "Unexpected count value: ^B$i^b. Wanted between 1 and 7 inclusive."
+	fds=
+	REPLY=2
+	while ((i--)); do
+		nextfd $((REPLY+1)) || die "Too few available file descriptors."
+		fds="$fds "$REPLY
+	done
+	set -A ${2:-reply} -- $fds
+}
+
+# Copyright © 2022 by Tom Davis <tom@greyshirt.net>.

@@ -1,14 +1,20 @@
 # <@(#)tag:csongor.greyshirt.net,2017-10-13:tw/01.33.17z/36f21bb>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^G(no arguments)^g
-#:   Sets ^O$^o^VREPLY^v to next available fd between 3 and 9
+#: FUNCTION ^[^Ustarting fd^u^]
+#:   Sets ^O$^o^VREPLY^v to next available fd between ^Ustarting fd^u 
+#:   and 9. If no ^Ustarting fd^u is given, defaults to ^T3^t.
+#:
 #:   Returns false on failure
 
 function nextfd {
-	local fd
+	local fd start count
+	start=${1:-3}
+	count=$((10-start))
+	((count>0))|| return
 	REPLY=''
-	for fd in $(jot 7 3); do
+	for fd in $(jot $count $start); do
+		((fd<=9))|| return
 		(: >&$fd ) 2>/dev/null && continue
 		(: <&$fd ) 2>/dev/null && continue
 		REPLY=$fd

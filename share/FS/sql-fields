@@ -1,14 +1,17 @@
 # <@(#)tag:tw.csongor.greyshirt.net,2019-11-26,03.13.42z/12493e>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^G(no arguments)^g
-#:   prints ^O$^o^V1^v split on ^O$^o^VSQLSEP^v tab-delimited.
+#: FUNCTION ^Urow^u ^[^Uprefix^u^]
+#:   Prints ^O$^o^Vrow^v split on ^O$^o^VSQLSEP^v, then tab-delimited.
+#:   Each line is prefixed with ^Uprefix^u, or two spaces if ^Uprefix^u 
+#:     is not given.
 
+needs splitstr
 function sql-fields {
 	local TAB SEP F
 	SEP=${2-  }
 	TAB='	'
-	splitstr "$SQLSEP" "$1" sqlfields 
+	splitstr "$SQLSEP" "${1:?Missing required parameter row.}" sqlfields
 	for F in "${sqlfields[@]}"; do
 		print -rn -- "$SEP$F" 
 		SEP=$TAB

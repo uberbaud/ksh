@@ -5,7 +5,7 @@
 #:   Coprocess but on STDERR, output to ^Ulog file^u, with timestamp
 #:   and with log file rotation.
 
-needs needs-path rotate-logfiles
+needs needs-path nextfd rotate-logfiles
 \log-stderr-to () {
 	local logfile logname logpath
 	logfile=${1:-~/log/${0##*/}.log}

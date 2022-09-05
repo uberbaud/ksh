@@ -1,0 +1,73 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2022-09-05,14.41.44z/ae41a5>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Ufd A^u ^Ufd B^u ^Ucommand^u ^[^Uparameters^u^]
+#:   Tries to simulate a coprocess with FIFOs and with the given file 
+#:   descriptors.
+#:
+#:   After the coprocess is successfully started, you will be able to 
+#:   write to ^Ufd B^u to send messages to the ^Icoprocess^i and read 
+#:   from ^Ufd A^u to get messages back.
+#:
+#:   ^NNote: ^Ucmd^u's stderr will be redirected so that error messages^n
+#:         ^Nwill also be available to the caller on ^Ufd B^u.^n
+
+needs shquote
+function coproc-w-fds {
+	local fdA fdB tmpD A B qCmd REPLY
+
+	fdA=${1:?Missing required fd_A}
+	fdB=${2:?Missing required fd_B}
+	[[ $fdA == [3-9] && $fdB == [3-9] ]]||
+		die "^Ufd A^u and ^Ufd B^u must be integers between 3 and 9 inclusive."
+	((fdA==fdB))&&
+		die "^Ufd A^u and ^Ufd B^u cannot be the same."
+	shift 2
+	(($#))||
+		die "Missing required parameter ^Ucommand^u."
+
+	tmpD=$(mktemp -d) || die "Could not ^Tmktemp^t"
+	A=$tmpD/a.fifo
+	B=$tmpD/b.fifo
+	mkfifo "$A" "$B" || {
+		rm -f "$A" "$B" 2>/dev/null # just in case one of them was created
+		rmdir "$tmpD"
+		die "Could not create FIFO pipes."
+	  }
+
+	# The jobs command will show exacly what we pass, so "$@", but if we 
+	# pass "$@" to eval, IFS could be problematic, so let's quote all 
+	# the parameters and then we can pass the quoted string to `eval`.
+	while (($#)); do
+		shquote "$1"
+		qCmd=${qCmd:+"$qCmd "}$REPLY
+		shift
+	done
+
+	# KSH requires that the file descriptors designating what will be 
+	# redirected be literal integers, not variables, so we need to 
+	# handle that in an `eval`.
+	#
+	# HOWEVER, ksh blocks when trying to create a Read_File_Descriptor 
+	# in `eval` because there's nothing on the other side yet, SO we 
+	# `print` nothing to each of the FIFOs to solve that weird kink. But 
+	# we still need to do each of those prints in the background or THEY 
+	# will block. This issue does not seem to be a problem when the 
+	# command is executed without `eval`.
+
+	# PRIME THE FIFOs (in a subshell for cleaner jobs output)
+	(print -n >$A & print -n >$B &)
+
+	# RUN THE COMMAND WITH REDIRECTIONS
+	eval "$qCmd <\$B >\$A 2>&1 &"
+
+	# CONNECT THE GIVEN FILE DESCRIPTORS TO THE FIFOs
+	eval "exec $fdA<\$A $fdB>\$B"
+
+	# Now that we have open handles to the FIFOs, we can remove them 
+	# from the file system while still using them.
+	rm -f "$A" "$B"
+	rmdir "$tmpD"
+}
+
+# Copyright © 2022 by Tom Davis <tom@greyshirt.net>.

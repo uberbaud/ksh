@@ -9,6 +9,11 @@ export VISUAL=vise
 export CPANMLIB=$xdgdata/perl5/lib/perl5
 alias cpanm="cpanm --local-lib=${CPANMLIB%/lib/perl5}"
 
+command -v realpath 2>/dev/null || function realpath {
+	while [[ $1 == -* ]]; do shift; done
+	readlink -f "$1" 2>/dev/null
+}
+
 typeset -fu pre-prompt
 export PS1=\
 '$(pre-prompt)'\

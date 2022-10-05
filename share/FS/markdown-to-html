@@ -6,8 +6,9 @@
 
 needs cmark
 function markdown-to-html {
+	: ${1:?}
     print "<html>\n<head><title>${1##*/}</title></head>\n<body>\n"
-    cmark --to html --smart --validate-utf8 "${1:?}"
+    cmark --to html --smart --validate-utf8 "$1"
     print "</body>\n</html>"
 }
 

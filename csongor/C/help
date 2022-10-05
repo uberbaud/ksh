@@ -99,6 +99,7 @@ fullstop
 functions
 generate-exclusive-lock-name
 get-exclusive-lock
+get-unused-fds
 getopts
 git-remote-links
 golang

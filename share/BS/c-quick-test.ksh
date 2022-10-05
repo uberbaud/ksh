@@ -54,20 +54,21 @@ function write-file { #{{{1
 	subst-pathvars $CURDIR CURDIR
 	subst-pathvars $OBJDIR OBJDIR
 	cat <<-===
-		/* --------------------------------------------------------------------
+		/* ----------------------------------------------------------------------
 		 | $(mk-stemma-header)
-		 | --------------------------------------------------------------------
-		 |  Lines in THIS comment which look like make assignments ([+:?!]*=)
-		 |    will be passed to \`make\` (stripped of leading whitespace).
-		 |  The variable \$PACKAGES, if not empty, will be fed to \`pkg-config\`
-		 |    and \$LDFLAGS and \$CFLAGS will be appended with that output.
-		 |  Files named in \$OBJS and found in \$OPATH will be added to \$LDLIBS
-		 + --------------------------------------------------------------------
+		 | ----------------------------------------------------------------------
+		 |     Lines in THIS comment which look like \`make\` assignments,
+		 |  when processed by \`fuddle\`, will be stripped of leading whitespace
+		 |  then passed to \`make\` to compile this file.
+		 |     The variable \$PACKAGES, if not empty, will be fed to \`pkg-config\`
+		 |  and \$LDFLAGS and \$CFLAGS will be appended with that output.
+		 |     Files named in \$OBJS and found in \$OPATH will be added to \$LDLIBS.
+		 + ----------------------------------------------------------------------
 		    # SRCPATH  = ${CURDIR:-}
 		    # OPATH    = ${OBJDIR:-}
 		    # OBJS     = ${OBJS:-my.o}
 		    # ^equivalent to: LDLIBS   += \$OPATH/my.o
-		    PACKAGES = notify_usr${*+ "$*"}
+		    PACKAGES = notify_usr${*+ $*}
 		    CFLAGS  += -std=c17
 		 + -------------------------------------------------------------------- */
 
@@ -97,7 +98,7 @@ function write-file { #{{{1
 
 needs add-exit-actions build-and-run clearout needs-cd pkg-config use-app-paths
 use-app-paths build-tools
-needs get-build-paths show-bad-packages
+needs get-build-paths show-bad-packages subst-pathvars
 
 (($#))|| pkg-config --exists "$@" || show-bad-packages "$@"
 

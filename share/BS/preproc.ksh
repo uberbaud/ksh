@@ -4,6 +4,7 @@
 
 set -o nounset;: ${FPATH:?Run from within KSH}
 
+XXDIFF=/usr/local/bin/xxdiff
 # Usage {{{1
 this_pgm=${0##*/}
 function usage {
@@ -12,7 +13,10 @@ function usage {
 	sparkle >&2 <<-\
 	===SPARKLE===
 	^F{4}Usage^f: ^T$PGM^t ^UC Source Code^u
-	         Show preprocessed ^UC Source Code^u.
+	         Runs ^UC Source Code^u through the preprocessor and if ^Sstdout^s
+	           is a terminal, ^Tdiff^ts the original and expanded versions, or
+	           if ^Sstderr^s has been redirected, spews the expanded version.
+	         Uses ^O\${^o^VDIFF^v^O:-^o^T$XXDIFF^t^O}^o.
 	       ^T$PGM -h^t
 	         Show this help message.
 	===SPARKLE===
@@ -46,7 +50,7 @@ function workit { # {{{1
 	sed -E -e "1,${mark}d" -e '/^[[:space:]]*#/d' <$fPreProc
 } # }}}1
 
-needs awk cc f-xxdiff needs-file sed
+needs awk cc needs-file sed
 
 (($#))||	die 'Missing required parameter ^TC Source Code^t'
 typeset -i10 i=0
@@ -74,8 +78,8 @@ awkpgm=$(</dev/stdin) <<-\
 	===AWK===
 
 pTmp=$(mktemp -d) || die 'Could not ^Tmktemp^t.'
-print -r -- "mktemp -> $pTmp"
-#trap "CleanUp '$pTmp'" EXIT
+[[ -t 1 ]]&& print -r -- "// mktemp -> $pTmp"
+trap "CleanUp '$pTmp'" EXIT
 iTmp=$pTmp/preproc.i
 
 fuddle ${cflags:+"${cflags[@]}"} "$target" >$iTmp
@@ -86,7 +90,8 @@ cTmp=$pTmp/clean.c
 workit "$iTmp" "$delTo" "$src" | cat -s >$cTmp
 #nvim -Rd "$src" "$cTmp"
 if [[ -t 1 ]]; then
-	D=${DIFF:-/usr/local/bin/xxdiff}
+	D=${DIFF:-${XXDIFF:?BAD PROGRAMMER, XXDIFF is not set}}
+	needs "$D"
 	if (ldd $(which $D) | sed 1d | egrep -q X11R6) >/dev/null 2>&1; then
 		($D "$src" "$cTmp"; CleanUp "$pTmp") >/dev/null 2>&1 &
 		trap - EXIT

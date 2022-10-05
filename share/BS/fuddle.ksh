@@ -6,6 +6,7 @@ set -o nounset;: ${FPATH:?Run from within KSH}
 
 MAKE=/usr/bin/make
 
+WarnLevel=${WARN_LEVEL:-everything}
 # Usage {{{1
 this_pgm=${0##*/}
 function usage {
@@ -16,6 +17,7 @@ function usage {
 	^F{4}Usage^f: ^T$PGM^t ^[^Umake opts^u^] ^UC source^u ^[^T-^t^]
 	         Ignoring any ^Imakefile^i, ^Tmake^t using vars from the ^UC source^u header.^N*^n
 	           ^T-^t Print created ^Imakefile^i but do not ^Tmake^t.
+	           Passes ^T-W^t^O\${^o^VWARN_LEVEL^v^O:-^o^Teverything^t^O}^o ^G(Currently^g ^T$WarnLevel^t^G)^g to ^O\$^o^VCC^v.
 	       ^T$PGM -h^t
 	         Show this help message.
 	   ^G____^g
@@ -79,7 +81,7 @@ needs-file -or-die "$source"
 [[ -n ${CFLAGS:-} ]]&& {
 	cflags=
 	for c in ${CFLAGS:-}; do
-		[[ ${c#-} == @(Weverything|fdiagnostics-show-option|fcolor-diagnostics) ]]&&
+		[[ ${c#-} == @(Wall|Weverything|fdiagnostics-show-option|fcolor-diagnostics) ]]&&
 			continue
 		cflags="${cflags+ }$c"
 	done
@@ -106,8 +108,8 @@ fi
 	$(get-header-assignments <$source)
 
 	#${hhhStandard-}
-	# Definitely show all the bits and in color
-	CFLAGS += -Weverything -fdiagnostics-show-option -fcolor-diagnostics
+	# Show all the bits and do it in color.
+	CFLAGS += -W$WarnLevel -fdiagnostics-show-option -fcolor-diagnostics
 
 	# handle OPATH/OBJS
 	.if defined(OPATH) && !empty(OPATH)

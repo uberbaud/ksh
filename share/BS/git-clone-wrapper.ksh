@@ -15,7 +15,7 @@ function usage {
 	===SPARKLE===
 	^F{4}Usage^f: ^T$PGM^t
 	         ^Tclone^ts a bare repository, checks that out as a worktree.
-	         The repository will be in ^SGIT_BARE_REPOS^s/^Uhost/and/path/repo.git^u
+	         The repository will be in ^SREPOS_HOME^s/^Uhost/and/path/repo.git^u
 
 	         ^GNote:^g ^T$PGM^t ^Goutputs the repository and worktree paths as^g
 	                  ^Gthe variables^g ^SWORKTREE_PATH^s ^Gand^g ^SREPOSITORY_PATH^s
@@ -80,7 +80,7 @@ function main { # {{{1
 
 	# git bare repository directory
 	R=${repo##@(http|https|ftp|ftps|git|ssh):*(/)}
-	REPOSITORY_PATH=$GIT_BARE_REPOS/$R
+	REPOSITORY_PATH=$REPOS_HOME/$R
 	repo_base=${REPOSITORY_PATH%/*}
 	[[ -d $repo_base ]]|| {
 		needs-path -create -or-die "$repo_base"

@@ -133,6 +133,12 @@ rcctl_2: $(PKG_LOG)
 	@echo $@
 	@/bin/ls -1 /etc/rc.d >$@
 
+ts:
+	@echo $@
+	@tree-sitter -h >tmp.tree-sitter
+	@awk '/^SUBCOMMANDS:/ {p=1;next} p {print $$1}' tmp.tree-sitter >$@
+	@rm tmp.tree-sitter
+
 $(PKG_LOG):
 	@echo $@
 	@mkdir -p $(PKG_LOG:H)

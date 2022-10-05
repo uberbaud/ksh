@@ -77,6 +77,8 @@ SYSDATA=$xdgdata/sysdata
 export KDOTDIR
 
 export GIT_BARE_REPOS=$xdgdata/repos
+export TREE_SITTER_LIBS=$xdgcache/tree-sitter/lib
+	[[ -d $TREE_SITTER_LIBS ]]|| unset TREE_SITTER_LIBS
 
 ####### IMPORT LOCAL BITS
 [[ -f $KU/kshrc ]]&& . $KU/kshrc

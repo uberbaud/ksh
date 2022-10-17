@@ -13,10 +13,11 @@ function usage {
 	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
-	^F{4}Usage^f: ^T$PGM^t ^[^T-e^t^] ^Usrc^u
+	^F{4}Usage^f: ^T$PGM^t ^[^T-e^t^|^T-l^t^] ^Usrc^u
 	         Uses header information in C file to set build environment,
-	         runs ^Tmake^t ^O\${^o^Vsrc^v^O%^o^T.c^t^O}^o, and runs the resulting executable.
-	         ^T-e^t  Open an editor and do make+run on saves.
+	         runs ^Tfuddle^t ^O\${^o^Vsrc^v^O%^o^T.c^t^O}^o, and runs the resulting executable.
+	         ^T-l^t  Do make+run on changes to ^Usrc^u (eg: saves).
+	         ^T-e^t  Open ^Usrc^u in an editor and do make+run on saves.
 	       ^T$PGM -h^t
 	         Show this help message.
 	===SPARKLE===
@@ -24,9 +25,11 @@ function usage {
 } # }}}
 # process -options {{{1
 MAIN=make+run
-while getopts ':eh' Option; do
+DOEDIT=false
+while getopts ':elh' Option; do
 	case $Option in
-		e)	MAIN=loop;														;;
+		e)	DOEDIT=true; MAIN=loop;											;;
+		l)	MAIN=loop;														;;
 		h)	usage;															;;
 		\?)	die USAGE "Invalid option: ^B-$OPTARG^b.";						;;
 		\:)	die USAGE "Option ^B-$OPTARG^b requires an argument.";			;;
@@ -66,7 +69,7 @@ function edit-c-file { #{{{1
 } #}}}1
 function make+run { # {{{1
 	local T rc
-	h3 "make $EXE"
+	h3 "make/fuddle $EXE"
 	fuddle "$CFILE" || return
 
 	[[ -f obj/$EXE ]]&& EXE=obj/$EXE
@@ -108,7 +111,7 @@ function loop { #{{{1
 	subst-pathvars "$PWD" prnPathName
 
 	UUID=$(uuidgen) # so edit-c-file can signal ONLY THIS watch-file
-	edit-c-file "$CFILE" &
+	$DOEDIT && edit-c-file "$CFILE" &
 	cksum_previous=unedited
 	h3 "$prnPathName / $UUID"
 	while watch-file -i "$UUID" "$CFILE" 2>/dev/null; do

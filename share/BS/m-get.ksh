@@ -11,9 +11,10 @@ function usage {
 	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
-	^F{4}Usage^f: ^T${PGM}^t ^[^Uacct_list^u^]
+	^F{4}Usage^f: ^T${PGM}^t ^[^T-n^t^] ^[^Uacct_list^u^]
 	         Download (fetchmail), import into MMH (inc), and do some
 	         processing.
+	           ^T-n^t  Don't download anything, just do the other bits.
 	       ^T${PGM} -l^t
 	         List available accounts.
 	       ^T${PGM} -h^t
@@ -31,8 +32,10 @@ function list-accts { # {{{2
 	needs $laccts
 	$laccts
 } # }}}2
-while getopts ':lh' Option; do
+DOWNLOAD=true
+while getopts ':lnh' Option; do
 	case $Option in
+		n)	DOWNLOAD=false;											;;
 		l)  list-accts; exit;										;;
 		h)	usage;													;;
 		\?)	die "Invalid option: [1m-$OPTARG[22m.";				;;
@@ -57,68 +60,31 @@ function group { # {{{1
 } 2>/dev/null # }}}1
 function P { printf '      ^F{4}─^f %s\n' "$1" | sparkle >&2; }
 
-i-can-haz-inet || die "$REPLY"
 
-accToFetch=${XDG_CONFIG_HOME:?}/fetchmail/accTofetch.ksh
-needs $accToFetch fetchmail inc m-list-new m-msgcount mark pick scan
+needs m-list-new m-msgcount mark pick
+if $DOWNLOAD; then
+	needs needs-file inc
 
-msgCount=$(m-msgcount)
-((msgCount))&& {
-	notify 'Noting old messages.'
-	mark +inbox a -sequence oldhat 2>/dev/null
-  }
+	getMail=${XDG_CONFIG_HOME:?}/fetchmail/get-remote-mail.ksh
+	needs-file -or-die "$getMail"
 
-msgCount=$(from|wc -l)
-((msgCount))&& {
-		notify 'Incorporating ^Slocal^s messages.'
-		inc -nochangecur >/dev/null
-	}
+	msgCount=$(m-msgcount)
+	((msgCount))&& {
+		notify 'Noting old messages.'
+		mark +inbox a -sequence oldhat 2>/dev/null
+	  }
 
-notify 'Generating ^Sfetchmailrc^s.'
-(($#))|| set -- \*
-$accToFetch "$@"
+	msgCount=$(from|wc -l)
+	((msgCount))&& {
+			notify 'Incorporating ^Slocal^s messages.'
+			inc -nochangecur >/dev/null
+		}
 
-notify 'Downloading ^Sremote^s messages…'
-fetchmail 2>&1 | while read -r resp; do
-	case "$resp" in
-		'reading message '*) continue; ;;
-		*' message'*seen\)*)
-			tM=${resp%% *}
-			sM=${resp#*\(}; sM=${sM% seen\) *}
-			N=$((tM-sM))
-			W=${resp#* for }; W=${W% at *}
-			M=message; [[ $resp == *messages* ]]&& M=messages
-			if ((N)); then
-				P "Getting ^F{5}$N^f $M for ^F{5}$W^f."
-			else
-				P "No new messages for ^F{5}$W^f."
-			fi
-			;;
-		*' message'*)
-			N=${resp%% *}
-			W=${resp#* for }; W=${W% at *}
-			M=message; [[ $resp == *messages* ]]&& M=messages
-			if ((N)); then
-				P "Getting ^S$N^s $M for ^S$W^s."
-			else
-				P "No new messages for ^S$W^s."
-			fi
-			;;
-		'fetchmail: No mail for '*)
-			W=${resp#* for }; W=${W% at *}
-			P "No new messages for ^S$W^s."
-			;;
-		*) warn "$resp"; ;;
-	esac
-done
-
-# regenerate fetchmail with all accounts enabled
-$accToFetch
+	$getMail "$@"
+fi
 
 msgCount=$(m-msgcount)
-((msgCount))|| { notify 'Nothing more to do, quitting'; exit 0; }
-
-/usr/bin/clear # clear, but keep the buffer
+((msgCount))|| { notify 'Nothing to do' 'quitting'; exit 0; }
 
 new-array scanout
 new-array groups

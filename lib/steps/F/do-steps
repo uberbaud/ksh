@@ -1,0 +1,26 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2022-11-08,22.42.38z/2d9eadb>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^G(no arguments)^g
+#:   Performs each ^Icommand^i in ^O$^o^Vsteps^v^O[]^o.
+#:   ^GNote: use^g ^T+^t ^Gto add steps.^g
+
+function do-steps {
+	local a i f ERRMSG
+	STEPS_DO_STEPS_WAS_CALLED=true
+	((${steps[*]+1}))|| die "No steps were created to perform."
+	i=0
+	while $STEPS_CONTINUE && ((i<STEPS_NEXT_ID)); do
+		a=${steps[i]}
+		desparkle "$a"
+		d=$REPLY
+		f=${steps_action[i]}
+		((i++))
+		[[ $f == skip ]]&& { $STEPS_ON_SKIP "^U$d^u"; continue; }
+		$STEPS_NOTIFIER "$a"
+		ERRMSG=
+		eval "$a" || $f "${ERRMSG:-"^B$d^b returned ^W$?^w."}"
+	done
+}
+
+# Copyright © 2022 by Tom Davis <tom@greyshirt.net>.

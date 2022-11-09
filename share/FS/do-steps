@@ -1,0 +1,14 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2022-10-28,00.45.47z/30376ce>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^G(no arguments)^g
+#:   Will be replaced by use-steps. See ^Thelp use-steps^t.
+
+needs bad-programmer
+function do-steps {
+	bad-programmer	\
+		'No steps have been created.'	\
+		'^GNote:^g ^Tuse-steps^t must be called before.'
+}
+
+# Copyright © 2022 by Tom Davis <tom@greyshirt.net>.

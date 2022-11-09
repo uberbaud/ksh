@@ -1,6 +1,7 @@
 amd
 apmd
 bgpd
+bgplgd
 bootparamd
 cron
 cups_browsed
@@ -67,7 +68,6 @@ spamlogd
 sshd
 statd
 svnserve
-switchd
 syslogd
 tftpd
 tftpproxy

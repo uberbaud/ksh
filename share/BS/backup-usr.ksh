@@ -22,6 +22,7 @@ quiet=false
 
 desparkle "$backbase"
 backbaseD=$REPLY
+use_local_store=true
 
 # Usage {{{1
 typeset -- this_pgm=${0##*/}

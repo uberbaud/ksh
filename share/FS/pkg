@@ -15,9 +15,8 @@
 #:   lists manually installed packages in a format which can be used by
 #:   ^Tpkg_add -l^t to do a best effort with flavors but not hampered by
 #:   version.
-#: FUNCTION ^Tweb^t ^Uglobs_…^u
-#: FUNCTION ^Twww^t ^Uglobs_…^u
-#:   Shows the html information page using ^Bw3m^b.
+#: FUNCTION ^Tdesc^t^|^Tinfo^t ^Uglobs_…^u
+#:   Shows the information page.
 
 function pkg {
 	needs cat die
@@ -34,6 +33,8 @@ function pkg {
 		update|upgrade)
 			as-root pkg_add -u "$@";									;;
 		web|www)
+			warn "Use ^Tdesc^t or ^Tinfo^t sub-command.";					;;
+		desc|info)
 			needs w3m
 			typeset f u h F
 			for f in "$@"; do

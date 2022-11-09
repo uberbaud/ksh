@@ -1,9 +1,9 @@
 add
 check
 delete
+desc
 grep
+info
 installed
 query
 update
-web
-www

@@ -1,0 +1,14 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2022-10-27,19.17.57z/3015155>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^G(no arguments)^g
+#:   Not intended to be called directly. Used to verify ^Tdo-steps^t was 
+#:   called before exit.
+
+needs bad-programmer
+function steps--on-exit {
+	$STEPS_DO_STEPS_WAS_CALLED ||
+		bad-programmer '^Tuse-steps^t was called but ^Tdo-steps^t was not called.'
+}
+
+# Copyright © 2022 by Tom Davis <tom@greyshirt.net>.

@@ -1,0 +1,12 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2022-11-08,22.38.08z/5e931a8>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Ucommand^u
+#:   This function is not intended to be called directly. It is the 
+#:   default ^Tskip^t action called by ^Tdo-steps^t.
+
+function steps--skip {
+	message '^K{136}^F{237}^B  SKIPPING ^b^f^k' '           ' "$@"
+}
+
+# Copyright © 2022 by Tom Davis <tom@greyshirt.net>.

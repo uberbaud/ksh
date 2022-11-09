@@ -1,17 +1,21 @@
 # <@(#)tag:tw.csongor.greyshirt.net,2021-11-25,01.43.20z/23c1c04>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^G(no arguments)^g
+#: FUNCTION ^[^T-die^t^]
 #:   Provide a common form for while development.
+#:   Default is to ^Twarn^t, but will ^Tdie^t if ^T-die^t is given.
 
-needs desparkle warn
+needs desparkle warn die
 # function MUST BE DEFINED using bourne shell format: func() {…},
 # NOT the korn shell format: function func {…}, in order to keep the
 # caller's name in $0
 NOT-IMPLEMENTED() {
-	local REPLY
+	local REPLY dowhat=warn
+	[[ ${1:-} == -die ]]&& { dowhat=die; shift; }
+	(($#))&& bad-programmer "Arg is not ^T-die^t."
+
 	desparkle "$0"
-	warn "^T$REPLY^t is not yet implemented."
+	$dowhat "^T$REPLY^t is not yet implemented."
 }
 
 # Copyright © 2021 by Tom Davis <tom@greyshirt.net>.

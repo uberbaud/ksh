@@ -1,0 +1,22 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2022-11-08,22.34.03z/33e3e0c>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Ucommand^u ^[^Twarn^t^|^Tdie^t^|^Tskip^t^]
+#:   Adds a step. If a second (2nd) parameter is given and it is either 
+#:   ^Twarn^t or ^Tdie^t, that's what will happen if ^Ucommand^u fails. 
+#:   If it is ^Tskip^t, ^Ucommand^u will not be performed. The default 
+#:   is ^Tdie^t.
+
+function + {
+	(($#>2))&& bad-programmer "Too many args to ^T+^t."
+	action=${2:-die}
+	[[ $action == @(warn|die|false|skip) ]]||
+		bad-programmer	\
+			'2nd arg to ^T+^t must be ^Twarn^t, ^Tdie^t, ^Tfalse^t, or ^Tskip^t.'	\
+			"Found: ^U$action^u."
+	steps[STEPS_NEXT_ID]=${1:?}
+	steps_action[STEPS_NEXT_ID]=$action
+	((++STEPS_NEXT_ID))
+}
+
+# Copyright © 2022 by Tom Davis <tom@greyshirt.net>.

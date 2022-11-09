@@ -1,0 +1,27 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2022-10-27,19.17.57z/3015155>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^[^UfnPrinter^u ^[^UfnSkipPrinter^u^]^]
+#:   Standardize output and such for steps in script.
+#:     ^UfnPrinter^u is the command which will be run before each step 
+#:       with the command string as its parameter. Defaults to ^Tnotify^t.
+#:     ^UfnSkipPrinter^u is the command which will be run instead of 
+#:       a ^Istep^i which is ^Iskip^iped.
+#:   Calls ^Tuse-app-paths steps^t exposing functions: ^T+^t and ^Tdo-steps^t.
+
+needs add-exit-actions use-app-paths
+function use-steps {
+	use-app-paths steps
+	STEPS_DO_STEPS_WAS_CALLED=false
+	STEPS_NOTIFIER=${1:-notify}
+	STEPS_ON_SKIP=${2:-steps--skip}
+	STEPS_NEXT_ID=0
+	STEPS_CONTINUE=true
+	set -A steps --
+	set -A steps_action --
+
+	trap STEPS_CONTINUE=false HUP INT TERM
+	add-exit-actions steps--on-exit 
+}
+
+# Copyright © 2022 by Tom Davis <tom@greyshirt.net>.

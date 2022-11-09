@@ -2,7 +2,7 @@
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
 #: FUNCTION ^[^T-or-warn^t^|^T-or-die^t^] ^Uname^u
-#:   Sets ^VAPP_PATH^v to ^O$^o^VKDOTDIR^v^T/share/lib/^t^Uname^u
+#:   Sets ^VAPP_PATH^v to ^O$^o^VKDOTDIR^v^/^Blib^b/^Uname^u
 #:   Prefixes ^VPATH^v and ^VFPATH^v with ^O$^o^VAPP_PATH^v^T/^t^O{^o^TB^t^O,^o^TF^T^O}^o respectively, if they exist.
 #:   ^Twarn^ts or ^Tdie^ts (default) if ^Uname^u is not found.
 

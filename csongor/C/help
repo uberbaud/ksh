@@ -46,6 +46,7 @@ dark
 desparkle
 die
 dir-is-empty
+do-steps
 downgrade-color
 dwm-keys
 dwmc
@@ -253,6 +254,7 @@ unset
 unset-alternate-screen
 unsubscribe-all
 use-app-paths
+use-steps
 utf8
 utf8-to-octal
 utf8codes

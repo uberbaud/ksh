@@ -36,34 +36,66 @@ done
 shift $((OPTIND-1))
 # ready to process non '-' prefixed arguments
 # /options }}}1
-
-function do-one-file {
-	# Convert file to ogg if necessary
+function bail-if-not-audio-file { # {{{1
+	NOT-IMPLEMENTED
+} # }}}1
+function convert-to-ogg-if-not-already-ogg { # {{{1
+	NOT-IMPLEMENTED
+} # }}}1
+function get-hash-name-from-ogg { # {{{1
 	# Get new name from
 	#   ckSum=$(oggdec -QRo - $OLDFILE | cksum -a sha384b)
 	#   fName=${ckSum#?}
 	#   fPath=${ckSum%"$fName"}
-	# Compare info if already exists
-	# OR, Hardlink (if originally ogg) OR mv (if converted) to
-	#   $AMUSE_DATA_HOME/$fPath/$fName
-	# -----
+	NOT-IMPLEMENTED
+} # }}}1
+function verify-ogg-isnt-already-amusified { # {{{1
 	# INSERT INTO files (pcm_sha384b,hertz,channels,encoding,duration)
 	#   …
 	# INSERT INTO vtags
-}
+	NOT-IMPLEMENTED
+} # }}}1
+function add-info-to-db { # {{{1
+	# Hardlink (if originally ogg) OR mv (if converted) to
+	#   $AMUSE_DATA_HOME/$fPath/$fName
+	NOT-IMPLEMENTED
+} # }}}1
+function mv-ogg-to-amuse-repository { # {{{1
+	NOT-IMPLEMENTED
+} # }}}1
+function do-safe-unzip { # {{{1
+	NOT-IMPLEMENTED
+	# print tempdir holding all files
+} # }}}1
+function do-one-file { # {{{1
+	local MUSIC_FILE=$1
+	(do-steps)
+} # }}}1
+function do-one-item { # {{{1
+	local f REPLY
+	[[ -f $1 && $1 == *.zip ]]&&
+		set -- $(do-safe-unzip)
 
-function do-one-item {
 	if [[ -f $1 ]]; then
 		do-one-file "$1"
 	elif [[ -d $1 ]]; then
-		for F in "$1"/*; do
-			do-one-item "$F"
+		for f in "$1"/*; do
+			[[ -f $f ]]&& do-one-file "$f"
 		done
 	else
 		warn "^B$1^b is neither a ^Ifile^i nor a ^Idirectory^i."
 	fi
+} # }}}1
 
-}
+use-steps
+
++ get-all-mediainfo						warn
++ bail-if-not-audio-file				false
++ convert-to-ogg-if-not-already-ogg		warn
++ get-hash-name-from-ogg				warn
++ verify-ogg-isnt-already-amusified		false
++ add-info-to-db						warn
++ mv-ogg-to-amuse-repository			warn
 
 for F { do-one-item "$F"; }; exit
 

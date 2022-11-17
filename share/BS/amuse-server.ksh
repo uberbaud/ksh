@@ -225,7 +225,7 @@ function set-audiodevice { # {{{1
 	vAUDEV=${1:?}
 	# between play-one-ogg runs, there is sometimes an audible click,
 	# but running a very quiet track alongside that cleans it up.
-	[[ -n $CLICK_CONTROL ]]&&
+	[[ -n ${CLICK_CONTROL:-} ]]&&
 		kill $CLICK_CONTROL
 	click-control &
 	CLICK_CONTROL=$!

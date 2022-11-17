@@ -195,10 +195,10 @@ export HGRCPATH=$xdgcfg/hg
 # handle whether  EDITOR or VISUAL was set in $HOST.kshrc
 [[ -z ${VISUAL:-${EDITOR:-}} ]]&& {
 	L=/usr/local/bin; S=/usr/bin; U=$HOME/local/bin
-	for VISUAL in $L/nvim $L/vim $U/vis $L/vis $L/vise $S/vi; do
-		[[ -x $VISUAL ]]&& break
+	for V in $U/nvim $L/nvim $L/vim $U/vis $L/vis $L/vise $S/vi; do
+		[[ -x $V ]]&& { VISUAL=$V; break; }
 	done
-	unset L S U
+	unset V L S U
   }
 
 case $VISUAL in

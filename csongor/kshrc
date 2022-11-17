@@ -57,6 +57,7 @@ export X11TERM=st
 export CSONGOR_XTERM_WINDOW_BG='#626262'
 export CSONGOR_XTERM_WINDOW_FG='#dadada'
 export MANPAGER='nvim -M +Man!'
+export YT=AUDIODEVICE=snd@yt.lan/default
 
 export TZ=EST5EDT
 

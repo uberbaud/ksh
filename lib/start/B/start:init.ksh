@@ -30,9 +30,9 @@ function usage { # {{{1
 	sparkle >&2 <<-\
 	===SPARKLE===
 	^F{4}Usage^f: ^T$PGM^t ^Uapp^u
-	   Set up X11 app specific ^Tstart^t framework.
-	   ^Uapp^u  The name of the command and the user that will be used to
-	            run the application.
+	   Set up an X11 app specific ^Tstart^t framework.
+	     ^Uapp^u  The name of the ^Bcommand^b which will also be the ^Buser^b used to
+	          run the application.
 
 	   This script is expected to be called from ^Tstart^t.
 	===SPARKLE===
@@ -44,11 +44,11 @@ function @ { # {{{1'
 	else
 		local W
 		shquote "$1"
-		print -nru3 -- "$REPLY"
+		print -nru3 -- "$REPLY"	# no leading space
 		shift
 		for W; do
 			shquote "$W"
-			print -nru3 -- " $REPLY"
+			print -nru3 -- " $REPLY" # with leading space
 		done
 		print -u3
 	fi
@@ -311,23 +311,7 @@ function CleanUp { # {{{1'
 		cat - "$fTEMP" >>~/log/$logName.log
 	rm "$fTEMP"
 } # }}}1
-
-[[ -d $SKEL_DIR ]]|| die "No skeleton directory ^B$SKEL_DIR ^b."
-(($#))||	die 'Missing required arguments'
-(($#>1))&&	die 'Too many arguments. Expected one (1).'
-[[ $1 == -h ]]&& usage
-
-needs shquote f-v h1 needs-cd needs-path
-
-USRNAME=$(id -un)
-
-APP=$1
-APP_HOME=$APP_BASE/$APP
-USER_START=$APP_HOME/bin/$START_SCRIPT
-
-HOLD=~/hold/$(uname -r)/sys-files/etc
-
-function main {
+function main { # {{{1
 	needs-path -create -or-die "$HOLD/RCS"
 	needs-cd -or-die "$HOLD"
 
@@ -369,8 +353,24 @@ function main {
 	create-app-starter
 	create-user-links
 
-}
+} # }}}1
 
-main "$@"; exit
+[[ -d $SKEL_DIR ]]|| die "No skeleton directory ^B$SKEL_DIR ^b."
+(($#))||	die 'Missing required arguments'
+(($#>1))&&	die 'Too many arguments. Expected one (1).'
+[[ $1 == @(-h|--help|help) ]]&& usage
+
+needs shquote f-v h1 needs-cd needs-path
+
+USRNAME=$(id -un)
+
+APP=$1
+APP_HOME=$APP_BASE/$APP
+USER_START=$APP_HOME/bin/$START_SCRIPT
+
+HOLD=~/hold/$(uname -r)/sys-files/etc
+
+
+main; exit
 
 # Copyright (C) 2021 by Tom Davis <tom@greyshirt.net>.

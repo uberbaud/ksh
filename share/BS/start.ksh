@@ -51,7 +51,7 @@ function setup-app-framework { # {{{1
 	yes-or-no "Create the framework for $REPLY" ||
 		return 1
 
-	/home/tw/config/ksh/share/BS/start:init.ksh "$1"
+	start:init.ksh "$1"
 } # }}}1
 function mk-cache-dir { # {{{1
 	local d t rc REPLY
@@ -84,7 +84,7 @@ function publicify-files { # {{{1
 		chmod g+x "$t"			# mark ONLY the directory browsable
 	}
 } # }}}1
-needs die notify sparkle-path warn
+needs die notify sparkle-path use-app-paths warn
 
 if [[ $shortcall != $shortbin ]]; then
 	appUser=${shortcall#start-}
@@ -95,6 +95,8 @@ else
 	appUser=$1
 	shift
 fi
+
+use-app-paths start
 
 app-framework-exists "$appUser" ||
 	setup-app-framework "$appUser" ||

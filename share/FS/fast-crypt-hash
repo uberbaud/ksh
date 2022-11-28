@@ -12,10 +12,10 @@
 # crypt-hashes which will be used as file system names, or when security
 # is an issue.
 
-needs /bin/cksum
+needs /bin/cksum needs-file
 function fast-crypt-hash {
 	(($#>1))&& die "Too many arguments"
-	[[ -f ${1:?} ]]|| die "^B$1^b is not a file"
+	needs-file -or-die "$1"
 	/bin/cksum -qa sha1b "$1"
 }
 

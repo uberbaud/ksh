@@ -14,7 +14,7 @@ function syntax		{ print -ru2 "$NAME: $* (line $lineno)"; ((errs++)); }
 function fullstop	{ print -ru2 "$NAME: $*"; exit 1; }
 
 (($#))&& {
-	${PAGER:-less} <<-\
+	${PAGER:-more} <<-\
 	===
     PLANB
 
@@ -97,7 +97,7 @@ function has-dow-passed {
 	have-x-days-passed $x
 }
 function has-dom-passed {
-	typeset -Z2 dom="${1%%+([dnrst])}"
+	typeset -Z2 dom="${1%%+([!0-9])}"
 	((++MON>12))&& { ((YEAR++)); MON=1; }
 	(($YEAR$MON$dom <= TODAY))
 }
@@ -155,7 +155,7 @@ function main {
 	for T; do
 		U=${T#/home/}
 		U=${U%/."$JOBFNAME"}
-		do-one-plan-b $U <$T # main file
+		do-one-plan-b $U <$T # user file
 	done
 }
 

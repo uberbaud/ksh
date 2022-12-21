@@ -224,6 +224,7 @@ splitstr
 sql-fields
 sql-reply
 sqlite3-c-api
+sqlite3-datetime
 ssh-askfirst
 ssh-clonedir
 stop

@@ -1,14 +1,14 @@
 # <@(#)tag:tw.csongor.greyshirt.net,2022-06-28,21.59.55z/2963375>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^[
+#: FUNCTION ^[^UYear^u ^Umonth^u ^Uday^u ^Uhour^u ^Uminute^u ^[^Usecond^u^]^]
 #:   Prints a very compact form of ^Ilocal now^i or the given time using one
-#:   character per ^UYmd-HMS^u translated to ^[^TZ1^t^O-^o^T9A^t^O-^o^TY^t^] without ^TJ^t, ^TO^t, or ^TU^t.
+#:   character per ^UYmd-HMS^u translated to ^[^Tz1^t^O-^o^T9a^t^O-^o^Ty^t^] without ^Tj^t, ^To^t, or ^Tu^t.
 #:
-#:   ^BYear^b modulo 32, ^Bmonth^b A-M (no J), ^Bday^b 1-Y (no J,O, or U)
-#:   ^BHour^b 0-P, ^BMinutes^b resolution of 2, ^Bseconds^b plus the missing minute but
+#:   ^BYear^b modulo 32, ^Bmonth^b ^Ta^t^-^Tm^t (no ^Tj^t), ^Bday^b ^T1^t^-^Ty^t (no ^Tj^t, ^To^t, or ^Tu^t)
+#:   ^BHour^b ^Tz^t-p, ^BMinutes^b resolution of 2, ^Bseconds^b plus the missing minute but
 #:   only a resolution of 4 seconds.
-#: ^GExample: ^I2022-06-28 19:24:10 EDT^i^g ^= ^G^I6FW-KC2^i^g
+#: ^GExample: ^I2022-06-28 19:24:10 EDT^i^g ^= ^G^i6fw-kc2^i^g
 
 
 needs bad-programmer date
@@ -16,7 +16,7 @@ function compact-timestamp {
 	local y m d H M S zVar TMSTMP ARGV
 	typeset -i10 i=0 atoms=0
 	ARGV=
-	set -A t -- Z 1 2 3 4 5 6 7 8 9 A B C D E F G H I K L M N P Q R S T V W Y
+	set -A t -- z 1 2 3 4 5 6 7 8 9 a b c d e f g h i k l m n p q r s t v w y
 	case $# in
 		0)
 			TMSTMP=

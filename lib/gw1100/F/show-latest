@@ -1,0 +1,29 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2022-12-21,01.56.32z/4e5a18e>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^G(no arguments)^g
+#:   prints latest weather status
+
+needs needs-file sqlite3
+function show-latest {
+	D=${XDG_DATA_HOME:?}/gw1100/gw1100.db3
+	needs-file -or-die "$D"
+
+	sql=$(</dev/stdin) <<-\
+		===SQL===
+		SELECT	datetime(u,'unixepoch','localtime') as 'when',
+				c AS '#',
+				a AS 'sensor',
+				val
+	  	FROM latest
+	 	WHERE sensor NOT NULL
+	 	ORDER BY sensor
+	 	 	;
+		===SQL===
+
+	print -n '\r'
+	sqlite3 -header "$D" ".mode box" "$sql" || die "sqlite3 problems"
+	print 'Current Conditions'
+}
+
+# Copyright © 2022 by Tom Davis <tom@greyshirt.net>.

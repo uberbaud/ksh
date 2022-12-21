@@ -1,15 +1,40 @@
 # <@(#)tag:tw.csongor.greyshirt.net,2021-11-22,21.27.44z/39a4334>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^G(no arguments)^g
-#:   Wrap two (2) locate calls with one command.
+#: FUNCTION ^[^T--user^t^|^T--sys^t^] ^Ulocate commands^u
+#:   Wrap two (2) locate calls with one command, or just do the one 
+#:   specified. if ^Ulocate commands^u includes ^T-d^t, only that 
+#:   database will be used (no ^Isystem^i nor ^Iuser^i databases).
 
-needs /usr/bin/locate
+needs needs-file /usr/bin/locate
 function f-locate {
-	local USRDB=${XDG_CACHE_HOME:?}/locate.db
-	/usr/bin/locate "$@"
-	[[ " $* " == *-d\ * ]]||
-		/usr/bin/locate -d "$USRDB" "$@"
+	local opt i IFS USRDB skipusr skipsys
+	skipsys=false
+	skipusr=false
+	IFS='
+'
+	i=0
+	set -A revised_opts
+	for opt; do
+		case $opt in
+			--us?(e)r)		skipsys=true;						;;
+			--sys?(tem))	skipusr=true;						;;
+			-d)				skipusr=true; revised_opts[i++]=-d;	;;
+			*)				revised_opts[i++]=$opt;				;;
+		esac
+	done
+
+	# die here, or locate will be called twice.
+	((i))|| die 'No options given.'
+
+	$skipsys ||
+		/usr/bin/locate "${revised_opts[@]}"
+
+	$skipusr || {
+		USRDB=${XDG_CACHE_HOME:?}/locate.db
+		needs-file -or-die "$USRDB"
+		/usr/bin/locate -d "$USRDB" "${revised_opts[@]}"
+	  }
 }
 
 # Copyright © 2021 by Tom Davis <tom@greyshirt.net>.

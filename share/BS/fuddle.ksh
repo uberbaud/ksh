@@ -49,7 +49,8 @@ dryrun=false
 
 needs needs-file header-line
 
-(($#))||	die 'Missing required parameter ^Uc source^u.'
+ERR_MISSING_SRC='Missing required parameter ^Uc source^u.'
+(($#))||	die "$ERR_MISSING_SRC"
 
 # move everything but the last into mkopts
 set -A mkopts --
@@ -62,7 +63,7 @@ done
 # last and note that we want a dry-run
 [[ $1 == - ]]&& {
 	dryrun=true
-	((mkopt_count--))
+	((mkopt_count--))|| die "$ERR_MISSING_SRC"
 	set -- "${mkopts[mkopt_count]}"
 	unset mkopts[mkopt_count]
 }

@@ -26,15 +26,42 @@ function get-auth { # {{{1
 function clear-screen { # {{{1
 	print -n -- '\033[H\033[2J\033[3J\033[H\c'
 } # }}}1
-function main { #{{{1
-	has-auth || get-auth || die "The ^Tssh-add^t thing was not successful."
-	/usr/bin/ssh yt.lan ./show-gw1100.ksh >$fTEMP
+function do-local  { # {{{1
+	local F
+	needs use-app-paths
+	use-app-paths gw1100
+	F=${FPATH%%:*}
+	[[ -f $F/$1 ]]|| die "No gw1100 function ^B$1^b."
+	whence -v $1 >/dev/null || die "^B$1^b is not a function"
+	"$@"
+} # }}}1
+function do-remote { #{{{1
+	local header fTEMP
+
+	needs /usr/bin/ssh{,-add} fold cursor-to-line-col add-exit-actions
+	(($#))|| set -- show-latest
+
+	fTEMP=$(mktemp) || die 'Could not ^Tmktemp^t'
+	add-exit-actions "rm $fTEMP"
+
+	set -A opt
+	i=0; for o; do shquote "$o" "opt[$((i++))]"; done
+
+	/usr/bin/ssh yt.lan ". \$ENV; $this_pgm ${opt[*]}" >$fTEMP
 
 	[[ -s $fTEMP ]]|| return
 
 	$want_clear && clear-screen
-	h3 'Inside Weather'
-	print -r -- "$(<$fTEMP)"
+
+	h3 "$(sed -n '$p')"
+	sed -e '$d'
+} # }}}1
+function main { # {{{1
+	if [[ $(hostname) == yt.lan ]]; then
+		do-local "$@"
+	else
+		do-remote "$@"
+	fi
 } # }}}1
 
 want_clear=false
@@ -47,11 +74,4 @@ while [[ ${1:-} == -* ]]; do
 	shift
 done
 
-needs /usr/bin/ssh{,-add} fold cursor-to-line-col add-exit-actions
-
-fTEMP=$(mktemp) || die 'Could not ^Tmktemp^t'
-add-exit-actions "rm $fTEMP"
-
 main "$@"; exit
-
-

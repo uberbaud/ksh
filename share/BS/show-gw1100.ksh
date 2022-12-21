@@ -50,14 +50,14 @@ function do-remote { #{{{1
 	i=0; for o; do shquote "$o" "opt[$((i++))]"; done
 	((i))|| opt[0]=
 
-	/usr/bin/ssh yt.lan ksh -l -c ". \$ENV; $this_pgm ${opt[*]}" >$fTEMP
+	/usr/bin/ssh yt.lan "ksh -l -c \". \\\$ENV; $this_pgm ${opt[*]}\"" >$fTEMP
 
 	[[ -s $fTEMP ]]|| return
 
 	$want_clear && clear-screen
 
-	h3 "$(sed -n '$p')"
-	sed -e '$d'
+	h3 "$(sed -n \$p "$fTEMP")"
+	sed -e '$d' "$fTEMP"
 } # }}}1
 function main { # {{{1
 	if [[ $(hostname) == yt.lan ]]; then

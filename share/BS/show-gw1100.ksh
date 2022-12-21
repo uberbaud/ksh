@@ -31,6 +31,9 @@ function do-local  { # {{{1
 	needs use-app-paths
 	use-app-paths gw1100
 	F=${FPATH%%:*}
+
+	(($#))|| set -- show-latest
+
 	[[ -f $F/$1 ]]|| die "No gw1100 function ^B$1^b."
 	whence -v $1 >/dev/null || die "^B$1^b is not a function"
 	"$@"
@@ -39,7 +42,6 @@ function do-remote { #{{{1
 	local header fTEMP
 
 	needs /usr/bin/ssh{,-add} fold cursor-to-line-col add-exit-actions
-	(($#))|| set -- show-latest
 
 	fTEMP=$(mktemp) || die 'Could not ^Tmktemp^t'
 	add-exit-actions "rm $fTEMP"

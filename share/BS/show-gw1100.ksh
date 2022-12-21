@@ -50,7 +50,7 @@ function do-remote { #{{{1
 	i=0; for o; do shquote "$o" "opt[$((i++))]"; done
 	((i))|| opt[0]=
 
-	/usr/bin/ssh yt.lan ". \$ENV; $this_pgm ${opt[*]}" >$fTEMP
+	/usr/bin/ssh yt.lan ksh -l -c ". \$ENV; $this_pgm ${opt[*]}" >$fTEMP
 
 	[[ -s $fTEMP ]]|| return
 

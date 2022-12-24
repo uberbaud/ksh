@@ -17,7 +17,7 @@ home directory and everything herein is designed around that concept.
 If you haven't previously set up your own **xdg** directories and 
 corresponding variables, you will probably want, at least,
   * XDG_CONFIG_HOME -> ~/config
-  * XDG_DATA_HOME   -> ~/local
+  * XDG_DATA_HOME   -> ~/local/share
 
 This is experimental and intended solely for my personal use.  You're 
 on your own if you want to use these files yourself.

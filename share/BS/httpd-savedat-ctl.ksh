@@ -9,6 +9,7 @@ SCRIPT=~/bin/perl/$BASE.pl
 LOGFILE=~/log/$BASE.log
 RESTART=false
 THIS_PGM=${0##*/}
+VERBOSE=true
 
 function get-pid { pgrep -f "^perl $SCRIPT\$"; }
 function help { # {{{1
@@ -29,12 +30,15 @@ function help { # {{{1
 } # }}}1
 function start { # {{{1
 	local pid
+
 	needs-file -or-die "$SCRIPT"
+	[[ -x $SCRIPT ]]|| die "^B$SCRIPT^b is not executable."
 
 	pid=$(get-pid)
-	[[ -x $SCRIPT ]]|| die "^B$SCRIPT^b is not executable."
-	[[ -n ${pid} ]]&&
-		die "$dBASE: already running (PID: ^B$pid^b)."
+	[[ -z ${pid} ]]|| {
+			$VERBOSE || exit
+			die "$dBASE: already running (PID: ^B$pid^b)."
+		}
 
 	rotate-logfiles "$LOGFILE"
 	trap '' HUP
@@ -69,8 +73,15 @@ function check { # {{{1
 } # }}}1
 function running { get-pid >/dev/null; }
 
-(($#>1))&& die "Too many parameters. Expected only one (1): ^Ucommand^u."
 (($#))|| die "Missing required parameter ^Ucommand^u."
+while [[ $1 == -* ]]; do
+	case ${1#-} in
+		q)	VERBOSE=false;					;;
+		*)	die "Unknown flag ^B$1^b.";	;;
+	esac
+	shift
+done
+(($#>1))&& die "Too many parameters. Expected only one (1): ^Ucommand^u."
 needs needs-file rotate-logfiles sparkle-path
 
 desparkle "$BASE.pl"

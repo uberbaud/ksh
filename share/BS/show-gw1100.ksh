@@ -41,16 +41,17 @@ function do-local  { # {{{1
 function do-remote { #{{{1
 	local header fTEMP
 
-	needs /usr/bin/ssh{,-add} fold cursor-to-line-col add-exit-actions
+	needs ssh-askfirst fold cursor-to-line-col add-exit-actions
+
+	set -A opt
+	i=0; for o; do shquote "$o" "opt[$((i++))]"; done
+	shquote ". \$ENV; $this_pgm${opt[*]:+ "${opt[*]}"}" embedded_cmd
 
 	fTEMP=$(mktemp) || die 'Could not ^Tmktemp^t'
 	add-exit-actions "rm $fTEMP"
 
-	set -A opt
-	i=0; for o; do shquote "$o" "opt[$((i++))]"; done
-	((i))|| opt[0]=
-
-	/usr/bin/ssh yt.lan "ksh -l -c \". \\\$ENV; $this_pgm ${opt[*]}\"" >$fTEMP
+	#print -ru2 "ksh -l -c $embedded_cmd"
+	ssh-askfirst ssh yt.lan "ksh -l -c $embedded_cmd" >$fTEMP
 
 	[[ -s $fTEMP ]]|| return
 

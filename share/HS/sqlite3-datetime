@@ -1,12 +1,12 @@
 ^BSQLite Date and Time Functions^b
 
 ^BCOMMANDS^b
-    ^Tdate^t^O(^o^[^Utime-value^u^O^[,^o ^Umodifier^u^O^[,^o^S…^s^O^]^]^])^o
-    ^Ttime^t^O(^o^[^Utime-value^u^O^[,^o ^Umodifier^u^O^[,^o^S…^s^O^]^]^])^o
-    ^Tdatetime^t^O(^o^[^Utime-value^u^O^[,^o ^Umodifier^u^O^[,^o^S…^s^O^]^]^])^o
-    ^Tjulianday^t^O(^o^[^Utime-value^u^O^[,^o ^Umodifier^u^O^[,^o^S…^s^O^]^]^])^o
-    ^Tunixepoch^t^O(^o^[^Utime-value^u^O^[,^o ^Umodifier^u^O^[,^o^S…^s^O^]^]^])^o
-    ^Tstrftime^t^O(^o^Uformat^u^O,^O ^[^Utime-value^u^O^[,^o ^Umodifier^u^O^[,^o^S…^s^O^]^]^])^o
+    ^Tdate^t^O(^o^[^Utime-value^u^[^O,^o ^Umodifier^u^[^O,^o^S…^s^]^]^]^O)^o
+    ^Ttime^t^O(^o^[^Utime-value^u^[^O,^o ^Umodifier^u^[^O,^o^S…^s^]^]^]^O)^o
+    ^Tdatetime^t^O(^o^[^Utime-value^u^[^O,^o ^Umodifier^u^[^O,^o^S…^s^]^]^]^O)^o
+    ^Tjulianday^t^O(^o^[^Utime-value^u^[^O,^o ^Umodifier^u^[^O,^o^S…^s^]^]^]^O)^o
+    ^Tunixepoch^t^O(^o^[^Utime-value^u^[^O,^o ^Umodifier^u^[^O,^o^S…^s^]^]^]^O)^o
+    ^Tstrftime^t^O(^o^Uformat^u^O,^o^[^Utime-value^u^[^O,^o ^Umodifier^u^[^O,^o^S…^s^]^]^]^O)^o
 
 ^BOUTPUT^b
     ^Tdate^t^O()^o ^S->^s ^Btext^b
@@ -51,12 +51,12 @@
         Shifts backward.
     ^Tweekday^t N
         Advances if necessary. Sunday is 0.
-    ^{^Tunixepoch^t^|^Tjulianday^t^|^Tauto^t^|^Tlocaltime^t^|^Tutc^t^}
+    ^Tunixepoch^t^|^Tjulianday^t^|^Tauto^t^|^Tlocaltime^t^|^Tutc^t
         Must follow ^Utime-value^u and for the first three, indicates how 
         that should be interpreted or in the case of last two, assumes the 
         opposite and converts. ^Tauto^t selects ^Tunixepoch^t or 
         ^Tjulianday^t based on magnitude. For the first 63 days of 1970 will 
-        chose julian.
+        choose julian.
 
 ^BCAVEATS AND BUGS^b
     The computation of local time depends heavily on the whim of politicians 
@@ -75,4 +75,3 @@
     All internal computations assume the Gregorian calendar system. They 
     also assume that every day is exactly 86400 seconds in duration; no leap 
     seconds are incorporated.
-

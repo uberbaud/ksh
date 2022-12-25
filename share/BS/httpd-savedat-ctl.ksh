@@ -6,10 +6,12 @@ set -o nounset;: ${FPATH:?Run from within KSH}
 
 BASE=httpd-savedat
 SCRIPT=~/bin/perl/$BASE.pl
-LOGFILE=~/log/$BASE.log
+LOGDIR=~/log
+LOGFILE=$LOGDIR/$BASE.log
 RESTART=false
 THIS_PGM=${0##*/}
 VERBOSE=true
+LOG_CTL=false
 
 function get-pid { pgrep -f "^perl $SCRIPT\$"; }
 function help { # {{{1
@@ -76,8 +78,9 @@ function running { get-pid >/dev/null; }
 (($#))|| die "Missing required parameter ^Ucommand^u."
 while [[ $1 == -* ]]; do
 	case ${1#-} in
-		q)	VERBOSE=false;					;;
-		*)	die "Unknown flag ^B$1^b.";	;;
+		l|-log)	LOG_CTL=true;					;;
+		q)		VERBOSE=false;					;;
+		*)		die "Unknown flag ^B$1^b.";		;;
 	esac
 	shift
 done
@@ -90,6 +93,12 @@ dBASE=^B$REPLY^b
 [[ $1 == @(-h|--help) ]]&& set -- help
 [[ $1 == @(start|stop|restart|check|help|running) ]]||
 	die "Unknown ^Ucommand^u ^B$1^b." "Try ^Ucommand^u ^Thelp^t"
+
+$LOG_CTL && {
+	needs-path -create -or-die "$LOGDIR"
+	exec >>$LOGDIR/${0##*/}.log 2>&1
+	date +'%Y-%m-%d %H:%M:%S %z'
+}
 
 "$1"; exit
 

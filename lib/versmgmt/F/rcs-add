@@ -1,0 +1,15 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2023-01-04,08.57.34z/b93934>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Ufilename^u ^Udescription^u
+#:   vmgr vms-cmd
+
+needs ci
+function rcs-add {
+	local file
+	file=${1:?}; shift
+	[[ -f RCS/$file,v ]]||
+		ci -q -i -t-"$*" -u ./"$file"
+}
+
+# Copyright © 2023 by Tom Davis <tom@greyshirt.net>.

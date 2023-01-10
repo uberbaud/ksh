@@ -103,7 +103,7 @@ function finit-github-ssh-password { # {{{1
 
 (($#))&& die 'Unexpected arguments. Expected ^Bnone^b.'
 
-needs git h1 i-can-haz-inet needs-cd sparkle-path message
+needs git h1 h3 i-can-haz-inet needs-cd sparkle-path message
 
 needs-cd -or-die "${KDOTDIR:?}"
 

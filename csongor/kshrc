@@ -12,6 +12,7 @@ HOLD_SYSBASE=~/hold/$(uname -r)
 #export PERLBREW_SKIP_INIT=''
 #export PERLBREW_CURRENT=$PERLBREW_ROOT/perls/current
 #export PERLBREW_LIB=$PERLBREW_CURRENT/lib
+export GOT_AUTHOR='Tom Davis <tom@greyshirt.net>'
 export GOPATH=$xdgdata/go
 export JDK_PATH=$xdgdata/jdk-1.8.0/bin
 export TCLLIBPATH=$xdgdata/tcl

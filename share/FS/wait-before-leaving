@@ -4,20 +4,36 @@
 #: FUNCTION ^Ucommand^u ^Uarg1^u ^S[…^s ^UargN^u^]
 #:   Wrapper around ^Ucommand^u and then waits for a keypress.
 #:   Leave without prompting ^IIF^i
-#:     1. The command exited without error,
-#:     2. ^SSHORTWAIT^s was set, and
-#:     3. ^O$^o^VSHORTWAIT^v ^T<=^t ^O$^o^VSECONDS^v
+#:     1. ^Ucommand^u exited without error,
+#:     2. ^VSHORTWAIT^v was set and
+#:     3. ^O$^o^VSHORTWAIT^v ^T<=^t ^O$^o^VSECONDS^v, and
+#:     4. ^Ucommand^u did not write to ^Istderr^i.
 
 function wait-before-leaving {
-	local rc
+	local rc tempF
 	( now; /usr/bin/printf '  %s\n' "$@"; )>>~/log/wait-before-leaving.log
-	"$@"
-	rc=$?
-	[[ ($rc -eq 0) && (-n ${SHORTWAIT:-}) && ($SHORTWAIT -le $SECONDS) ]]&&
-		return
-	((rc))&& warn "Exited with code ^E$rc^e."
-	print '  ^WPress a key to exit.^w'|sparkle >&2
-	readkeys | read
+	tempF=$(mktemp)
+	( # Do this is a subshell so we are sure to remove $tempF
+		rcIsZero=true; notTooSoon=true; noStderrWrites=true;
+		SHORTWAIT=${SHORTWAIT:-0}
+
+		# ACTUAL COMMAND WE ARE RUNNING IN THE X11 TERMINAL WINDOW
+		SPARKLE_FORCE_COLOR=true "$@" 2>$tempF
+		rc=$?
+
+		(($rc))&&				rcIsZero=false
+		((SECONDS>SHORTWAIT))||	notTooSoon=false
+		[[ -s $tempF ]]&&		noStderrWrites=false
+
+		$rcIsZero && $notTooSoon && $noStderrWrites && return
+
+		$rcIsZero		||	warn "Exited with return code ^E$rc^e."
+		$notTooSoon		||	warn "Exited too quickly. ^G(see SHORTWAIT)^g"
+		$noStderrWrites	||	{ h2 "$1 2>$tempF"; print -r -- "$(<$tempF)"; }
+
+		print '  ^WPress a key to exit.^w'|sparkle >&2
+		readkeys | read
+	); rm -f "$tempF"
 }
 
 # Copyright © 2020 by Tom Davis <tom@greyshirt.net>.

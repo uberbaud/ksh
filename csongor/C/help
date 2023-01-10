@@ -212,6 +212,7 @@ set
 set-alternate-screen
 set-colors-bg-fg
 set-perl5lib
+setWarnOrDie
 shell-tips
 shift
 showvar
@@ -260,6 +261,7 @@ utf8
 utf8-to-octal
 utf8codes
 versctl:which
+versmgmt-init
 vtmp
 wait
 wait-before-leaving

@@ -1,0 +1,17 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2023-01-10,01.07.31z/32caac0>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Ufile^u ^Utype^u ^Utext^u
+#:   Add a description or change log message to ^O$^o^VSYSDATA^v/versmgmt.db3.
+#:   Where ^Utype^u is ^TD^t for a description, and ^TL^t is a change 
+#:   log message.
+
+needs versmgmt-describe
+function git-describe {
+	local commit root
+	commit=$(git rev-parse HEAD)
+	root=$(git rev-parse --show-toplevel)
+	versmgmt-describe "$commit" "${PWD#"$root"/}/$1" "$2" "$3"
+}
+
+# Copyright © 2023 by Tom Davis <tom@greyshirt.net>.

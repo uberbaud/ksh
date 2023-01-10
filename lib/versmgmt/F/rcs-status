@@ -1,0 +1,18 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2023-01-04,08.57.35z/3fcb0f4>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION
+#:   vmgr vms-cmd
+
+needs rcs-changed
+function rcs-status {
+	STATUS=untracked
+	[[ -f RCS/$1,v ]]&&
+		if rcs-changed "$1"; then
+			STATUS=modified
+		else
+			STATUS=ok
+		fi
+}
+
+# Copyright © 2023 by Tom Davis <tom@greyshirt.net>.

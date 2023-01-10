@@ -12,7 +12,7 @@ function sam-vnc {
 	# `readkeys` sends header, `read` reads it and exits, `readkeys` sends
 	# key info on keypress, but there's no reader so it dies on SIGPIPE
 	readkeys|read
-	vncviewer -Shared=1 -MenuKey=$mnukey -FullScreen sam.lan
+	vncviewer -Shared=1 -MenuKey=$mnukey -FullScreen -DotWhenNoCursor sam.lan
 }
 
 # Copyright © 2022 by Tom Davis <tom@greyshirt.net>.

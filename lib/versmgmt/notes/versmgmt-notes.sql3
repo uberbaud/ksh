@@ -1,0 +1,13 @@
+-- <@(#)tag:tw.csongor.greyshirt.net,2023-01-10,00.14.37z/9972e7>
+-- Copyright (C) 2023 by Tom Davis <tom@greyshirt.net>.
+-- Descriptions and log messages for per-edit to commits.
+
+CREATE TABLE log (
+    ts          text NOT NULL DEFAULT(unixepoch('now')),
+    commitid    text NOT NULL,
+    filename    text NOT NULL,
+    msgtype     text NOT NULL CHECK(msgtype = 'D' OR msgtype = 'L'),
+    msg         text NOT NULL
+);
+
+-- vim: filetype=sql tabstop=4 textwidth=68 expandtab

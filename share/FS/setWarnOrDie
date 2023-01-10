@@ -1,0 +1,18 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2023-01-06,20.28.39z/5e34c2b>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^[^T-or-^t^]^Twarn^t ^| ^T-or-^t^]^Tfalse^t ^| ^T-or-^t^]^Tdie^t
+#:   Validates options and sets ^O$^o^VwarnOrDie^v.
+#:   ^GSee also:^g ^Thelp warnOrDie^t
+
+needs die
+function setWarnOrDie {
+	[[ ${1#-or-} == @(warn|die|false) ]]||
+		die "^WBAD PROGRAMMER^w Unknown option to $0. Should be one of:"	\
+			"    ^[^T-or-^t]^Twarn^t,"										\
+			"    ^[^T-or-^t]^Tdie^t, or"									\
+			"    ^[^T-or-^t]^Tfalse^t"
+	warnOrDie=${1#-or-}
+}
+
+# Copyright © 2023 by Tom Davis <tom@greyshirt.net>.

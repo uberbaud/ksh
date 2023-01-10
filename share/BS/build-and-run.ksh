@@ -47,15 +47,13 @@ function first-time-get-set { # {{{1
 	showvar_fn=show-get-set
 } # }}}1
 function edit-c-file { #{{{1
-	local E F T Cmd2 c2f
+	local E F T Cmd2
 	shquote "$1" F
 	E=${VISUAL:-${EDITOR:-vi}}
 	[[ -e RCS/$F,v ]]&& {
 		co -l -q "$F"
 		T=$(mktemp)
-		c2f=$KDOTDIR/share/BS/cat-to-file.ksh
-		[[ -x $c2f ]]&&
-			Cmd2="rcsdiff '$F'; rlwrap -s 0 $c2f -p 'ci> ' '$T'"
+		Cmd2="rcsdiff '$F'; rlwrap -s 0 cat-to-file -p 'ci> ' '$T'"
 	  }
 
 	${X11TERM:-xterm} -e ksh -c "$E $F${Cmd2:+; $Cmd2}" >/dev/null 2>&1
@@ -106,7 +104,7 @@ function clear-screen { print -u2 '\033[H\033[2J\033[3J\033[H\c'; }
 function loop { #{{{1
 	local cksum_previous cksum_current UUID
 
-	needs fuddle pkill shquote subst-pathvars uuidgen watch-file
+	needs cat-to-file fuddle pkill shquote subst-pathvars uuidgen watch-file
 
 	subst-pathvars "$PWD" prnPathName
 

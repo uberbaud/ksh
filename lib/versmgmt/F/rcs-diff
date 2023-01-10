@@ -1,0 +1,13 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2023-01-04,08.57.35z/2ba7282>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION
+#:   vmgr vms-cmd
+
+needs rcsdiff
+function rcs-diff {
+	[[ -f RCS/$1,v ]]&&
+		rcsdiff -q ./"$1"
+}
+
+# Copyright © 2023 by Tom Davis <tom@greyshirt.net>.

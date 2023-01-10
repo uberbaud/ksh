@@ -1,0 +1,21 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2023-01-10,00.06.28z/473e54a>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Ucommit-id^u ^Ufile^u ^Utype^u ^Umsg^u
+#:   Add description of a file or log change message.
+
+needs needs-file SQLify
+function versmgmt-describe {
+	local DB commit file type msg ins
+	commit=${1:?}
+	file=${2:?}
+	type=${3:?}
+	msg=${4:?}
+	SQLify commit file type msg
+	DB=${SYSDATA:?}/versmgmt.db3
+	ins='INSERT INTO log (commitid,filename,msgtype,msg) VALUES '
+	needs-file -or-warn "$DB"
+	command sqlite3 "$DB" "$ins ($commit,$file,$type,$msg);"
+}
+
+# Copyright © 2023 by Tom Davis <tom@greyshirt.net>.

@@ -1,0 +1,16 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2023-01-04,08.57.32z/4d1177a>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^G(no arguments)^g
+#:   vmgr vms-cmd
+
+function git-checkin {
+	local file msg
+	file=${1:?}; shift
+	git add "$file"
+	# toplevel=$(git rev-parse --show-toplevel)
+	# msg=$*
+	# versmgmt-add-msg project path-from-toplevel/file $msg
+}
+
+# Copyright © 2023 by Tom Davis <tom@greyshirt.net>.

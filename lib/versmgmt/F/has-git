@@ -1,0 +1,12 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2023-01-04,05.35.07z/471972c>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^[^Upath^u^]
+#:   Returns true if given or current ^Upath^u is managed by ^Tgit^t.
+
+function has-git {
+	whence -p git &&
+		git ${1:+-C "$1"} rev-parse --is-inside-work-tree
+} 1>/dev/null 2>&1
+
+# Copyright © 2023 by Tom Davis <tom@greyshirt.net>.

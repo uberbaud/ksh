@@ -6,12 +6,37 @@
 
 function ansi-attr {
 	local i
+	set -A a
+	a[1]=bold
+	a[2]=dim
+	a[3]=italic
+	a[4]=underline
+	a[5]=slow-blink
+	a[6]=fast-blink
+	a[7]=reverse
+	a[8]=conceal
+	a[9]=struck
+	a[21]=2x-ulined
+	a[51]=framed
+	a[52]=encircled
+	a[53]=overlined
+	a[58]=color-uln
 	print '  \033[47;38m    \\e[#m   \\e[3#m  \\e[4#m  \033[0m'
-	FMT=' %3d: \e[%dm ATTR \e[0m  \e[3%dm FORE \e[0m  \e[4%dm BACK \e[0m\n'
-	for i in 1 2 3 4 5 6 7 8; do
-		printf "$FMT" $i $i $i $i
+	# ======================================== begin show attributes ===
+	FMT=' %3d: \e[%dm %-10s \e[0m  \e[3%dm FORE \e[0m  \e[4%dm BACK \e[0m\n'
+	for i in 1 2 3 4 5 6 7; do
+		printf "$FMT" $i $i "${a[i]}" $i $i
 	done
-	print '  \033[47;38m   Note: E[8m is hidden text\033[0m'
+	FMT=' %3d: \e[%dm %-10s \e[0m\n'
+	for i in 8 9 21 51 52 53; do
+		printf "$FMT" $i $i "${a[i]}"
+	done
+	FMT=' %3d: \e[%d;5;12m\e[4m %-10s \e[0m\n'
+	i=58
+	printf "$FMT" $i $i "${a[i]}"
+	# ========================================== end show attributes ===
+
+	print '  \033[47;30m   Note: E[8m is hidden text\033[0m'
 }
 
 # Copyright © 2017 by Tom Davis,,, <tom@greyshirt.net>.

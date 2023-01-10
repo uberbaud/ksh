@@ -1,0 +1,34 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2023-01-05,20.26.31z/d3692>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Ucmd^u ^Ufilename^u ^U...^u
+#:   Iterates over all applicapable ^IVMS^ies and performs ^Ucmd^u.
+#:
+#:   If ^VFOREACH_VMS^v is set to a valid command, that will be 
+#:   performed at the end of each iteration.
+#:
+#:   Local variables available to the function in ^VFOREACH_VMS^v are: 
+#:   ^Vcmd^v, ^Vfilename^v, ^Vvms^v, ^VvmsCmd^v, and ^Vfn^v. Where 
+#:   ^VvmsCmd^v is "^O$^o^Vvms^v-^O$^o^Vcmd^v", and ^Vfn^v is either 
+#:   ^O$^o^VFOREACH_VMS^v or the shell command ^T:^t.
+
+needs bad-programmer warn whence versmgmt-active-vmses
+function versmgmt-apply {
+	local cmd filename vms vmsCmd fn
+	cmd=${1:?Missing $0 arg 1, cmd}
+	filename=${2:?Missing $0 arg 2, filename}
+	shift 2
+	((${VMSes[*]+1}))|| versmgmt-active-vmses
+	fn=${FOREACH_VMS:-:}
+	whence $fn >/dev/null || bad-programmer "Cannot find function ^B$fn^b."
+
+	for vms in $VMSes; do
+		vmsCmd=${vms}-${cmd}
+		whence $vmsCmd >/dev/null ||
+			warn "Function ^T$vmsCmd^t is not implemented." || continue
+		$vmsCmd "$filename" "$@"
+		$fn
+	done
+}
+
+# Copyright © 2023 by Tom Davis <tom@greyshirt.net>.

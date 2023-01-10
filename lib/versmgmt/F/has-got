@@ -1,0 +1,11 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2023-01-04,07.40.37z/1666fd3>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^[^Upath^u^]
+#:   Returns true if given or current ^Upath^u is managed by ^Tgot^t.
+
+function has-got {
+	whence -p got && (builtin cd "${1:-.}" && got info)
+} 1>/dev/null 2>&1
+
+# Copyright © 2023 by Tom Davis <tom@greyshirt.net>.

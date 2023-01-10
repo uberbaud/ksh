@@ -139,6 +139,10 @@ ts:
 	@awk '/^SUBCOMMANDS:/ {p=1;next} p {print $$1}' tmp.tree-sitter >$@
 	@rm tmp.tree-sitter
 
+vmgr_1:
+	@echo $@
+	@vmgr cmdlist >$@
+
 $(PKG_LOG):
 	@echo $@
 	@mkdir -p $(PKG_LOG:H)

@@ -1,0 +1,47 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2023-01-04,18.28.35z/379d1d3>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^G(no arguments)^g
+#:   Wrapper with auto cd and branch on clone
+
+: ${REPOS_HOME:?}
+needs needs-cd fossil
+function f-fossil {
+	local subcmd R i lastarg F workdir 
+	lastarg=$(while (($#>1)) { shift; }; print $1)
+	[[ " $* " != *" clone "* || $lastarg != @(http?(s)|ssh|file):* ]]&& {
+		command fossil "$@"
+		return
+	  }
+
+	workdir=${lastarg##*/}
+	workdir=${workdir%.*}
+	F=$workdir.fossil	# create our own name so we'll know what it is
+
+	i=0
+	set -A common # common options come before the subcommand, others after
+	while [[ $1 != clone ]]; do
+		common[i++]=$1
+		shift
+	done
+	shift	# we're removing 'clone'
+	R=${REPOS_HOME:?}/fossil
+
+	WORKTREE_PATH=$PWD/$workdir
+	REPOSITORY=$R/$F
+	export WORKTREE_PATH REPOSITORY
+	print -r "  WORKTREE_PATH=${WORKTREE_PATH-}"
+	print -r "  REPOSITORY=${REPOSITORY-}"
+
+	needs-path -create -with-notice -or-die "$R"
+	fossil 								\
+		${common[*]:+"${common[@]}"}	\
+		--chdir "$REPOSITORY"			\
+		clone							\
+		--no-open "$@" "$F"
+	fossil open --workdir "$WORKTREE_PATH" "$REPOSITORY"
+	needs-cd -or-die "$workdir"
+
+}
+
+# Copyright © 2023 by Tom Davis <tom@greyshirt.net>.

@@ -1,0 +1,11 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2023-01-04,05.21.28z/4922e8a>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^[^Upath^u^]
+#:   Returns true if current or given ^Upath^u is managed by ^BRCS^b
+
+function has-rcs {
+	whence -p rcs && [[ -d ${1:-.}/RCS ]]
+} 1>/dev/null 2>&1
+
+# Copyright © 2023 by Tom Davis <tom@greyshirt.net>.

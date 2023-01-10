@@ -1,0 +1,22 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2023-01-05,19.39.44z/241cc9d>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^[^Upath^u^]
+#:   Populate ^VVMSes^v with the actual vmses available for files in 
+#:   ^Upath^u or ^O$^o^VPWD^v.
+
+function versmgmt-active-vmses {
+	local P vms
+
+	# get a directory for checking
+	P=$(realpath -q ${1:-.})|| die "^B$P^b: No such file or directory."
+	[[ ! -d $P && -d ${P%/*} ]]&& P=${P%/*}
+
+	VMSes=
+	for vms in ${VERSMGMT_AVAILABLE:?}; do
+		has-$vms "$P" && VMSes=${VMSes:+"$VMSes "}$vms
+	done
+	[[ -n $VMSes ]]
+}
+
+# Copyright © 2023 by Tom Davis <tom@greyshirt.net>.

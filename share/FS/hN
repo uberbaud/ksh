@@ -11,20 +11,22 @@
 
 needs downgrade-color gsub resize term-does-utf8 term-has-256-colors
 function hN {
-	local IFS=' ' attr prefix suffix text
-	attr=${1:?Missing required ANSI escape attribute}
-	[[ $attr == @(|\\033)* ]]&&
-		die 'ANSI escape attribute should not include the prefix ^S\033[^s'
-	[[ $attr == *m ]]&&
-		die 'ANSI escape attribute should not include the trailing ^Sm^s'
-	[[ $attr == +([0-9])*(;+([0-9])) ]]||
-		die 'Expected an ANSI color or attribute string (eg: ^S1;47;31^s)'
-	prefix=${2?Missing required text prefix}
-	suffix=${3?Missing required text suffix} # may be blank
+	local IFS=' ' attr prefix suffix text errmsg1 errmsg2 errmsg3
+	errmsg1='ANSI escape attribute should not include the prefix ^S\033[^s'
+	errmsg2='ANSI escape attribute should not include the trailing ^Sm^s'
+	errmsg3='Expected an ANSI color or attribute string (eg: ^S1;47;31^s)'
+
+	attr=${1:?Missing required parameter: ANSI escape attribute}
+	[[ $attr == @(|\\033)* ]]&&			bad-programmer "$errmsg1"
+	[[ $attr == *m ]]&&						bad-programmer "$errmsg2"
+	[[ $attr == +([0-9])*(;+([0-9])) ]]||	bad-programmer "$errmsg3"
+	prefix=${2?Missing required parameter: prefix}
+	suffix=${3?Missing required parameter: suffix} # may be blank
 	shift 3
+
 	gsub \\ \\\\ "$*" text
 	[[ -z $text ]]&& text='This header left (un)intentionally blank'
-	if [[ -t 1 ]]; then
+	if [[ -t 2 ]]; then
 		eval $(resize)
 		typeset -R$((COLUMNS+2)) setline='\r'
 		(((COLUMNS-6)<${#text}))&& {
@@ -34,7 +36,7 @@ function hN {
 		local H='─'
 		term-has-256-colors	|| attr=$(downgrade-color "$attr")
 		term-does-utf8		|| H='-'
-		print -- "\033[0;${attr}m$setline $H $text $H\033[0m"
+		print -u2 -- "\r\033[0;${attr}m$setline $H $text $H\033[0m"
 	else
 		suffix=${suffix:+ $suffix}
 		local decoration="$prefix $suffix"

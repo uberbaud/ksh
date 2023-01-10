@@ -1,0 +1,14 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2023-01-04,08.57.32z/495fd90>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^G(no arguments)^g
+#:   vmgr vms-cmd
+
+function git-changed {
+	local status
+	status=$(git status --short "$1")
+	status=${status#?}	# remove index status byte
+	[[ $status == M* ]]
+}
+
+# Copyright © 2023 by Tom Davis <tom@greyshirt.net>.

@@ -1,0 +1,29 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2023-01-06,20.01.40z/12ab9dc>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^G(no arguments)^g
+#:   Handles aspects of versmgmt initialization.
+#:   Sets ^VERRMSG^v on failure.
+
+needs use-app-paths
+function versmgmt-init {
+	local P F V
+
+	use-app-paths -or-false versmgmt ||
+		ERRMSG='use-app-paths failed to load versmgmt' return
+
+	VERSMGMT_PATH=${APP_PATH:?}
+	needs versmgmt-active-vmses versmgmt-apply
+
+	for P in $VERSMGMT_PATH/{B,F}; do
+		set -- $P/has-*
+		[[ $1 == $P/has-\* ]]&& continue
+		for F { V=${V:+"$V "}${F#"$P"/has-}; }
+	done
+
+	VERSMGMT_AVAILABLE=${V:-}
+	[[ -n "$VERSMGMT_AVAILABLE" ]]||
+		ERRMSG="Did not find any has-* functions in $VERSMGMT_PATH." return
+}
+
+# Copyright © 2023 by Tom Davis <tom@greyshirt.net>.

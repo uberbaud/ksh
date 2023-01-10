@@ -1,0 +1,15 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2023-01-04,08.57.34z/3676c0a>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION
+#:   vmgr vms-cmd
+
+needs ci
+function rcs-checkin {
+	local file
+	file=${1:?}; shift
+	[[ -f RCS/$file,v ]]&&
+		ci -q -j -m"$*" -u ./"$file"
+}
+
+# Copyright © 2023 by Tom Davis <tom@greyshirt.net>.

@@ -73,6 +73,7 @@ function write-file { #{{{1
 		 + -------------------------------------------------------------------- */
 
 		#include <notify_usr.h> /* sparkle(),message(),inform(),caution(),die() */
+		#include <dbg_chkpnt.h> /* DBG_CHKPNT, DBG_LOGIT(msg) */
 		
 		#pragma clang diagnostic push
 		#pragma clang diagnostic ignored "-Wreserved-id-macro"

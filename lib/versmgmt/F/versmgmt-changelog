@@ -1,0 +1,43 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2023-01-14,18.31.24z/3065366>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Ucommit id^u ^[^Ufile name^u^]
+#:   Get changes since ^Ucommit id^u for commit/worktree style version 
+#:   management systems.
+#:     ^GNote: Uses ^O$^o^VSYSDATA^v^T/versmgmt.db3^t
+
+needs SQL SQLify
+: ${SYSDATA:?}
+NL='
+'
+TAB='	'
+SQL "ATTACH '$SYSDATA/versmgmt.db3' AS versmgmt;"
+function versmgmt-changelog {
+	local commitid filename
+	commitid=${1:?}
+	filename=${2:-}
+	SQLify commitid filename
+	[[ $filename == NULL ]]&& filename=
+	SQL <<-===SQL===
+	SELECT filename, replace(msg,char(10),'{NL}') AS msg
+	  FROM versmgmt.log
+	 WHERE commitid = $commitid
+	   ${filename:+AND filename = $filename}
+	 ORDER BY filename, ts
+		;
+	===SQL===
+	((${sqlreply[*]+1}))|| ERRMSG="No changes recorded for $commitid" return
+	local tuple F M
+	for tuple in "${sqlreply[@]}"; do
+		F=${tuple%$SQLSEP*}
+		M=${tuple#*$SQLSEP}
+		[[ $F == $filename ]]|| {
+			filename=$F
+			print -r -- "$filename:"
+		  }
+		gsub "{NL}" "$NL$TAB" "$M" msg
+		print -r -- "	$msg"
+	done
+}
+
+# Copyright © 2023 by Tom Davis <tom@greyshirt.net>.

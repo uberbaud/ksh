@@ -1,7 +1,7 @@
 # <@(#)tag:tw.csongor.greyshirt.net,2021-11-25,01.43.20z/23c1c04>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^[^T-die^t^]
+#: FUNCTION ^[^T-die^t^] ^[^Uadditional message^u^]
 #:   Provide a common form for while development.
 #:   Default is to ^Twarn^t, but will ^Tdie^t if ^T-die^t is given.
 
@@ -15,7 +15,7 @@ NOT-IMPLEMENTED() {
 	(($#))&& bad-programmer "Arg is not ^T-die^t."
 
 	desparkle "$0"
-	$dowhat "^T$REPLY^t is not yet implemented."
+	$dowhat "^T$REPLY^t is not yet implemented." "$@"
 }
 
 # Copyright © 2021 by Tom Davis <tom@greyshirt.net>.

@@ -4,7 +4,7 @@
 
 set -o nounset;: ${FPATH:?Run from within KSH}
 
-set -A CMDLIST -- add changed checkin checkout diff status vmslist
+set -A CMDLIST -- add changed changelog checkin checkout diff status vmslist
 set -A ALTLIST -- ci cmdlist co help
 
 CMD=
@@ -98,29 +98,41 @@ versmgmt-init ||
 
 [[ $CMD == vmslist ]]&& { $CMD; exit; }
 
+### HANDLE Path/FileName ARG
 FILEARG=$(realpath -q ${1:-.}) || die "^B$1^b does not exit."
 (($#))&& shift
 WORKPATH=$FILEARG
 [[ -f $WORKPATH ]]&& WORKPATH=${WORKPATH%/*}
-FILEARG=${FILEARG#"$WORKPATH"}
-FILEARG=${FILEARG#/}
+FILENAME=${FILEARG#"$WORKPATH"}
+FILENAME=${FILENAME#/}
 needs-cd -or-die "$WORKPATH"
 
+### GET APPLICABLE VERSION MANAGERS
 versmgmt-active-vmses
 
-### SPECIAL HANDLING FOR COMMAND: status
-[[ $CMD == status && -z ${FILEARG-} ]]&& {
+### ALLOWED COMMANDS WITH NEITHER A FILE ARG NOR ANY VMS
+[[ $CMD == status && -z ${FILENAME-} ]]&& {
 	print -r -- "vmses: ${VMSes:--none-}"
-	return
-}
-[[ $CMD == status ]]&& FOREACH_VMS=prn_status
-STATUS=-0-
+	exit
+  }
+
+### ALL COMMANDS THAT MAKE IT HERE REQUIRE A VMS
 [[ -n ${VMSes:-} ]]|| die "No active vmses for ^N$WORKPATH^n."
 
-### ALL COMMANDS THAT MAKE IT TO HERE REQURE A FILE ARG.
-[[ -n ${FILEARG-} ]]|| die "^T$CMD^t requires a file argument."
-needs-file -or-die "$WORKPATH/$FILEARG"
+[[ $CMD == changelog && -z ${FILENAME-} ]]&& {
+	versmgmt-apply "$CMD"
+	exit
+  }
 
-versmgmt-apply "$CMD" "$FILEARG" "$@"; exit
+### ALL COMMANDS THAT MAKE IT TO HERE REQURE A FILE ARG.
+[[ -n ${FILENAME-} ]]|| die "^T$CMD^t requires a file argument."
+needs-file -or-die "$WORKPATH/$FILENAME"
+
+### SPECIAL HANDLING FOR COMMAND: status
+[[ $CMD == status ]]&& FOREACH_VMS=prn_status
+STATUS=-0-
+
+### DO THE THINGS
+versmgmt-apply "$CMD" "$FILENAME" "$@"; exit
 
 # Copyright (C) 2023 by Tom Davis <tom@greyshirt.net>.

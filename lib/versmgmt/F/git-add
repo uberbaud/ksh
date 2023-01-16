@@ -4,13 +4,12 @@
 #: FUNCTION ^G(no arguments)^g
 #:   vmgr vms-cmd
 
-#needs  versmgmt-add-description 
+needs git-describe 
 function git-add {
 	local file description
 	file=${1:?}; shift
 	git add "$file"
-	# toplevel=$(git rev-parse --show-toplevel)
-	# versmgmt-add-description project path-from-toplevel/file $description
+	git-describe "$file" D "$*"
 }
 
 # Copyright © 2023 by Tom Davis <tom@greyshirt.net>.

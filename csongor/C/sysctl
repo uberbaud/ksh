@@ -52,7 +52,6 @@ kern.malloc.kmemstat.devbuf
 kern.malloc.kmemstat.pcb
 kern.malloc.kmemstat.rtable
 kern.malloc.kmemstat.ifaddr
-kern.malloc.kmemstat.soopts
 kern.malloc.kmemstat.sysctl
 kern.malloc.kmemstat.counters
 kern.malloc.kmemstat.ioctlops
@@ -60,8 +59,8 @@ kern.malloc.kmemstat.iov
 kern.malloc.kmemstat.mount
 kern.malloc.kmemstat.NFS_req
 kern.malloc.kmemstat.NFS_mount
+kern.malloc.kmemstat.log
 kern.malloc.kmemstat.vnodes
-kern.malloc.kmemstat.namecache
 kern.malloc.kmemstat.UFS_quota
 kern.malloc.kmemstat.UFS_mount
 kern.malloc.kmemstat.shm
@@ -70,12 +69,10 @@ kern.malloc.kmemstat.sem
 kern.malloc.kmemstat.dirhash
 kern.malloc.kmemstat.ACPI
 kern.malloc.kmemstat.VM_pmap
-kern.malloc.kmemstat.file
 kern.malloc.kmemstat.file_desc
 kern.malloc.kmemstat.sigio
 kern.malloc.kmemstat.proc
 kern.malloc.kmemstat.subproc
-kern.malloc.kmemstat.VFS_cluster
 kern.malloc.kmemstat.MFS_node
 kern.malloc.kmemstat.Export_Host
 kern.malloc.kmemstat.NFS_srvsock
@@ -110,7 +107,6 @@ kern.malloc.kmemstat.witness
 kern.malloc.kmemstat.memdesc
 kern.malloc.kmemstat.crypto_data
 kern.malloc.kmemstat.IPsec_creds
-kern.malloc.kmemstat.emuldata
 kern.malloc.kmemstat.ip6_options
 kern.malloc.kmemstat.NDP
 kern.malloc.kmemstat.temp
@@ -151,7 +147,6 @@ kern.forkstat.fork_pages
 kern.forkstat.vfork_pages
 kern.forkstat.tfork_pages
 kern.forkstat.kthread_pages
-kern.nselcoll
 kern.tty.tk_nin
 kern.tty.tk_nout
 kern.tty.tk_rawcc
@@ -196,6 +191,7 @@ kern.consbufsize
 kern.audio.record
 kern.timeout_stats
 kern.utc_offset
+kern.video.record
 vm.loadavg
 vm.psstrings
 vm.swapencrypt.enable
@@ -207,6 +203,14 @@ vm.vtextmin
 vm.vnodemin
 vm.malloc_conf
 fs.posix.setuid
+net.unix.stream.recvspace
+net.unix.stream.sendspace
+net.unix.dgram.recvspace
+net.unix.dgram.sendspace
+net.unix.seqpacket.recvspace
+net.unix.seqpacket.sendspace
+net.unix.inflight
+net.unix.deferred
 net.inet.ip.forwarding
 net.inet.ip.redirect
 net.inet.ip.ttl
@@ -234,6 +238,9 @@ net.inet.ip.ipsec-auth-alg
 net.inet.ip.mtudisc
 net.inet.ip.mtudisctimeout
 net.inet.ip.ipsec-comp-alg
+net.inet.ip.ifq.len
+net.inet.ip.ifq.maxlen
+net.inet.ip.ifq.drops
 net.inet.ip.mforwarding
 net.inet.ip.multipath
 net.inet.ip.mrtproto
@@ -307,6 +314,9 @@ net.inet6.ip6.neighborgcthresh
 net.inet6.ip6.maxdynroutes
 net.inet6.ip6.dad_pending
 net.inet6.ip6.mtudisctimeout
+net.inet6.ip6.ifq.len
+net.inet6.ip6.ifq.maxlen
+net.inet6.ip6.ifq.drops
 net.inet6.icmp6.redirtimeout
 net.inet6.icmp6.nd6_delay
 net.inet6.icmp6.nd6_umaxtries
@@ -332,6 +342,8 @@ hw.pagesize
 hw.disknames
 hw.diskcount
 hw.sensors.cpu0.temp0
+hw.sensors.cpu0.frequency0
+hw.sensors.cpu2.frequency0
 hw.sensors.acpibtn0.indicator0
 hw.sensors.acpibat0.volt0
 hw.sensors.acpibat0.volt1
@@ -378,6 +390,7 @@ hw.allowpowerdown
 hw.perfpolicy
 hw.smt
 hw.ncpuonline
+hw.power
 machdep.console_device
 machdep.bios.diskinfo.128
 machdep.bios.cksumlen

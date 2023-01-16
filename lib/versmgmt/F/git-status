@@ -5,14 +5,23 @@
 #:   vmgr vms-cmd
 
 function git-status {
-	local status
-	status=$(git status --short "$1")
-	if [[ $status = \?\?* ]]; then
-		STATUS=untracked
-	elif [[ ${status#?} == M* ]]; then
-		STATUS=modified
+	local file
+	file=$1
+	STATUS=ok
+	set -- $(git status --porcelain=v2 "$file")
+	(($#==0))&& return
+	if [[ $1 == 1 ]]; then
+		if [[ $2 = \?\?* ]]; then
+			STATUS=untracked
+		elif [[ $2 != ?. ]]; then
+			STATUS=modified
+		fi
+	elif [[ $1 == 2 ]]; then
+		NOT-IMPLEMENTED "moved/renamed"
+	elif [[ $1 == u ]]; then
+		NOT-IMPLEMENTED "merge issues"
 	else
-		STATUS=ok
+		STATUS=error
 	fi
 }
 

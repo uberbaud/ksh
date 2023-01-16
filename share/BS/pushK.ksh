@@ -42,7 +42,7 @@ function GIT { # {{{1
 	[[ $hlevel == [123] ]]||
 		die "GIT parameter #2 is not a level indicator" "^S$lnum^s: ^U$*^u"
 	for o; do
-		[[ $o == msg ]]&& break
+		[[ $o == %MSG% ]]&& break
 		cmd="${cmd:+$cmd }$1"
 		shift
 	done
@@ -69,7 +69,8 @@ function commit-everything { # {{{1
 
 	# check for uncommitted changes in the index
 	git diff-index --cached --quiet HEAD ||
-		GIT 2 commit -av	 msg "did not commit ^B$branch^b"
+	  { now; print; vmgr changelog; } |
+		GIT 2 commit -aveF - %MSG% "did not commit ^B$branch^b"
 } # }}}1
 function diffstat { # {{{1
 	(($#<1))&& bad-programmer "Missing required parameter ^Ubranch^u."

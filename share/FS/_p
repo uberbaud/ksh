@@ -6,12 +6,11 @@
 #:   ^GUse:^g ^Talias p='^t_p ^O$^o^V#^v "^O$^o^V@^v"^T'^t
 
 function _p {
-	local i
+	local i n
 	[[ ${1:?} == +([0-9]) ]]|| bad-programmer "See ^Thelp ^B_p^b^t"
 	# if more than $@ was passed, remove $@ so we print what was passed
-	(($#==($1+1)))||
-		shift $1
-	shift 1 # remove $#
+	n=$1; shift
+	(($#==n))|| shift $n
 	for i { print -r -- "$i"; }
 }
 

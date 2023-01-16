@@ -4,18 +4,24 @@
 #: FUNCTION ^Ucommit-id^u ^Ufile^u ^Utype^u ^Umsg^u
 #:   Add description of a file or log change message.
 
-needs needs-file SQLify
+needs needs-file SQLify term-get-text
 function versmgmt-describe {
-	local DB commit file type msg ins
-	commit=${1:?}
-	file=${2:?}
-	type=${3:?}
-	msg=${4:?}
+	local commit file type msg DB INS prompt
+	commit=${1:?Missing arg 1: commit-id}
+	file=${2:?Missing arg 2: file}
+	type=${3:?Missing arg 3: type.}
+	case $type in
+		L)	prompt='ci';											;;
+		D)	prompt='description';									;;
+		*)	ERRMSG="Unknown VERSMGMT log type: $type"; return 1;	;;
+	esac
+	msg=${4:-$(term-get-text "$prompt")}
+		[[ -n $msg ]]|| return
 	SQLify commit file type msg
 	DB=${SYSDATA:?}/versmgmt.db3
-	ins='INSERT INTO log (commitid,filename,msgtype,msg) VALUES '
 	needs-file -or-warn "$DB"
-	command sqlite3 "$DB" "$ins ($commit,$file,$type,$msg);"
+	INS='INSERT INTO log (commitid,filename,msgtype,msg) VALUES '
+	command sqlite3 "$DB" "$INS ($commit,$file,$type,$msg);"
 }
 
 # Copyright © 2023 by Tom Davis <tom@greyshirt.net>.

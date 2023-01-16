@@ -6,7 +6,7 @@
 
 needs rcsdiff
 function rcs-changed {
-	! rcsdiff -q ./"$1" >/dev/null
+	! rcsdiff -q ./"$1" 2>&1 >/dev/null
 }
 
 # Copyright © 2023 by Tom Davis <tom@greyshirt.net>.

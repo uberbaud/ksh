@@ -130,6 +130,7 @@ credential
 credential-cache
 credential-store
 fmt-merge-msg
+hook
 interpret-trailers
 mailinfo
 mailsplit

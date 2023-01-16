@@ -9,6 +9,7 @@
 #:     3. ^O$^o^VSHORTWAIT^v ^T<=^t ^O$^o^VSECONDS^v, and
 #:     4. ^Ucommand^u did not write to ^Istderr^i.
 
+needs h2 h3 now readkeys warn
 function wait-before-leaving {
 	local rc tempF
 	( now; /usr/bin/printf '  %s\n' "$@"; )>>~/log/wait-before-leaving.log
@@ -17,9 +18,11 @@ function wait-before-leaving {
 		rcIsZero=true; notTooSoon=true; noStderrWrites=true;
 		SHORTWAIT=${SHORTWAIT:-0}
 
+		tail -f "$tempF" >&2 & pidTail=$!
 		# ACTUAL COMMAND WE ARE RUNNING IN THE X11 TERMINAL WINDOW
 		SPARKLE_FORCE_COLOR=true "$@" 2>$tempF
 		rc=$?
+		kill $pidTail
 
 		(($rc))&&				rcIsZero=false
 		((SECONDS>SHORTWAIT))||	notTooSoon=false
@@ -27,6 +30,7 @@ function wait-before-leaving {
 
 		$rcIsZero && $notTooSoon && $noStderrWrites && return
 
+		h3 'wait-before-leaving results'
 		$rcIsZero		||	warn "Exited with return code ^E$rc^e."
 		$notTooSoon		||	warn "Exited too quickly. ^G(see SHORTWAIT)^g"
 		$noStderrWrites	||	{ h2 "$1 2>$tempF"; print -r -- "$(<$tempF)"; }

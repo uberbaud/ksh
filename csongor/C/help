@@ -236,6 +236,7 @@ sysexits
 t
 tdump
 term-does-utf8
+term-get-text
 term-has-256-colors
 test
 time

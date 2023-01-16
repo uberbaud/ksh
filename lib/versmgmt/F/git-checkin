@@ -8,9 +8,9 @@ function git-checkin {
 	local file msg
 	file=${1:?}; shift
 	git add "$file"
-	# toplevel=$(git rev-parse --show-toplevel)
-	# msg=$*
-	# versmgmt-add-msg project path-from-toplevel/file $msg
+	msg=$*
+	[[ -n $msg ]]|| git-diff "$file"
+	git-describe "$file" 'L' "$msg"
 }
 
 # Copyright © 2023 by Tom Davis <tom@greyshirt.net>.

@@ -9,7 +9,7 @@ function rcs-add {
 	local file
 	file=${1:?}; shift
 	[[ -f RCS/$file,v ]]||
-		ci -q -i -t-"$*" -u ./"$file"
+		ci -q -i -t-"$*" -u ./"$file" 2>&1
 }
 
 # Copyright © 2023 by Tom Davis <tom@greyshirt.net>.

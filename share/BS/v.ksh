@@ -96,7 +96,7 @@ function handle-modified { #{{{1
 } #}}}1
 function init-or-sync-then-checkout { #{{{1
 	case ${STATUS:-nope} in
-		untracked)	$vms-add "$filename" "$DESCRIPTION";					;;
+		untracked)	$vms-add "$filename" "${DESCRIPTION:=$(term-get-text)}"; ;;
 		modified)	handle-modified "$filename";							;;
 		ok)			:;														;;
 		nope)		warn "^T$vms-status^t does not set ^O$^o^VSTATUS^v.";	;;
@@ -130,8 +130,8 @@ function main { # {{{1
 	  }
 
 	if $HAS_VERSMGMT; then
-		versmgmt-apply checkin "$f_name" "$rcsmsg"
-	elif $hasmsg; then
+		versmgmt-apply checkin "$f_name" "${ciMsg:-}"
+	elif [[ -n $ciMsg ]]; then
 		warn 'Supplied a ^Bcheckin^b message, but there'\''s no ^IVMS^i.'
 	fi
 
@@ -153,8 +153,7 @@ verify-file-is-editable		"$f_fullpath"
 check-flags-for-writability	"$f_fullpath"
 safe-to-edit				"$f_fullpath"
 
-rcsmsg=$*
-[[ -n $rcsmsg ]]&& hasmsg=true || hasmsg=false
+ciMsg=$*
 
 # because we've `realpath`ed the arg, it's guaranteed to have at least 
 # one (1) forward slash ('/') as (and at) the root.

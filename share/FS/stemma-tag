@@ -1,0 +1,29 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2023-01-17,06.42.15z/2118546>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Uuser^u ^Umachine^u ^Udomain^u ^udate^u ^utime^u
+#:   The guts of stemma creation
+
+function stemma-tag {
+	local U M H D T a b c
+	U=${1:-$(id -un)}
+	M=${2:-$(uname -n)}; M=${M%.*}
+	H=${3:-${URI_AUTHORITY:-${EMAIL:-}}}
+	[[ -n $H ]]|| die 'Neither ^VURI_AUTHORITY^v nor ^VEMAIL^v is set'
+	H=${H#*@}
+	if [[ -n ${4:-} && -n ${5:-} ]]; then
+		D=$4; T=$5
+	elif [[ -z ${4:-} && -z ${5:-} ]]; then
+		set -- $(date -u +'%Y-%m-%d %H.%M.%Sz')
+		D=$1; T=$2
+	else
+		die "Must set both ^Udate^u and ^Utime^u or neither."
+	fi
+	random -e 10; a=$?
+	random -e 10; b=$?
+	random -e 10; c=$?
+	typeset -i16 X=10#$$$a$b$c
+	print '<\0100\050\043\051'"tag:$U.$M.$H,$D,$T/${X#?(-)16#}>"
+}
+
+# Copyright © 2023 by Tom Davis <tom@greyshirt.net>.

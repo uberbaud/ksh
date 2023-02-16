@@ -1,0 +1,16 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2023-02-06,22.05.54z/5ad4262>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Uvarname^u
+#:   Given a ^Bvarname^b, returns whether its value is ^Itruish^i, where
+#:   truish is the literal (case insensitive) value ^Ttrue^t or ^Tyes^t 
+#:   or any number other than ^T0^t.
+
+function truish {
+	[[ $1 == [A-Za-z_]*([A-Za-z0-9_]) ]]||
+		bad-programmer "\$1 is not a ^Bvarname^b: $1"
+	eval "typeset -l v=\${$1:-}"
+	[[ -n $v && $v == @(true|[1-9]*([0-9])|yes) ]]
+}
+
+# Copyright © 2023 by Tom Davis <tom@greyshirt.net>.

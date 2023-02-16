@@ -23,7 +23,7 @@
         ^TA^t → ASCIIfy (change ^T©^t to ^T(C)^t, for example)
         ^TZ^t → Allow undefined or null string
 
-    Multiple modifiers can included, and will be processed left to right.
+    Multiple modifiers can be included, and will be processed left to right.
 
     For example, if ^VMY_VAL^v is ^G'^g^T/home/me/my/path/somewhere.ext^t^G'^g, then
     ^S«[^s^VMY_VAL^v^O:^o^TPB^t^S]»^s yields ^G'^g^Tpath^t^G'^g.

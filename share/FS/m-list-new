@@ -3,7 +3,9 @@
 
 #: FUNCTION ^G(no arguments)^g
 #:   List new mail (^Tscan^t or ^Txscan^t) and ^Sgroups^s.
+#: ^GIf^g ^VMAIL_ALWAYS_XSCAN^v ^Gis ^Itruish^i,^g ^Txscan^t ^Gwill be used.^g
 
+needs truish
 function m-list-new {
 	local scanseq c
 	((LINES))|| LINES=$(tput lines)
@@ -11,7 +13,7 @@ function m-list-new {
 	[[ -n $(flist +inbox -sequence L -noshowzero) ]]|| scanseq='a'
 	set -- $(pick +inbox $scanseq -nolist 2>/dev/null)
 	c=${1:-0}
-	if ((c>(LINES-8))); then
+	if truish MAIL_ALWAYS_XSCAN || ((c>(LINES-8))); then
 		xscan
 	elif ((c)); then
 		scan +inbox $scanseq

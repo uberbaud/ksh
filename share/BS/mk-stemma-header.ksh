@@ -4,6 +4,7 @@
 
 set -o nounset;: ${FPATH:?Run from within KSH}
 
+U=; M=; H=; D=; T=
 # Usage {{{1
 typeset -- this_pgm=${0##*/}
 function usage {
@@ -76,12 +77,13 @@ shift $(($OPTIND - 1))
 pfx=${1:+${1% } }
 sfx=${2:+ ${2# }}
 
-bins[0]='date'
-bins[1]='random'
+i=0
+bins[i++]='date'
+bins[i++]='random'
 # we only need to find what we don't already have
-[[ -n ${M:-} ]]|| bins[${#bins[*]}]='id'
-[[ -n ${U:-} ]]|| bins[${#bins[*]}]='uname'
-needs "${bins[@]}" warnOrDie
+[[ -n ${M:-} ]]|| bins[i++]='id'
+[[ -n ${U:-} ]]|| bins[i++]='uname'
+needs "${bins[@]}" warnOrDie stemma-tag die
 
 if $DATEGIVEN && $TIMEGIVEN; then
 	DTs=$(date -ju +'%Y-%m-%d:%H.%M.%Sz' "$Dy$Dm$Dd$Th$Tm.$Ts" 2>&1) || {
@@ -90,30 +92,15 @@ if $DATEGIVEN && $TIMEGIVEN; then
 	  }
 	[[ $DTs == "$Dy-$Dm-$Dd:$Th.$Tm.$Ts"z ]]||
 		die "Bad date or time values." "in:  $Dy-$Dm-$Dd:$Th.$Tm.$Ts""z" "out: $DTs"
+	D=${DTs%:*}
+	T=${DTs#*:}
 elif $DATEGIVEN; then
 	die 'If you give the date, you must also give the time.'
 elif $TIMEGIVEN; then
 	die 'If you give the time, you must also give the date.'
-else
-	DTs=$(date -u +'%Y-%m-%d:%H.%M.%Sz')
 fi
 
-D=${DTs%:*}
-T=${DTs#*:}
-
-# Use the pid, but suffix it with with 3 digits, making the result
-# unpredictable while maintaining uniqueness.
-random -e 10;	A=$?;
-random -e 10;	B=$?
-random -e 10;	C=$?
-typeset -i16 X=$$$A$B$C
-[[ -n ${M:-} ]]|| { M=$(uname -n); M=${M%.*}; }
-[[ -n ${U:-} ]]|| { U=$(id -un); }
-[[ -n ${H:-} ]]|| { H=${URI_AUTHORITY-${EMAIL#*@}}; }
-: ${H-Neither URI_AUTHORITY nor EMAIL is set.}
-
-#	'@' = \0100, '(' = \050, '#' = \043, ')' = \051
-#print -n '<\0100\050\043\051'"tag:$M.$H,$D:$U/$T/${X#?(-)16#}>"
-print -n "$pfx"'<\0100\050\043\051'"tag:$U.$M.$H,$D,$T/${X#?(-)16#}>$sfx"
+stemma=$(stemma-tag "$U" "$M" "$H" "$D" "$T")
+print -- "$pfx$stemma$sfx"
 
 # Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

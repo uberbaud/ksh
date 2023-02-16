@@ -161,10 +161,13 @@ needs
 needs-cd
 needs-file
 needs-path
+needs-var
+needs-vars
 new-array
 newest
 nextfd
 nodark
+noglob
 nohup
 note
 notify
@@ -228,6 +231,7 @@ sqlite3-c-api
 sqlite3-datetime
 ssh-askfirst
 ssh-clonedir
+stemma-tag
 stop
 subscribe
 subst-pathvars
@@ -247,6 +251,7 @@ trackfile
 trap
 trnsxtrm
 true
+truish
 type
 typeset
 ulimit

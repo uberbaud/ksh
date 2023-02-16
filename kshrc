@@ -94,19 +94,20 @@ else
 	histmark="# OLDHISTORY $(date -u +'%Y-%m-%d %H:%M:%S Z')"
 	T="$(cat)" <<-===
 	function ShHistCleanUp {
-		local fhist KHIST
-		fhist='$fhist'
-		KHIST='$KHIST'
-		awk '/^$histmark\$/{p=1;next}p' "\$fhist">>"\$KHIST"
-		(($?))&& { warn 'Did not update \$K/H/history'; return; }
-		rm "\$fhist"
+	    local fhist KHIST
+	    fhist='$fhist'
+	    KHIST='$KHIST'
+	    if awk '/^$histmark\$/{p=1;next}p' "\$fhist">>"\$KHIST"; then
+	        rm "\$fhist"
+	    else
+	        warn 'Did not update ^O\$^o^VK^v^B/H/history^b'
+	    fi
 	}
 	===
 	eval "$T"
 	add-exit-actions ShHistCleanUp
 	tail -n 127 $KHIST>$fhist
 	print "$histmark" >>$fhist
-	HISTFILE="$fhist"
 fi
 
 # paths
@@ -291,8 +292,20 @@ else
 fi
 alias no2='2>/dev/null '
 alias noerr='2>/dev/null '
-alias noglob='set -f;noglob '; function noglob { set +f; ("$@"); }
+# ==================================================== BEGIN: NOGLOB ===
+alias noglob='[[ $- == *f* ]]|| { set -f; false; };noglob $? '
+function noglob {
+	[[ $2 == \[\[ ]]&& return $1 # handle nested noglobs
+	local undo_noglob=$1; shift
+	( "$@" )
+	typeset -i e=$?
+	((undo_noglob))&& set +f
+	return $e
+}
+# ====================================================== END: NOGLOB ===
+
 alias p='_p $# "$@"'
+alias pass=' pass' # don't put in history
 alias prn="/usr/bin/printf '  \e[35m｢\e[39m%s\e[35m｣\e[39m\n'"
 
 [[ -n $KDOTDIR ]]&& {

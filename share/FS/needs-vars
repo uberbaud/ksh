@@ -1,0 +1,27 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2023-01-16,23.48.42z/5d2c013>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^[^T-or-warn^t^|^T-or-die^T^|^T-or-false^t^] ^Uvar name^u ^S…^s
+#:   Validate that required variables exist and are set.
+
+function needs-vars {
+	local what var missing msg
+	[[ -n ${1:-} ]]|| return
+	msg='Expected ^T-or-^t^{^Twarn^t^|^Tdie^t^|^Tfalse^t^}'
+	case ${1:-} in
+		-or-@(warn|die|false)) what=${1#-or-}; shift;		;;
+		-or-*) bad-programmer 'Bad action flag.' "$msg";	;;
+		*) what=die;										;;
+	esac
+	(($#))|| $what "^T$0^t called without any ^Uvar name^us."
+	integer i=0
+	for var { eval "[[ -n \${$var:-} ]]" || missing[i++]=$var; }
+	case $i in
+		0)	return;											;;
+		1)	msg="Required variable is unset or empty:";		;;
+		*)	msg="Required variables are unset or empty:";	;;
+	esac
+	$what "$msg" "^V${missing[@]}^v"
+}
+
+# Copyright © 2023 by Tom Davis <tom@greyshirt.net>.

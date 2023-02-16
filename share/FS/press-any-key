@@ -1,13 +1,15 @@
 # <@(#)tag:tw.csongor.greyshirt.net,2022-05-24,00.51.19z/55ef5dc>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^[^Umessage^u^]
-#:   Waits for ANY key press
+#: FUNCTION ^[^Umessage^u^] ^= ^VREPLY^v
+#:   Waits for ANY key press.
+#:   ^VREPLY^v is set to the ^Bkey-class-char^b and the ^Bkey-name^b.
 
 needs readkeys
 function press-any-key {
 	print -- ${1:-Press ANY key.}
-	readkeys|(read name pid; read; kill -HUP $pid)
+	REPLY=$(trap '' INT;readkeys|
+			(read n pid;read class key;kill -HUP $pid;print -r "$class-$key"))
 }
 
 # Copyright © 2022 by Tom Davis <tom@greyshirt.net>.

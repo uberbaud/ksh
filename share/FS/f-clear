@@ -5,10 +5,11 @@
 #:   Reimplement ^Tclear^t to clear buffer too, possibly draw a banner 
 #:   and run a second command whose name and argument are in the banner
 
+needs h3
 function f-clear {
 	local IFS=' '
 	print -u2 '\033[H\033[2J\033[3J\033[H\c'
-	((!$#)) || h1 "$@" >/dev/tty
+	((!$#)) || h3 "$@" >/dev/tty
 	"$@"
 }
 

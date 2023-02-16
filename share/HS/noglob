@@ -1,0 +1,5 @@
+^Bnoglob^b
+
+    Executes a command with given arguments ^BWITHOUT^b expanding file name 
+    patterns. ^GSee ^Iman(1)^i -f | noglob^g
+

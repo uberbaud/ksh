@@ -31,6 +31,7 @@ export MAILDROP=/var/mail/$USER
 export MAILPATH=''
 export MAIL_HOME=$xdgcfg/mail
 export MAILRC=$MAIL_HOME/mail.rc
+export MAIL_ALWAYS_XSCAN=true
 export MBOX=$MAIL_HOME/mbox
 #=== (M)MH
 export MMH=$xdgcfg/mmh
@@ -59,6 +60,7 @@ export CSONGOR_XTERM_WINDOW_BG='#626262'
 export CSONGOR_XTERM_WINDOW_FG='#dadada'
 export MANPAGER='nvim -M +Man!'
 export YT=AUDIODEVICE=snd@yt.lan/default
+export SUDO=/usr/bin/doas
 
 export TZ=EST5EDT
 
@@ -71,7 +73,7 @@ amuse:create-cmd-wrappers
 
 # noglobs
 for i in cowmath math note; { alias $i="noglob $i"; }
-alias mathcow="noglob cowmath"
+alias mathcow="cowmath"
 # askfirst all commands that use ssh
 for i in ssh scp sftp rsync;	{ alias "$i=ssh-askfirst $i"; }
 # Make fully qualified known hosts into aliases for sshing to that host

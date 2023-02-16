@@ -2,12 +2,10 @@
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
 #: FUNCTION ^Ucommand^u ^Uarg1^u ^S[…^s ^UargN^u^]
-#:   Wrapper around ^Ucommand^u and then waits for a keypress.
-#:   Leave without prompting ^IIF^i
-#:     1. ^Ucommand^u exited without error,
-#:     2. ^VSHORTWAIT^v was set and
-#:     3. ^O$^o^VSHORTWAIT^v ^T<=^t ^O$^o^VSECONDS^v, and
-#:     4. ^Ucommand^u did not write to ^Istderr^i.
+#:   Executes ^Ucommand^u then waits for a keypress ^Bif^b
+#:     1. ^Ucommand^u exited with an error,
+#:     2. ^O$^o^VSECONDS^v ^O<^o ^O${^VSHORTWAIT^v^O:-^o^T∞^t^O}^o, or
+#:     3. ^Ucommand^u wrote to ^Istderr^i.
 
 needs h2 h3 now readkeys warn
 function wait-before-leaving {

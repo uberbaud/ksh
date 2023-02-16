@@ -12,10 +12,9 @@ needs desparkle warn die
 NOT-IMPLEMENTED() {
 	local REPLY dowhat=warn
 	[[ ${1:-} == -die ]]&& { dowhat=die; shift; }
-	(($#))&& bad-programmer "Arg is not ^T-die^t."
 
 	desparkle "$0"
-	$dowhat "^T$REPLY^t is not yet implemented." "$@"
+	$dowhat "^T$REPLY^t: not yet implemented." "$@"
 }
 
 # Copyright © 2021 by Tom Davis <tom@greyshirt.net>.

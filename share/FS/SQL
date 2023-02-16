@@ -8,11 +8,11 @@
 #:   If there is not already an ^Isqlite3^i co-process running:
 #:     1) Starts the co-process,
 #:     2) Sets the array ^O$^o^VSQLFD^v to the co-process file 
-#:        descriptors,
-#:     3) Sets ^O$^o^VSQLSEP^v (the field separator) to ^O\^o^S034^s if 
-#:        it is not already set, and
+#:        descriptors and marks it as ^Breadonly^b,
+#:     3) Sets and marks as ^Breadonly^b ^O$^o^VSQLSEP^v (the field 
+#:        separator) to ^O\^o^S034^s if it is not already set, and
 #:     4) Sets ^O$^o^VSQLPID^v to the process id of the ^Isqlite3^i 
-#:        co-process instance.
+#:        co-process instance and marks it as ^Breadonly^b.
 #:
 #: FUNCTION respects the variables
 #:   ^O$^o^VSQL_AUTODIE^v (^Itrue^i, ^Iwarn^i, or ^Ifalse^i). Defaults to ^Itrue^i.
@@ -38,13 +38,14 @@ function SQL {
 	  }
 	[[ $autodie == warn ]]&& { autodie=false; autowarn=true; }
 
-	SQLSEP=${SQLSEP:-"$(print '\034')"} # ^\ -> field separator
 	(($#))&& sql="$*" || sql=$(</dev/stdin)
 	((${SQLFD[0]:-}))|| { # BEGIN CO-PROCESS START-UP
+		readonly SQLSEP=${SQLSEP:-"$(print '\034')"} # ^\ -> field separator
 		get-unused-fds 2 SQLFD
+		readonly SQLFD
 		coproc-w-fds ${SQLFD[0]} ${SQLFD[1]}	\
 			sqlite3 -noheader -batch -list -separator "$SQLSEP"
-		SQLPID=$!
+		readonly SQLPID=$!
 
 		add-exit-actions "(trap '' PIPE; print -u${SQLFD[1]} '.quit')"
 		# clear the SQLite3 init output

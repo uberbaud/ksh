@@ -78,6 +78,11 @@ cabal_1:
 	@echo $@
 	@cabal --help |awk '$(CABAL_AWK)' >$@
 
+CARGO_AWK  = $$1 == "Installed" {next} $$1 ~ /../ {print $$1}
+cargo_1:
+	@echo $@
+	@cargo --list | awk '$(CARGO_AWK)' >$@
+
 ELM_AWK    = /^    elm [^[:space:]]+[[:space:]]+--help$$/ {print $$2}
 elm_1:
 	@echo $@

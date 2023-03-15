@@ -3,20 +3,20 @@
 
 #: FUNCTION ^[^UYear^u ^Umonth^u ^Uday^u ^Uhour^u ^Uminute^u ^[^Usecond^u^]^]
 #:   Prints a very compact form of ^Ilocal now^i or the given time using one
-#:   character per ^UYmd-HMS^u translated to ^[^Tz1^t^O-^o^T9a^t^O-^o^Ty^t^] without ^Tj^t, ^To^t, or ^Tu^t.
+#:   character per ^UYYYmd-HMS^u translated to ^[^Tz1^t^O-^o^T9a^t^O-^o^Ty^t^] without ^To^t or ^Tu^t.
 #:
-#:   ^BYear^b modulo 32, ^Bmonth^b ^Ta^t^-^Tm^t (no ^Tj^t), ^Bday^b ^T1^t^-^Ty^t (no ^Tj^t, ^To^t, or ^Tu^t)
-#:   ^BHour^b ^Tz^t-p, ^BMinutes^b resolution of 2, ^Bseconds^b plus the missing minute but
+#:   ^BYear^b modulo 32, ^Bmonth^b ^Ta^t^-^Tl^t, ^Bday^b ^T1^t^-^Ty^t (no ^To^t or ^Tu^t)
+#:   ^BHour^b ^Tz^t-^Tp^t, ^BMinutes^b resolution of 2, ^Bseconds^b plus the missing minute but
 #:   only a resolution of 4 seconds.
-#: ^GExample: ^I2022-06-28 19:24:10 EDT^i^g ^= ^G^i6fw-kc2^i^g
+#: ^GExample: ^I2022-06-28 19:24:10 EDT^i^g ^= ^G^237fw-kc2^i^g
 
 
 needs bad-programmer date
 function compact-timestamp {
-	local y m d H M S zVar TMSTMP ARGV
+	local y m d H M S zVar TMSTMP ARGV X Y
 	typeset -i10 i=0 atoms=0
 	ARGV=
-	set -A t -- z 1 2 3 4 5 6 7 8 9 a b c d e f g h i k l m n p q r s t v w y
+	set -A t -- z 1 2 3 4 5 6 7 8 9 a b c d e f g h i j k l m n p q r s t v w y
 	case $# in
 		0)
 			TMSTMP=
@@ -55,7 +55,12 @@ function compact-timestamp {
 	set -- $(date -j +'%Y %m %e %k %M %S' $TMSTMP) ||
 		die "Bad date ^B$ARGV^b ^= ^B$TMSTMP^b."
 	atoms=${#t[*]}
-	y=${t[(${1#0}%atoms)]}	# year modulo sizeof t array
+
+	y=${1#0}
+	while ((y)); do
+		((X=y%atoms,y-=X,y/=atoms))
+		Y=${t[X]}${Y:-}
+	done				# year base sizeof t array
 	m=${t[(${2#0}+9)]}	# month - 1 + 10, zeroify but only use letters
 	d=${t[(${3#0}+1)]}	# day of month +1 is less than or equal to 32
 	H=${t[(${4})]}		# hours fits into 32 slots
@@ -65,7 +70,7 @@ function compact-timestamp {
 	i=$((${6#0}+((i%2)*60)))
 	S=${t[(i/4)]}		# i could be 0-120 (because of leap seconds),
 						#   so use resolution of four (4) seconds.
-	print -r -- "$y$m$d-$H$M$S"
+	print -r -- "$Y$m$d-$H$M$S"
 }
 
 # Copyright © 2022 by Tom Davis <tom@greyshirt.net>.

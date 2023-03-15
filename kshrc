@@ -179,9 +179,10 @@ set -o vi -o vi-tabcomplete
 set -o braceexpand -o ignoreeof -o physical
 
 export INPUTRC=$xdgcfg/init/input.rc
-[[ -n ${LC_CTYPE:-} ]]&& {
+[[ -n ${LC_CTYPE:-} ]]&& { # set in ~/.xsession
 	export LANG=$LC_CTYPE
-	for v in ALL COLLATE MESSAGES MONETARY NUMERIC TIME; do
+	# LC_ALL *overrides* all other LC_* setings, SO DON'T SET IT.
+	for v in COLLATE MESSAGES MONETARY NUMERIC TIME; do
 		export LC_$v=$LANG
 	done
   }

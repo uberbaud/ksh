@@ -15,7 +15,7 @@ function ssh-askfirst {
 
 	# test whether identities are already loaded
 	/usr/bin/ssh-add -l >/dev/null || {
-		print -u2 '  \033[s ==> Gather passphrase'
+		print -nu2 '  \033[s ==> Gather passphrase\r'
 		# force an x-window
 		/usr/bin/ssh-add < /dev/null
 		# restore cursor and blank intermediate

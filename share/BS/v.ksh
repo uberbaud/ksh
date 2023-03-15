@@ -96,7 +96,7 @@ function handle-modified { #{{{1
 } #}}}1
 function init-or-sync-then-checkout { #{{{1
 	case ${STATUS:-nope} in
-		untracked)	$vms-add "$filename" "${DESCRIPTION:=$(term-get-text)}"; ;;
+		untracked)	$vms-add "$filename" "${DESCRIPTION:=$(term-get-text descr)}"; ;;
 		modified)	handle-modified "$filename";							;;
 		ok)			:;														;;
 		nope)		warn "^T$vms-status^t does not set ^O$^o^VSTATUS^v.";	;;

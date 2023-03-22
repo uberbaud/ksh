@@ -124,15 +124,17 @@ function main { # {{{1
 	$ED "$f_fullpath"
 
 	CKSUM_AFTER=$(fast-crypt-hash "$f_fullpath")
-	[[ $CKSUM_BEFORE != $CKSUM_AFTER ]]&& {
+	if [[ $CKSUM_BEFORE != $CKSUM_AFTER ]]; then
 		trackfile "$f_fullpath"
 		[[ -f .LAST_UPDATED ]]&& date -u +"$ISO_DATE" >.LAST_UPDATED
-	  }
 
-	if $HAS_VERSMGMT; then
-		versmgmt-apply checkin "$f_name" "${ciMsg:-}"
+		if $HAS_VERSMGMT; then
+			versmgmt-apply checkin "$f_name" "${ciMsg:-}"
+		elif [[ -n $ciMsg ]]; then
+			warn 'Supplied a ^Bcheckin^b message, but there'\''s no ^IVMS^i.'
+		fi
 	elif [[ -n $ciMsg ]]; then
-		warn 'Supplied a ^Bcheckin^b message, but there'\''s no ^IVMS^i.'
+		warn 'Supplied a ^Bcheckin^b message, but there were no changes made.'
 	fi
 
 	[[ -n ${LOCKNAME:-} ]]&& release-exclusive-lock "$LOCKNAME" $V_CACHE

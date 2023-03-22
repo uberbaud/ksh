@@ -166,6 +166,7 @@ needs-vars
 new-array
 newest
 nextfd
+nibble
 nodark
 noglob
 nohup

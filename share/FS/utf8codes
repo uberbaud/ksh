@@ -12,7 +12,7 @@
 function utf8codes {
 	(($#))||	die 'Missing arguments. Expected one (1) or two (2).'
 	(($#>2))&&	die 'Too many arguments. Expected one (1) or two (2).'
-	local str=$1 ucont p c s short
+	local str=$1 UTF8_CONT p c s short
 	integer len=0 max=${2:-0} L=0
 	if ((max>0)); then
 		REPLY=''
@@ -44,11 +44,11 @@ function utf8codes {
 			true
 		} #}}}1
 	fi
-	ustart=$(print '\0302-\0364')
-	ucont=$(print '\0200-\0277')
-	while [[ $str == *[$ustart]+([$ucont])* ]]; do
-		p=${str%%[$ustart]+([$ucont])*}
-		s=${str##"$p"[$ustart]+([$ucont])}
+	UTF8_START=${UTF8_START:-"$(print '\0302-\0364')"}
+	UTF8_CONT=${UTF8_CONT:-"$(print '\0200-\0277')"}
+	while [[ $str == *[$UTF8_START]+([$UTF8_CONT])* ]]; do
+		p=${str%%[$UTF8_START]+([$UTF8_CONT])*}
+		s=${str##"$p"[$UTF8_START]+([$UTF8_CONT])}
 		c=${str%"$s"}; c=${c#"$p"}
 		addpart "$p" || break
 		addpart "$c" 1 || break

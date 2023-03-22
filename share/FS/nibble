@@ -1,0 +1,24 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2023-03-22,00.28.54z/547361>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Ustring^u ^[^Ucount^u^] ^= ^O$^o^Vreply^v
+#:   Remove ^O${^o^V2^v^O:^o^T1^t^O}^o UTF-8 character(s) from ^Ustring^u and return it in ^Vreply^v^O[^o^T0^t^O]^o,
+#:   and ^Ustring^u less the nibble in ^Vreply^v^O[^o^T1^t^O]^o.
+
+function nibble {
+	local s c x nibble
+	s=$1; c=${2:-1}; nibble=; set -A reply -- '' ''
+	[[ -z $s ]]&& return
+	UTF8_START=${UTF8_START:-"$(print '\0302-\0364')"}
+	UTF8_CONT=${UTF8_CONT:-"$(print '\0200-\0277')"}
+	while ((c--)); do
+		x=${s##@([$UTF8_START]+([$UTF8_CONT])|?)}	# x = s - 1st char
+		x=${s%"$x"}									# get 1st char
+		s=${s#"$x"}
+		nibble=$nibble$x
+	done
+	reply[0]=$nibble
+	reply[1]=$s
+}
+
+# Copyright © 2023 by Tom Davis <tom@greyshirt.net>.

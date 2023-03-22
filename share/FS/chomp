@@ -8,11 +8,11 @@
 function chomp {
 	[[ -z ${1:-} ]]&& { REPLY=""; return; }
 	integer i=${2:-1}
-	ustart=${ustart:-"$(print '\0302-\0364')"}
-	ucont=${ucont:-"$(print '\0200-\0277')"}
+	UTF8_START=${UTF8_START:-"$(print '\0302-\0364')"}
+	UTF8_CONT=${UTF8_CONT:-"$(print '\0200-\0277')"}
 	REPLY=$1
 	while ((i--)); do
-		REPLY=${REPLY%%@([$ustart]+([$ucont])|?)}
+		REPLY=${REPLY%%@([$UTF8_START]+([$UTF8_CONT])|?)}
 		[[ -z $REPLY ]]&& return;
 	done
 }

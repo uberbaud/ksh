@@ -19,6 +19,8 @@ function help { # {{{1
 	         management systems (^IVMS^i).
 	           ^Tadd^t ^Ufile^u ^Udescription^u
 	               Adds a file and sets ^Udescription^u.
+	           ^Tchangelog^t
+	               List changed files with consolidated log messages.
 	           ^Tcheckin^t^|^Tci^t ^Ufile^u ^Umsg^u
 	               Adds a new revision to the archive with log ^Umsg^u and
 	               removes any locks. In systems like ^Tgit^t, the log message

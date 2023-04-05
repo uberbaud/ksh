@@ -4,9 +4,10 @@
 #: FUNCTION ^G(no arguments)^g
 #:   vmgr vms-cmd
 
-function git-checkin {
+function git-snap {
 	local file msg
 	file=${1:?}; shift
+	git check-ignore -q "$file" && return
 	git add "$file"
 	msg=$*
 	[[ -n $msg ]]|| git-diff "$file"

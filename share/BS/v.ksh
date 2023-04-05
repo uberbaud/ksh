@@ -16,7 +16,7 @@ function usage { # {{{1
 	sparkle <<-\
 	==SPARKLE==
 	^F{4}Usage^f: ^T${PGM}^t  ^[^T-f^t^] ^Ufile^u ^[^Umessage^u^]
-	         Edits a file and handles RCS checkout/checkin.
+	         Edits a file and handles VMS checkout/checkin.
 	         ^T-f^t  Force edit even if ^Ufile^u isn't text.
 	       ^T${PGM}^t  ^[^T-f^t^] ^T=^t^Ucommand^u ^[^Umessage^u^]
 	         Edits a command in ^SPATH^s or a function in ^SFPATH^s.
@@ -96,7 +96,7 @@ function handle-modified { #{{{1
 } #}}}1
 function init-or-sync-then-checkout { #{{{1
 	case ${STATUS:-nope} in
-		untracked)	$vms-add "$filename" "${DESCRIPTION:=$(term-get-text descr)}"; ;;
+		untracked)	$vms-track "$filename" "${DESCRIPTION:=$(term-get-text descr)}"; ;;
 		modified)	handle-modified "$filename";							;;
 		ok)			:;														;;
 		nope)		warn "^T$vms-status^t does not set ^O$^o^VSTATUS^v.";	;;
@@ -129,12 +129,12 @@ function main { # {{{1
 		[[ -f .LAST_UPDATED ]]&& date -u +"$ISO_DATE" >.LAST_UPDATED
 
 		if $HAS_VERSMGMT; then
-			versmgmt-apply checkin "$f_name" "${ciMsg:-}"
+			versmgmt-apply snap "$f_name" "${ciMsg:-}"
 		elif [[ -n $ciMsg ]]; then
-			warn 'Supplied a ^Bcheckin^b message, but there'\''s no ^IVMS^i.'
+			warn 'Supplied a ^Blog^b message, but there'\''s no ^IVMS^i.'
 		fi
 	elif [[ -n $ciMsg ]]; then
-		warn 'Supplied a ^Bcheckin^b message, but there were no changes made.'
+		warn 'Supplied a ^Blog^b message, but there were no changes made.'
 	fi
 
 	[[ -n ${LOCKNAME:-} ]]&& release-exclusive-lock "$LOCKNAME" $V_CACHE

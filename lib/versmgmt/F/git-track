@@ -5,7 +5,7 @@
 #:   vmgr vms-cmd
 
 needs git-describe 
-function git-add {
+function git-track {
 	local file description
 	file=${1:?}; shift
 	git add "$file"

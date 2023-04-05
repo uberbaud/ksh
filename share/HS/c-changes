@@ -55,5 +55,27 @@
     ^BC17^b revises ^BC11^b to resolve defects but neither introduces nor 
         deprecates language features.
 
+^BC17 -> C23^b
+
+    ^BC23^b adds
+    ^T<stdckdint.h>^t with macros ^Tckd_add^t to provide signed integer with 
+    infinite range arithmetic simulation;
+
+    ^Tmemset_explicit^t to avoid optimizing out memory clearing code;
+
+    ^Ttrue^t, ^Tfalse^t, and ^Tnullptr^t are language keywords,
+
+    ^Ttypeof^t feature,
+
+    ^T#embed^t for arbitrary binary data,
+
+    ^T={}^t syntax for zeroed local structs and variable-length arrays,
+
+    ^T0b^t prefix for binary representation of numbers,
+
+    ^WWARNING^w
+    ^BC23^b redeclares ^Trealloc(^t^Up^u^T,0)^t from ^Ifrees and returns 
+    ^BNULL^b^i to ^Iundefined behavior^i.
+
 ^BSEE ALSO^b
     ^Uhttps://clang.llvm.org/c_status.html^u

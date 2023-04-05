@@ -5,7 +5,7 @@
 #:   vmgr vms-cmd
 
 needs ci term-get-text
-function rcs-checkin {
+function rcs-snap {
 	local file msg
 	file=${1:?}; shift
 	msg=$*

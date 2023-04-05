@@ -5,7 +5,7 @@
 #:   vmgr vms-cmd
 
 needs ci
-function rcs-add {
+function rcs-track {
 	local file
 	file=${1:?}; shift
 	[[ -f RCS/$file,v ]]||

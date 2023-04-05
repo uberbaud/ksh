@@ -99,6 +99,7 @@ ftry
 fullstop
 functions
 generate-exclusive-lock-name
+geometry
 get-exclusive-lock
 get-unused-fds
 getopts

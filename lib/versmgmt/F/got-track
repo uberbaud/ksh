@@ -1,10 +1,10 @@
-# <@(#)tag:tw.csongor.greyshirt.net,2023-01-04,08.57.33z/c9dd4a>
+# <@(#)tag:tw.csongor.greyshirt.net,2023-01-04,08.57.33z/463d0e5>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
 #: FUNCTION ^G(no arguments)^g
 #:   vmgr vms-cmd
 
-function got-checkin {
+function got-track {
 	NOT-IMPLEMENTED
 }
 

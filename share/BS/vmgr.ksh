@@ -4,8 +4,8 @@
 
 set -o nounset;: ${FPATH:?Run from within KSH}
 
-set -A CMDLIST -- add changed changelog checkin checkout diff status vmslist
-set -A ALTLIST -- ci cmdlist co help
+set -A CMDLIST -- changed changelog checkout diff snap status track vmslist
+set -A ALTLIST -- cmdlist help
 
 CMD=
 this_pgm=${0##*/}
@@ -60,10 +60,6 @@ function vmslist { # {{{1
 } # }}}1
 function CMD-is-valid { # {{{1
 	local valid
-	case $CMD in
-		ci)		CMD=checkin;	;;
-		co)		CMD=checkout;	;;
-	esac
 	for valid in "${CMDLIST[@]}"; do
 		[[ $CMD == $valid ]]&& return
 	done

@@ -127,6 +127,7 @@ kill
 let
 libtw
 list-known-hosts
+list-p5lib
 list-path-vars
 load-function
 local

@@ -1,0 +1,29 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2023-04-11,14.01.03z/27001d5>
+
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^[^Ubasedir^u^]
+#:   List modules intalled to ^O${^o^Ubasedir^u^O:-$^o^VPERL5LIB^v^O}^o
+
+needs find needs-cd perl uname xargs
+function list-p5lib {(
+	machine=$(uname -m)
+	os=$(uname -s|tr A-Z a-z)
+
+	needs-cd "${1:-${PERL5LIB:?Neither \$1 nor \$PERL5LIB is defined}}"
+	PGM=$(</dev/stdin) <<-===
+		for (@ARGV) {
+			s!^\\./!!;
+			s!^5\\.\\d+\\.\\d+/!!;
+			s!^$machine-$os/!!;
+			s!^auto/!!;
+			s!\\.pm\z!!;
+			s!/!::!g;
+			say;
+		}
+	===
+
+	find . -name \*.pm | xargs perl -E"$PGM"
+)}
+
+# Copyright © 2023 by Tom Davis <tom@greyshirt.net>.

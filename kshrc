@@ -144,8 +144,8 @@ export USR_PLIB=$xdgdata/lib/perl5
 export PERL5LIB=$USR_PLIB
 # ^ add? -> # ${PERLBREW_LIB:+:$PERLBREW_LIB}
 #export PERLBREW_BIN=$PERLBREW_CURRENT/bin
-export PERL_MB_OPT="--install_base $USR_PLIB"
-export PERL_MM_OPT="INSTALL_BASE=$USR_PLIB"
+export PERL_MB_OPT="--install_base $xdgdata"
+export PERL_MM_OPT="INSTALL_BASE=$xdgdata"
 # similar but for raku
 export RAKULIB=$xdgdata/lib/raku
 
@@ -168,7 +168,7 @@ wantpath "$USRBIN"					PREPEND
 # APPEND, so in order
 wantpath "$MMH_BIN_PATH"			APPEND
 wantpath /usr/games					APPEND
-wantpath "$PERL5LIB/bin"			APPEND
+wantpath "$xdgdata/bin"				APPEND # perl5lib
 wantpath "$JDK_PATH"				APPEND
 wantpath "$ROFFTOOLS_PATH"			APPEND
 wantpath "$xdgdata/luarocks/bin"	APPEND

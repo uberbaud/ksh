@@ -14,20 +14,22 @@
 
 needs bad-programmer warn whence versmgmt-active-vmses
 function versmgmt-apply {
-	local cmd filename vms vmsCmd fn
+	local cmd filename vms vmsCmd fn rc
 	cmd=${1:?Missing $0 arg 1, cmd};	shift
 	(($#))&& { filename=${1-}; shift; }
 	((${VMSes[*]+1}))|| versmgmt-active-vmses
 	fn=${FOREACH_VMS:-:}
 	whence $fn >/dev/null || bad-programmer "Cannot find function ^B$fn^b."
 
+	rc=0
 	for vms in $VMSes; do
 		vmsCmd=${vms}-${cmd}
 		whence $vmsCmd >/dev/null ||
 			warn "Function ^T$vmsCmd^t is not implemented." || continue
-		$vmsCmd ${filename:+"$filename"} "$@"
-		$fn
+		$vmsCmd ${filename:+"$filename"} "$@" || rc=1
+		$fn || rc=1
 	done
+	return $rc
 }
 
 # Copyright © 2023 by Tom Davis <tom@greyshirt.net>.

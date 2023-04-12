@@ -15,7 +15,9 @@ NL='
 # so those don't make sense either. Those probably need a terminal.
 
 function list-start-apps { #{{{1
-	needs-cd -or-warn /home/apps || return 1
+	P=/home/apps
+	[[ -d $P ]]|| return
+	needs-cd -or-warn "$P" || return 1
 	for app in *; do
 		[[ -d $app ]]&& print -rn -- "$app "
 	done
@@ -111,7 +113,7 @@ function handle-cmd { # {{{
 # websearch
 	[[ " $websearch " == *" $req "* ]]&& {
 		websearch "$req" "$args"
-		surf "$REPLY"
+		$BROWSER "$REPLY"
 		return
 	  }
 
@@ -154,7 +156,7 @@ others='amuse weather wordnet wnb'
 web='h s http https www chrome surf'
 special='task'
 
-dypgm=dwm_dmenu_completion
+# dypgm=dwm_dmenu_completion
 
 # print -u2 -- "===== SUPPORTED COMMANDS ====="
 # print -u2 -- "  starts:    $starts"
@@ -166,11 +168,13 @@ dypgm=dwm_dmenu_completion
 # print -u2 -- "  special:   $special"
 # print -u2 -- "=============================="
 
-for w in '' $starts $websearch $others $x11 $amuse $web $special; do
-	print -r -- "$w";
-done | sort >$cmdcache
+[[ $cmdcache -ot $0 ]]&&
+	for w in '' $starts $websearch $others $x11 $amuse $web $special; do
+		print -r -- "$w";
+	done | sort --unique >$cmdcache
 
-{ dmenu -dy "$dypgm '$cmdcache'" "$@" || print "ESC"; } | handle-cmd
+# { dmenu -dy "$dypgm '$cmdcache'" "$@" || print "ESC"; } | handle-cmd
+{ dmenu "$@" <$cmdcache || print "ESC"; } | handle-cmd
 
 
 # Copyright (C) 2020 by Tom Davis <tom@greyshirt.net>.

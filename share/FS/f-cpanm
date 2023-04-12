@@ -6,8 +6,10 @@
 
 needs cpanm
 function f-cpanm {
-	local log=$HOME/hold/$(uname -r)/cpanm-install.lst
-	for a { print -- "$a" >>$log; }
+	local log
+	: ${XDG_DATA_HOME:?}
+	log=$HOME/hold/$(uname -r)/cpanm-install.lst
+	for a { [[ $a == -* ]]|| print -- "$a"; } >>$log
 	command cpanm -l $XDG_DATA_HOME "$@"
 }
 

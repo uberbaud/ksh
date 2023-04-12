@@ -4,28 +4,28 @@
 #: FUNCTION ^Ufunction name^u
 #:   Edit and redefine an existing function.
 
-needs splitstr search-path
+needs search-path
 function fedit {
-	local fname fdef F NL
-
-	fdef=$(typeset -fp ${1:?Missing required function name}) ||
-		${fname:?Could not find function '$1'}
-
-	fname=$1
+	local fname fdef E F O T
+	fname=${1:?Missing required function name}
+	fdef=$(typeset -fp $fname) || {
+		warn "No such function ^T$1^t"
+		return
+	  }
 
 	[[ $fdef == $fname'() ' ]]&& {
 		search-path "$FPATH" $fname
-		F=${reply[0]:?Could not find a matching funtion in FPATH}
+		F=${reply[0]:?Could not find function}
 		fdef=$(. "$F"; typeset -fp $fname)
 	  }
 
-	NL='
-'
-	splitstr "$NL" "$fdef" lines
-	for ln in "${lines[@]}"; do
-		print -rs -- "$ln"
-	done
-	fc ${#lines[*]}
+	T=$(mktemp) || die "Could not mktemp"
+	print -r -- "$fdef" >$T
+	E=${VISUAL:-${EDITOR:-vi}}
+	[[ $E == *vim ]]&& O=x
+	$E ${O:+--cmd 'set ft=ksh'} "$T"
+	. "$T" || warn "Bad source ^B$T^b."
+	rm -f "$T"
 }
 
 # Copyright © 2021 by Tom Davis <tom@greyshirt.net>.

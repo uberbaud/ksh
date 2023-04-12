@@ -8,6 +8,7 @@ function git-status {
 	local file
 	file=$1
 	STATUS=ok
+	git check-ignore -q "$file" && STATUS=ignored return
 	set -- $(git status --porcelain=v2 "$file")
 	(($#==0))&& return
 	if [[ $1 == 1 ]]; then

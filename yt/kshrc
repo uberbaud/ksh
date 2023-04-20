@@ -14,6 +14,7 @@ osarc=$(uname -m)
 PKG_PATH=ftp://ftp4.usa.openbsd.org/pub/OpenBSD/$osrev/packages/$osarc
 export PKG_PATH
 export TZ=EST5EDT
+export PKG_CONFIG_PATH=$XDG_CONFIG_HOME/pkgconfig
 
 eval "$(env -i perl -I$HOME/perl5/lib/perl5 -Mlocal::lib)"
 

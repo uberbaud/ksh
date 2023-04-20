@@ -5,7 +5,8 @@
 #:   Handles aspects of versmgmt initialization.
 #:   Sets ^VERRMSG^v on failure.
 
-needs use-app-paths
+needs use-app-paths needs-path sqlite3
+: ${SYSDATA:?}
 function versmgmt-init {
 	local P F V
 
@@ -14,6 +15,20 @@ function versmgmt-init {
 
 	VERSMGMT_PATH=${APP_PATH:?}
 	needs versmgmt-active-vmses versmgmt-apply
+
+	needs-path -create -or-die "$SYSDATA"
+	VERSMGMT_DB=$SYSDATA/versmgmt.db3
+	[[ -f $VERSMGMT_DB ]]|| sqlite3 "$VERSMGMT_DB" <<-\
+	===SQL===
+	CREATE TABLE log (
+	    ts          text NOT NULL DEFAULT(unixepoch('now')),
+	    commitid    text NOT NULL,
+	    filename    text NOT NULL,
+	    msgtype     text NOT NULL CHECK(msgtype = 'D' OR msgtype = 'L'),
+	    msg         text NOT NULL
+	);
+	CREATE INDEX ndx_commitid ON log (commitid);
+	===SQL===
 
 	for P in $VERSMGMT_PATH/{B,F}; do
 		set -- $P/has-*

@@ -78,6 +78,7 @@ function running { get-pid >/dev/null; }
 (($#))|| die "Missing required parameter ^Ucommand^u."
 while [[ $1 == -* ]]; do
 	case ${1#-} in
+		h|-help)	set '' 'help';				;;
 		l|-log)	LOG_CTL=true;					;;
 		q)		VERBOSE=false;					;;
 		*)		die "Unknown flag ^B$1^b.";		;;

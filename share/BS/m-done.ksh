@@ -95,7 +95,7 @@ expire-old-mail
   X -from  '@stackoverflow\.'             stackover     'Stack Overflow'
 CIP='alexepstein@industrialprogress.net'
   X -from  "$CIP"                         energy        'CIP'
-  X -from  'receipt@lowes\.com'           receipts      "Lowe's Receipt"
+  X -from  '@receipt\.lowes\.com'         receipts      "Lowe's Receipt"
   X -from  'permies@permies.com'          permies       "permies"
 
 if Done; then

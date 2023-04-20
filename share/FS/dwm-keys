@@ -1,0 +1,55 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2020-12-24,23.11.43z/54aca26>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^G(no arguments)^g
+#:   Show dwm keys
+
+needs awk h1 sparkle
+function dwm-keys {
+	local dwmcfg
+	dwmcfg=$HOME/src/tw-needs/dwm/config.h
+	AWKPGM="$(</dev/stdin)" <<-\
+	\===AWK===
+	BEGIN	{p=1;FS=",[[:space:]]+"}
+    /Key[[:space:]]+keys/	{p=0;next}
+	p						{next}
+	/TAGKEYS/				{next}
+	/};/					{nextfile}
+	/\/\*/					{next}
+	/\/\//					{next}
+	1						{
+								sub(/{ /,"",$1);
+								gsub(/\|/,"+",$1);
+								sub(/XK_/,"",$2);
+								k=$1"+"$2;
+								gsub(/[[:space:]]/,"",k);
+								sub(/MODKEY/,"M4",k);
+								sub(/Shift/,"S",k);
+								sub(/Page_/,"Pg",k);
+								sub(/Mask/,"",k);
+								sub(/M4\+S\+/,"S+M4+",k);
+								sub(/comma/,",",k);
+								sub(/semicolon/,";",k);
+								sub(/Escape/,"Esc",k);
+								a=$3
+							}
+	/=/						{
+								sub(/^.*=[[:space:]]*/,"");
+								sub(/[[:space:]]*}.*$/,"");
+								sub(/&layouts/,"");
+								sub(/\[Layout/,"");
+								sub(/\]/,"");
+								a=a"("$0")"
+							}
+	1						{printf("^%-12s|%s\n",k,a)}
+	===AWK===
+	h1 dwm-keys
+	print
+	awk "$AWKPGM" "$dwmcfg"						|
+		column									|
+		sed -E -e 's/\^/ ^V/g' -e 's/\|/^v /g'	|
+		sparkle
+	print
+}
+
+# Copyright © 2020 by Tom Davis <tom@greyshirt.net>.

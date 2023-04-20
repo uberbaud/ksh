@@ -260,6 +260,8 @@ trap hTimer		USR2
 trap CleanUp	EXIT
 
 needs-cd -or-die "${AMUSE_RUN_DIR:?}"
+# Set the titlebar text
+print -nu2 "\033]0;$this_pgm\007"
 # register the signals we want for changes to
 print USR1 >subs-playing/$$		# general status
 print USR2 >subs-time/$$		# time played

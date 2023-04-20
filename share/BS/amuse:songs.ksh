@@ -68,7 +68,13 @@ function show-full { # {{{1
 	SQL <<-==SQLITE==
 	SELECT
 		id,
-		performer || '|' || album || '|' || track || '|' || song,
+		coalesce(performer,'-')
+			|| '|' ||
+		coalesce(album,'-')
+			|| '|' ||
+		coalesce(track,'-')
+			|| '|' ||
+		coalesce(song,'-'),
 		dtenths
 	  FROM vsongs
 	 WHERE id IN (

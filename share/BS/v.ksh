@@ -8,6 +8,7 @@ BIN=$(realpath -q "$0")
 [[ $(whence $VISUAL) == $BIN ]]&& unset VISUAL
 [[ $(whence $EDITOR) == $BIN ]]&& unset EDITOR
 ED=${VISUAL:-${EDITOR:?Neither VISUAL nor EDITOR is set.}}
+WOD_ACTION='edit'
 
 typeset -- this_pgm=${0##*/}
 function usage { # {{{1
@@ -48,6 +49,32 @@ done
 shift $(($OPTIND - 1))
 # ready to process non '-' prefixed arguments
 # /options }}}1
+# eval unset parameter exits function not script, so add level of indirection
+function expand-origin { eval R="$1"; }
+function other-origins { # {{{1
+	local F O X R TAB name origin
+	O=${1%/*}/ORIGINS
+	[[ -f $O ]]|| return
+	F=${1##*/}
+	TAB='	'
+	while IFS=$TAB read name origin; do
+		[[ $name == $F ]]|| continue
+		break
+	done <$O
+	[[ -n $origin ]]|| return
+	expand-origin "$origin" || die "^VORIGIN^v syntax error."
+
+	X="^VORIGIN^v^O/^o^B$name^b"
+	sparkle-path "$R"
+	[[ -f $R ]]||
+		die "$X does not point to a file." \
+			"=> ^B$origin^b" "== ^B$REPLY^b"
+
+	WOD_ACTION="edit ^B$REPLY^b"
+	warnOrDie "$X ^= $REPLY"
+	REPLY=$R
+	true
+} # }}}1
 function already-in-edit { # {{{1
 	set -- $(<$1)
 	warn "File is already being edited (pid=^B$1^b)"
@@ -151,6 +178,7 @@ needs	\
 f_fullpath=$(realpath -q -- "$1") || die "Could not ^Trealpath^t ^B$1^b."
 shift
 
+other-origins				"$f_fullpath" && f_fullpath=$REPLY
 verify-file-is-editable		"$f_fullpath"
 check-flags-for-writability	"$f_fullpath"
 safe-to-edit				"$f_fullpath"

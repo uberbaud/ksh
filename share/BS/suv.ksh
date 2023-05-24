@@ -107,7 +107,7 @@ function main { # {{{1
 			set -A errMsg "System file and archived file have diverged."
 			[[ $warnOrDie == die ]]&&
 				errMsg[1]="Do an RCS ^Tci^t and rerun, or"
-			rcsdiff -q ./"$workfile" || warnOrDie "${errMsg[@]}"
+			rcsdiff -q -kk ./"$workfile" || warnOrDie "${errMsg[@]}"
 			unset errMsg
 		  }
 	else
@@ -129,7 +129,7 @@ function main { # {{{1
 	trackfile ./"$workfile" # track the copy in case weirdness ensues below
 	if [[ -f $rcsFile ]]; then
 		# previously checked in
-		rcsdiff -q ./"$workfile" ||
+		rcsdiff -kk -q ./"$workfile" ||
 			ci -q -u -j ${1:+-m"$*"} ./"$workfile"
 	else
 		ci -q -u -i -t"-${*:-$CI_INITIAL_DESCRIPTION}" ./"$workfile"

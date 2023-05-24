@@ -5,13 +5,13 @@
 #:   Infrastructure for ^T-f^t (force) behavior.
 #:   Uses ^$^NwarnOrDie^n (set to ^Twarn^t, ^Tdie^t, or ^Tfalse^t) to 
 #:     determine which action to take. Adds the useful instruction 
-#:     "^O${^o^VFORCE_MSG^v^O:-^oUse -f to force action.^O}^o"
+#:     "^O${^o^VFORCE_MSG^v^O:-^oUse ^O^^T^o-f^O^^t^o to force ^O${^o^VWOD_ACTION^v^O:-^oaction^O}.^O}^o"
 #:   ^GSee also:^g ^Thelp setWarnOrDie^t
 
 function warnOrDie {
 	case $warnOrDie in
 		die)
-			FORCE_MSG=${FORCE_MSG-Use ^T-f^t to force action.}
+			FORCE_MSG=${FORCE_MSG-Use ^T-f^t to force ${WOD_ACTION:-action}.}
 			die "$@" ${FORCE_MSG:+"$FORCE_MSG"}
 			;;
 		warn)

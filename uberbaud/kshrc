@@ -4,6 +4,7 @@
 
 export TZ=EST5EDT
 export EDITOR=vise
+export PKG_CONFIG_PATH=/home/tw/config/pkgconfig
 export VISUAL=vise
 
 export CPANMLIB=$xdgdata/perl5/lib/perl5

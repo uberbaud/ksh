@@ -150,6 +150,8 @@ export PERL_MM_OPT="INSTALL_BASE=$xdgdata"
 export RAKULIB=$xdgdata/lib/raku
 
 ####### SET PATH
+# sane start, but with installed (/usr/local) ahead of included (/usr)
+PATH=/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/X11R6/bin
 function wantpath { # {{{1
 	[[ -d $1 && :$PATH: != *:$1:* ]]|| return
 	if [[ $2 == P* ]]; then

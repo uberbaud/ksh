@@ -11,7 +11,11 @@
 
 needs downgrade-color gsub resize term-does-utf8 term-has-256-colors
 function hN {
-	local IFS=' ' attr prefix suffix text errmsg1 errmsg2 errmsg3
+	local TAB NL IFS attr prefix suffix text errmsg1 errmsg2 errmsg3 p s
+	TAB='	'
+	NL='
+'
+	IFS=' '
 	errmsg1='ANSI escape attribute should not include the prefix ^S\033[^s'
 	errmsg2='ANSI escape attribute should not include the trailing ^Sm^s'
 	errmsg3='Expected an ANSI color or attribute string (eg: ^S1;47;31^s)'
@@ -24,7 +28,15 @@ function hN {
 	suffix=${3?Missing required parameter: suffix} # may be blank
 	shift 3
 
-	gsub \\ \\\\ "$*" text
+
+	gsub \\ \\\\ "$*" text					# escape backslashes
+	gsub "$NL" '\\n' "$text" text			# convert newlines
+	gsub "$TAB" '\\t' "$text" text			# convert tabs
+	while [[ $text == *[[:cntrl:]]* ]]; do	# remove control characters
+		p=${text%%+([[:cntrl:]])*}
+		s=${text##"$p"+([[:cntrl:]])}
+		text=$p$s
+	done
 	[[ -z $text ]]&& text='This header left (un)intentionally blank'
 	if [[ -t 2 ]]; then
 		eval $(resize)
@@ -45,7 +57,7 @@ function hN {
 			typeset -L$((80-declen-1)) chopped=$text
 			text=$chopped'…'
 		  }
-		print -- "$prefix $text$suffix\n"
+		print -u2 -- "$prefix $text$suffix\n"
 	fi
 }
 

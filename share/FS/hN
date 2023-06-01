@@ -30,8 +30,8 @@ function hN {
 
 
 	gsub \\ \\\\ "$*" text					# escape backslashes
-	gsub "$NL" '\\n' "$text" text			# convert newlines
-	gsub "$TAB" '\\t' "$text" text			# convert tabs
+	gsub "$NL" ' ' "$text" text				# space-ify newlines
+	gsub "$TAB" ' ' "$text" text			# space-ify tabs
 	while [[ $text == *[[:cntrl:]]* ]]; do	# remove control characters
 		p=${text%%+([[:cntrl:]])*}
 		s=${text##"$p"+([[:cntrl:]])}

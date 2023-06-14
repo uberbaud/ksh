@@ -10,7 +10,7 @@ function f-cpanm {
 	: ${XDG_DATA_HOME:?}
 	log=$HOME/hold/$(uname -r)/cpanm-install.lst
 	for a { [[ $a == -* ]]|| print -- "$a"; } >>$log
-	command cpanm -l $XDG_DATA_HOME "$@"
+	CFLAGS= command cpanm -l $XDG_DATA_HOME "$@"
 }
 
 # Copyright © 2020 by Tom Davis <tom@greyshirt.net>.

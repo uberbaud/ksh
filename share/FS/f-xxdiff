@@ -4,6 +4,7 @@
 #: FUNCTION ^G^Uxxdiff_options^u^g
 #:   Wrapper
 
+needs /usr/local/bin/xxdiff
 function f-xxdiff {
 	/usr/local/bin/xxdiff "$@" &
 }

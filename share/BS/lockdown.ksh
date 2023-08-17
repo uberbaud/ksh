@@ -50,16 +50,18 @@ get-exclusive-lock -no-wait $LOCK
 log timesheet xlock begin || warn $REPLY
 
 # opts: a negative number sets the maximum
+# OTHER GOOD MODES: eyes, goop
 new-array opts
 +opts	-planfont	'-*-dejavu sans-bold-r-normal-*-*-160-*-*-p-*-ascii-*'
 +opts	-mode		clock
-+opts	-count		20
-+opts	-size		-500
++opts	-count		20			# clock
++opts	-size		-500		# random, clock
 +opts	-username	' '
 +opts	-password	' '
 +opts	-info		"'I can't die but once.' -- Harriet Tubman"
 +opts	-bg			gray30	# only for the logon screen
-# don't go to black, keep the clocks showing!
+# don't go to black, keep the screensaver showing, we'll do our own 
+# suspend/hibernate
 +opts	-dpmsoff		0
 +opts	-dpmsstandby	0
 +opts	-dpmssuspend	0

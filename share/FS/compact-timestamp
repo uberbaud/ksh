@@ -13,9 +13,10 @@
 
 needs bad-programmer date
 function compact-timestamp {
-	local y m d H M S zVar TMSTMP ARGV X Y
+	local y m d H M S zVar TMSTMP ARGV X Y pre2001
 	typeset -i10 i=0 atoms=0
 	ARGV=
+	pre2001=''
 	set -A t -- z 1 2 3 4 5 6 7 8 9 a b c d e f g h i j k l m n p q r s t v w y
 	case $# in
 		0)
@@ -56,7 +57,13 @@ function compact-timestamp {
 		die "Bad date ^B$ARGV^b ^= ^B$TMSTMP^b."
 	atoms=${#t[*]}
 
-	y=${1#0}
+	y=$((${1#0}-2001))
+	if ((y<0)); then
+		pre2001='*'
+		y=${y#-}
+	elif ((y==0)); then
+		pre2001='z'
+	fi
 	while ((y)); do
 		((X=y%atoms,y-=X,y/=atoms))
 		Y=${t[X]}${Y:-}
@@ -70,7 +77,7 @@ function compact-timestamp {
 	i=$((${6#0}+((i%2)*60)))
 	S=${t[(i/4)]}		# i could be 0-120 (because of leap seconds),
 						#   so use resolution of four (4) seconds.
-	print -r -- "$Y$m$d-$H$M$S"
+	print -r -- "$pre2001$Y$m$d-$H$M$S"
 }
 
 # Copyright © 2022 by Tom Davis <tom@greyshirt.net>.

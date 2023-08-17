@@ -10,6 +10,9 @@ digit=0123456789
 punct='!"#$%&'\''()*+,-./:;<=>?@[\]^_`{|}~'
 mob_punct='~|&_./'
 mob_max=9
+mob_upper=ABCDEFGHJKLMNPQRSTUVWXYZ
+mob_lower=abcdefghijkmnopqrstuvwxyz
+mob_digit=23456789
 
 defaultAlphabet=SNCL;	symbols=''
 integer defaultMin=13	defaultMax=19	minLen=-1	maxLen=-1	count=3
@@ -26,7 +29,8 @@ function usage {
 	         Generates passwords using ^B/dev/urandom^b
 	       ^BPassword Options^b
 	           ^[^T-n^t ^Umin_len^u^] ^[^T-x^t ^Umax_len^u^] ^[^T-a^t ^Ualphabet^u^] ^[^T-s^t ^Usymbols^u^] ^[^T-c^t ^Uhow_many^u^]
-	           ^[^T-m^t^] sets ^T-x ^B$mob_max^b -s '^B$mob_punct^b'^t
+	           ^[^T-d^t^] adds some dashes and sets default alphabet to NCL
+	           ^[^T-m^t^] sets ^T-x ^B$mob_max^b^t
 	         The ^Balphabet^b argument can be:
 	             ^US^u, ^Us^u, ^UP^u, or ^Up^u for symbols/punctuation^I*^i
 	             ^UN^u, ^Un^u, ^UD^u, or ^Ud^u for numerals/digits
@@ -55,6 +59,7 @@ updatePassword=false
 alphabetIsSet=false;	infoIsSet=false
 allowUC=false;   allowLC=false;   allowSYM=false;   allowDIG=false
 requireUC=false; requireLC=false; requireSYM=false; requireDIG=false
+dashify=false
 integer requireLength=0
 quiet=false
 ### process args helper functions
@@ -106,10 +111,12 @@ function add-custom-id { #{{{2
 	add-id "${1%%:*}" "${1#*:}"
 } #}}}2
 
-while getopts ':a:c:n:x:e:u:O:s:qmrh' Option; do
+use_mobile=false
+while getopts ':a:c:dn:x:e:u:O:s:qmrh' Option; do
 	case $Option in
 		a)  set-alphabet "$OPTARG";									;;
 		c)  posint count "$OPTARG";									;;
+		d)  dashify=true;											;;
 		n)  posint minLen "$OPTARG";								;;
 		x)  posint maxLen "$OPTARG";								;;
 		e)  add-id 'eml' "$OPTARG";									;;
@@ -117,7 +124,7 @@ while getopts ':a:c:n:x:e:u:O:s:qmrh' Option; do
 		O)  add-custom-id "$OPTARG";								;;
 		s)  symbols=$OPTARG;										;;
 		q)  quiet=true;												;;
-		m)  posint maxLen $mob_max; symbols=$mob_punct;			;;
+		m)  posint maxLen $mob_max; use_mobile=true;				;;
 		r)	updatePassword=true;									;;
 		h)	usage;													;;
 		\?)	die "Invalid option: [1m-$OPTARG[22m.";				;;
@@ -129,6 +136,13 @@ done
 shift $(($OPTIND - 1))
 # ready to process non '-' prefixed arguments
 
+$use_mobile && {
+	upper=$mob_upper
+	lower=$mob_lower
+	digit=$mob_digit
+	[[ -n $symbols ]]|| dashify=true
+}
+
 [[ -n $symbols ]]&& {
 	$quiet || {
 		[[ $symbols == +([[:punct:]]) ]]||
@@ -137,7 +151,16 @@ shift $(($OPTIND - 1))
 	punct=$symbols
   }
 
+$dashify && $alphabetIsSet && {
+	$requireSYM || $allowSYM &&
+		die '^T-d^t conflicts with ^T-s^t ^O*[^o^TSs^t^O]*^o' \
+			'dashify cannot be used with an alphabet containing symbols/punctuations'
+}
 $alphabetIsSet || set-alphabet "$defaultAlphabet"
+$dashify && {
+	requireSYM=false
+	allowSYM=false
+  }
 
 # max MUST come before min so that -1 won't be kept for min
 ((maxLen == -1))&& {
@@ -203,9 +226,10 @@ function add-random-char { #{{{1
 } #}}}1
 
 new-array results
-integer range=$((maxLen-minLen)) thisLen=0
+integer range=$((maxLen-minLen)) thisLen=0 dashCount=0 lastDash=0 dashWhen=3
 while ((count--)); do
 	set -A rstr --
+	lastDash=1
 	((!range))|| random -e $range
 	thisLen=$((minLen+$?))
 	$requireSYM	&& add-random-char $thisLen "$punct"
@@ -214,7 +238,12 @@ while ((count--)); do
 	$requireLC	&& add-random-char $thisLen "$lower"
 	for i in $(jot $thisLen 0); do
 		[[ -n ${rstr[i]:-} ]]&& continue
-		random-char "$allowed"
+		if $dashify && ((++lastDash == dashWhen))then
+			R=-
+			lastDash=0
+		else
+			random-char "$allowed"
+		fi
 		rstr[i]="$R"
 	done
 	+results "$(printf '%s' "${rstr[@]}")"

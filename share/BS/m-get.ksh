@@ -70,7 +70,7 @@ if $DOWNLOAD; then
 
 	msgCount=$(m-msgcount)
 	((msgCount))&& {
-		notify 'Noting old messages.'
+		notify "^K{136} Putting ^B$msgCount^b old messages in ^Isequence^i ^BoldhatBt. ^k"
 		mark +inbox a -sequence oldhat 2>/dev/null
 	  }
 

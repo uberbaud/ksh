@@ -8,7 +8,7 @@
 needs readkeys
 function press-any-key {
 	print -- ${1:-Press ANY key.}
-	REPLY=$(trap '' INT;readkeys|
+	REPLY=$(set -e; readkeys|
 			(read n pid;read class key;kill -HUP $pid;print -r "$class-$key"))
 }
 

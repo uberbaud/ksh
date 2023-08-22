@@ -3,12 +3,13 @@
 
 #: FUNCTION ^[^UYear^u ^Umonth^u ^Uday^u ^Uhour^u ^Uminute^u ^[^Usecond^u^]^]
 #:   Prints a very compact form of ^Ilocal now^i or the given time using one
-#:   character per ^UYYYmd-HMS^u translated to ^[^Tz1^t^O-^o^T9a^t^O-^o^Ty^t^] without ^To^t or ^Tu^t.
+#:   character per ^UYYYmd-HMS^u translated to ^[^Tz1^t^O-^o^T9a^t^O-^o^Tkm^t^O-^o^Ttvwy^t^] ^G(no letter ^Tl^t^G,^g
+#:   ^Tu^t^G, or ^g^Tx^t^G)^g and with a resolution of 4 seconds.
 #:
-#:   ^BYear^b modulo 32, ^Bmonth^b ^Ta^t^-^Tl^t, ^Bday^b ^T1^t^-^Ty^t (no ^To^t or ^Tu^t)
+#:   ^BYear^b^O-^o^T2001^t modulo 32, ^Bmonth^b ^Ta^t^-^Tm^t ^G(no ^g^Tl^t^G)^g, ^Bday^b ^T1^t^-^Ty^t ^G(no^g ^Tl^t^G,^g ^Tu^t^G, or^g ^Tx^t^G)^g
 #:   ^BHour^b ^Tz^t-^Tp^t, ^BMinutes^b resolution of 2, ^Bseconds^b plus the missing minute but
 #:   only a resolution of 4 seconds.
-#: ^GExample: ^I2022-06-28 19:24:10 EDT^i^g ^= ^G^237fw-kc2^i^g
+#: ^GExample: ^I2022-06-28 19:24:10 EDT^i^g ^= ^G^Imfv-jc2^i^g
 
 
 needs bad-programmer date
@@ -17,7 +18,7 @@ function compact-timestamp {
 	typeset -i10 i=0 atoms=0
 	ARGV=
 	pre2001=''
-	set -A t -- z 1 2 3 4 5 6 7 8 9 a b c d e f g h i j k l m n p q r s t v w y
+	set -A t -- z 1 2 3 4 5 6 7 8 9 a b c d e f g h i j k m n o p q r s t v w y
 	case $# in
 		0)
 			TMSTMP=

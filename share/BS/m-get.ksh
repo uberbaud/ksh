@@ -68,6 +68,8 @@ if $DOWNLOAD; then
 	getMail=${XDG_CONFIG_HOME:?}/fetchmail/get-remote-mail.ksh
 	needs-file -or-die "$getMail"
 
+	tput clear
+
 	msgCount=$(m-msgcount)
 	((msgCount))&& {
 		notify "^K{136} Putting ^B$msgCount^b old messages in ^Isequence^i ^BoldhatBt. ^k"

@@ -75,7 +75,7 @@ function async-download { # {{{1
 } # }}}1
 function main { # {{{1
 	async-download "$@" | while IFS='	' read -r ln col msg; do
-		print -- "\033[$((ln+2));${col}H$msg"
+		print -- "\033[$((top+ln));${col}H$msg"
 	done
 } # }}}1
 function setup-screen { # {{{1
@@ -83,7 +83,7 @@ function setup-screen { # {{{1
 
 	eval "$(resize)"
 	((LINES<$#))&& warn "Screen is too short, will be fudged."
-	tput clear
+#	tput clear
 
 	maxlen=0
 	for acct; do
@@ -93,7 +93,7 @@ function setup-screen { # {{{1
 	INFOPOS=$((maxlen+(MARGIN*2)))
 } # }}}1
 
-needs needs-cd needs-file fetchmail i-can-haz-inet
+needs needs-cd needs-file fetchmail i-can-haz-inet get-row-col
 
 i-can-haz-inet || die "$REPLY"
 
@@ -108,6 +108,9 @@ trap 'tput cnorm' EXIT
 tput civis
 h1 "Fetching remote mail"
 
-main "$@"; print -- "\033[$(($#+3));1H"; exit
+top=$(get-row-col)
+top=${top% *}
+
+main "$@"; print -- "\033[$(($#+top+1));1H"; exit
 
 # Copyright (C) 2022 by Tom Davis <tom@greyshirt.net>.

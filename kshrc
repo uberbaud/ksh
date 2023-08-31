@@ -80,6 +80,14 @@ export REPOS_HOME=$xdgdata/repos
 export TREE_SITTER_LIBS=$xdgcache/tree-sitter/lib
 	[[ -d $TREE_SITTER_LIBS ]]|| unset TREE_SITTER_LIBS
 
+function -no-globs {
+	local cmd prev recmd
+	for cmd; do
+		prev=$(alias $cmd) && recmd=${prev#"$cmd"=} || recmd=$cmd
+		alias "$cmd"="noglob $recmd"
+	done
+}
+
 ####### IMPORT LOCAL BITS
 [[ -f $KU/kshrc ]]&& . $KU/kshrc
 
@@ -150,7 +158,7 @@ export PERL_MM_OPT="INSTALL_BASE=$xdgdata"
 export RAKULIB=$xdgdata/lib/raku
 
 ####### SET PATH
-# sane start, but with installed (/usr/local) ahead of included (/usr)
+# sane start, but with installed (/usr/local) ahead of included (/usr/*)
 PATH=/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/X11R6/bin
 function wantpath { # {{{1
 	[[ -d $1 && :$PATH: != *:$1:* ]]|| return
@@ -271,7 +279,10 @@ ifs=$IFS; IFS=:; set -- $FPATH; IFS=$ifs
 # functions or the executables, we name those functions with the 'f-' 
 # prefix and then alias those to the name without the 'f-'. Everybody 
 # wins.
-for p { for i in $p/f-*; { i="${i#$p/}"; alias "${i#f-}=$i"; } }
+for p { for i in $p/f-*; { i="${i#$p/}"; alias "${i#f-}=$i"; }; }
+
+# do the -no-globs here, AFTER the FPATH/f-* processing
+-no-globs find locate
 
 # FPATH functions are implicitly autoloaded, BUT the completion 
 # mechanism doesn't know about them unless we explicitly autoload them

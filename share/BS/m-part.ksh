@@ -78,6 +78,12 @@ function clean-html {( # {{{1
 			 "Did ^Enot^e ^Trmdir^t ^S$PWD^s"
 	fi
 )} # }}}1
+function has-some-html { # {{{1
+	x=$(w3m ${1:?}|tr -d [[:space:]]|wc -c) ||
+		die "A suffusion of yellow."
+	((x))
+} # }}}1
+
 needs tidy needs-cd needs-path
 
 work=${XDG_PUBLICSHARE_DIR:?}/mail
@@ -104,12 +110,18 @@ for f in *; do
 		mv "$f" "$H" && f=$H
 	fi
 	# fix all the Microsoft (et al.) broken html marked as xhtml
-	[[ $f == *.html ]]&& clean-html "$f"
+	[[ $f == *.html ]]&& {
+		clean-html "$f"
+		has-some-html "$f" || {
+			warn "^B$f^b is empty."
+			continue
+		  }
+	}
 	chmod a+r "$f"
 	+parts "$f"
 done
 rm $mark
 
-open "${parts[@]}"
+((${parts[*]+1}))&& open "${parts[@]}"
 
 # Copyright (C) 2017 by Tom Davis <tom@greyshirt.net>.

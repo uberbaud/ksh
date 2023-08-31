@@ -73,7 +73,7 @@ alias ts=tree-sitter
 amuse:create-cmd-wrappers
 
 # noglobs
-for i in cowmath math note; { alias $i="noglob $i"; }
+-no-glob cowmath math note
 alias mathcow="cowmath"
 # askfirst all commands that use ssh
 for i in ssh scp sftp rsync;	{ alias "$i=ssh-askfirst $i"; }

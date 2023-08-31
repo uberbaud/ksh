@@ -33,7 +33,6 @@ clang
 clearout
 cmd-in-use
 command
-compact-timestamp
 cond-rlwrap
 continue
 coproc-w-fds

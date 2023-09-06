@@ -5,7 +5,7 @@
 #:   Create links for files in $BS or $FS but not in $B, $F, or $USRBIN
 
 function localize-shared {
-	local rc=0 BS FS B F
+	local rc=0 BS FS B F L S
 	: ${1:?} ${USRBIN:?} ${KDOTDIR:?} ${HOST:?}
 	BS=$KDOTDIR/share/BS
 	FS=$KDOTDIR/share/FS
@@ -13,14 +13,15 @@ function localize-shared {
 	F=$KDOTDIR/$HOST/F
 
 	REPLY=''
+	S=${1%.ksh}
 	if [[ -f $FS/$1 ]]; then
-		ln -fs "$FS/$1" "$F/$1"							|| rc=1
-	elif [[ $1 == *.ksh && -f $BS/$1 ]]; then
-		ln -fs "$BS/$1" "$B/$1"							|| rc=1
+		ln -fs "$FS/$1" "$F/$1"					|| rc=1
+		REPLY="\$FS/$1 linked to \$F/$1"
 	elif [[ -f $BS/${1%.ksh}.ksh ]]; then
-		# probably not necessary, but it shouldn't hurt
-		ln -fs "$BS/${1%.ksh}.ksh" "$B/${1%.ksh}.ksh"	|| rc=1
-		ln -fs "$BS/${1%.ksh}.ksh" "$USRBIN/${1%.ksh}"	|| rc=1
+		L=$B/$S.ksh
+		ln -fs "$BS/$S.ksh" "$L"				|| rc=1
+		ln -fs "$L" "$USRBIN/$S"				|| rc=1
+		REPLY="\$BS/$S.ksh linked to {\$B,\$USRBIN}/$S"
 	else
 		REPLY='Could not find shared command file.'
 		rc=1

@@ -7,23 +7,22 @@
 function git-status {
 	local file
 	file=$1
-	STATUS=ok
 	git check-ignore -q "$file" && STATUS=ignored return
 	set -- $(git status --porcelain=v2 "$file")
 	(($#==0))&& return
-	if [[ $1 == 1 ]]; then
-		if [[ $2 = \?\?* ]]; then
-			STATUS=untracked
-		elif [[ $2 != ?. ]]; then
-			STATUS=modified
-		fi
-	elif [[ $1 == 2 ]]; then
-		NOT-IMPLEMENTED "moved/renamed"
-	elif [[ $1 == u ]]; then
-		NOT-IMPLEMENTED "merge issues"
-	else
-		STATUS=error
-	fi
+	case $1 in
+		\?) STATUS=untracked;								;;
+		1)
+			case $2 in
+				\?\?*)	STATUS=untracked;	;;
+				?.)		STATUS=modified;	;;
+				*)		STATUS=ok;			;;
+			esac
+			;;
+		2) STATUS=ok; NOT-IMPLEMENTED "moved/renamed";		;;
+		u) STATUS=ok; NOT-IMPLEMENTED "merge issues";		;;
+		*) STATUS=error;									;;
+	esac
 }
 
 # Copyright © 2023 by Tom Davis <tom@greyshirt.net>.

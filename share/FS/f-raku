@@ -1,0 +1,12 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2020-11-13,20.27.44z/1952b1e>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^G(no arguments)^g
+#:   Wrapper to ^Trlwrap^t and load an rlwrap initialization file
+
+needs cond-rlwrap
+function f-raku {
+	cond-rlwrap raku "$@"
+}
+
+# Copyright © 2020 by Tom Davis <tom@greyshirt.net>.

@@ -1,0 +1,18 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2023-09-05,16.23.19z/1f3cbd6>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+#: FUNCTION ^Ufunction^u ^[^U…^u^]
+#:   Wrap a function and print any $REPLY
+
+function fn-and-print-reply {
+	local E REPLY
+	if (($#)); then
+		REPLY=; "$@"; E=$?
+	else
+		REPLY="$0: Missing function parameter."
+		E=255
+	fi
+	print "  ${REPLY:-\$REPLY was not set.}"
+	return $E
+}
+
+# Copyright © 2023 by Tom Davis <tom@greyshirt.net>.

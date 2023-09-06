@@ -70,7 +70,7 @@ while getopts ':H:M:D:T:U:h' Option; do
 	esac
 done
 # remove already processed arguments
-shift $(($OPTIND - 1))
+shift $((OPTIND-1))
 # ready to process non '-' prefixed arguments
 # /options }}}1
 (($#>2))&& die 'Too many nonflag parameters. Expected at most two (2).'

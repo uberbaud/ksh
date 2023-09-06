@@ -38,15 +38,15 @@ function bad_programmer {	# {{{2
 typeset -- warnOrDie='die';
 while getopts ':fh' Option; do
 	case $Option in
-		f)	warnOrDie='warn';										;;
-		h)	usage;													;;
+		f)	warnOrDie='warn';									;;
+		h)	usage;												;;
 		\?)	die "Invalid option: ^B-$OPTARG^b.";				;;
 		\:)	die "Option ^B-$OPTARG^b requires an argument.";	;;
-		*)	bad_programmer "$Option";								;;
+		*)	bad_programmer "$Option";							;;
 	esac
 done
 # remove already processed arguments
-shift $(($OPTIND - 1))
+shift $((OPTIND-1))
 # ready to process non '-' prefixed arguments
 # /options }}}1
 # eval unset parameter exits function not script, so add level of indirection
@@ -117,13 +117,17 @@ function verify-file-is-editable { # {{{1
 	file-is-valid-utf8 "$f_fullpath" ||
 		warnOrDie "File is not valid UTF-8 text."
 } # }}}1
+function begin-tracking { # {{{1
+	$vms-track "$1" "${DESCRIPTION:=$(term-get-text descr)}"
+} # }}}1
 function handle-modified { #{{{1
 	warnOrDie 'Checked-in and working versions differ.'
-	NOT-IMPLEMENTED
+	warn "Add a checkin message for ^Bprevious^b edits."
+	$vms-snap "$1"
 } #}}}1
 function init-or-sync-then-checkout { #{{{1
 	case ${STATUS:-nope} in
-		untracked)	$vms-track "$filename" "${DESCRIPTION:=$(term-get-text descr)}"; ;;
+		untracked)	begin-tracking "$filename";								;;
 		modified)	handle-modified "$filename";							;;
 		ok)			:;														;;
 		nope)		warn "^T$vms-status^t does not set ^O$^o^VSTATUS^v.";	;;

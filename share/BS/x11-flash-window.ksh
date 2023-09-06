@@ -39,7 +39,7 @@ while getopts ':dqh' Option; do
 	esac
 done
 # remove already processed arguments
-shift $(($OPTIND - 1))
+shift $((OPTIND-1))
 # ready to process non '-' prefixed arguments
 # /options }}}1
 (($#))||	die 'Missing required argument ^Uwindowid^u.'

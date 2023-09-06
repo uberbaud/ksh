@@ -133,7 +133,7 @@ while getopts ':a:c:dn:x:e:u:O:s:qmrh' Option; do
 	esac
 done
 # remove already processed arguments
-shift $(($OPTIND - 1))
+shift $((OPTIND-1))
 # ready to process non '-' prefixed arguments
 
 $use_mobile && {

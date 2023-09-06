@@ -156,6 +156,7 @@ export PERL_MB_OPT="--install_base $xdgdata"
 export PERL_MM_OPT="INSTALL_BASE=$xdgdata"
 # similar but for raku
 export RAKULIB=$xdgdata/lib/raku
+export xRAKU_BASE=$xdgdata/rakudo
 
 ####### SET PATH
 # sane start, but with installed (/usr/local) ahead of included (/usr/*)
@@ -182,6 +183,7 @@ wantpath "$xdgdata/bin"				APPEND # perl5lib
 wantpath "$JDK_PATH"				APPEND
 wantpath "$ROFFTOOLS_PATH"			APPEND
 wantpath "$xdgdata/luarocks/bin"	APPEND
+wantpath "$xRAKU_BASE/bin"			APPEND
 wantpath "$CARGO_HOME/bin"			APPEND
 
 # input, locale, and such
@@ -299,6 +301,7 @@ alias clear='f-clear '
 alias doas='doas '
 alias hush='>/dev/null 2>&1 '
 alias k='fc -s'
+alias localize-shared='"  $REPLY";(return $E)&&:'
 if [[ -x /usr/local/bin/colorls ]]; then
 	alias ls='/usr/local/bin/colorls $LS_OPTIONS'
 else
@@ -321,6 +324,8 @@ function noglob {
 alias p='_p $# "$@"'
 alias pass=' pass' # don't put in history
 alias prn="/usr/bin/printf '  \e[35m｢\e[39m%s\e[35m｣\e[39m\n'"
+[[ -x /usr/local/bin/rlwrap ]]&&
+	alias rlwrap='rlwrap '
 
 [[ -n $KDOTDIR ]]&& {
 	KCOMPLETE=$KU/C

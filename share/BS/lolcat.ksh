@@ -80,7 +80,7 @@ while getopts ':c:is:tu:h' Option; do
 	esac
 done
 # remove already processed arguments
-shift $(($OPTIND - 1))
+shift $((OPTIND-1))
 # ready to process non '-' prefixed arguments
 # /options }}}1
 ((cpc<0))&&		die '^Schars per color^s must be greater than ^B0^b.'

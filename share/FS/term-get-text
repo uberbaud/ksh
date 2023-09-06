@@ -9,7 +9,7 @@ function term-get-text {
 	local tempF
 	[[ -t 0 ]]|| return # input must be a term
 	tempF=$(mktemp) || return
-	(rlwrap -s 0 cat-to-file ${1:+-p "$1> "} "$tempF") 1>&0 2>&0
+	(rlwrap -s 0 -- cat-to-file ${1:+-p "$1> "} "$tempF") 1>&0 2>&0
 	print -r -- "$(<$tempF)"
 	rm -f "$tempF"
 }

@@ -4,7 +4,8 @@
 
 : ${FPATH:?Run from within KSH}
 
-Prefix="  "
+fAccts=${XDG_CONFIG_HOME:?}/mail/fetchmail
+Prefix='  '
 
 # Usage {{{1
 typeset -- this_pgm="${0##*/}"
@@ -13,8 +14,9 @@ function usage {
 	PGM="$REPLY"
 	sparkle >&2 <<-\
 	===SPARKLE===
-	^F{4}Usage^f: ^T${PGM}^t ^[^T-r^t^]
+	^F{4}Usage^f: ^T${PGM}^t ^[^T-a^t^] ^[^T-r^t^]
 	         List accounts in ^Baccounts^b file
+	           ^T-a^t  Lists all accounts, including ^Imanual-download-only^i.
 	           ^T-r^t  Lists in ^Iraw^i form (suitable for machine processing).
 	       ^T${PGM} -h^t
 	         Show this help message.
@@ -22,12 +24,10 @@ function usage {
 	exit 0
 } # }}}
 # process -options {{{1
-function bad_programmer {	# {{{2
-	die 'Programmer error:'	\
-		"  No getopts action defined for [1m-$1[22m."
-  };	# }}}2
-while getopts ':rh' Option; do
+showAll=false
+while getopts ':arh' Option; do
 	case $Option in
+		a)	showAll=true;											;;
 		r)	Prefix='';												;;
 		h)	usage;													;;
 		\?)	die "Invalid option: [1m-$OPTARG[22m.";				;;
@@ -47,18 +47,22 @@ function warnOrDie { #{{{1
 					'warnOrDie is [1m${warnOrDie}[22m.'
 	esac
 } # }}}1
+function list-accts { # {{{1
+	for f in *; do 
+		[[ -h $f ]]&& continue
+		[[ -f $f ]]|| continue
+		print -r -- "$Prefix$f"
+	done
+} # }}}1
+function main { # {{{1
+	list-accts
+	$showAll && { needs-cd SKIP; list-accts; }
+} # }}}1
 
-needs awk
-fAccts=${XDG_CONFIG_HOME:?}/fetchmail/accounts
-[[ -f $fAccts ]]|| -die "No such file [1m$fAccts[22m."
+(($#))&& die "Did not expect any arguments other than flags."
+needs needs-cd
+needs-cd -or-die "$fAccts"
 
-awkpgm="$(cat)" <<-\
-	==AWK==
-		/^[ \t]*;/	{ next }
-		/^opts=/	{ next }
-		/@/			{ print "$Prefix"\$1; next }
-		/=/			{ print "$Prefix"\$1"@localhost"}
-	==AWK==
-awk -F'=' "$awkpgm" "$fAccts"
+main | sort; exit
 
 # Copyright (C) 2017 by Tom Davis <tom@greyshirt.net>.

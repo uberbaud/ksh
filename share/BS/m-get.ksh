@@ -28,9 +28,8 @@ function bad_programmer {	# {{{2
 		"  No getopts action defined for [1m-$1[22m."
   };	# }}}2
 function list-accts { # {{{2
-	laccts=${XDG_CONFIG_HOME:?}/fetchmail/listAccts.ksh
-	needs $laccts
-	$laccts
+	needs mail-list-accts
+	mail-list-accts
 } # }}}2
 DOWNLOAD=true
 while getopts ':lnh' Option; do

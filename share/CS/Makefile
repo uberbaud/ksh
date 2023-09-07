@@ -110,11 +110,12 @@ man: $(PKG_LOG) $(MAN_CONF)
 	@echo $@
 	@$(LIST_MAN_PAGES) >$@
 
-MAIL_ACCT_DIR=$(XDG_CONFIG_HOME)/fetchmail
-MAIL_ACCOUNTS=$(MAIL_ACCT_DIR)/accounts
-m_2: $(MAIL_ACCOUNTS)
+MAIL_ACCT_DIR=$(XDG_CONFIG_HOME)/mail
+MAIL_UDATED=$(MAIL_ACCT_DIR)/.LAST_UPDATED
+MAIL_BIN=$(KDOTDIR)/share/BS/mail-list-accts.ksh
+m_2: $(MAIL_UPDATED)
 	@echo $@
-	@$(MAIL_ACCT_DIR)/listAccts.ksh -r | sort >$@
+	@$(MAIL_BIN) -ar >$@
 
 SSH_HOSTS=$(XDG_CONFIG_HOME)/ssh/known_hosts
 ssh: $(SSH_HOSTS)

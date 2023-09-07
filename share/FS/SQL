@@ -15,8 +15,8 @@
 #:        co-process instance and marks it as ^Breadonly^b.
 #:
 #: FUNCTION respects the variables
-#:   ^O$^o^VSQL_AUTODIE^v (^Itrue^i, ^Iwarn^i, or ^Ifalse^i). Defaults to ^Itrue^i.
-#:   ^O$^o^VSQL_VERBOSE^v (^Itrue^i or ^Ifalse^i). Defaults to ^O${^o^Vverbose^v^O:-^o^Tfalse^t^O}^o.
+#:   ^O$^o^VSQL_AUTODIE^v (^Ttrue^t, ^Twarn^t, or ^Tfalse^t). Defaults to ^Ttrue^t.
+#:   ^O$^o^VSQL_VERBOSE^v (^Ttrue^t or ^Tfalse^t). Defaults to ^O${^o^Vverbose^v^O:-^o^Tfalse^t^O}^o.
 #:
 #: ^GSee also: ^BSQLify^b, ^Bsql-reply^b, and ^Bsql-fields^b^g
 #: ^GNote:^g FUNCTION ^Gdelineates ^Isqlite3^i responses with a line consisting
@@ -72,13 +72,14 @@ function SQL {
 		$verbose && print -ru2 -- "$response"
 	done
 
-	[[ ${sqlreply[0]:-} == Error:* ]]&& {
-		sqlreply[i]="$sql"
-		$autodie && die "${sqlreply[@]}"
-		$autowarn && warn "${sqlreply[@]}"
-		return 1
-	  }
-	return 0
+	[[ -z ${sqlreply:-} ]]&& return
+	[[ $sqlreply == Error:* || $sqlreply == 'Parse error near '* ]]||
+		return 0
+
+	sqlreply[i]="$sql"
+	$autodie	&& die	"${sqlreply[@]}"
+	$autowarn	&& warn	"${sqlreply[@]}"
+	return 1
 }
 
 # Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

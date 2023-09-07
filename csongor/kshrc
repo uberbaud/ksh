@@ -25,7 +25,7 @@ export BROWSER="$(<$xdgcfg/etc/browser)"
 
 # mail
 export EMAIL='tom@greyshirt.net'
-export FETCHMAILHOME=$xdgcfg/fetchmail
+export FETCHMAILHOME=$xdgcfg/mail
 export MAILCHECK=-1
 export MAILDROP=/var/mail/$USER
 export MAILPATH=''

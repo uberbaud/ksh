@@ -364,11 +364,11 @@ function write-fetch-rc { # {{{1
 		set softbounce
 
 		poll $host protocol imap
+		     port     $port
 		     username '$usr'
 		     password '$pwd'
-		     port     $port
-		     mda      "$FETCHMAIL_MDA_CMD"
 		$(for o in $fopts; do print "     $o"; done)
+		     mda      "$FETCHMAIL_MDA_CMD"
 		===
 
 } # }}}1
@@ -411,6 +411,7 @@ function create-one-fetchmail-file { # {{{1
 	esac
 
 	write-fetch-rc "$usr" "$pwd" "$host" "$port" "${fopts:-}" >$outpath/"$usr"
+	chmod 0600 $outpath/"$usr"
 
 } # }}}1
 function create-fetchmail-files { # {{{1
@@ -424,7 +425,6 @@ function create-fetchmail-files { # {{{1
 	((${sqlreply[*]:+1}))|| { warn "No users found!"; return; }
 	set -- "${sqlreply[@]}"
 	for uid { create-one-fetchmail-file "$uid"; }
-	timestamp >.LAST_UPDATED
 } # }}}1
 function create-smtpd-files { # {{{1
 	NOT-IMPLEMENTED
@@ -439,6 +439,7 @@ function main { # {{{1
 	  }
 	create-fetchmail-files
 	create-smtpd-files
+	timestamp >$CFGDIR/.LAST_UPDATED
 } # }}}1
 
 needs SQL SQLify needs-file sql-fields

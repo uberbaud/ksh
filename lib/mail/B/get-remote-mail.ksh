@@ -6,6 +6,7 @@ set -o nounset;: ${FPATH:?Run from within KSH}
 
 MARGIN=4
 nomail='\033[35mnone\033[39m'
+MAIL_CFG_DIR=${XDG_CONFIG_HOME:?}/mail
 
 # Usage {{{1
 this_pgm=${0##*/}
@@ -38,9 +39,18 @@ function status-update { # {{{1
 	print -r -- "${1:?}	${2:?}	${3:?}"
 } # }}}1
 function do-one-acct { # {{{1
-	local T S A H a b c d e msg
+	local T S A H a b c d e msg rc sGet sSkip
 	local -i10 new=0 got=0
 
+	rc=$1
+	[[ -f $rc ]]|| rc=SKIP/$1
+	[[ -f $rc ]]|| {
+		sparkle-path "$PWD"
+		sGet=$REPLY
+		sparkle-path "$PWD/SKIP"
+		sSkip=$REPLY
+		warn "Could not find ^B$1^b in either" "$sGet, or" "$sSkip."
+	  }
 	needs-file -or-warn ./${1:?} || return 1
 
 	status-update "$2" "$MARGIN" "\033[1;36m$1\033[22;39m"
@@ -93,11 +103,15 @@ function setup-screen { # {{{1
 	INFOPOS=$((maxlen+(MARGIN*2)))
 } # }}}1
 
-needs needs-cd needs-file fetchmail i-can-haz-inet get-row-col
+needs needs-cd needs-file fetchmail i-can-haz-inet get-row-col use-app-paths
 
 i-can-haz-inet || die "$REPLY"
 
-needs-cd -or-die "$XDG_CONFIG_HOME/fetchmail/T"
+use-app-paths mail
+needs-cd -or-die "$MAIL_CFG_DIR"
+[[ .LAST_UPDATED -ot accounts ]]&& mail-update-accts.ksh
+
+needs-cd -or-die "fetchmail"
 (($#))|| {
 	set -- *@*.*
 	[[ $1 == *\* ]]&& die "No accounts to download."

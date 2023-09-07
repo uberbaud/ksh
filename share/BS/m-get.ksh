@@ -15,8 +15,6 @@ function usage {
 	         Download (fetchmail), import into MMH (inc), and do some
 	         processing.
 	           ^T-n^t  Don't download anything, just do the other bits.
-	       ^T${PGM} -l^t
-	         List available accounts.
 	       ^T${PGM} -h^t
 	         Show this help message.
 	===SPARKLE===
@@ -27,15 +25,10 @@ function bad_programmer {	# {{{2
 	die 'Programmer error:'	\
 		"  No getopts action defined for [1m-$1[22m."
   };	# }}}2
-function list-accts { # {{{2
-	needs mail-list-accts
-	mail-list-accts
-} # }}}2
 DOWNLOAD=true
-while getopts ':lnh' Option; do
+while getopts ':nh' Option; do
 	case $Option in
 		n)	DOWNLOAD=false;											;;
-		l)  list-accts; exit;										;;
 		h)	usage;													;;
 		\?)	die "Invalid option: [1m-$OPTARG[22m.";				;;
 		\:)	die "Option [1m-$OPTARG[22m requires an argument.";	;;
@@ -62,10 +55,9 @@ function P { printf '      ^F{4}─^f %s\n' "$1" | sparkle >&2; }
 
 needs m-list-new m-msgcount mark pick
 if $DOWNLOAD; then
-	needs needs-file inc
-
-	getMail=${XDG_CONFIG_HOME:?}/fetchmail/get-remote-mail.ksh
-	needs-file -or-die "$getMail"
+	needs use-app-paths
+	use-app-paths mail
+	needs inc get-remote-mail.ksh
 
 	tput clear
 
@@ -81,7 +73,7 @@ if $DOWNLOAD; then
 			inc -nochangecur >/dev/null
 		}
 
-	$getMail "$@"
+	get-remote-mail.ksh "$@"
 fi
 
 msgCount=$(m-msgcount)

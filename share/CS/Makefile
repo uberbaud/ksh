@@ -112,7 +112,7 @@ man: $(PKG_LOG) $(MAN_CONF)
 
 MAIL_ACCT_DIR=$(XDG_CONFIG_HOME)/mail
 MAIL_UDATED=$(MAIL_ACCT_DIR)/.LAST_UPDATED
-MAIL_BIN=$(KDOTDIR)/share/BS/mail-list-accts.ksh
+MAIL_BIN=$(KDOTDIR)/share/BS/m-list-accts.ksh
 m_2: $(MAIL_UPDATED)
 	@echo $@
 	@$(MAIL_BIN) -ar >$@

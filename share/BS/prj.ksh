@@ -202,8 +202,31 @@ function verify-type { # {{{1
 	warn "^T$type^t is not in ^Tprj.types^t." \
 		"Can be one of $tstr."
 } # }}}1
+function search-files { # {{{1
+	local findstr
+	findstr="$1"
+	awk -f /dev/stdin $PRJFLDR/*/PROJECT <<-\
+		===AWK===
+		BEGIN { FS = " +\\\\| +" }
+		\$1 == "summary" && \$2 ~ /$findstr/ {
+				n = split(FILENAME,y,"/");
+				print y[n-1]"|"\$2
+				nextfile
+			}
+		===AWK===
+} # }}}1
 function search { # {{{1
-	NOT-IMPLEMENTED
+	local IFS D
+	IFS=$NL
+	set -- $(search-files "$*")
+	case $# in
+		0)	warn "no match"; return;	;;
+		1)	D=${1%%\|*};				;;
+		*)	D=$(umenu "$@") || return
+			D=${D%%\|*}
+			;;
+	esac
+	print "$D"
 } # }}}1
 ### prj sub-commands
 function subcmd-inc { # {{{1
@@ -239,8 +262,31 @@ function subcmd-inc { # {{{1
 	((errs==0))|| die "Bad format$s in $sPRJPATH."
 
 } # }}}1
+function show-project-summaries { # {{{1
+	local fmt fmt_raw fmt_sprkld
+	fmt_raw='%s\t%s%s\n'
+	fmt_sprkld='  ^B^T%s^t ^N%s^n^b%s\n'
+	[[ ${1:-} == raw ]]&& fmt=$fmt_raw || fmt=$fmt_sprkld
+	awk -v fmt="$fmt" -f /dev/stdin $PRJFLDR/*/PROJECT <<-\
+		\===AWK===
+		function prnsummary(s,n,y,i,nm) {
+				i = index($2,":")
+				if (i>0) {
+					nm = substr(s,1,i-1)
+					s = substr(s,i+1)
+				  }
+				n = split(FILENAME,y,"/");
+				printf(fmt, y[n-1], nm, s);
+			}
+		BEGIN { FS = " +\\| +" }
+		$1 == "summary" {
+				prnsummary($2)
+				nextfile
+			}
+		===AWK===
+} # }}}1
 function subcmd-ls { # {{{1
-	NOT-IMPLEMENTED
+	show-project-summaries "${1:-sparkle}" |sparkle
 } # }}}1
 function subcmd-help { # {{{1
 	usage
@@ -265,8 +311,10 @@ SQL 'SELECT COUNT(*) FROM prj.projects;'
 [[ $sqlreply == +([0-9]) ]]|| create-db
 
 if [[ $1 == @(help|inc|ls|new) ]]; then
-	"subcmd-$@"
+	CMD=$1; shift
+	"subcmd-$CMD" "$@"
 else
+	[[ $1 == \! ]]&& shift
 	search "$@"
 fi; exit
 

@@ -284,7 +284,7 @@ ifs=$IFS; IFS=:; set -- $FPATH; IFS=$ifs
 for p { for i in $p/f-*; { i="${i#$p/}"; alias "${i#f-}=$i"; }; }
 
 # do the -no-globs here, AFTER the FPATH/f-* processing
--no-globs find locate
+-no-globs locate
 
 # FPATH functions are implicitly autoloaded, BUT the completion 
 # mechanism doesn't know about them unless we explicitly autoload them

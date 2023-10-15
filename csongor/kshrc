@@ -61,7 +61,7 @@ export CSONGOR_XTERM_WINDOW_FG='#dadada'
 export MANPAGER='nvim -M +Man!'
 export YT=AUDIODEVICE=snd@yt.lan/default
 export SUDO=/usr/bin/doas
-
+export SQLITE_LOADABLE_EXTENSION_PATH=$xdgdata/lib/sqlite3_le
 export TZ=EST5EDT
 
 alias lua=lua53

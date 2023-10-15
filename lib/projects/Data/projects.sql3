@@ -1,0 +1,199 @@
+-- <@(#)tag:tw.csongor.greyshirt.net,2023-06-19,15.59.29z/152d4a5>
+
+.mode lines
+-- LOAD function tempstore
+.load /home/tw/local/share/lib/sqlite3_le/lfn_tempstore
+-- LOAD function compact_timestamp
+.load /home/tw/local/share/lib/sqlite3_le/lfn_cmpct_tm
+-- LOAD virtual table splitstr
+.load /home/tw/local/share/lib/sqlite3_le/vt_splitstr
+
+ATTACH '/home/tw/projects/projects.db3' AS prj;
+
+DROP TABLE IF EXISTS prj."DBAPP_CONFIG";
+DROP TABLE IF EXISTS prj."clients";
+DROP TABLE IF EXISTS prj."types";
+DROP TABLE IF EXISTS prj."projects";
+DROP TABLE IF EXISTS prj."prjfts";
+DROP TABLE IF EXISTS prj."client-project-assoc";
+DROP TABLE IF EXISTS prj."staten";
+DROP TABLE IF EXISTS prj."status";
+DROP VIEW  IF EXISTS prj."gist";
+
+CREATE TABLE prj."DBAPP_CONFIG" (
+    "key"   text NOT NULL,
+    "value" text NOT NULL,
+    PRIMARY KEY ("key","value")
+  );
+INSERT INTO prj."DBAPP_CONFIG" ("key","value")
+    VALUES  ('lext', 'lfn_cmpct_tm'),
+            ('lext', 'lfn_tempstore'),
+            ('lext', 'vt_splitstr')
+         ;
+
+CREATE TABLE prj."clients" (
+    -- who requested the project
+    -- see also: "client-project-assoc"
+    "id"    INTEGER NOT NULL PRIMARY KEY,
+    "name"  text NOT NULL UNIQUE ON CONFLICT ABORT
+  );
+INSERT INTO prj."clients" (name)
+  VALUES
+    ('tw')
+  ;
+CREATE TABLE prj."types" (
+    -- available project types
+    "id"     INTEGER NOT NULL PRIMARY KEY,
+    "label"  text NOT NULL UNIQUE ON CONFLICT ABORT,
+    "descr"  text
+  );
+INSERT INTO prj.types (label,descr)
+  VALUES
+    ('facility',   'code or object providing infrastructure'),
+    ('tool',       'product used to create other products'),
+    ('product',    'application for end users'),
+    ('frame',      'Containers such as Web sites, templates, etc.')
+  ;
+CREATE TABLE prj."projects" (
+    -- top-level project relation
+    "id"      INTEGER NOT NULL PRIMARY KEY,
+    "began"   integer NOT NULL UNIQUE DEFAULT (unixepoch('now')),
+    "type"    integer NOT NULL REFERENCES "types" ("id"),
+    "alias"   text UNIQUE,  -- compact-timestamp of "began"
+    "summary" text,         -- name: short description
+    "details" text          -- long description
+  );
+CREATE TRIGGER prj."dont-change-id"
+    BEFORE UPDATE ON prj."projects"
+    FOR EACH ROW WHEN NEW."began" != OLD."began"
+    BEGIN
+        SELECT RAISE(FAIL,'Cannot update "projects" primary key "began"');
+    END;
+CREATE VIRTUAL TABLE prj."prjfts"
+    USING fts5(project UNINDEXED,summary,details)
+    ;
+CREATE TRIGGER prj."load-prjfts"
+    AFTER INSERT ON prj."projects"
+    FOR EACH ROW
+    BEGIN
+        INSERT INTO "prjfts"
+                    (project,    summary,     details)
+            VALUES  (NEW.id, NEW.summary, NEW.details)
+            ;
+    END;
+CREATE TRIGGER prj."update-prjfts"
+    AFTER UPDATE OF summary, details ON prj."projects"
+    FOR EACH ROW
+    BEGIN
+        UPDATE "prjfts"
+           SET summary = NEW.summary,
+               details = NEW.details
+         WHERE project = OLD.id
+             ;
+    END;
+
+CREATE TABLE prj."client-project-assoc" (
+    -- connects multiple clients to a project
+    "id"      INTEGER NOT NULL PRIMARY KEY,
+    "client"  integer NOT NULL REFERENCES "clients" ("id"),
+    "project" integer NOT NULL REFERENCES "projects" ("id"),
+    UNIQUE ("client","project") ON CONFLICT ABORT
+  );
+CREATE TABLE prj."staten" (
+    -- available project states
+    "id"      INTEGER NOT NULL PRIMARY KEY,
+    "label"   text NOT NULL ON CONFLICT ABORT
+  );
+INSERT INTO prj."staten" ("label")
+  VALUES
+    ('design'),
+    ('implement'),
+    ('prove'),
+    ('release'),
+    ('update'),
+    ('abandon')
+  ;
+CREATE TABLE prj."status" (
+    -- status of a project at a given time
+    "id"      INTEGER NOT NULL PRIMARY KEY,
+    "project" integer NOT NULL REFERENCES "projects" ("id"),
+    "when"    integer NOT NULL DEFAULT (unixepoch('now')),
+    "status"  integer NOT NULL REFERENCES "staten" ("id"),
+    "note"    text
+  );
+
+CREATE VIEW prj."gist" AS
+    -- "projects" with referenced relations incorporated
+    SELECT p."id", p."began", p."alias", p."summary", p."details",
+           group_concat(c."name") AS "client-list",
+           t."label" AS "type",
+           s."when", n."label" AS status, s."note"
+      FROM "projects" p,
+           "clients" c,
+           "client-project-assoc" cpa,
+           "types" t,
+           "status" s,
+           "staten" n
+     WHERE cpa."project" = p."id"
+       AND c."id" = cpa."client"
+       AND t."id" = p."type"
+       AND s."project" = p."id"
+       AND n."id" = s."status"
+     GROUP BY p."id"
+    HAVING s."when" = max(s."when")
+         ;
+
+CREATE TRIGGER prj."gist-abort-insert"
+    INSTEAD OF INSERT ON prj."gist"
+    FOR EACH ROW
+    WHEN NEW.status IS NOT NULL
+    BEGIN
+        SELECT RAISE( ABORT, 'Cannot update status in INSERT INTO gist' );
+    END;
+
+CREATE TRIGGER prj."gist-insert"
+    INSTEAD OF INSERT ON prj."gist"
+    FOR EACH ROW
+    WHEN NEW.status IS NULL
+    BEGIN
+        -- projects
+        INSERT INTO "projects"
+                   ("began",   "type",  "summary",  "details")
+            SELECT tempstore(1,coalesce(NEW."began",unixepoch())),
+                   t."id", NEW."summary", NEW."details"
+              FROM "types" t
+             WHERE t."label" = NEW."type"
+                 ;
+        UPDATE "projects"
+           SET "alias" = compact_timestamp(tempstore(1))
+         WHERE "id" = tempstore(0,last_insert_rowid())
+             ;
+
+        -- Translate comma-ed list of names into clients references.
+        -- SQLITE3 v3.39.5 does not support Common Table Expressions (WITH
+        --   RECURSIVE) so we use a loadable virtual table.
+
+        -- clients
+        INSERT OR IGNORE INTO "clients" ("name")
+            SELECT trim("value")
+              FROM splitstr(NEW."client-list",',')
+                 ;
+
+        -- client-project-assoc
+        -- intentionally uses CARTESIAN PRODUCT / CROSS JOIN
+        INSERT INTO "client-project-assoc" ("client","project")
+            SELECT c."id", tempstore(0)
+              FROM "clients" c
+             WHERE "name" IN (
+                    SELECT trim("value")
+                      FROM splitstr(NEW."client-list",',')
+                   )
+                 ;
+
+         INSERT INTO "status" ("project","when","status","note")
+            SELECT tempstore(0),tempstore(1),id,"initial"
+              FROM staten
+             WHERE "label" = 'design'
+                 ;
+    END;
+

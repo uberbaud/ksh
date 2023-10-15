@@ -302,9 +302,12 @@ NL='
 '
 PRJFLDR=${HOME:?}/projects
 PRJDB=$PRJFLDR/projects.db3
+S3LIB=${SQLITE_LOADABLE_EXTENSION_PATH:?}
 needs-path -create -or-die "$PRJFLDR"
 
 SQL "ATTACH '$PRJDB' AS prj;"
+SQL ".load $S3LIB/lfn_cmpct_tm"
+SQL ".load $S3LIB/vt_splitstr"
 SQL 'SELECT COUNT(*) FROM prj.projects;'
 ((${sqlreply[*]+1}))||
 	die "Unknown problem reading ^B$PRJDB^b."

@@ -40,98 +40,21 @@ shift $((OPTIND-1))
 # /options }}}1
 function create-db { # {{{1
 	local SQL_VERBOSE
+	needs-file -or-die $PRJ_DB_INIT_FILE
 	SQL_VERBOSE=true
 	h3 "BEGIN: $PRJDB"
-	SQL <<-===SQL===
-	CREATE TABLE prj."clients" (
-	    -- who requested the project
-	    -- see also: "client-project-assoc"
-	    "id"    INTEGER NOT NULL PRIMARY KEY,
-	    "name"  text NOT NULL UNIQUE ON CONFLICT ABORT
-	  );
-	INSERT INTO prj."clients" (name)
-	  VALUES
-	    ('tw')
-	  ;
-	CREATE TABLE prj."types" (
-	    -- available project types
-	    "id"     INTEGER NOT NULL PRIMARY KEY,
-	    "label"  text NOT NULL UNIQUE ON CONFLICT ABORT,
-	    "descr"  text
-	  );
-	INSERT INTO prj.types (label,descr)
-	  VALUES
-	    ('facility',   'code or object providing infrastructure'),
-	    ('tool',       'product used to create other products'),
-	    ('product',    'application for end users'),
-	    ('frame',      'Containers such as Web sites, templates, etc.')
-	  ;
-	CREATE TABLE prj."projects" (
-	    -- top-level project relation
-	    "id"      INTEGER NOT NULL PRIMARY KEY,
-	    "began"   integer NOT NULL UNIQUE DEFAULT (unixepoch('now')),
-	    "type"    integer NOT NULL REFERENCES "types" ("id"),
-	    "alias"   text NOT NULL UNIQUE, -- compact-timestamp of "began"
-	    "summary" text,                 -- name: short description
-	    "details" text                  -- long description
-	  );
-	CREATE TABLE prj."client-project-assoc" (
-	    -- connects multiple clients to a project
-	    "id"      INTEGER NOT NULL PRIMARY KEY,
-	    "client"  integer NOT NULL REFERENCES "clients" ("id"),
-	    "project" integer NOT NULL REFERENCES "projects" ("id"),
-	    UNIQUE ("client","project") ON CONFLICT ABORT
-	  );
-	CREATE TABLE prj."staten" (
-	    -- available project states
-	    "id"      INTEGER NOT NULL PRIMARY KEY,
-	    "label"   text NOT NULL ON CONFLICT ABORT
-	  );
-	INSERT INTO prj."staten" ("label")
-	  VALUES
-	    ('design'),
-	    ('implement'),
-	    ('prove'),
-	    ('release'),
-	    ('update'),
-	    ('abandon')
-	  ;
-	CREATE TABLE prj."status" (
-	    -- status of a project at a given time
-	    "id"      INTEGER NOT NULL PRIMARY KEY,
-	    "project" integer NOT NULL REFERENCES "projects" ("id"),
-	    "when"    integer NOT NULL DEFAULT (unixepoch('now')),
-	    "status"  integer NOT NULL REFERENCES "staten" ("id"),
-	    "note"    text
-	  );
-	CREATE VIEW prj.gist AS
-	    -- "projects" with referenced relations incorporated
-	    SELECT p."id", p."began", p."name", p."summary", p."details",
-	           group_concat(c."name") AS "client-list",
-	           s."when", n."label" AS status, s."note"
-	      FROM "projects" p,
-	           "clients" c,
-	           "client-project-assoc" cpa,
-	           "status" s,
-	           "staten" n
-	     WHERE "project" = p."id"
-	       AND c."id" = cpa."client"
-	       AND s."project" = p."id"
-	       AND n."id" = s."status"
-	     GROUP BY p."id"
-	    HAVING s."when" = max(s."when")
-	         ;
-	===SQL===
+	SQL <$PRJ_DB_INIT_FILE
 	h3 "DONE: $PRJDB"
 } #}}}1
 function parse-project-file { # {{{1
 	local extra missing
 
 	# read key:val header
-	while IFS="$TAB" read key val; do
+	while IFS="|" read key val; do
 		[[ -n $key ]]|| break
-		key=${key%:}
-		if [[ $key == @(began|clients|type|summary|details) ]]; then
+		key=${key%%+( )}
+		val=${val##+( )}
+		if [[ $key == @(began|clients|type|summary) ]]; then
 			eval "$key=\$val"
 		else
 			extra=${extra+=$extra, }^V$key^v
@@ -171,7 +94,7 @@ function verify-began { # {{{1
 
 	[[ $3 == [A-Z][A-Z][A-Z] ]]||
 		warn 'Bad timezone format' || return
-	unixtm=$(date -j -f '%Y-%m-%d %H:%M:%S %Z' +%s "$began") ||
+	unixtm=$(date -jf '%Y-%m-%d %H:%M:%S %Z' +%s "$began") ||
 		warn 'Bad format for ^Tbegan^t' || return
 } # }}}1
 function verify-alias { # {{{1
@@ -179,8 +102,8 @@ function verify-alias { # {{{1
 	[[ -n ${unixtm:-} ]]||
 		bad-programmer '^Tunixtm^t MUST be set before calling ^Tverify-alias^t.'
 
-	x=$(compact-timestamp $(date -j -r $unixtm +'%Y %m %d %H %M %S'))
-	[[ ${alias:?} == ${x#?} ]]||
+	x=$(compact-timestamp $(date -r $unixtm +'%Y %m %d %H %M %S'))
+	[[ ${alias:?} == $x ]]||
 		warn '^Talias^t and ^Tbegan^t do not match.' || return
 } # }}}1
 function verify-type { # {{{1
@@ -251,7 +174,7 @@ function subcmd-inc { # {{{1
 	 │ clients: $clients
 	 │ type:    $type
 	 │ summary: $summary
-
+	 └────────────────────────────────────────────────────────────────────────
 	===
 
 	errs=0; s=''
@@ -260,6 +183,14 @@ function subcmd-inc { # {{{1
 	verify-type		|| ((errs++))
 	((errs>1))&& s=s
 	((errs==0))|| die "Bad format$s in $sPRJPATH."
+
+	: ${unixtm:?}
+	SQLify unixtm clients type summary details
+	SQL <<-===SQL===
+	INSERT INTO gist (began,"client-list","type",summary,details)
+		VALUES ($unixtm,$clients,$type,$summary,$details)
+		;
+	===SQL===
 
 } # }}}1
 function show-project-summaries { # {{{1
@@ -295,11 +226,14 @@ function subcmd-new { # {{{1
 	NOT-IMPLEMENTED
 } # }}}1
 
-needs needs-file needs-path NOT-IMPLEMENTED SQL SQLify sparkle-path
+needs needs-file needs-path NOT-IMPLEMENTED SQL SQLify sparkle-path \
+	use-app-paths
+use-app-paths projects # sets APP_PATH
 
 TAB='	'
 NL='
 '
+PRJ_DB_INIT_FILE=$APP_PATH/Data/projects.sql3
 PRJFLDR=${HOME:?}/projects
 PRJDB=$PRJFLDR/projects.db3
 S3LIB=${SQLITE_LOADABLE_EXTENSION_PATH:?}
@@ -308,7 +242,10 @@ needs-path -create -or-die "$PRJFLDR"
 SQL "ATTACH '$PRJDB' AS prj;"
 SQL ".load $S3LIB/lfn_cmpct_tm"
 SQL ".load $S3LIB/vt_splitstr"
+SQL ".load $S3LIB/lfn_tempstore"
+SQL_AUTODIE=false
 SQL 'SELECT COUNT(*) FROM prj.projects;'
+SQL_AUTODIE=true
 ((${sqlreply[*]+1}))||
 	die "Unknown problem reading ^B$PRJDB^b."
 [[ $sqlreply == +([0-9]) ]]|| create-db

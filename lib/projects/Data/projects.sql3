@@ -1,14 +1,14 @@
 -- <@(#)tag:tw.csongor.greyshirt.net,2023-06-19,15.59.29z/152d4a5>
 
-.mode lines
--- LOAD function tempstore
-.load /home/tw/local/share/lib/sqlite3_le/lfn_tempstore
--- LOAD function compact_timestamp
-.load /home/tw/local/share/lib/sqlite3_le/lfn_cmpct_tm
--- LOAD virtual table splitstr
-.load /home/tw/local/share/lib/sqlite3_le/vt_splitstr
+-- .mode lines
+-- -- LOAD function tempstore
+-- .load /home/tw/local/share/lib/sqlite3_le/lfn_tempstore
+-- -- LOAD function compact_timestamp
+-- .load /home/tw/local/share/lib/sqlite3_le/lfn_cmpct_tm
+-- -- LOAD virtual table splitstr
+-- .load /home/tw/local/share/lib/sqlite3_le/vt_splitstr
 
-ATTACH '/home/tw/projects/projects.db3' AS prj;
+-- ATTACH '/home/tw/projects/projects.db3' AS prj;
 
 DROP TABLE IF EXISTS prj."DBAPP_CONFIG";
 DROP TABLE IF EXISTS prj."clients";
@@ -127,7 +127,7 @@ CREATE VIEW prj."gist" AS
     SELECT p."id", p."began", p."alias", p."summary", p."details",
            group_concat(c."name") AS "client-list",
            t."label" AS "type",
-           s."when", n."label" AS status, s."note"
+           n."label" AS status, s."when" AS noted, s."note"
       FROM "projects" p,
            "clients" c,
            "client-project-assoc" cpa,

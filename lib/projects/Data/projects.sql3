@@ -59,7 +59,7 @@ CREATE TABLE prj."projects" (
     "id"      INTEGER NOT NULL PRIMARY KEY,
     "began"   integer NOT NULL UNIQUE DEFAULT (unixepoch('now')),
     "type"    integer NOT NULL REFERENCES "types" ("id"),
-    "alias"   text UNIQUE,  -- compact-timestamp of "began"
+    "alias"   text UNIQUE DEFAULT (compact_timestamp(unixepoch())),
     "summary" text,         -- name: short description
     "details" text          -- long description
   );

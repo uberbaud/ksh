@@ -1,33 +1,47 @@
 #!/bin/ksh
 # <@(#)tag:tw.csongor.greyshirt.net,2023-06-09,00.30.39z/39d939b>
-
 # vim: ft=ksh ts=4 tw=72 noexpandtab nowrap foldmethod=marker
 
 set -o nounset;: ${FPATH:?Run from within KSH}
 
 # Usage {{{1
+full_pgm=$0
 this_pgm=${0##*/}
 function usage {
 	desparkle "$this_pgm"
 	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
-	^F{4}Usage^f: ^T$PGM^t ^Usearch terms^u
+	^F{4}Usage^f: ^T$PGM^t ^[^Tfind^t^|^Tquery^t^|^Tsearch^t^] ^Usearch terms^u
 	         Show matching projects and ^Tcd^t to selected project.
 	       ^T$PGM inc^t ^Udirectory^u
 	         Incorporate an existing project directory using its ^TPROJECT^t file.
 	       ^T$PGM ls^t ^[^Usearch terms^u^]
 	         List all or matching projects.
-	       ^T$PGM new^t
+	       ^T$PGM new^t ^Uproject: summary^u
 	         Create a new project.
+	       ^T$PGM edit^t
+	         Revise ^TPROJECT^t file.
+	       ^T$PGM status^t
+	         Set status of current project (according to ^O\$^o^VPWD^v)
+	       ^T$PGM -L^t
+	         List all sub-commands.
 	       ^T$PGM help^t^|^T-h^t
 	         Show this help message.
 	===SPARKLE===
 	exit 0
 } # }}}
+AWK_SUBCMD_PGM='/^function subcmd-/ {print $3}'
+function show-commands { # {{{1
+	local cmd
+	set -s -- search find query $(awk -F'[ -]' "$AWK_SUBCMD_PGM" "$full_pgm")
+	for cmd { print "$cmd"; }
+	exit 0
+} # }}}
 # process -options {{{1
-while getopts ':h' Option; do
+while getopts ':Lh' Option; do
 	case $Option in
+		L)	show-commands;													;;
 		h)	usage;															;;
 		\?)	die USAGE "Invalid option: ^B-$OPTARG^b.";						;;
 		\:)	die USAGE "Option ^B-$OPTARG^b requires an argument.";			;;
@@ -153,21 +167,24 @@ function search { # {{{1
 } # }}}1
 ### prj sub-commands
 function subcmd-inc { # {{{1
-	local began clients type alias summary details errs unixtm
+	local began clients type alias summary details errs unixtm prjdir prjfile
 
-	[[ -d $PRJFLDR/$1 ]]|| die "No such project ^B$1^b."
-	needs-file -or-die $PRJFLDR/$1/PROJECT
+	: ${1:?}
+	alias=${1##*/}
+	prjdir=$PRJFLDR/$alias
+	[[ -d $prjdir ]]|| die "No such project ^B$1^b."
+	prjfile=$prjdir/PROJECT
+	needs-file -or-die "$prjfile"
 	(($#==1))||
 		die "Too many parameters to ^Tinc^t sub-command." 'Expected one (1).'
 
-	alias=$1
-	parse-project-file <$PRJFLDR/$1/PROJECT ||
-		die "Cannot incorporate project ^B$1^b."
+	parse-project-file <$prjfile ||
+		die "Cannot incorporate project ^B$alias^b."
 
-	sparkle-path $PRJFLDR/$1/PROJECT
+	sparkle-path $prjfile
 	sPRJPATH=$REPLY
 
-	cat <<-===
+	cat >&2 <<-===
 	 ┌────────────────────────────────────────────────────────────────────────
 	 │ alias:   $alias
 	 │ began:   $began
@@ -223,6 +240,47 @@ function subcmd-help { # {{{1
 	usage
 } # }}}1
 function subcmd-new { # {{{1
+	local alias began clients date n prjdir prjfile s summary type unixtm
+	needs umenu compact-timestamp needs-path
+	: ${TTY:?}
+
+	(($#))|| die 'Missing required ^Uproject: summary^u.'
+	s=${1%:}; shift
+	summary="$s: $*"
+
+	unixtm=$(date +%s)
+	began=$(date -r $unixtm +'%Y-%m-%d %H:%M:%S %Z')
+	alias=$(compact-timestamp $(date -r $unixtm +'%Y %m %d %H %M %S'))
+	SQL "SELECT label || ': ' || descr FROM prj.\"types\";"
+	type=$(umenu "${sqlreply[@]}")
+	type=${type%:*}
+
+	SQL 'SELECT "name" FROM prj."clients";'
+	for n in "${sqlreply[@]}"; do
+		clients=${clients:+$clients,}$n
+	done
+
+	prjdir=${PRJFLDR:?}/$alias
+	needs-path -create -or-die "$prjdir"
+	prjfile=$prjdir/PROJECT
+
+	cat >$prjfile <<-===
+	clients | $clients
+	type    | $type
+	began   | $began
+	summary | $summary
+
+	===
+
+	("${VISUAL:-${EDITOR:?}}" "$prjfile")0<$TTY 1>$TTY
+	subcmd-inc "$alias"
+
+	print -- "$alias"
+} # }}}1
+function subcmd-status { # {{{1
+	NOT-IMPLEMENTED
+} # }}}1
+function subcmd-edit { # {{{1
 	NOT-IMPLEMENTED
 } # }}}1
 
@@ -239,10 +297,13 @@ PRJDB=$PRJFLDR/projects.db3
 S3LIB=${SQLITE_LOADABLE_EXTENSION_PATH:?}
 needs-path -create -or-die "$PRJFLDR"
 
-SQL "ATTACH '$PRJDB' AS prj;"
-SQL ".load $S3LIB/lfn_cmpct_tm"
-SQL ".load $S3LIB/vt_splitstr"
-SQL ".load $S3LIB/lfn_tempstore"
+SQL <<-===SQL===
+	ATTACH '$PRJDB' AS prj;
+	.load $S3LIB/lfn_cmpct_tm
+	.load $S3LIB/vt_splitstr
+	.load $S3LIB/lfn_tempstore
+	===SQL===
+
 SQL_AUTODIE=false
 SQL 'SELECT COUNT(*) FROM prj.projects;'
 SQL_AUTODIE=true
@@ -253,6 +314,9 @@ SQL_AUTODIE=true
 if [[ $1 == @(help|inc|ls|new) ]]; then
 	CMD=$1; shift
 	"subcmd-$CMD" "$@"
+elif [[ $1 == @(cd|search|find|query) ]]; then
+	shift
+	search "$@"
 else
 	[[ $1 == \! ]]&& shift
 	search "$@"

@@ -1,17 +1,18 @@
 # <@(#)tag:tw.csongor.greyshirt.net,2023-10-05,20.16.43z/14d7e36>
-
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
 #: FUNCTION ^G(no arguments)^g
 #:   Wrapper around prj.ksh for ^Tcd^t.
 
+
 function f-prj {
-	local P
+	local P tty
 	: ${BS:?}
-	if [[ $1 == @(help|inc|ls|new) ]]; then
+	if [[ $1 == @(-L|edit|find|help|inc|ls|query|search|status) ]]; then
 		$BS/prj.ksh "$@"
 	else
-		P=$($BS/prj.ksh "$@")
+		tty=$(tty)
+		P=$(TTY=$tty $BS/prj.ksh "$@")
 		[[ -n $P ]]&& { cd ~/projects/"$P"; ls; }
 	fi
 }

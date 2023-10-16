@@ -117,6 +117,11 @@ m_2: $(MAIL_UPDATED)
 	@echo $@
 	@$(MAIL_BIN) -ar >$@
 
+PRJ_BIN=$(KDOTDIR)/share/BS/prj.ksh
+prj_1: $(PRJ_BIN)
+	@echo $@
+	@$(PRJ_BIN) -L >$@
+
 SSH_HOSTS=$(XDG_CONFIG_HOME)/ssh/known_hosts
 ssh: $(SSH_HOSTS)
 	@echo $@

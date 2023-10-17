@@ -1,0 +1,17 @@
+# <@(#)tag:tw.csongor.my.greyshirt.net,2023-10-17,20.36.48z/84e14b>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^G(no arguments)^g
+#:   Highlight ^Iunified diff^i on ^Vstdin^v
+
+needs sed sparkle
+function highlight-udiff {
+	sed -E 								\
+		-e 's/\^/^^/g'					\
+		-e  '/^-/s/^.*$/^F{1}&^f/'		\
+		-e '/^\+/s/^.*$/^F{2}&^f/'		\
+		-e '/^[^ ]/s/^.*$/^F{142}&^f/'	\
+	  | sparkle
+}
+
+# Copyright © 2023 by Tom Davis <tom@greyshirt.net>.

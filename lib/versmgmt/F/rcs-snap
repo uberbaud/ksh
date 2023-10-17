@@ -9,10 +9,8 @@ function rcs-snap {
 	local file msg
 	file=${1:?}; shift
 	msg=$*
-	[[ -n $msg ]]|| {
-		rcs-diff "$file"
+	[[ -n $msg ]]||
 		msg=$(term-get-text ci)
-	}
 	[[ -f RCS/$file,v ]]&&
 		ci -q -j -m"${msg:-.}" -u ./"$file" 2>&1
 }

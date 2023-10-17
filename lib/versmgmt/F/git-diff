@@ -5,7 +5,12 @@
 #:   vmgr vms-cmd
 
 function git-diff {
-	git --no-pager diff "$1"
+	local file staged
+	file=$1
+	set -- git status --porcelain=v2 "$file"
+	[[ $1 != 1 ]]|| return
+	[[ $2 == @(?M|M.) ]]&& staged=--staged
+	git --no-pager diff ${staged:-} "$file"
 }
 
 # Copyright © 2023 by Tom Davis <tom@greyshirt.net>.

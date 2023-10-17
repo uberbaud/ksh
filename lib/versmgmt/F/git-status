@@ -7,20 +7,26 @@
 function git-status {
 	local file
 	file=$1
+	[[ -f $file ]]|| STATUS=not-a-file return
 	git check-ignore -q "$file" && STATUS=ignored return
 	set -- $(git status --porcelain=v2 "$file")
-	(($#==0))&& return
+	(($#))|| STATUS=ok return
 	case $1 in
 		\?) STATUS=untracked;								;;
 		1)
+			X=${2%?}; Y=${2#?}
 			case $2 in
-				\?\?*)	STATUS=untracked;	;;
-				?.)		STATUS=modified;	;;
-				*)		STATUS=ok;			;;
+				?M)       STATUS=modified;		;;
+				M?)       STATUS=ok;			;;
+				.[AD])    STATUS=ok;			;;
+				A[.TD])   STATUS=ok;			;;
+				\?\?)     STATUS=untracked;		;;
+				\!\!)     STATUS=ignored;		;;
+				*)        STATUS=unhandled;		;;
 			esac
 			;;
-		2) STATUS=ok; NOT-IMPLEMENTED "moved/renamed";		;;
-		u) STATUS=ok; NOT-IMPLEMENTED "merge issues";		;;
+		2) STATUS=ok; NOT-IMPLEMENTED 'moved/renamed';		;;
+		u) STATUS=ok; NOT-IMPLEMENTED 'merge issues';		;;
 		*) STATUS=error;									;;
 	esac
 }

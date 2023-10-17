@@ -123,13 +123,14 @@ function begin-tracking { # {{{1
 function handle-modified { #{{{1
 	warnOrDie 'Checked-in and working versions differ.'
 	warn "Add a checkin message for ^Bprevious^b edits."
+	$vms-diff "$1" | highlight-udiff
 	$vms-snap "$1"
 } #}}}1
 function init-or-sync-then-checkout { #{{{1
 	case ${STATUS:-nope} in
 		untracked)	begin-tracking "$filename";								;;
 		modified)	handle-modified "$filename";							;;
-		ok)			:;														;;
+		ok|ignored|untracked)	:;											;;
 		nope)		warn "^T$vms-status^t does not set ^O$^o^VSTATUS^v.";	;;
 		*)			warn "^T$vms-status^t: ^O$^o^VSTATUS^v=^U$STATUS^u.";	;;
 	esac
@@ -160,6 +161,8 @@ function main { # {{{1
 		[[ -f .LAST_UPDATED ]]&& date -u +"$ISO_DATE" >.LAST_UPDATED
 
 		if $HAS_VERSMGMT; then
+			[[ -n ${ciMsg:-} ]]&&
+				versmgmt-apply diff "$f_name" | highlight-udiff
 			versmgmt-apply snap "$f_name" "${ciMsg:-}"
 		elif [[ -n $ciMsg ]]; then
 			warn 'Supplied a ^Blog^b message, but there'\''s no ^IVMS^i.'

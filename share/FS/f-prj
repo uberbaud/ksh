@@ -4,16 +4,19 @@
 #: FUNCTION ^G(no arguments)^g
 #:   Wrapper around prj.ksh for ^Tcd^t.
 
-
+needs awk h3 tty $BS/prj.ksh
 function f-prj {
-	local P tty
+	local D P S tty
 	: ${BS:?}
 	if [[ $1 == @(-L|edit|find|help|inc|ls|query|search|status) ]]; then
 		$BS/prj.ksh "$@"
 	else
 		tty=$(tty)
 		P=$(TTY=$tty $BS/prj.ksh "$@")
-		[[ -n $P ]]&& { cd ~/projects/"$P"; ls; }
+		D=$HOME/projects/$P
+		S=$(awk -F'\\\| *' '/^summary / {print $2}' "$D"/PROJECT)
+		h3 "$P / $S"
+		[[ -n $P ]]&& { cd "$D"; ls; }
 	fi
 }
 

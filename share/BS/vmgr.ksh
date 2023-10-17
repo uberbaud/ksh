@@ -85,7 +85,7 @@ while [[ $# -gt 0 && $1 == -* ]]; do
 done
 # /options }}}1
 
-needs die sparkle versmgmt-init
+needs die sparkle versmgmt-init highlight-udiff
 
 [[ -z $CMD && $# -eq 0 ]]&& die "Missing required ^Ucommand^u."
 [[ -n $CMD ]]|| { CMD=$1; shift; }
@@ -136,6 +136,11 @@ needs-file -or-die "$WORKPATH/$FILENAME"
 STATUS=-0-
 
 ### DO THE THINGS
-versmgmt-apply "$CMD" "$FILENAME" "$@"; exit
+set -- versmgmt-apply "$CMD" "$FILENAME" "$@"
+if [[ $CMD == diff ]]; then
+	"$@" | highlight-udiff
+else
+	"$@"
+fi; exit
 
 # Copyright (C) 2023 by Tom Davis <tom@greyshirt.net>.

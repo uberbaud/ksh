@@ -10,7 +10,6 @@ function git-snap {
 	git check-ignore -q "$file" && return
 	git add "$file"
 	msg=$*
-	[[ -n $msg ]]|| git-diff "$file"
 	git-describe "$file" 'L' "$msg"
 }
 

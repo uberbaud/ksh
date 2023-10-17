@@ -251,7 +251,7 @@ export PAGER=/usr/bin/less
 #		sort -nr						|
 #		head -n 1
 #  )
-export AUTOCONF_VERSION=2.69
+export AUTOCONF_VERSION=2.71
 #export AUTOMAKE_VERSION=$(
 #	/bin/ls /usr/local/bin/automake-*	|
 #		awk -F- '{print $NF}'			|

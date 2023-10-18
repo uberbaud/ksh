@@ -10,11 +10,11 @@ needs desparkle warn die
 # NOT the korn shell format: function func {…}, in order to keep the
 # caller's name in $0
 NOT-IMPLEMENTED() {
-	local REPLY dowhat=warn
-	[[ ${1:-} == -die ]]&& { dowhat=die; shift; }
+	local REPLY dowhat=-warn-only
+	[[ ${1:-} == -die ]]&& { dowhat=; shift; }
 
 	desparkle "$0"
-	$dowhat "^T$REPLY^t: not yet implemented." "$@"
+	bad-programmer ${dowhat:-} "^T$REPLY^t: not yet implemented." "$@"
 }
 
 # Copyright © 2021 by Tom Davis <tom@greyshirt.net>.

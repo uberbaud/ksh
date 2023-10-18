@@ -6,13 +6,15 @@
 
 needs message
 bad-programmer() {
-	local EX_SOFTWARE=70
+	local EX_SOFTWARE WANT_DIE padding
+	EX_SOFTWARE=70
+	WANT_DIE=true
+	[[ ${1:-} == -warn-only ]]&& WANT_DIE=false shift
 
-	message "  ^B$0^b:" '        ' "^WBAD PROGRAMMER^w" "$@"
+	padding='        '
+	message "  ^B$0^b:" "$padding"  "^WBAD PROGRAMMER^w" "$@"
 
-	# don't exit a user's shell, just get back to the prompt
-	[[ -o interactive ]]&& kill -s TERM $$
-	exit $EX_SOFTWARE
+	$WANT_DIE && die SOFTWARE 'exiting …'
   }
 
 # vim: ft=ksh ts=4

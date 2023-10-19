@@ -7,11 +7,14 @@ HOLD=/var/cache/$NAME
 JOBFNAME=${NAME}-tab
 JOBF=/etc/$JOBFNAME
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+SPTAB=' 	'
 
 set -u
-integer errs=0 lineno=0
-function syntax		{ print -ru2 "$NAME: $* (line $lineno)"; ((errs++)); }
-function fullstop	{ print -ru2 "$NAME: $*"; exit 1; }
+integer ERRS=0
+integer LINENO
+function error		{ print -ru2 "$NAME: $1"; }
+function syntax		{ error "syntax: $* (line $LINENO)"; ((ERRS++)); }
+function fullstop	{ error "$*"; exit 1; }
 
 (($#))&& {
 	${PAGER:-more} <<-\
@@ -75,15 +78,19 @@ set -- $(date +'%Y %m %d %H %M %S %s')
 typeset -Z2 MON DOM H M S # zero padded vars of width 2
 YEAR=$1;    MON=$2;     DOM=$3
 H=$4;       M=$5;       S=$6
+UNIXTM=$7
 TODAY=$YEAR$MON$DOM
-todayE=$(($7-(((H*60)+M)*60)+S))
+END_OF_TODAY=$((UNIXTM-(((H*60)+M)*60)+S))
+SECS_IN_DAY=$((24*60*60))
 
 function have-x-days-passed {
-	local nextrunE=$((tsE+($1*(24*60*60))))
-	((nextrunE <= todayE))
+	local nextrunE
+	nextrunE=$((LAST_RUN_TS+($1*$SECS_IN_DAY)))
+	((nextrunE <= END_OF_TODAY))
 }
 function has-dow-passed {
-	local pass x
+	local pass tsdow x
+	tsdow=$2
 	case $1 in
 		mo*)	pass=1;	;;
 		tu*)	pass=2;	;;
@@ -93,32 +100,35 @@ function has-dow-passed {
 		sa*)	pass=6;	;;
 		su*)	pass=7;	;;
 	esac
-	x=$(((pass+7-tsDOW)%7)); ((x))||x=7
+	x=$(((pass+7-tsdow)%7)); ((x))||x=7
 	have-x-days-passed $x
 }
 function has-dom-passed {
-	typeset -Z2 dom="${1%%+([!0-9])}"
-	((++MON>12))&& { ((YEAR++)); MON=1; }
-	(($YEAR$MON$dom <= TODAY))
+	local year mon
+	typeset -Z2 dom=$1
+	year=${2%??}
+	mon=${2#$year}
+	((++mon>12))&& { ((year++)); mon=1; }
+	(($year$mon$dom <= TODAY))
 }
 function do-execute {
-	local tsF ts when="$1" cmd="$2" as="$3"
+	local tsF ts tsdow when=$1 cmd=$2 as=$3
 	# name of timestamp file
 	tsF="$(print -n "${as:+$as-}$when-$cmd" | tr ' /' '_%')"
 	[[ -f $tsF ]]&& {							# if it exists
-		ts="$(<$tsF)"							# get the last run time
+		ts=$(<$tsF)								# get the last run time
 		set -- $(date -j +'%s %u' $ts'0000')
-		tsE=$1					# seconds since epoch of last run time
-		tsDOW=$2				# weekday when command was last run
+		LAST_RUN_TS=$1			# seconds since epoch of last run time
+		tsdow=$2				# weekday when command was last run
 		case $when in
 			+([0-9]))
-				have-x-days-passed $when		|| return 0
+				have-x-days-passed $when				|| return 0
 				;;
 			@(su|mo|tu|we|th|fr|sa)*)
-				has-dow-passed $when			|| return 0
+				has-dow-passed $when $tsdow				|| return 0
 				;;
 			@([0-9]|[012][0-9]|3[01])@(st|nd|rd|th))
-				has-dom-passed $when			|| return 0
+				has-dom-passed ${when%??} "${ts%??}"	|| return 0
 				;;
 			+([0-9])@(st|nd|rd|th))
 				syntax 'day of month is too big'
@@ -135,12 +145,13 @@ function do-execute {
 typeset -l when
 function do-one-plan-b {
 	local as=${1-}
-	while read -r when cmd; do
-		((lineno++))
+	LINENO=0
+	while IFS=$SPTAB read -r when cmd; do
+		((LINENO++))
 		[[ ${when:-#} == \#* ]]&& continue		# comments and blank lines
-		[[ -n ${cmd:-} ]]|| { syntax "syntax error"; continue; }
+		[[ -n ${cmd:-} ]]|| { syntax "no command or garbled"; continue; }
 		[[ $when == @(+([0-9])?(st|nd|rd|th)|@(su|mo|tu|we|th|fr|sa)*) ]]||{
-			syntax "syntax: bad interval"
+			syntax "bad interval"
 			continue
 		  }
 		do-execute $when "$cmd" "$as"
@@ -148,18 +159,22 @@ function do-one-plan-b {
 }
 
 function main {
-	local T U
+	local job_file username
 	do-one-plan-b <$JOBF # main file
 	set -- /home/*/.$JOBFNAME
 	[[ $1 == /home/\*/.$JOBFNAME ]]&& return
-	for T; do
-		U=${T#/home/}
-		U=${U%/."$JOBFNAME"}
-		do-one-plan-b $U <$T # user file
+	for job_file; do
+		username=${job_file#/home/}
+		username=${username%/."$JOBFNAME"}
+		do-one-plan-b $username <$job_file # user file
 	done
 }
 
-main; exit $errs
+# Some shells read one line at a time. Putting main and exit on the same 
+# line ensures that those shells exit after running main and don't 
+# continue reading from a file that was changed out from under them if 
+# this file is edited during a run.
+main; exit $ERRS
 
 # Copyright (C) 2017 by Tom Davis <tom@greyshirt.net>.
 # vim: ft=ksh

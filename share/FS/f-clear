@@ -7,7 +7,7 @@
 
 needs h3
 function f-clear {
-	local IFS=' '
+	local IFS=' ' P
 	print -u2 '\033[H\033[2J\033[3J\033[H\c'
 	((!$#)) || h3 "$@" >/dev/tty
 	"$@"

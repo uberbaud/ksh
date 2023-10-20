@@ -1,0 +1,19 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2023-10-20,22.12.14z/50c1f81>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^[^Upath^u^] ^= ^SSTDOUT^s
+#:   Get project name from a given ^Upath^u or ^O$^o^VPWD^v.
+
+needs needs-file
+function project-name-from-path {
+	local F P T
+	P=${1:-$PWD}
+	[[ $P == ${HOME:?}/projects/?(?)???-????(/*) ]]|| return
+	P=${P#"$HOME"/projects/}
+	P=${P%%/*}
+	F=$HOME/projects/$P/PROJECT
+	needs-file -or-die "$F"
+	awk -F'[\|:] *' '/^summary/ {print $2;nextfile}' "$F"
+}
+
+# Copyright © 2023 by Tom Davis <tom@greyshirt.net>.

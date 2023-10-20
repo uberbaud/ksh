@@ -149,6 +149,7 @@ function main { # {{{1
 					"  ^B$filenameD^b"
 		  }
 	  }
+	print -r -- "$filename" >>$LOGFILE
 	if [[ -w $filename ]]; then
 		cat ./"$workfile" >"$filename"
 	else
@@ -159,15 +160,16 @@ function main { # {{{1
 
 (($#))|| die 'Missing required argument ^Ufile^u.'
 
-CKSUM=$(which b3sum) || CKSUM="$(which cksum) -qa sha384b" ||
-	die 'Could not find ^Tb3sum^t or ^Tcksum^t.'
 
-needs as-root ci co desparkle get-exclusive-lock $ED needs-cd needs-path	\
-	release-exclusive-lock warnOrDie
+needs as-root ci co desparkle fast-crypt-hash get-exclusive-lock $ED	\
+	needs-cd needs-path release-exclusive-lock warnOrDie
 
+CKSUM=fast-crypt-hash
 CI_INITIAL_DESCRIPTION='OpenBSD system file'
 LOCKBASE=${XDG_CACHE_HOME:?}/suv/locks
 needs-path -create -or-die "$LOCKBASE"
+needs-path -create -or-die $HOME/log
+LOGFILE=$HOME/log/logfile
 
 filename=$1; shift
 desparkle "$filename"

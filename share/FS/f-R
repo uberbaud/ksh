@@ -1,0 +1,35 @@
+# <@(#)tag:csongor.greyshirt.net,2017-08-01:tw/02.50.25z/5a8966>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^[^Ufile_name^u^]
+#:   Read something, a given ^Ufile_name^u or a file whose name is
+#:   vaguely ^Ireadme^i-like.
+
+function f-R {
+	typeset readme=''
+	if (($#)); then
+		readme=$1
+	else
+		set -- @([Rr][Ee][Aa][Dd]*|*.[Rr][Ee][Aa][Dd][Mm][Ee])
+		for p; do
+			[[ -f $p ]]&& { readme=$p; break; }
+		done
+
+		[[ -n $readme ]]|| die NOINPUT 'No README found.'
+	fi
+
+	typeset -l lext=${readme##*.}
+	if [[ $lext == @(m?(?(ar)k)d?(?(o)?(w)n)?(t?(e)xt)|rmd) ]]; then
+		needs markdown-to-html w3m
+		markdown-to-html "$readme" | w3m -T text/html
+	elif [[ $lext == htm?(l) ]]; then
+		needs w3m
+		w3m -T text/html "$readme"
+	else
+		needs nvim
+		typeset opts='set nolist norelativenumber nonumber colorcolumn='
+		nvim -MR +"$opts" "$readme"
+	fi
+}
+
+# Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

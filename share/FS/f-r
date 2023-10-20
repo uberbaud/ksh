@@ -1,35 +1,13 @@
-# <@(#)tag:csongor.greyshirt.net,2017-08-01:tw/02.50.25z/5a8966>
+# <@(#)tag:tw.csongor.greyshirt.net,2023-10-20,00.16.43z/ac435c>
+
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^[^Ufile_name^u^]
-#:   Read something, a given ^Ufile_name^u or a file whose name is
-#:   vaguely ^Ireadme^i-like.
+#: FUNCTION ^Ufile^u
+#:   Read, but in a new terminal.
 
+needs f-R
 function f-r {
-	typeset readme=''
-	if (($#)); then
-		readme=$1
-	else
-		set -- @([Rr][Ee][Aa][Dd]*|*.[Rr][Ee][Aa][Dd][Mm][Ee])
-		for p; do
-			[[ -f $p ]]&& { readme=$p; break; }
-		done
-
-		[[ -n $readme ]]|| die NOINPUT 'No README found.'
-	fi
-
-	typeset -l lext=${readme##*.}
-	if [[ $lext == @(m?(?(ar)k)d?(?(o)?(w)n)?(t?(e)xt)|rmd) ]]; then
-		needs markdown-to-html w3m
-		markdown-to-html "$readme" | w3m -T text/html
-	elif [[ $lext == htm?(l) ]]; then
-		needs w3m
-		w3m -T text/html "$readme"
-	else
-		needs nvim
-		typeset opts='set nolist norelativenumber nonumber colorcolumn='
-		nvim -MR +"$opts" "$readme"
-	fi
+	trnsxtrm f-R "$@"
 }
 
-# Copyright © 2017 by Tom Davis <tom@greyshirt.net>.
+# Copyright © 2023 by Tom Davis <tom@greyshirt.net>.

@@ -12,7 +12,7 @@ function f-prj {
 		$BS/prj.ksh "$@"
 	else
 		tty=$(tty)
-		P=$(TTY=$tty $BS/prj.ksh "$@")
+		P=$(TTY=$tty $BS/prj.ksh "$@") || return
 		D=$HOME/projects/$P
 		S=$(awk -F'\\\| *' '/^summary / {print $2}' "$D"/PROJECT)
 		h3 "$P / $S"

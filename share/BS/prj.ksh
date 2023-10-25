@@ -34,7 +34,7 @@ function usage {
 AWK_SUBCMD_PGM='/^function subcmd-/ {print $3}'
 function show-commands { # {{{1
 	local cmd
-	set -s -- search find query $(awk -F'[ -]' "$AWK_SUBCMD_PGM" "$full_pgm")
+	set -s -- cd search find query $(awk -F'[ -]' "$AWK_SUBCMD_PGM" "$full_pgm")
 	for cmd { print "$cmd"; }
 	exit 0
 } # }}}

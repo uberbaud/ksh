@@ -114,7 +114,6 @@ else # -n with bare filename (no path)
 	pathname=$PWD
 fi
 
-ORIGINAL_PWD=$PWD
 if [[ -z ${pathname:-} ]]; then
 	pathname=$(mktemp -d) || die 'Could not ^Tmktemp^t.'
 	needs-cd -or-die "$pathname"
@@ -129,7 +128,7 @@ filename=${filename%.c}.c
 	die "$REPLY already exists." "See: ^Tbuild-and-run -e^t"
   }
 
-get-build-paths "$ORIGINAL_PWD"
+get-build-paths "$pathname"
 
 write-file "$@" >$filename
 build-and-run -e "$filename"; exit

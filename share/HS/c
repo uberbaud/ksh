@@ -10,3 +10,9 @@
         ^Tstruct mydata  *x;^t
         ^Tx = malloc(sizeof(*x));^t
 
+    ^BGuaranteed read entire file into ^Vbuf^v^b
+        ^Tfor (n=0;n<(sizeof buf) && (r=read(fd,buf+n,(sizeof buf)-n))>0; n+=(size_t)r);^t
+        ^Tif (r<0) err(1,"read error");^t
+
+        ^Vn^v contains bytes read. Requires ^Nerr.h^n, ^Nfcntl.h^n, and ^Nunistd.h^n.
+

@@ -2,14 +2,23 @@
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
 #: FUNCTION ^O$^o^V#^v ^T"^t^O$^o^V@^v^T"^t ^[^U…^u^]
-#:   Prints ^U…^u if any, otherwise prints "^O$^o^V@^v^T"^t
-#:   ^GUse:^g ^Talias p='^t_p ^O$^o^V#^v "^O$^o^V@^v"^T'^t
+#:   If ^O$^o^V1^v exactly equals the number of following arguments, 
+#:     prints those arguments. If there are more than ^O$^o^V1^v 
+#:     additional arguments, prints only the additional arguments.
+#:     It is an error to call FUNCTION with fewer than ^O$^o^V1^v^T+1^t arguments,
+#:     or with ^O$^o^V1^v not a number.
+#:   That is, if called as:
+#:       FUNCTION ^O$^o^V#^v ^T"^t^O$^o^V@^v^T"^t ^[^U…^u^]
+#:     If ^O$^o^V1^v is ^O$^o^V#^v, prints ^U…^u if any, otherwise prints "^O$^o^V@^v^T"^t
+#:   ^GUse:^g ^Talias p='^tFUNCTION ^O$^o^V#^v "^O$^o^V@^v"^T'^t
 
 function _p {
-	local i n
-	[[ ${1:?} == +([0-9]) ]]|| bad-programmer "See ^Thelp ^B_p^b^t"
+	local i n m
+	m='See ^Thelp ^B_p^b^t'
+	[[ ${1:?} == +([0-9]) ]]|| bad-programmer "$m"
 	# if more than $@ was passed, remove $@ so we print what was passed
 	n=$1; shift
+	(($#<n))&& bad-programmer "Fewer parameters than expected." "$m"
 	(($#==n))|| shift $n
 	for i { print -r -- "$i"; }
 }

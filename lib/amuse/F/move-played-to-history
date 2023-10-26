@@ -1,0 +1,16 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2023-10-25,23.45.16z/55ca966>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^G(no arguments)^g
+#:   Amuse utility. Does what it says.
+
+function move-played-to-history {
+	local PlayedBuf PlayingBuf
+	PlayingBuf=$(<playing)
+	: >playing
+	PlayedBuf=$(<played.lst)
+	print -r -- "$PlayingBuf" >played.lst
+	print -r -- "$PlayedBuf" >>played.lst
+}
+
+# Copyright © 2023 by Tom Davis <tom@greyshirt.net>.

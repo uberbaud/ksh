@@ -15,8 +15,6 @@ function usage {
 	===SPARKLE===
 	^F{4}Usage^f: ^T$PGM^t
 	         ^IAmuse^i server.
-	           Accepts commands:
-	             ^I$CMDLIST^i
 	       ^T$PGM -h^t
 	         Show this help message.
 	===SPARKLE===
@@ -39,9 +37,12 @@ done
 shift $((OPTIND-1))
 # ready to process non '-' prefixed arguments
 # /options }}}1
-needs amuse:env get-exclusive-lock fpop play-one-ogg release-exclusive-lock SQL
+needs use-app-paths amuse:env get-exclusive-lock fpop play-one-ogg \
+	release-exclusive-lock SQL
 # Set AMUSE_COMMANDS, AMUSE_RUN_DIR, AMUSE_DATA_HOME, and
 # create function is-valid-amuse-cmd
+use-app-paths amuse
+
 amuse:env || fullstop "$REPLY"
 : ${AMUSE_DATA_HOME:?} ${AMUSE_RUN_DIR:?}
 
@@ -72,31 +73,6 @@ function file-from-id { # {{{1
 	F=${sqlreply[0]#?}
 	P=${sqlreply[0]%"$F"}
 	REPLY="$AMUSE_DATA_HOME/$P/$F.oga"
-} # }}}1
-function move-played-to-history { # {{{
-	local PlayedBuf PlayingBuf
-	PlayingBuf=$(<playing)
-	: >playing
-	PlayedBuf=$(<played.lst)
-	print -r -- "$PlayingBuf" >played.lst
-	print -r -- "$PlayedBuf" >>played.lst
-} # }}}
-function play-file { # {{{1
-	local action=played PlayedBuf PlayingBuf
-	print -- 0 >timeplayed
-	#======================================[ heavy lifter ]===============#
-	AUDIODEVICE=${vAUDEV:-snd/0} play-one-ogg "$1" ${2:-}	\
-		1>paused-at											\
-		2>~/log/amuse-player.log							\
-		3>timeplayed										\
-		&
-	#=====================================================================#
-	print $! >player-pid
-	wait $! || action=paused
-	: >player-pid
-	[[ -s again || -s paused-at ]]||
-		move-played-to-history
-	print $action >sigpipe
 } # }}}1
 function get-random-song  { #{{{1
 	local song id
@@ -148,7 +124,7 @@ function play-next-song { #{{{1
 	fi
 	read amuse_id the_rest <playing
 	file-from-id "$amuse_id"
-	play-file "$REPLY" $startpos &
+	play-file.ksh ${vAUDEV:-snd/0} "$REPLY" $startpos &
 	FN_PLAY_PID=$!
 
 	return 0

@@ -1,0 +1,20 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2023-10-27,02.24.42z/4ef8f8f>
+
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^G(no arguments)^g
+#:   Run dig for A MX CNAME TXT NS AAAA
+
+needs header-line dig
+function dig-all {
+	local H T
+	H=${1:?}
+	set -- A AAAA CNAME MX NS SRV TXT SOA
+	for T; do
+		header-line 78 = [ ] $T
+		dig +nostats +noauthority +nocomment +multiline -t $T "$H" |
+			sed -E -e 1d -e '/^;/d'
+	done
+}
+
+# Copyright © 2023 by Tom Davis <tom@greyshirt.net>.

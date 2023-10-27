@@ -6,8 +6,15 @@
 
 needs with-defaults
 function f-espeak {
-	local cfg=${XDG_CONFIG_HOME:-~/config}/etc/espeak.rc
-	with-defaults $cfg /usr/local/bin/espeak "$@"
+	local cfg ftmp
+	cfg=${XDG_CONFIG_HOME:-~/config}/etc/espeak.rc
+	ftmp=$(mktemp)
+	(	# use a subshell so catastrophich errors don't prevent $ftmp
+		# from being deleted
+		with-defaults $cfg /usr/local/bin/espeak -w "$ftmp" "$@" &&
+			aucat -h wav -i "$ftmp"
+	)
+	rm -f "$ftmp"
 }
 
 # Copyright © 2020 by Tom Davis <tom@greyshirt.net>.

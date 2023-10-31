@@ -45,11 +45,13 @@ function app-framework-exists { # {{{1
 	return 0
 } # }}}1
 function setup-app-framework { # {{{1
+	# bail if we're called from dmenu or such
+	[[ -t 1 && -t 2 ]]|| return
+
 	desparkle "$1"
 	warn "^B$REPLY^b is not set up for ^Tstart^t."
 
-	yes-or-no "Create the framework for $REPLY" ||
-		return 1
+	yes-or-no "Create the framework for $REPLY" || return
 
 	start:init.ksh "$1"
 } # }}}1

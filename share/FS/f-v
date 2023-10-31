@@ -4,13 +4,13 @@
 #: FUNCTION ^[^Uv.ksh_options^u^] ^[^Ufile_name^u^]
 #:   Wrapper to allow alias processing.
 
-needs find-function resolve-alias shquote trnsxtrm
+needs find-function resolve-alias shquote in-new-term
 function f-v {
 	local o opts i=0 cmdexp filexp edit ecmd
 	edit=$HOME/bin/ksh/v
 
 	# NO parameters, so short circuit all the others
-	(($#))|| { trnsxtrm "$edit"; return; }
+	(($#))|| { in-new-term "$edit"; return; }
 
 	for o; do
 		[[ $1 == -* ]]|| break
@@ -47,8 +47,8 @@ function f-v {
 		F=$USR_PLIB/$F.pm
 		[[ -f $F ]]&& filexp=$F
 	  }
-	set -- trnsxtrm "$edit" ${opts[*]:+"${opts[@]}"} "$filexp" "$@"
-	# remove trnsxtrm if there's no WINDOWID
+	set -- in-new-term "$edit" ${opts[*]:+"${opts[@]}"} "$filexp" "$@"
+	# remove in-new-term if there's no WINDOWID
 	[[ -n ${WINDOWID:-} ]]|| shift
 	"$@"
 }

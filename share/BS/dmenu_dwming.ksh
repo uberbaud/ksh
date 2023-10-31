@@ -124,7 +124,7 @@ function handle-cmd { # {{{
 
 # special
 	[[ $req == amuse || $req == amuse-ui ]]&& {
-		trnsxtrm amuse-ui
+		in-new-term amuse-ui
 		return
 	  }
 
@@ -133,6 +133,9 @@ function handle-cmd { # {{{
 		cmd="${req#!*( )} $qARGS"
 	elif [[ $req == ,* ]]; then
 		cmd="lockdown z"
+	elif [[ " $newterm " == *" $req "* ]]; then
+		[[ $req == in-new-term ]]|| cmd='in-new-term '
+		cmd="${cmd:-}$req $qARGS"
 	elif [[ " $starts " == *" $req "* ]]; then
 		cmd="start $req $qARGS"
 	elif [[ " $amuse " == *" $req "* ]]; then
@@ -146,7 +149,7 @@ function handle-cmd { # {{{
 	ksh -c "$cmd" &
 } # }}}1
 
-needs amuse:env dmenu dwm_dmenu_completion grep sort trnsxtrm
+needs amuse:env dmenu dwm_dmenu_completion grep in-new-term sort
 
 starts=$(list-start-apps)
 amuse=$(list-amuse-commands)
@@ -154,22 +157,26 @@ websearch='g a w amazon book cpan google imdb map synonyms translate wikipedia'
 x11='display ghb glxgears oclock showrgb soffice xcalc xclock xmag xwd'
 others='amuse weather wordnet wnb'
 web='h s http https www chrome surf'
-special='task'
+special=	# 'task'
+newterm='man in-new-term'
 
 # dypgm=dwm_dmenu_completion
 
-# print -u2 -- "===== SUPPORTED COMMANDS ====="
-# print -u2 -- "  starts:    $starts"
-# print -u2 -- "  websearch: $websearch"
-# print -u2 -- "  others:    $others"
-# print -u2 -- "  x11:       $x11"
-# print -u2 -- "  amuse:     $amuse"
-# print -u2 -- "  web:       $web"
-# print -u2 -- "  special:   $special"
-# print -u2 -- "=============================="
+[[ -n ${DEBUG:-} ]]&& {
+	print -u2 -- "===== SUPPORTED COMMANDS ====="
+	print -u2 -- "  starts:    $starts"
+	print -u2 -- "  websearch: $websearch"
+	print -u2 -- "  others:    $others"
+	print -u2 -- "  x11:       $x11"
+	print -u2 -- "  amuse:     $amuse"
+	print -u2 -- "  web:       $web"
+	print -u2 -- "  special:   $special"
+	print -u2 -- "  newterm:   $newterm"
+	print -u2 -- "=============================="
+  }
 
 [[ $cmdcache -ot $0 ]]&&
-	for w in '' $starts $websearch $others $x11 $amuse $web $special; do
+	for w in '' $starts $websearch $others $x11 $amuse $web $special $newterm; do
 		print -r -- "$w";
 	done | sort --unique >$cmdcache
 

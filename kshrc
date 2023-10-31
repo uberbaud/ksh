@@ -40,13 +40,18 @@ export KDOTDIR
 [[ -n $XDG_CACHE_HOME   ]]|| XDG_CACHE_HOME=$HOME/.cache
 [[ -n $XDG_CONFIG_HOME  ]]|| XDG_CONFIG_HOME=$HOME/.config
 [[ -n $XDG_DATA_HOME    ]]|| XDG_DATA_HOME=$HOME/.local/share
-[[ -n $XDG_STATE_HOME   ]]|| XDG_STATE_HOME=$HOME/.local/state
+xdglocal=${xdglocal:-${XDG_DATA_HOME%/*}}
+[[ $xdglocal == $HOME ]]&& print -ru2 -- "Warning: \$xdglocal := $xdglocal"
+[[ -d $xdglocal ]]|| mkdir -p "$xdglocal"
+[[ -n $XDG_RUNTIME_DIR  ]]|| XDG_RUNTIME_DIR=$xdglocal/run
+[[ -n $XDG_STATE_HOME   ]]|| XDG_STATE_HOME=$xdglocal/state
 [[ -n $XDG_DATA_DIRS    ]]|| XDG_DATA_DIRS=/usr/local/share:/usr/share
 [[ -n $XDG_CONFIG_DIRS  ]]|| XDG_CONFIG_DIRS=/etc/xdg
 xdgcfg=$XDG_CONFIG_HOME
-xdglocal=${xdglocal:-${XDG_DATA_HOME%/share}}
-xdgdata=$XDG_DATA_HOME
 xdgcache=$XDG_CACHE_HOME
+xdgdata=$XDG_DATA_HOME
+xdgrun=$XDG_RUNTIME_DIR
+xdgstate=$XDG_STATE_HOME
 
 [[ -f $xdgcfg/user-dirs.dirs ]]|| xdg-user-dirs-update
 [[ -f $xdgcfg/user-dirs.dirs ]]&& . $xdgcfg/user-dirs.dirs

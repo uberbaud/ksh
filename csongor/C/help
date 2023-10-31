@@ -44,6 +44,7 @@ cursor-to-line-col
 dark
 desparkle
 die
+dig-all
 dir-is-empty
 do-steps
 downgrade-color
@@ -66,6 +67,7 @@ f-cpanm
 f-espeak
 f-fc
 f-fortune
+f-fossil
 f-git
 f-go
 f-halt
@@ -73,6 +75,8 @@ f-help
 f-host
 f-locate
 f-luarocks
+f-man
+f-new
 f-prj
 f-r
 f-raku
@@ -122,6 +126,7 @@ history
 hr
 i-can-haz-inet
 in-ancestor-path
+in-new-term
 integer
 is-exclusive-lock-valid
 is-function-loaded

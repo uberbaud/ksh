@@ -1,12 +1,12 @@
 # <@(#)tag:tw.csongor.greyshirt.net,2023-10-25,17.41.57z/320c173>
-
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
 #: FUNCTION ^S…^s
 #:   do ^Tnew.pl^t in a new terminal window
 
+needs in-new-term
 function f-new {
-	trnsxtrm /home/tw/bin/perl/new.pl
+	in-new-term /home/tw/bin/perl/new.pl
 }
 
 # Copyright © 2023 by Tom Davis <tom@greyshirt.net>.

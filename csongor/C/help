@@ -172,7 +172,6 @@ needs
 needs-cd
 needs-file
 needs-path
-needs-var
 needs-vars
 new-array
 newest
@@ -262,7 +261,6 @@ today
 todo
 trackfile
 trap
-trnsxtrm
 true
 truish
 type

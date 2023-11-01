@@ -7,10 +7,24 @@
 #:       with the command string as its parameter. Defaults to ^Tnotify^t.
 #:     ^UfnSkipPrinter^u is the command which will be run instead of 
 #:       a ^Istep^i which is ^Iskip^iped.
-#:   Calls ^Tuse-app-paths steps^t exposing functions: ^T+^t and ^Tdo-steps^t.
+#:     ^GUses variables^g ^O$^o^Vsteps^v^O[]^o, ^O$^o^Vsteps_action^v^O[]^o, and ^O$^o^VSTEPS_^v^O*^o
+#:
+#:   Exposes functions: ^T+^t and ^Tdo-steps^t.
+#:     ^T+ '^t^Ucommand …^u^T'^t ^[^Twarn^t^|^Tdie^t^|^Tskip^t^]
+#:         Adds a step.
+#:         If a second (2nd) parameter is given and it is either ^Twarn^t or ^Tdie^t,
+#:         that's what will happen if ^Ucommand^u fails. If it is ^Tskip^t, ^Ucommand^u
+#:         will not be performed. The default is ^Tdie^t.
+#:     ^Tdo-steps^t ^G(no arguments)^g
+#:         ^BEvals^b each ^Ucommand …^u added with ^T+^t.
 
 needs add-exit-actions use-app-paths
 function use-steps {
+	local APP_PATH
+	[[ $- == *i* ]]&& {
+		warn "^Tuse-steps^t only works in a script, not interactively."
+		return
+	  }
 	use-app-paths steps
 	STEPS_DO_STEPS_WAS_CALLED=false
 	STEPS_NOTIFIER=${1:-notify}

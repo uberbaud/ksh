@@ -1,12 +1,25 @@
 # <@(#)tag:tw.csongor.greyshirt.net,2023-10-25,17.41.57z/320c173>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^S…^s
-#:   do ^Tnew.pl^t in a new terminal window
+#: FUNCTION ^B...^b
+#:     Run ^K{239}^Tin-new-term new.pl "^t^O$^o^V@^v^T"^t^k ^Iunless^i ^Tnew^t was with called
+#:     with a ^Ilist^i or ^Ishow^i flag: ^T-h^t, ^T-T^t, ^T-V^t, ^T-X^t, ^T-H^t, or ^T-N^t.
+#:   ^GNote: Use^g ^Tnew -h^t ^Gfor help on^g ^Tnew.pl^t^G.^g
 
 needs in-new-term
 function f-new {
-	in-new-term /home/tw/bin/perl/new.pl
+	local new o c
+	new=/home/tw/bin/perl/new.pl
+	for o in "$@" ''; do
+		[[ $o == -[hTVXHN] ]]&& break
+	done
+	if [[ -z $o ]]; then			# There *is* a list or show flag
+		in-new-term $new "$@"
+	else							# There's *not* a list or show flag
+		c=$*
+		c=${c#*$o}
+		$new $o $c
+	fi
 }
 
 # Copyright © 2023 by Tom Davis <tom@greyshirt.net>.

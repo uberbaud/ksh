@@ -5,7 +5,7 @@
 #:   Wrapper around $BS/m-get.ksh
 
 function m-get {
-	PRE_MAIL_PWD=$PWD
+	PRE_MAIL_PWD=${PRE_MAIL_PWD:-$PWD}
 	builtin cd ${XDG_PUBLICSHARE_DIR:?}/mail
 	${BS:?}/m-get.ksh "$@"
 }

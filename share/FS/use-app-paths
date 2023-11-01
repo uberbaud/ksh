@@ -9,26 +9,31 @@
 
 needs bad-programmer warnOrDie
 function use-app-paths {
-	local A I warnOrDie=die
+	local A I warnOrDie
+	warnOrDie=die	# default, will be reset in flag processing loop
 	while [[ ${1:-} == -* ]]; do
-		[[ ${1#-or-} == @(warn|die|false) ]]||
+		[[ $1 == -or-@(warn|die|false) ]]||
 			bad-programmer "Unknown option ^B$1^b."
 		warnOrDie=${1#-or-}
 		shift
 	done
 	I=lib
-	[[ -n ${1:-} ]]|| bad-programmer "^T$0^t: missing parameter ^Uname^u."
-	A=${KDOTDIR:?}/$I/$1
-	[[ -d $A ]]|| {
-		FORCE_MSG=
-		warnOrDie "No private path ^O\$^o^VKDOTDIR^v^T/$I/^t^B$1^b."
-		return
-	  }
-	[[ -d $A/F && :$FPATH: != *:$A/F:* ]]&&
-		FPATH=$A/F${FPATH:+:"$FPATH"}
-	[[ -d $A/B && :$PATH: != *:$A/B:* ]]&&
-		PATH=$A/B${PATH:+:"$PATH"}
-	APP_PATH=$A
+	(($#))|| bad-programmer "^T$0^t: missing parameter ^Uname^u."
+	while (($#)); do
+		A=${KDOTDIR:?}/$I/$1
+		[[ -d $A ]]|| {
+			FORCE_MSG=
+			warnOrDie "No private path ^O\$^o^VKDOTDIR^v^T/$I/^t^B$1^b."
+			continue
+		  }
+		[[ -d $A/F && :$FPATH: != *:$A/F:* ]]&&
+			FPATH=$A/F${FPATH:+:"$FPATH"}
+		[[ -d $A/B && :$PATH: != *:$A/B:* ]]&&
+			PATH=$A/B${PATH:+:"$PATH"}
+		[[ :${APP_PATH:-}: != *:$A:* ]]&&
+			APP_PATH=${APP_PATH:+$APP_PATH:}$A
+		shift
+	done
 }
 
 # Copyright © 2021 by Tom Davis <tom@greyshirt.net>.

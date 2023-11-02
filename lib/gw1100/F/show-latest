@@ -6,10 +6,7 @@
 
 needs needs-file sqlite3
 function show-latest {
-	D=${XDG_DATA_HOME:?}/gw1100/gw1100.db3
-	needs-file -or-die "$D"
-
-	sql=$(</dev/stdin) <<-\
+	_show-sql-results <<-\
 		===SQL===
 		SELECT	datetime(u,'unixepoch','localtime') as 'when',
 				c AS '#',
@@ -20,10 +17,6 @@ function show-latest {
 	 	ORDER BY sensor
 	 	 	;
 		===SQL===
-
-	print -n '\r'
-	sqlite3 -header "$D" ".mode box" "$sql" || die "sqlite3 problems"
-	print 'Current Conditions'
 }
 
 # Copyright © 2022 by Tom Davis <tom@greyshirt.net>.

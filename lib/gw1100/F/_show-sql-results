@@ -5,7 +5,7 @@
 #:   Displays the results from ^VSQL^v given on ^VSTDIN^v
 
 needs needs-file sqlite3
-function show-latest {
+function _show-sql-results {
 	D=${XDG_DATA_HOME:?}/gw1100/gw1100.db3
 	needs-file -or-die "$D"
 

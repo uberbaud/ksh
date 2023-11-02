@@ -6,7 +6,7 @@
 
 needs needs-file sqlite3
 function show-latest {
-	_show-sql-results <<-\
+	_show-sql-results 'Current Conditions' <<-\
 		===SQL===
 		SELECT	datetime(u,'unixepoch','localtime') as 'when',
 				c AS '#',

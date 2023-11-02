@@ -88,7 +88,6 @@ while [[ ${1:-} == -* ]]; do
 		esac
 	done
 done
-
 $want_extremes && set -- show-extremes
 
 main "$@"; exit

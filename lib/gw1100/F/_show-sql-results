@@ -1,7 +1,7 @@
 # <@(#)tag:tw.csongor.greyshirt.net,2023-11-02,16.18.30z/27e165f>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^G(no arguments)^g
+#: FUNCTION ^Uheader text^u
 #:   Displays the results from ^VSQL^v given on ^VSTDIN^v
 
 needs needs-file sqlite3
@@ -14,7 +14,7 @@ function _show-sql-results {
 
 	print -n '\r'
 	sqlite3 -header "$D" ".mode box" "$sql" || die "sqlite3 problems"
-	print 'Current Conditions'
+	print "${1:-<no header>}"
 }
 
 # Copyright © 2022 by Tom Davis <tom@greyshirt.net>.

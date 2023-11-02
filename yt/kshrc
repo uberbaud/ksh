@@ -5,7 +5,7 @@
 export PRINTER=poco
 export ABDUCO_CMD=/bin/ksh
 
-for t in ALL COLLATE CTYPE MESSAGES MONETARY NUMERIC TIME; do
+for t in COLLATE CTYPE MESSAGES MONETARY NUMERIC TIME; do
 	export LC_$t=en_US.UTF-8
 done
 

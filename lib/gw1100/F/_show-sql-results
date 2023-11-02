@@ -1,0 +1,20 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2023-11-02,16.18.30z/27e165f>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^G(no arguments)^g
+#:   Displays the results from ^VSQL^v given on ^VSTDIN^v
+
+needs needs-file sqlite3
+function show-latest {
+	D=${XDG_DATA_HOME:?}/gw1100/gw1100.db3
+	needs-file -or-die "$D"
+
+	[[ -t 0 ]]&& bad-programmer	'Expected some SQL on ^VSTDIN^v.'
+	sql=$(</dev/stdin)
+
+	print -n '\r'
+	sqlite3 -header "$D" ".mode box" "$sql" || die "sqlite3 problems"
+	print 'Current Conditions'
+}
+
+# Copyright © 2022 by Tom Davis <tom@greyshirt.net>.

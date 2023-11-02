@@ -10,6 +10,9 @@ function usage { #{{{1
 	^NUsage^n: ^T$PGM^t ^[^T-c^t^]
 	         Print latest weather station values.
 	           ^T-c^t  Clear the screen before printing.
+	       ^T$PGM^t ^[^T-c^t^] ^T-x^t
+	         Print latest weather station values.
+	           ^T-c^t  Clear the screen before printing.
 	       ^T$PGM^t ^T-h^t
 	         Show this help message
 	===SPARKLE===
@@ -69,13 +72,23 @@ function main { # {{{1
 } # }}}1
 
 want_clear=false
+want_extremes=false
 while [[ ${1:-} == -* ]]; do
-	case ${1#-} in
-		c) want_clear=true;				;;
-		h) usage;						;;
-		*) die "Unknown flag ^B$1^b.";	;;
-	esac
-	shift
+	o=${1#-}; shift
+	[[ -n $o ]]|| o=-
+	while [[ ${#o} -gt 0 ]]; do
+		t=${o#?}
+		f=${o%"$t"}
+		o=$t
+		case $f in
+			c) want_clear=true;				;;
+			x) want_extremes=true;			;;
+			h) usage;						;;
+			*) die "Unknown flag ^B$f^b.";	;;
+		esac
+	done
 done
+
+$want_extremes && set -- show-extremes
 
 main "$@"; exit

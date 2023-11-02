@@ -1,0 +1,18 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2023-11-02,16.07.54z/29428df>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^G(no arguments)^g
+#:   prints min and max values from the last 24 hours
+
+needs needs-file sqlite3
+function show-extremes {
+	_show-sql-results <<-\
+		===SQL===
+		SELECT "extreme", "when", "alias", "val"
+		  FROM last24hours
+		 WHERE alias LIKE 'temp-%'
+		     ;
+		===SQL===
+}
+
+# Copyright © 2023 by Tom Davis <tom@greyshirt.net>.

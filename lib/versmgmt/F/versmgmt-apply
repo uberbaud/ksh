@@ -17,7 +17,7 @@ function versmgmt-apply {
 	local cmd filename vms vmsCmd fn rc
 	cmd=${1:?Missing $0 arg 1, cmd};	shift
 	(($#))&& { filename=${1-}; shift; }
-	((${VMSes[*]+1}))|| versmgmt-active-vmses
+	[[ -n $VMSes ]]|| versmgmt-active-vmses
 	fn=${FOREACH_VMS:-:}
 	whence $fn >/dev/null || bad-programmer "Cannot find function ^B$fn^b."
 

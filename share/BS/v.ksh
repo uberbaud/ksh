@@ -149,8 +149,19 @@ function vms-checkin-all { # {{{1
 		warn "^BVERSMGMT^b: $ERRMSG"
 	fi
 } # }}}1
+function mk-temp-copy { #{{{1
+	fTEMP=/dev/null
+	[[ -s $1 ]]&& fTEMP=$(mktemp)
+	add-exit-actions "rm -f '$fTEMP'"
+	cp "$1" "$fTEMP" || die "Could not ^Tcp $1^t."
+} # }}}1
+function get-ciMsg { # {{{1
+	diff -u "$fTEMP" "$f_fullpath" | highlight-udiff
+	ciMsg=$(term-get-text ci)
+} # }}}1
 function main { # {{{1
 	vms-checkin-all "$f_name"
+	$HAS_VERSMGMT && mk-temp-copy "$f_fullpath"
 	CKSUM_BEFORE=$(fast-crypt-hash "$f_fullpath")
 
 	$ED "$f_fullpath"
@@ -161,8 +172,7 @@ function main { # {{{1
 		[[ -f .LAST_UPDATED ]]&& date -u +"$ISO_DATE" >.LAST_UPDATED
 
 		if $HAS_VERSMGMT; then
-			[[ -n ${ciMsg:-} ]]&&
-				versmgmt-apply diff "$f_name" | highlight-udiff
+			[[ -z ${ciMsg:-} ]]&& get-ciMsg
 			versmgmt-apply snap "$f_name" "${ciMsg:-}"
 		elif [[ -n $ciMsg ]]; then
 			warn 'Supplied a ^Blog^b message, but there'\''s no ^IVMS^i.'

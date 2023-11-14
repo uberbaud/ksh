@@ -1,0 +1,59 @@
+#!/bin/ksh
+# <@(#)tag:tw.csongor.greyshirt.net,2023-11-08,16.59.23z/1e7ef45>
+
+# vim: ft=ksh ts=4 tw=72 noexpandtab nowrap foldmethod=marker
+
+set -o nounset;: ${FPATH:?Run from within KSH}
+
+# Usage {{{1
+this_pgm=${0##*/}
+function usage {
+	desparkle "$this_pgm"
+	PGM=$REPLY
+	sparkle >&2 <<-\
+	===SPARKLE===
+	^F{4}Usage^f: ^T$PGM^t ^Uscore^u
+	         Extract and expand macro code snippets from ^Uscore^u into
+	         source code files.
+	       ^T$PGM -h^t
+	         Show this help message.
+	===SPARKLE===
+	exit 0
+} # }}}
+# process -options {{{1
+while getopts ':h' Option; do
+	case $Option in
+		h)	usage;															;;
+		\?)	die USAGE "Invalid option: ^B-$OPTARG^b.";						;;
+		\:)	die USAGE "Option ^B-$OPTARG^b requires an argument.";			;;
+		*)	bad-programmer "No getopts action defined for ^T-$Option^t.";	;;
+	esac
+done
+# remove already processed arguments
+shift $((OPTIND-1))
+# ready to process non '-' prefixed arguments
+# /options }}}1
+function main { # {{{1
+	local score s_score workpath
+
+	needs-file -or-die "$1"
+	score=$(realpath "$1")
+	sparkle-path "$score"; s_score=$REPLY
+
+	validate-score <$score || die "$ERRMSG" ${ERRMSG_2:+"${ERRMSG_2}"}
+
+	workpath=${score%/*}
+	needs-cd -or-die "$(mktemp -d)"
+	add-exit-actions 'clearout -f'
+
+	sed -E -e '1,/^$/d' "$score" >score
+	[[ -s $score ]]|| die "score $s_score has no body."
+
+} #}}}1
+
+(($#))|| die 'Missing required parameter ^Uscore^u.'
+
+needs needs-file 
+main "$@"; exit
+
+# Copyright (C) 2023 by Tom Davis <tom@greyshirt.net>.

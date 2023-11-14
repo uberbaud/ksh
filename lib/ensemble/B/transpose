@@ -1,0 +1,46 @@
+#!/bin/ksh
+# <@(#)tag:tw.csongor.greyshirt.net,2023-11-08,17.02.11z/26c4137>
+
+# vim: ft=ksh ts=4 tw=72 noexpandtab nowrap foldmethod=marker
+
+set -o nounset;: ${FPATH:?Run from within KSH}
+
+# Usage {{{1
+this_pgm=${0##*/}
+function usage {
+	desparkle "$this_pgm"
+	PGM=$REPLY
+	sparkle >&2 <<-\
+	===SPARKLE===
+	^F{4}Usage^f: ^Tensemble $PGM^t ^[^T-t^t ^Utype^u^] ^Uscore^u ^[^Uoutfile^u^]
+	         Convert ^Uscore^u into an output document.
+	           ^T-t^t  Transform ^Uscore^u into ^Utype^u. If ^T-t^t is not given, the output
+	               type is determined by the ^Uoutfile^u extension.
+	           If ^Uoutfile^u is not given, output is written to ^Vstdout^v, in
+	           which case ^T-t^t is required.
+	===SPARKLE===
+	exit 0
+} # }}}
+# process -options {{{1
+TYPE=
+while getopts ':t:h' Option; do
+	case $Option in
+		t)	TYPE=$OPTARG;													;;
+		h)	usage;															;;
+		\?)	die USAGE "Invalid option: ^B-$OPTARG^b.";						;;
+		\:)	die USAGE "Option ^B-$OPTARG^b requires an argument.";			;;
+		*)	bad-programmer "No getopts action defined for ^T-$Option^t.";	;;
+	esac
+done
+# remove already processed arguments
+shift $((OPTIND-1))
+# ready to process non '-' prefixed arguments
+# /options }}}1
+function main { # {{{1
+	NOT-IMPLEMENTED
+} #}}}1
+
+NOT-IMPLEMENTED -die
+main "$@"; exit
+
+# Copyright (C) 2023 by Tom Davis <tom@greyshirt.net>.

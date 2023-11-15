@@ -82,12 +82,13 @@ msgCount=$(m-msgcount)
 new-array scanout
 new-array groups
 
-group qutebrw   --list-id 'qutebrowser\.lists\.qutebrowser\.org'
-group drgfly    --list-id 'users\.dragonflybsd\.org'
-group obugs     --list-id 'bugs\.openbsd\.org'
-group otech     --list-id 'tech\.openbsd\.org'
-group omisc     --list-id 'misc\.openbsd\.org'
 group obsd      --list-id 'source-changes\.openbsd\.org'
+group omisc     --list-id 'misc\.openbsd\.org'
+group otech     --list-id 'tech\.openbsd\.org'
+group obugs     --list-id 'bugs\.openbsd\.org'
+group drgfly    --list-id 'users\.dragonflybsd\.org'
+group got       --list-id 'gameoftrees\.openbsd\.org'
+group qutebrw   --list-id 'qutebrowser\.lists\.qutebrowser\.org'
 group zig       --list-id '/ziglang\.lists\.sr\.ht'
 
 m-list-new

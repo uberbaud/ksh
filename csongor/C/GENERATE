@@ -1,5 +1,4 @@
 # Include files that need to be built on this machine
-cabal_1
 cargo_1
 elm_1
 git_1
@@ -7,6 +6,7 @@ got_1
 help
 m_2
 prj_1
+pijul_1
 rcctl_2
 scp
 ssh

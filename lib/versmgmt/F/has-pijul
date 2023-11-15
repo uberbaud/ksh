@@ -1,0 +1,11 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2023-11-15,04.38.49z/14d1d25>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION
+#:   vmgr test for repository type
+
+function has-pijul {
+whence -p pijul && (builtin cd "${1:-.}" && pijul channel)
+} 1>/dev/null 2>&1
+
+# Copyright © 2023 by Tom Davis <tom@greyshirt.net>.

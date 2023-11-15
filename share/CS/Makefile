@@ -117,6 +117,10 @@ m_2: $(MAIL_UPDATED)
 	@echo $@
 	@$(MAIL_BIN) -ar >$@
 
+pijul_1:
+	@echo $@
+	@pijul -h | awk 'p && /^    [a-z]/ {print $$1} /^SUBCOMMANDS:/ {p=1}' >$@
+
 PRJ_BIN=$(KDOTDIR)/share/BS/prj.ksh
 prj_1: $(PRJ_BIN)
 	@echo $@

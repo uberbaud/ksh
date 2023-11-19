@@ -127,7 +127,7 @@ else
 	commit-everything $HOST
 
 	# get the latest from origin
-	GIT 1 fetch --all
+	GIT 1 fetch --all --tags
 
 	[[ $(git rev-parse trunk) == $(git rev-parse FETCH_HEAD) ]]|| {
 		# merge trunk with origin/trunk

@@ -14,7 +14,7 @@ VERBOSE=true
 LOG_CTL=false
 
 function get-pid { pgrep -f "^perl $SCRIPT\$"; }
-function help { # {{{1
+function subcmd-help { # {{{1
 	desparkle "$THIS_PGM"
 	PGM=$REPLY
 	sparkle >&2 <<-\
@@ -25,12 +25,14 @@ function help { # {{{1
 	         Show status.
 	       ^T$PGM running^t
 	         exits with status ^T0^t ^G(true)^g or ^T1^t ^G(false)^g
+	       ^T$PGM commands^t
+	         Lists all valid commands sorted alphabetically.
 	       ^T$PGM help^t^|^T-h^t^|^T--help^t
 	         Show this help message.
 	===SPARKLE===
 	exit 0
 } # }}}1
-function start { # {{{1
+function subcmd-start { # {{{1
 	local pid
 
 	needs-file -or-die "$SCRIPT"
@@ -47,7 +49,7 @@ function start { # {{{1
 	notify "Starting $dBASE"
 	$SCRIPT </dev/null 1>$LOGFILE 2>&1 &
 } # }}}1
-function stop { # {{{1
+function subcmd-stop { # {{{1
 	local pid
 	pid=$(get-pid)
 	if [[ -n ${pid:-} ]]; then
@@ -57,11 +59,11 @@ function stop { # {{{1
 		warn "$dBASE: not running."
 	fi
 } #}}}1
-function restart { # {{{1
-	stop
-	start
+function subcmd-restart { # {{{1
+	subcmd-stop
+	subcmd-start
 } # }}}1
-function check { # {{{1
+function subcmd-check { # {{{1
 	local pid
 	pid=$(get-pid)
 	if [[ -n ${pid:-} ]]; then
@@ -73,7 +75,10 @@ function check { # {{{1
 		notify "$dBASE: not running"
 	fi
 } # }}}1
-function running { get-pid >/dev/null; }
+function subcmd-running { get-pid >/dev/null; }
+function subcmd-commands { # {{{1
+	awk -F'[ -]' '/^function subcmd-/ {print $3}' "$1" | sort
+} # }}}1
 
 (($#))|| die "Missing required parameter ^Ucommand^u."
 while [[ $1 == -* ]]; do
@@ -91,8 +96,7 @@ needs needs-file rotate-logfiles sparkle-path
 desparkle "$BASE.pl"
 dBASE=^B$REPLY^b
 
-[[ $1 == @(-h|--help) ]]&& set -- help
-[[ $1 == @(start|stop|restart|check|help|running) ]]||
+[[ $1 == @(start|stop|restart|check|help|running|commands) ]]||
 	die "Unknown ^Ucommand^u ^B$1^b." "Try ^Ucommand^u ^Thelp^t"
 
 $LOG_CTL && {
@@ -101,6 +105,6 @@ $LOG_CTL && {
 	date +'%Y-%m-%d %H:%M:%S %z'
 }
 
-"$1"; exit
+subcmd-$1 "$0"; exit
 
 # Copyright (C) 2022 by Tom Davis.

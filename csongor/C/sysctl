@@ -51,7 +51,9 @@ kern.malloc.kmemstat.free
 kern.malloc.kmemstat.devbuf
 kern.malloc.kmemstat.pcb
 kern.malloc.kmemstat.rtable
+kern.malloc.kmemstat.pf
 kern.malloc.kmemstat.ifaddr
+kern.malloc.kmemstat.ifgroup
 kern.malloc.kmemstat.sysctl
 kern.malloc.kmemstat.counters
 kern.malloc.kmemstat.ioctlops
@@ -192,6 +194,7 @@ kern.audio.record
 kern.timeout_stats
 kern.utc_offset
 kern.video.record
+kern.autoconf_serial
 vm.loadavg
 vm.psstrings
 vm.swapencrypt.enable
@@ -261,7 +264,6 @@ net.inet.tcp.rfc1323
 net.inet.tcp.keepinittime
 net.inet.tcp.keepidle
 net.inet.tcp.keepintvl
-net.inet.tcp.slowhz
 net.inet.tcp.baddynamic
 net.inet.tcp.sack
 net.inet.tcp.mssdflt
@@ -277,6 +279,7 @@ net.inet.tcp.always_keepalive
 net.inet.tcp.synuselimit
 net.inet.tcp.rootonly
 net.inet.tcp.synhashsize
+net.inet.tcp.tso
 net.inet.udp.checksum
 net.inet.udp.baddynamic
 net.inet.udp.recvspace
@@ -321,6 +324,7 @@ net.inet6.icmp6.redirtimeout
 net.inet6.icmp6.nd6_delay
 net.inet6.icmp6.nd6_umaxtries
 net.inet6.icmp6.nd6_mmaxtries
+net.inet6.icmp6.nd6_queued
 net.inet6.icmp6.errppslimit
 net.inet6.icmp6.nd6_maxnudhint
 net.inet6.icmp6.mtudisc_hiwat
@@ -365,13 +369,6 @@ hw.sensors.acpibat1.watthour4
 hw.sensors.acpibat1.raw0
 hw.sensors.acpiac0.indicator0
 hw.sensors.acpithinkpad0.temp0
-hw.sensors.acpithinkpad0.temp1
-hw.sensors.acpithinkpad0.temp2
-hw.sensors.acpithinkpad0.temp3
-hw.sensors.acpithinkpad0.temp4
-hw.sensors.acpithinkpad0.temp5
-hw.sensors.acpithinkpad0.temp6
-hw.sensors.acpithinkpad0.temp7
 hw.sensors.acpithinkpad0.fan0
 hw.sensors.acpithinkpad0.indicator0
 hw.sensors.acpitz0.temp0
@@ -391,6 +388,10 @@ hw.perfpolicy
 hw.smt
 hw.ncpuonline
 hw.power
+hw.battery.chargemode
+hw.battery.chargestart
+hw.battery.chargestop
+hw.ucomnames
 machdep.console_device
 machdep.bios.diskinfo.128
 machdep.bios.cksumlen

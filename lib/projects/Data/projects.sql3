@@ -69,29 +69,38 @@ CREATE TRIGGER prj."dont-change-id"
     BEGIN
         SELECT RAISE(FAIL,'Cannot update "projects" primary key "began"');
     END;
+--------8<------------------------8<--------
+-- Copied (then updated)
+--   from https://abdus.dev/prj."prjfts"/quick-full-text-search-using-sqlite/
+--   2023-11-04 19:48:15 EDT
+--------------------------------------------
 CREATE VIRTUAL TABLE prj."prjfts"
-    USING fts5(project UNINDEXED,summary,details)
+    USING fts5 (summary, details, content='projects', content_rowid = 'id')
     ;
-CREATE TRIGGER prj."load-prjfts"
-    AFTER INSERT ON prj."projects"
-    FOR EACH ROW
-    BEGIN
-        INSERT INTO "prjfts"
-                    (project,    summary,     details)
-            VALUES  (NEW.id, NEW.summary, NEW.details)
-            ;
-    END;
-CREATE TRIGGER prj."update-prjfts"
-    AFTER UPDATE OF summary, details ON prj."projects"
-    FOR EACH ROW
-    BEGIN
-        UPDATE "prjfts"
-           SET summary = NEW.summary,
-               details = NEW.details
-         WHERE project = OLD.id
-             ;
-    END;
+CREATE TRIGGER prj."load-prjfts" AFTER INSERT ON prj."projects"
+BEGIN
+    INSERT INTO prjfts (rowid, summary, details)
+        VALUES (new.rowid, new.summary, new.details)
+        ;
+END;
 
+CREATE TRIGGER prj."syncdel-prjfts" AFTER DELETE ON prj."projects"
+BEGIN
+    INSERT INTO prjfts (prjfts, rowid, summary, details)
+        VALUES ('delete', old.rowid, old.summary, old.details)
+        ;
+END;
+
+CREATE TRIGGER prj."update-prjfts" AFTER UPDATE ON prj."projects"
+BEGIN
+    INSERT INTO prjfts (prjfts, rowid, summary, details)
+        VALUES ('delete', old.rowid, old.summary, old.details)
+        ;
+    INSERT INTO prjfts (rowid, summary, details)
+        VALUES (new.rowid, new.summary, new.details)
+        ;
+END;
+-------->8------------------------>8--------
 CREATE TABLE prj."client-project-assoc" (
     -- connects multiple clients to a project
     "id"      INTEGER NOT NULL PRIMARY KEY,
@@ -196,4 +205,10 @@ CREATE TRIGGER prj."gist-insert"
              WHERE "label" = 'design'
                  ;
     END;
+
+-- recommended by sqlite3 .lint fkey-indexes
+CREATE INDEX 'client-project-assoc_project' ON 'client-project-assoc'('project'); --> projects(id)
+CREATE INDEX 'projects_type' ON 'projects'('type'); --> types(id)
+CREATE INDEX 'status_status' ON 'status'('status'); --> staten(id)
+CREATE INDEX 'status_project' ON 'status'('project'); --> projects(id)
 

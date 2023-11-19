@@ -16,3 +16,9 @@
 
         ^Vn^v contains bytes read. Requires ^Nerr.h^n, ^Nfcntl.h^n, and ^Nunistd.h^n.
 
+    ^BHandle Any Endian^b
+        From little endian encoding:
+          ^Ti = (data[0]<<0) | (data[1]<<8) | (data[2]<<16) | (data[3]<<24);^t
+        From big endian encodeing:
+          ^Ti = (data[3]<<0) | (data[2]<<8) | (data[1]<<16) | (data[0]<<24);^t
+

@@ -1,0 +1,11 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2023-11-15,03.55.18z/b9a64a>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION
+#:   vmgr vms-cmd
+
+function pijul-changed {
+NOT-IMPLEMENTED
+}
+
+# Copyright © 2023 by Tom Davis <tom@greyshirt.net>.

@@ -4,13 +4,15 @@
 #: FUNCTION ^Ufile^u
 #:   Wrap ^Tcksum -qa sha1b^t for memories sake.
 
-# SHA1 is the fastest on my system (amd64) of any of the cksum
-# algorithms, more than twice as fast as sha224 or sha256, and nearly
-# twice as fast as the 64 bit SHAs (384, 512/256, 512). But it's even
-# faster than md5, or the traditional cksum algorithm. It is also faster
-# than b3sum, which is faster than the others and a better choice for
-# crypt-hashes which will be used as file system names, or when security
-# is an issue.
+# FOR hashing a SINGLE FILE (1 file) at at time:
+# SHA1 is the fastest on my system (amd64) of any of the cksum 
+# algorithms including md5 or crc32. It is also faster than b3sum, which 
+# is faster than the others and a better choice for crypt-hashes which 
+# will be used as file system names, or when security is an issue.
+#
+# BLAKE3 (b3sum) is much faster for many files at once, but the 
+# executable itself takes much longer to load, process it's parameters, 
+# etc which obliterates any speed advantage of the algorithm itself.
 
 needs /bin/cksum needs-file
 function fast-crypt-hash {

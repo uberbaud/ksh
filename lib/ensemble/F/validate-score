@@ -1,0 +1,90 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2023-11-08,17.42.30z/4c384b1>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^G(no arguments)^g
+#:   Determine if a given file is a valid score
+
+needs splitstr
+
+function nextln {
+	local IFS
+	IFS=
+	((lineno++))
+	read ln || die 'Could not read line.'
+}
+
+function validate-version {
+	nextln && [[ $ln == 'ensemble version 1.0' ]]|| return
+}
+
+function validate-langdscr {
+	[[ $1 == *( )+([A-Za-z0-9_-])?(+( )\(+([A-Za-z0-9_-])\))*( ) ]]
+}
+
+function validate-srcdscr {
+	splitstr ',' "$1" srclangs
+	for src in "${srclangs[@]}"; do
+		validate-langdscr "$src" || return
+	done
+}
+
+function validate-meta {
+	local meta
+	meta=${1##+( )}
+	meta=${meta%%+( )}
+	[[ $meta == coverpage ]]
+}
+
+function validate-content-types {
+	nextln
+	splitstr // "$ln" content
+	[[ ${#content[*]} -lt 3 ]]&& ERRMSG_2='Missing components'	return 1
+	[[ ${#content[*]} -gt 3 ]]&& ERRMSG_2='Too many components'	return 1
+	validate-langdscr "${content[0]}" || ERRMSG_2='Bad markup' return 1
+	validate-srcdscr  "${content[1]}" || ERRMSG_2='Bad code'	return 1
+	validate-meta     "${content[2]}" || ERRMSG_2='Bad meta'	return 1
+	set -A content --
+}
+
+function validate-dashline {
+	nextln
+	[[ $ln == --- ]]
+}
+
+function process-meta {
+	set -A coverpage --
+	integer i=0
+	while IFS= read ln; do
+		[[ $ln == ---- ]]&& 'Missing blank line header separator' return 1
+		[[ -z $ln ]]&& break
+		[[ $ln == [[:space:]]* ]]|| ((i++))
+		coverpage=${coverpage[i]:+${coverpage[i]}${ln##+([[:space:]])}}
+	done
+	((i==3))|| return
+	for ln in "${coverpage[@]}"; do
+		case $ln in
+			'by '*)
+				[[ -z ${BYLINE:-} ]]|| ERRMSG_2='Multiple bylines' return
+				BYLINE=$ln
+				;;
+			[12][0-9][0-9][0-9]-[0-1][0-9]-[0-3][0-9])
+				[[ -z ${PUBDATE:-} ]]|| ERRMSG_2='Multiple date lines' return
+				PUBDATE=$ln
+				;;
+			*)
+				[[ -z ${TITLE:-} ]]|| ERRMSG_2='Multiple title lines' return
+				TITLE=$ln
+				;;
+		esac
+	done
+}
+
+function validate-score {
+	local ln
+	validate-version		|| ERRMSG='Invalid version line'			return
+	validate-content-types	|| ERRMSG='Invalid content type line'		return
+	validate-dashline		|| ERRMSG='Invalid end of header'			return
+	process-meta			|| ERRMSG='Invalid meta data (coverpage)'	return
+}
+
+# Copyright © 2023 by Tom Davis <tom@greyshirt.net>.

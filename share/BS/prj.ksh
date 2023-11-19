@@ -298,6 +298,7 @@ S3LIB=${SQLITE_LOADABLE_EXTENSION_PATH:?}
 needs-path -create -or-die "$PRJFLDR"
 
 SQL <<-===SQL===
+	PRAGMA trusted_schema=1;
 	ATTACH '$PRJDB' AS prj;
 	.load $S3LIB/lfn_cmpct_tm
 	.load $S3LIB/vt_splitstr

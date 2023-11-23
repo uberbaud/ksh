@@ -4,12 +4,14 @@
 #: FUNCTION ^[^Uquestion^u^]
 #:   Ask ^B^Uquestion^u [y,n]?^b  (or ^IYes or No [y,n]?^i), then
 #:   ^Treturn^t ^S0^s for ^Iy^i or ^Iyes^i, ^S1^s for ^In^i or ^Ino^i, or repeat the question.
+#:   ^GNote: ^Uquestion^u is^g ^Tsparkle^t^Gd.^g
 
+needs sparkle
 function yes-or-no {
 	(($#))|| set 'Yes or No'
 	typeset -l go_on='please'
 	while [[ $go_on == !(y|yes|n|no) ]]; do
-		print -nu2 -- "  $* [y,n]? "
+		print -n -- "  $* [y,n]? " | sparkle >&2
 		read -r go_on
 	done
 	[[ $go_on == y* ]]

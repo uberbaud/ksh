@@ -16,9 +16,11 @@ function usage { # {{{1
 	PGM=$REPLY
 	sparkle <<-\
 	==SPARKLE==
-	^F{4}Usage^f: ^T${PGM}^t  ^[^T-f^t^] ^Ufile^u ^[^Umessage^u^]
+	^F{4}Usage^f: ^T${PGM}^t ^[^T-f^t^] ^[^T-k^t ^Uwfid^u^] ^Ufile^u ^[^Umessage^u^]
 	         Edits a file and handles VMS checkout/checkin.
 	         ^T-f^t  Force edit even if ^Ufile^u isn't text.
+	         ^T-k^t  On exit, runs:
+	             ^Tpkill -HUP -lf -- "^^watchfile -i ^Uwfid^u"^t
 	       ^T${PGM}^t  ^[^T-f^t^] ^T=^t^Ucommand^u ^[^Umessage^u^]
 	         Edits a command in ^SPATH^s or a function in ^SFPATH^s.
 	         ^T-f^t  Force edit even if ^Ufile^u isn't text.
@@ -36,10 +38,12 @@ function bad_programmer {	# {{{2
 		"  No getopts action defined for ^B-$1^b."
   };	# }}}2
 typeset -- warnOrDie='die';
-while getopts ':fh' Option; do
+typeset -- kill_watch_file_id=
+while getopts ':fk:h' Option; do
 	case $Option in
 		f)	warnOrDie='warn';									;;
 		h)	usage;												;;
+		k)	kill_watch_file_id=$OPTARG;							;;
 		\?)	die "Invalid option: ^B-$OPTARG^b.";				;;
 		\:)	die "Option ^B-$OPTARG^b requires an argument.";	;;
 		*)	bad_programmer "$Option";							;;
@@ -159,12 +163,19 @@ function get-ciMsg { # {{{1
 	diff -u "$fTEMP" "$f_fullpath" | highlight-udiff
 	ciMsg=$(term-get-text ci)
 } # }}}1
+function kill-watch-file-with-id { # {{{1
+	[[ -z ${kill_watch_file_id:-} ]]&& return
+	pkill -HUP -lf -- "^watch-file -i $kill_watch_file_id"
+	kill_watch_file_id=
+} # }}}1
 function main { # {{{1
 	vms-checkin-all "$f_name"
 	$HAS_VERSMGMT && mk-temp-copy "$f_fullpath"
 	CKSUM_BEFORE=$(fast-crypt-hash "$f_fullpath")
 
 	$ED "$f_fullpath"
+
+	kill-watch-file-with-id
 
 	CKSUM_AFTER=$(fast-crypt-hash "$f_fullpath")
 	if [[ $CKSUM_BEFORE != $CKSUM_AFTER ]]; then
@@ -189,7 +200,10 @@ needs $ED
 
 needs	\
 	fast-crypt-hash file-is-valid-utf8 get-exclusive-lock needs-cd		\
-	needs-path release-exclusive-lock trackfile versmgmt-init warnOrDie
+	needs-path release-exclusive-lock trackfile versmgmt-init warnOrDie	\
+	add-exit-actions
+
+[[ -n ${kill_watch_file_id:-} ]]&& add-exit-actions kill-watch-file-with-id
 
 [[ -a $1 ]]|| die "No such file ^B$1^b."
 f_fullpath=$(realpath -q -- "$1") || die "Could not ^Trealpath^t ^B$1^b."

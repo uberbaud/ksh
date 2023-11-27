@@ -11,7 +11,7 @@ function yes-or-no {
 	(($#))|| set 'Yes or No'
 	typeset -l go_on='please'
 	while [[ $go_on == !(y|yes|n|no) ]]; do
-		print -n -- "  $* [y,n]? " | sparkle >&2
+		print -n -- "  $* [y,n]?\033[0m " | sparkle >&2
 		read -r go_on
 	done
 	[[ $go_on == y* ]]

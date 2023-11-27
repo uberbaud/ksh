@@ -2,17 +2,26 @@
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
 #: FUNCTION ^[^UN^u^]
-#:   Wraps ^Tfc^t for a default of the last ^$^{^N1^n^:^-^N20^n^} commands
-#:     passes ^$^@ to ^Tbuiltin fc^t if $1 =! +([0-9])
+#:   Replaces the ^Tbuiltin fc^t which seems to have some issues 
+#:   sometimes when called multple times in a single shell session.
 
+needs warn
 function f-fc {
-	if ((!$#)); then
-		builtin fc -20 -1
-	elif [[ $# == 1 &&  $1 == +([0-9]) ]]; then
-		builtin fc -$1 -1
-	else
-		builtin fc "$@"
-	fi
+	local T ED O
+	(($#))|| set -- 20
+	[[ $# == 1 &&  $1 == +([0-9]) ]]|| {
+		warn "^Tf-fc^t does not handle ^T$*^t" 'Use ^T\fc^t instead.'
+		return
+	  }
+	[[ -f ${HISTFILE:?} ]]|| {
+		warn '^VHISTFILE^v is not a file.' "$HISTFILE"
+		return
+	  }
+	T=$(mktemp)
+	ED=${VISUAL:-${EDITOR:-vi}}
+	[[ ${ED##*/} == ?(n)vim ]]&& O='set ft=ksh'
+	(tail -n $1 "$HISTFILE" |sed 's/^/# /' >$T; $ED ${O:++"$O"} "$T"; . "$T")
+	\rm -f "$T"
 }
 
 # Copyright © 2020 by Tom Davis <tom@greyshirt.net>.

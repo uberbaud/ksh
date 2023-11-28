@@ -11,8 +11,14 @@
 #:         ^Gthe lock file name.^g
 
 function is-exclusive-lock-valid {
-	local fInfo
-	fInfo=$(<${1:?})	# get contents of lock file
+	local lockfile fInfo REPLY err
+	lockfile=${1:?}
+	[[ -f $lockfile ]]|| {
+		desparkle "$lockfile"
+		warn "lockfile ^B$REPLY^b is not a file."
+		return
+	  }
+	fInfo=$(<$lockfile)	# get contents of lock file
 	set -- $fInfo		# remove leading spaces, break into fields
 
 	[[ $fInfo == $(ps -opid=,lstart= -p $1) ]]

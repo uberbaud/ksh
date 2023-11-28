@@ -92,9 +92,7 @@ function already-in-edit { # {{{1
 function safe-to-edit { #{{{1
 	local F
 	F=${1:?Programmer error. Missing parameter.}
-	gsub % %% "$F"
-	gsub / %  "$REPLY"
-	LOCKNAME=$REPLY
+	filename-from-file-w-path "$F" LOCKNAME
 	V_CACHE=$XDG_CACHE_HOME/v
 	needs-path -create -or-die "$V_CACHE"
 	get-exclusive-lock -no-wait "$LOCKNAME" $V_CACHE ||
@@ -201,7 +199,7 @@ needs $ED
 needs	\
 	fast-crypt-hash file-is-valid-utf8 get-exclusive-lock needs-cd		\
 	needs-path release-exclusive-lock trackfile versmgmt-init warnOrDie	\
-	add-exit-actions
+	add-exit-actions filename-from-file-w-path
 
 [[ -n ${kill_watch_file_id:-} ]]&& add-exit-actions kill-watch-file-with-id
 

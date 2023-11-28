@@ -1,0 +1,14 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2023-11-27,19.15.34z/503e635>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^U/path/to/file^u  ^[^Uvarname^u^] ^= ^O${^o^T2^t^O:-^o^VREPLY^v^O}^o
+#:   Standardized filename to lockname (^T%^t ^= ^T%%^t, ^T/^t ^= ^T%^t)
+
+needs gsub
+function filename-from-file-w-path {
+	local TX
+	gsub % %% "${1:?}" TX
+	gsub / % "$TX" ${2:+"$2"}
+}
+
+# Copyright © 2023 by Tom Davis <tom@greyshirt.net>.

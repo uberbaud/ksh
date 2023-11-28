@@ -94,6 +94,7 @@ fc
 fedit
 fg
 file-is-valid-utf8
+filename-from-file-w-path
 find-function
 flash-parent-window-of-pid
 fmark

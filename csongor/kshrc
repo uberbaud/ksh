@@ -65,6 +65,7 @@ export SUDO=/usr/bin/doas
 export SQLITE_LOADABLE_EXTENSION_PATH=$xdgdata/lib/sqlite3_le
 export TZ=EST5EDT
 
+alias in-new-term='in-new-term '
 alias lua=lua53
 alias pg=playground
 alias renet='doas /bin/sh /etc/netstart'
@@ -80,7 +81,7 @@ alias mathcow="cowmath"
 for i in ssh scp sftp rsync;	{ alias "$i=ssh-askfirst $i"; }
 # Make fully qualified known hosts into aliases for sshing to that host
 for i in $(grep '\.' $KU/C/ssh); do
-	alias "$i=ssh $i"
+	alias "$i=ssh $i "
 done
 alias i-can-haz-inet='i-can-haz-inet;E=$?;print -r -- "  $REPLY";(return $E)&&:'
 for s in $(getent shells); do

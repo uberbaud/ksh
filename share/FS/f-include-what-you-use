@@ -1,0 +1,18 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2023-12-04,21.21.25z/a063b8>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^G(no arguments)^g
+#:   Adds some default bits for embetterment
+
+function f-include-what-you-use {
+	local i OPTS
+	i=0
+	OPTS[i++]=-I/usr/local/include
+	OPTS[i++]=-I/home/tw/local/share/c/api
+	# includes all /usr/include/*.h so we can start from zero
+	OPTS[i++]=-include
+	OPTS[i++]=$XDG_DATA_HOME/c/api/std-headers.h
+	command include-what-you-use "${OPTS[@]}" "$@"
+}
+
+# Copyright © 2023 by Tom Davis <tom@greyshirt.net>.

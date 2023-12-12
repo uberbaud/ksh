@@ -10,7 +10,7 @@ function f-v {
 	edit=$HOME/bin/ksh/v
 
 	# NO parameters, so short circuit all the others
-	(($#))|| { in-new-term "$edit"; return; }
+	(($#))|| { \in-new-term "$edit"; return; }
 
 	for o; do
 		[[ $1 == -* ]]|| break

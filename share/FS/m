@@ -4,10 +4,19 @@
 #: FUNCTION ^G(no arguments)^g
 #:   A wrapper around all m-*
 
-needs matching-commands
+needs matching-commands gsub
 function m {
-	(($#))|| { matching-commands m-\*; return; }
+	local m_cmds NL
+	m_cmds=$(matching-commands m-\*)
+	gsub m- '' "$m_cmds" m_cmds
+	NL='
+'
+
+	(($#))|| { print -r -- "$m_cmds"| column; return; }
 	[[ $1 == +([0-9]) ]]&& set -- part "$@"
+	gsub "$NL" '|' "$m_cmds" m_cmds
+	eval "[[ \$1 == @($m_cmds) ]]" ||
+		die "^B$1^b is not a valid ^Tm^t ^(^Imail^i^) sub-command."
 	m-"$@"
 }
 

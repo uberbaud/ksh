@@ -24,12 +24,12 @@ function needs-path {
 		esac
 		shift
 	done
-	$notice && ! $create && bad-programmer \
-		'^T-with-notice^t is only valid with ^T-create^t.'
+	$notice && ! $create &&
+		bad-programmer '^T-with-notice^t is only valid with ^T-create^t.'
+	[[ -n ${1:-} ]]||
+		bad-programmer 'Missing required parameter ^Udir name^u.'
 
-	[[ -n ${1:-} ]]|| die 'Missing required parameter ^Udir name^u.'
 	dirname=$1
-
 	[[ -n $or_what ]]|| die "Missing required ^T-or-^t^Uaction^u."
 	[[ $or_what == *\ * ]]&& {
 		set -- $or_what
@@ -45,7 +45,9 @@ function needs-path {
 
 	sparkle-path "$dirname"
 
-	if $create; then
+	if [[ -a $dirname ]]; then
+		errmsg="$REPLY exists but is not a directory."
+	elif $create; then
 		$notice && notify "Creating directory $REPLY."
 		mkdir -p "$dirname" >/dev/null 2>&1 && return
 		errmsg="$REPLY does not exist and could not be created."

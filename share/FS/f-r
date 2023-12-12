@@ -6,7 +6,7 @@
 
 needs f-R in-new-term
 function f-r {
-	in-new-term f-R "$@"
+	\in-new-term f-R "$@"
 }
 
 # Copyright © 2023 by Tom Davis <tom@greyshirt.net>.

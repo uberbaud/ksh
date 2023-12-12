@@ -1,0 +1,22 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2023-12-07,05.22.06z/5bb908a>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^[-n^] ^Umsg-list^u
+#:   Find urls in mail messages given in ^Umsg-list^u.
+#:   By default FUNCTION will open the found urls in ^O$^o^VBROWSER^v, but
+#:   if ^T-n^t is given, or ^Bstdout^b is not a ^Itty^i, FUNCTION will print
+#:   the urls instead.
+
+function h {
+	local open IFS
+	IFS='
+'
+	open=true
+	[[ -t 1 ]]|| open=false
+	[[ ${1:-} == -n ]]&& open=false shift
+	[[ -n ${BROWSER:-} ]]|| open=false
+	set -- $(show "$@" | egrep -o 'https?://[^[:space:]]+')
+	$open && chrome "$@" || for u { print -r -- "$u"; }
+}
+
+# Copyright © 2023 by Tom Davis <tom@greyshirt.net>.

@@ -14,7 +14,7 @@ function f-new {
 		[[ $o == -[hTVXHN] ]]&& break
 	done
 	if [[ -z $o ]]; then			# There *is* a list or show flag
-		in-new-term $new "$@"
+		\in-new-term $new "$@"
 	else							# There's *not* a list or show flag
 		c=$*
 		c=${c#*$o}

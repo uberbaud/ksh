@@ -37,53 +37,21 @@ shift $((OPTIND-1))
 # ready to process non '-' prefixed arguments
 # /options }}}1
 
-needs w3m Xdialog
+needs w3m xnotify
 (($#))&& die 'Unexpected arguments. Wanted none.'
 
-planBpath=/var/planB
-[[ -a $planBpath ]]|| die "No such path ^B$planBpath^b."
-[[ -d $planBpath ]]|| die "^B$planBpath^b is not a directory."
-cd $planBpath >/dev/null 2>&1 || die "Could not ^Bcd^b to ^B$planBpath^b."
+plan_b_path=/var/plan-b
+needs-path -or-die $plan_b_path
 
-tmpD="$(mktemp -tdq hsyspatch.XXXXXXXXX)"
-trap "rm -rf ${tmpD?Could not create a temporary directory.}" EXIT
-[[ -d $tmpD ]]|| die 'Did not create temporary directory.'
-
-errataH="https://www.openbsd.org/errata$(uname -r|tr -d .).html"
-errataT="$tmpD/errata.txt"
-errataN="$tmpD/errata.new"
-
-w3m -no-graph "$errataH" >$errataT
-
-announce=syspatch.announce
-tempstore=syspatch.save
-emptyfile=syspatch.new
-
+announce=$plan_b_path/syspatch.announce
 [[ -s $announce ]]||	exit 0 # a change to nothing
-[[ -a $tempstore ]]&&	die "Temporary file ^B$tempstore^b already exists."
 
-[[ -a $emptyfile ]]&& die "^B$emptyfile^b already exists."
-touch $emptyfile >/dev/null 2>&1 || die "Could not create ^B$emptyfile^b"
-ln $announce $tempstore || die "Could not create ^B$tempstore^b."
-mv $emptyfile $announce || die "Could not create ^B$announce^b."
+# set -- $(<$announce)
+# (($#))|| die 'Did not get the patch names.'
 
-set -- $(cat $tempstore)
-(($#))|| die 'Did not get the patch names.'
+msg='SYSPATCH: Available Syspatchen'
+errata="https://www.openbsd.org/errata$(uname -r|tr -d .).html"
 
-rm $tempstore
-
-i=0
-for P { AWKPGM[i++]="/^ +\\* +${P%%_*}: /,/^\$/"; }
-
-awk "${AWKPGM[*]}" "$errataT" >"$errataN"
-
-new-array xdopts
-+xdopts --backtitle 'SYSPATCH: Available Syspatchen'
-+xdopts --ok-label 'Dismiss' --no-cancel
-+xdopts --textbox "$errataN" $(($(wc -l <"$errataN")*3+5)) 180
-
-trap - EXIT
-(Xdialog "${xdopts[@]}"; rm -rf $tmpD)& >/dev/null 2>&1
-
+xnotify "$msg See: $errata"
 
 # Copyright (C) 2018 by Tom Davis <tom@greyshirt.net>.

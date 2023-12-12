@@ -163,7 +163,7 @@ function get-ciMsg { # {{{1
 } # }}}1
 function kill-watch-file-with-id { # {{{1
 	[[ -z ${kill_watch_file_id:-} ]]&& return
-	pkill -HUP -lf -- "^watch-file -i $kill_watch_file_id"
+	pkill -HUP -lf -- "^watch-file -i $kill_watch_file_id" >/dev/null 2>&1
 	kill_watch_file_id=
 } # }}}1
 function main { # {{{1

@@ -5,23 +5,38 @@
 #:   Validate that required variables exist and are set.
 
 function needs-vars {
-	local what var missing msg
-	[[ -n ${1:-} ]]|| return
+	local what var b_msg m_msg
 	msg='Expected ^T-or-^t^{^Twarn^t^|^Tdie^t^|^Tfalse^t^}'
-	case ${1:-} in
-		-or-@(warn|die|false)) what=${1#-or-}; shift;		;;
-		-or-*) bad-programmer 'Bad action flag.' "$msg";	;;
-		*) what=die;										;;
+	[[ ${1:-} == -or-* ]]&& case ${1#-or-} in
+		@(warn|die|false)) what=${1#-or-}; shift;				;;
+		*) bad-programmer "Bad action flag: ^T$1^t." "$msg";	;;
 	esac
-	(($#))|| $what "^T$0^t called without any ^Uvar name^us."
-	integer i=0
-	for var { eval "[[ -n \${$var:-} ]]" || missing[i++]=$var; }
-	case $i in
-		0)	return;											;;
-		1)	msg="Required variable is unset or empty:";		;;
-		*)	msg="Required variables are unset or empty:";	;;
+	(($#))|| bad-programmer "^T$0^t called without any ^Uvar name^us."
+	set -A missing --
+	set -A badname --
+	integer m=0 b=0
+	for var {
+		if [[ $var != [A-Za-z_]*([A-Za-z0-9_]) ]]; then
+			local badname[b++]=$var
+		else
+			eval "[[ -n \${$var:-} ]]" || local missing[m++]=$var
+		fi
+	  }
+	((m+b))|| return 0
+	[[ $what == false ]]&& return 1
+	case $b in
+		0)	:;												;;
+		1)	b_msg='Given variable name is not valid:';		;;
+		*)	b_msg='Given variable namess are not valid:';	;;
 	esac
-	$what "$msg" "^V${missing[@]}^v"
+	case $m in
+		0)	:;												;;
+		1)	m_msg="Required variable is unset or empty:";	;;
+		*)	m_msg="Required variables are unset or empty:";	;;
+	esac
+	${what:-die}	\
+		${b_msg:+"$b_msg" "^V${badname[@]}^v"}	\
+		${m_msg:+"$m_msg" "^V${missing[@]}^v"}
 }
 
 # Copyright © 2023 by Tom Davis <tom@greyshirt.net>.

@@ -90,7 +90,7 @@ function browse-the-web  { #{{{1
 	${BROWSER:-$USRBIN/surf} "$scheme://$url"
 } #}}}1
 function handle-cmd { # {{{
-	local cmd qARGS
+	local cmd qARGS req args
 	read -r req args
 	[[ -z $req ]]&& { st & return; }
 
@@ -181,7 +181,7 @@ newterm='man in-new-term'
 	done | sort --unique >$cmdcache
 
 # { dmenu -dy "$dypgm '$cmdcache'" "$@" || print "ESC"; } | handle-cmd
-{ dmenu "$@" <$cmdcache || print "ESC"; } | handle-cmd
+{ dmenu "$@" <$cmdcache || print "ESC"; } | handle-cmd; exit
 
 
 # Copyright (C) 2020 by Tom Davis <tom@greyshirt.net>.

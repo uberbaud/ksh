@@ -7,7 +7,7 @@ LOG=$HOME/log/$THIS_PGM
 LOCALBIN=$HOME/local/bin
 Watch=$LOCALBIN/watch-file
 AlertUser=$LOCALBIN/handle-patch.ksh
-MsgFile=/var/planB/syspatch.announce
+MsgFile=/var/plan-b/syspatch.announce
 
 function Die { # {{{1
 	print -ru2 -- "$*"

@@ -64,12 +64,13 @@ function write-file { #{{{1
 		 |  and \$LDFLAGS and \$CFLAGS will be appended with that output.
 		 |     Files named in \$OBJS and found in \$OPATH will be added to \$LDLIBS.
 		 + ----------------------------------------------------------------------
+			# CC       = include-what-you-use
 		    # SRCPATH  = ${CURDIR:-}
 		    # OPATH    = ${OBJDIR:-}
 		    # OBJS     = ${OBJS:-my.o}
 		    # ^equivalent to: LDLIBS   += \$OPATH/my.o
 		    PACKAGES = notify_usr${*+ $*}
-		    CFLAGS  += -std=c17
+		    CFLAGS  += -std=c17 -Wno-unsafe-buffer-usage
 		 + -------------------------------------------------------------------- */
 
 		#include <notify_usr.h> /* sparkle(),message(),inform(),caution(),die() */

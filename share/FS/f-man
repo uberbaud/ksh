@@ -7,7 +7,7 @@
 needs in-new-term
 function f-man {
 	if [[ -t 1 ]]; then
-		in-new-term man "$@"
+		\in-new-term command man "$@"
 	else
 		command man "$@"
 	fi

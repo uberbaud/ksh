@@ -73,6 +73,7 @@ f-go
 f-halt
 f-help
 f-host
+f-include-what-you-use
 f-locate
 f-luarocks
 f-man
@@ -114,6 +115,7 @@ getopts
 git-remote-links
 golang
 gsub
+h
 h1
 h2
 h3
@@ -150,6 +152,7 @@ lolcow
 lpeg
 ls-cfuncs
 ls-lan
+ls-linked-so
 ls-redirs
 ls-todos
 m

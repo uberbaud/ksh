@@ -6,14 +6,40 @@
 #:   and executables.
 
 function matching-commands {
-	die 'Not yet implemented.'
-	(
-	# match against list of builtins
-	# match against alias
-	# match against functions
-	# find in $FPATH
-	# find in $PATH
-	)|sort -u|column
+	( for glob; do
+		# match against list of special builtins
+		for cmd in break builtin continue eval exec exit export readonly \
+			return set shift times trap typeset unset
+		do [[ $cmd == $glob ]] && print "$cmd"; done
+
+		# match against list of builtins
+		for cmd in alias bg cd command false fc fg getopts jobs kill pwd \
+			read true umask unalias wait echo let print suspend test     \
+			ulimit whence
+		do [[ $cmd == $glob ]] && print "$cmd"; done
+
+		# match against aliases
+		for cmd in $(alias +); do
+			[[ $cmd == $glob ]] && print "$cmd"
+		done
+
+		# match against functions (duplicates with FPATH be removed)
+		for cmd in $(typeset +f);do
+			[[ $cmd == $glob ]] && print "$cmd"
+		done
+
+		# find in $FPATH (need only exist to be at least tried as function)
+		for p in $(path "$FPATH"); do
+			eval "set -- \$p/$glob"
+			for f { [[ -f $f ]]&& print -r -- "${f#$p/}"; }
+		done
+
+		# find in $PATH (must be executable)
+		for p in $(path); do
+			eval "set -- \$p/$glob"
+			for f { [[ -x $f ]]&& print -r -- "${f#$p/}"; }
+		done
+	done )| sort -u
 }
 
 # Copyright © 2018 by Tom Davis <tom@greyshirt.net>.

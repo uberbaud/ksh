@@ -1,0 +1,15 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2023-12-08,22.10.36z/22faaa5>
+
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Uelf^u
+#:   Show the names of the dynamicaly linked libraries in ^Uelf^u.
+
+needs readelf awk tr
+function ls-linked-so {
+	readelf -d ${1:?} |
+		awk '/Shared library:/ {print $NF}' |
+		tr -d '[]'
+}
+
+# Copyright © 2023 by Tom Davis <tom@greyshirt.net>.

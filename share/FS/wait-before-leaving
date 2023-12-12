@@ -7,13 +7,14 @@
 #:     2. ^O$^o^VSECONDS^v ^O<^o ^O${^VSHORTWAIT^v^O:-^o^T∞^t^O}^o, or
 #:     3. ^Ucommand^u wrote to ^Istderr^i.
 
-needs h2 h3 now readkeys warn
+needs h2 h3 now readkeys warn press-a-key
 function wait-before-leaving {
-	local rc tempF log
+	local tempF log
 	log=${HOME:?}/log/wait-before-leaving.log
 	( now; /usr/bin/printf '  %s\n' "$@"; )>>$log
+	tempF=$(mktemp) || die 'Could not ^Tmktemp^t.'
 	# Use a subshell to ensure removal of $tempF
-	tempF=$(mktemp) && (
+	(
 		rcIsZero=true; notTooSoon=true; noStderrWrites=true;
 		SHORTWAIT=${SHORTWAIT:-0}
 
@@ -26,9 +27,14 @@ function wait-before-leaving {
 
 		(($rc))&&				rcIsZero=false
 		((SECONDS>SHORTWAIT))||	notTooSoon=false
-		[[ -s $tempF ]]&&		noStderrWrites=false
+		[[ -s $tempF ]]&& {
+			color='(?:\e\[|\x{9B})[0-9;]+m'
+			OSC='(?:\e\]|\x{9D}).*?(?:\e\\|\x{9C}|\x{07}|\x{0d})'
+			perl -i -pe "s/$color//g;s/$OSC//g" "$tempF"
+			[[ -s $tempF ]]&& noStderrWrites=false
+		}
 
-		$rcIsZero && $notTooSoon && $noStderrWrites && return
+		$rcIsZero && $notTooSoon && $noStderrWrites && return;
 
 		h3 'wait-before-leaving results'
 		$rcIsZero		||	warn "Exited with return code ^E$rc^e."
@@ -36,10 +42,10 @@ function wait-before-leaving {
 		$noStderrWrites	||	{ h2 "$1 2>$tempF"; vis -cot "$tempF"; }
 
 		forceline
+		tput civis; stty -echo
 		print
-		tput civis invis
 		hN '0;30;48;5;136' '[[[' ']]]' 'Press a key to exit.'
-		xev -id $WINDOWID -event keyboard | read
+		press-a-key
 	); rm -f "$tempF"
 }
 

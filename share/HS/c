@@ -22,3 +22,10 @@
         From big endian encodeing:
           ^Ti = (data[3]<<0) | (data[2]<<8) | (data[1]<<16) | (data[0]<<24);^t
 
+    ^Bswitch statement^b
+        ^Tswitch^t ^O(^o^Uexpression^u^O) {^o
+            ^Tcase^t ^Uvalue^u^O:^o ^U…^u^O;^o ^Tbreak^t^O;^o
+            ^U…^u
+            ^Tdefault^t^O:^o ^U…^u^O;^o
+          ^O}^o
+

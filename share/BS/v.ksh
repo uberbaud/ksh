@@ -138,18 +138,20 @@ function init-or-sync-then-checkout { #{{{1
 	esac
 	$vms-checkout "$filename"
 } # }}}1
-function vms-checkin-all { # {{{1
+function vms-checkout-all { # {{{1
 	VMSes=
-	if versmgmt-init; then
-		HAS_VERSMGMT=true
-		versmgmt-active-vmses && {
-			FOREACH_VMS=init-or-sync-then-checkout 
-			versmgmt-apply status ./$f_name
-		  }
-	else
-		HAS_VERSMGMT=false
+	HAS_VERSMGMT=false
+
+	versmgmt-init || {
 		warn "^BVERSMGMT^b: $ERRMSG"
-	fi
+		return
+	  }
+
+	versmgmt-active-vmses || return
+
+	HAS_VERSMGMT=true
+	FOREACH_VMS=init-or-sync-then-checkout 
+	versmgmt-apply status ./$f_name
 } # }}}1
 function mk-temp-copy { #{{{1
 	fTEMP=/dev/null
@@ -167,7 +169,7 @@ function kill-watch-file-with-id { # {{{1
 	kill_watch_file_id=
 } # }}}1
 function main { # {{{1
-	vms-checkin-all "$f_name"
+	vms-checkout-all "$f_name"
 	$HAS_VERSMGMT && mk-temp-copy "$f_fullpath"
 	CKSUM_BEFORE=$(fast-crypt-hash "$f_fullpath")
 
@@ -188,6 +190,7 @@ function main { # {{{1
 		fi
 	elif [[ -n $ciMsg ]]; then
 		warn 'Supplied a ^Blog^b message, but there were no changes made.'
+		versmgmt-apply reshelve "$f_name"
 	fi
 
 	[[ -n ${LOCKNAME:-} ]]&& release-exclusive-lock "$LOCKNAME" $V_CACHE

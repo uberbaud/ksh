@@ -1,0 +1,12 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2023-12-13,23.06.48z/4a01bff>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Ufile name^u
+#:   reshelves, checks-in, resets a checked-out file that wasn't 
+#:   changed.
+
+function got-reshelve {
+    : NOT-IMPLEMENTED
+}
+
+# Copyright © 2023 by Tom Davis <tom@greyshirt.net>.

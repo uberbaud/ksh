@@ -16,6 +16,7 @@ export SM_SAVE_DIR=$XDG_STATE_HOME/xsessions
 #export PERLBREW_LIB=$PERLBREW_CURRENT/lib
 export GOPATH=$xdgdata/go
 export JDK_PATH=$xdgdata/jdk-1.8.0/bin
+export OPAMROOT=$xdgcfg/opam
 export TCLLIBPATH=$xdgdata/tcl
 export RLWRAP_HOME=$xdgcfg/rlwrap
 export ROFFTOOLS_PATH=$xdgdata/heirloom-doctools/bin

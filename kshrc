@@ -185,11 +185,12 @@ wantpath "$USRBIN"					PREPEND
 wantpath "$MMH_BIN_PATH"			APPEND
 wantpath /usr/games					APPEND
 wantpath "$xdgdata/bin"				APPEND # perl5lib
-wantpath "$JDK_PATH"				APPEND
-wantpath "$ROFFTOOLS_PATH"			APPEND
 wantpath "$xdgdata/luarocks/bin"	APPEND
 wantpath "$xRAKU_BASE/bin"			APPEND
 wantpath "$CARGO_HOME/bin"			APPEND
+wantpath "$OPAMROOT/default/bin"	APPEND # ocaml
+wantpath "$JDK_PATH"				APPEND
+wantpath "$ROFFTOOLS_PATH"			APPEND
 
 # input, locale, and such
 set -o vi -o vi-tabcomplete

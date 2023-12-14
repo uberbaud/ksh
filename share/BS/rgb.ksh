@@ -64,12 +64,12 @@ set -A palG -- 08 12 1c 26 30 3a 44 4e 58 62 6c 76 80 8a 94 9e a8 b2 bc c6 d0 da
 function tc→256c { # {{{1
 	typeset -i10 c=$1 C=0
 	# CLOSEST COLOR
-	if		((c<48));	then CLOSE=0
-	elif	((c<115));	then CLOSE=1
-	elif	((c<155));	then CLOSE=2
-	elif	((c<195));	then CLOSE=3
-	elif	((c<235));	then CLOSE=4
-	else					 CLOSE=5
+	if		((c<48));	then NEARLY=0
+	elif	((c<115));	then NEARLY=1
+	elif	((c<155));	then NEARLY=2
+	elif	((c<195));	then NEARLY=3
+	elif	((c<235));	then NEARLY=4
+	else					 NEARLY=5
 	fi
 	# MAYBE IT'S A GREY?
 	if		((c<4));	then GREY=16
@@ -96,7 +96,8 @@ function tc→256c { # {{{1
 	elif	((c<213));	then GREY=252
 	elif	((c<223));	then GREY=253
 	elif	((c<233));	then GREY=254
-	else					 GREY=255
+	elif	((c<243));	then GREY=255
+	else					 GREY=15
 	fi
 } # }}}1
 function set-hex6 { # {{{1
@@ -108,19 +109,21 @@ function set-hex6 { # {{{1
 	x=$((hex%16#10000))
 	g=$((x/16#100))
 	b=$((x%16#100))
-	tc→256c $r; rC=$CLOSE rG=$GREY
-	tc→256c $g; gC=$CLOSE gG=$GREY
-	tc→256c $b; bC=$CLOSE bG=$GREY
-	if ((rG==gG && rG==bG)); then
+	tc→256c $r; rC=$NEARLY rG=$GREY
+	tc→256c $g; gC=$NEARLY gG=$GREY
+	tc→256c $b; bC=$NEARLY bG=$GREY
+	if ((rG==gG && rG==bG)); then # it's grey
 		ANSI=$rG
 		if ((rG==16)); then
 			HEX='#000000'
+		elif ((rG==15)); then
+			HEX='#ffffff'
 		else
 			typeset p=${palG[rG-232]}
 			HEX="#$p$p$p"
 		fi
 		set -A rgb -- '' '' '' "$HEX" "$ANSI"
-	else
+	else # it's a color, not grey
 		ANSI=$(((((rC*6)+gC)*6+bC)+16))
 		HEX="#${palX[rC]}${palX[gC]}${palX[bC]}"
 		set -A rgb -- $rC $gC $bC "$HEX" "$ANSI"
@@ -140,16 +143,17 @@ function set-16-colors { # {{{1
 	case $1 in
 		 0) hex='#000000';		;;
 		 1) hex='#800000';		;;
-		 2) hex='#008000';		;;
-		 3) hex='#808000';		;;
-		 4) hex='#000080';		;;
-		 5) hex='#800080';		;;
-		 6) hex='#008080';		;;
-		 7) hex='#c0c0c0';		;;
-		 8) hex='#808080';		;;
+		 2) hex='#00cd00';		;;
+		 3) hex='#cdcd00';		;;
+		 4) hex='#1e90ff';		;;
+		 5) hex='#cd00cd';		;;
+		 6) hex='#00cdcd';		;;
+		 7) hex='#e5e5e5';		;;
+		 8) hex='#7f7f7f';		;;
 		 9) hex='#ff0000';		;;
+		10) hex='#00ff00';		;;
 		11) hex='#ffff00';		;;
-		12) hex='#0000ff';		;;
+		12) hex='#5c5cff';		;;
 		13) hex='#ff00ff';		;;
 		14) hex='#00ffff';		;;
 		15) hex='#ffffff';		;;
@@ -213,14 +217,12 @@ if (($#==1)); then
 	fi
 	set -- "${rgb[@]}"
 elif (($#==3)); then
-    R=$1 G=$2 B=$3
-	[[ $R == *[!0-9]* ]]&&	bad-color-die
-	[[ $G == *[!0-9]* ]]&&	bad-color-die
-	[[ $B == *[!0-9]* ]]&&	bad-color-die
-	((0<=R && R<=5))||	bad-color-die
-	((0<=G && G<=5))||	bad-color-die
-	((0<=B && B<=5))||	bad-color-die
+	for y; do
+		[[ $y == *[!0-9]* ]]&&	bad-color-die
+		((0<=y && y<=5))||	bad-color-die
+	done
 
+    R=$1 G=$2 B=$3
 	ANSI=$((16+(36*R)+(6*G)+B))
 	HEX="#${palX[R]}${palX[G]}${palX[B]}"
 	set -A rgb -- $R $G $B "$HEX" "$ANSI"

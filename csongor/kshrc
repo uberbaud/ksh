@@ -67,7 +67,7 @@ export TZ=EST5EDT
 
 alias pkgcfg=pkg-config
 alias in-new-term='\in-new-term '
-alias lua=lua53
+alias lua=lua51
 alias pg=playground
 alias renet='doas /bin/sh /etc/netstart'
 alias s=show

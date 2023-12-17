@@ -12,35 +12,51 @@ function usage {
 	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
-	^F{4}Usage^f: ^T$PGM^t ^[^Tfind^t^|^Tquery^t^|^Tsearch^t^] ^Usearch terms^u
-	         Show matching projects and ^Tcd^t to selected project.
-	       ^T$PGM inc^t ^Udirectory^u
-	         Incorporate an existing project directory using its ^TPROJECT^t file.
-	       ^T$PGM ls^t ^[^Usearch terms^u^]
-	         List all or matching projects.
-	       ^T$PGM new^t ^Uproject: summary^u
-	         Create a new project.
-	       ^T$PGM edit^t
-	         Revise ^TPROJECT^t file.
-	       ^T$PGM status^t
-	         Set status of current project (according to ^O\$^o^VPWD^v)
-	       ^T$PGM -L^t
-	         List all sub-commands.
-	       ^T$PGM help^t^|^T-h^t
-	         Show this help message.
+	^F{4}Usage^f: ^T$PGM^t ^Usubcmd^u
+	           Project manager command. Wrapped by ^Tf-prj^t which calls ^Tcurprj^t
+	           if no ^Usubcmd^u is given, and will ^Tcd^t to the ^Iproject^i if a
+	           non-sub-command word is give or if the ^Usubcmd^u is ^Tcd^t.
+	       ^BSUB-COMMANDS^b
+	       ^Tcurprj^t
+	           Prints the status of the current project (according to ^O\$^o^VPWD^v)
+	       ^Tedit^t ^[^Usearch term^u^|^Uprj id^u^]
+	           Opens ^TPROJECT^t file in ${VISUAL:-$EDITOR}.
+	       ^Tfind^t ^Usearch terms^u
+	           Show matching projects.
+	       ^Tinc^t ^Udirectory^u
+	           Incorporate an existing project directory using its ^TPROJECT^t file.
+	       ^Tls^t ^[^Usearch terms^u^]
+	           List all or matching projects.
+	       ^Tnew^t ^Uproject: summary^u
+	           Create a new project.
+	       ^Tstatus^t
+	           Set status of current project (according to ^O\$^o^VPWD^v)
+	       ^T-c^t ^Usubcmd^u
+	           Check that ^Usubcmd^u is a valid sum-command.
+	       ^T-L^t
+	           List all sub-commands.
+	       ^Thelp^t^|^T-h^t
+	           Show this help message.
 	===SPARKLE===
 	exit 0
 } # }}}
 AWK_SUBCMD_PGM='/^function subcmd-/ {print $3}'
+set -A cmdlist -s -- -c -L $(awk -F'[ -]' "$AWK_SUBCMD_PGM" "$full_pgm")
 function show-commands { # {{{1
 	local cmd
-	set -s -- cd search find query $(awk -F'[ -]' "$AWK_SUBCMD_PGM" "$full_pgm")
-	for cmd { print "$cmd"; }
+	for cmd in "${cmdlist[@]}"; { print -- "$cmd"; }
 	exit 0
 } # }}}
+function is-valid-command { # {{{1
+	local cmd
+	[[ -n ${1:-} ]]|| return 1
+	for cmd in "${cmdlist[@]}"; { [[ $1 == $cmd ]]&& return 0; }
+	return 1
+} # }}}1
 # process -options {{{1
-while getopts ':Lh' Option; do
+while getopts ':c:Lh' Option; do
 	case $Option in
+		c)	is-valid-command "$OPTARG"; exit;										;;
 		L)	show-commands;													;;
 		h)	usage;															;;
 		\?)	die USAGE "Invalid option: ^B-$OPTARG^b.";						;;
@@ -141,18 +157,27 @@ function verify-type { # {{{1
 } # }}}1
 function search-files { # {{{1
 	local findstr
-	findstr="$1"
-	awk -f /dev/stdin $PRJFLDR/*/PROJECT <<-\
+	awk -v fstr="$1" -f /dev/stdin $PRJFLDR/*/PROJECT <<-\
 		===AWK===
 		BEGIN { FS = " +\\\\| +" }
-		\$1 == "summary" && \$2 ~ /$findstr/ {
+		\$1 == "summary" && \$2 ~ fstr {
 				n = split(FILENAME,y,"/");
 				print y[n-1]"|"\$2
 				nextfile
 			}
 		===AWK===
 } # }}}1
-function search { # {{{1
+function show-project-name { # {{{1
+	local P
+	P=$PWD
+	while ! [[ -f $P/PROJECT ]]; do
+		P=${P%/*}
+		[[ -n $P ]]|| return
+	done
+	awk -F\| '/^summary / {print " "$2; nextfile}' "$P"/PROJECT
+} # }}}1
+### prj sub-commands
+function subcmd-find { # {{{1
 	local IFS D
 	IFS=$NL
 	set -- $(search-files "$*")
@@ -165,7 +190,11 @@ function search { # {{{1
 	esac
 	print "$D"
 } # }}}1
-### prj sub-commands
+function subcmd-curprj { # {{{1
+	show-project-name && return
+	sparkle-path "$PWD"
+	warn "$REPLY is ^Bnot^b in a project."
+} # }}}1
 function subcmd-inc { # {{{1
 	local began clients type alias summary details errs unixtm prjdir prjfile
 
@@ -283,6 +312,9 @@ function subcmd-status { # {{{1
 function subcmd-edit { # {{{1
 	NOT-IMPLEMENTED
 } # }}}1
+function subcmd-cd { # {{{1
+	warn '^Tcd^t only works through the function wrapper ^Tf-prj^t.'
+} # }}}1
 
 needs needs-file needs-path NOT-IMPLEMENTED SQL SQLify sparkle-path \
 	use-app-paths
@@ -291,6 +323,10 @@ use-app-paths projects # sets APP_PATH
 TAB='	'
 NL='
 '
+(($#))||					die 'Missing required parameter ^Usub-command^u.'
+is-valid-command "$1" ||	die "^B$1^b is not a valid sub-command."
+CMD=$1; shift
+
 PRJ_DB_INIT_FILE=$APP_PATH/Data/projects.sql3
 PRJFLDR=${HOME:?}/projects
 PRJDB=$PRJFLDR/projects.db3
@@ -312,15 +348,6 @@ SQL_AUTODIE=true
 	die "Unknown problem reading ^B$PRJDB^b."
 [[ $sqlreply == +([0-9]) ]]|| create-db
 
-if [[ $1 == @(help|inc|ls|new) ]]; then
-	CMD=$1; shift
-	"subcmd-$CMD" "$@"
-elif [[ $1 == @(cd|search|find|query) ]]; then
-	shift
-	search "$@"
-else
-	[[ $1 == \! ]]&& shift
-	search "$@"
-fi; exit
+"subcmd-$CMD" "$@"; exit
 
 # Copyright (C) 2023 by Tom Davis <tom@greyshirt.net>.

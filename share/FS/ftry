@@ -6,11 +6,11 @@
 #:     ^T-x^t sets ^Strace^s on function.
 
 function ftry {
-	local trace=false warnOrDie=warn
-	[[ ${1:-} == -x ]]&& { trace=true; shift; }
+	local trace=+ warnOrDie=warn
+	[[ ${1:-} == -x ]]&& { trace=-; shift; }
 
 	load-function "$1" || return
-	$trace && typeset -ft "$1"
+	typeset ${trace}ft "$1"
    	"$@"
 }
 

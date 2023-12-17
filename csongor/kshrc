@@ -17,6 +17,14 @@ export SM_SAVE_DIR=$XDG_STATE_HOME/xsessions
 export GOPATH=$xdgdata/go
 export JDK_PATH=$xdgdata/jdk-1.8.0/bin
 export OPAMROOT=$xdgcfg/opam
+opam_def=$OPAMROOT/default
+export OPAM_SWITCH_PREFIX=$opam_def
+opam_lib=$opam_def/lib
+opam_ocaml=$opam_lib/ocaml
+export CAML_LD_LIBRARY_PATH=$opam_lib/stublibs:$opam_ocaml/stublibs:$opam_ocaml
+export OCAML_TOPLEVEL_PATH=$opam_lib/toplevel
+unset opam_def opam_lib opam_ocaml
+
 export TCLLIBPATH=$xdgdata/tcl
 export RLWRAP_HOME=$xdgcfg/rlwrap
 export ROFFTOOLS_PATH=$xdgdata/heirloom-doctools/bin

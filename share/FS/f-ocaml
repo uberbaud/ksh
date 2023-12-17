@@ -1,0 +1,12 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2023-12-14,19.09.54z/4ee329b>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^S…^s
+#:   Wrapper to ^Trlwrap ocaml^t
+
+needs cond-rlwrap
+function f-ocaml {
+	cond-rlwrap ocaml "$@"
+}
+
+# Copyright © 2023 by Tom Davis <tom@greyshirt.net>.

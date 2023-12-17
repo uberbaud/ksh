@@ -6,17 +6,34 @@
 
 needs awk h3 tty $BS/prj.ksh
 function f-prj {
-	local D P S tty
-	: ${BS:?}
-	if [[ $1 == @(-L|edit|find|help|inc|ls|query|search|status) ]]; then
-		$BS/prj.ksh "$@"
+	local D P S X tty CD cmd
+	X=${BS:?}/prj.ksh
+	CD=false
+
+	if [[ ${1:-} == @(-h|help) ]]; then
+		"$X" -h
+		return
+	elif (($#)); then
+		"$X" -c "$1" || set -- cd "$@"
 	else
-		tty=$(tty)
-		P=$(TTY=$tty $BS/prj.ksh "$@") || return
+		set -- curprj
+	fi
+	cmd=$1; shift
+
+	[[ $cmd == cd ]]&& {
+		cmd=find
+		CD=true
+	  }
+
+	tty=$(tty)
+	if $CD; then
+		P=$(TTY=$tty "$X" "$cmd" "$@") || return
 		D=$HOME/projects/$P
 		S=$(awk -F'\\\| *' '/^summary / {print $2}' "$D"/PROJECT)
 		h3 "$P / $S"
 		[[ -n $P ]]&& { cd "$D"; ls; }
+	else
+		TTY=$tty "$X" "$cmd" "$@"
 	fi
 }
 

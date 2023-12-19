@@ -1,17 +1,23 @@
-# <@(#)tag:csongor.greyshirt.net,2019-03-16:tw/16.15.21z/51ddd78>
+# <@(#)tag:tw.csongor.greyshirt.net,2023-12-19,05.03.42z/5696f47>
+
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^Udir-name^u
-#:   Test whether a directory is empty.
+#: FUNCTION ^[^Udirectory^u^]
+#:   Returns true (0) if ^Udirectory^u is empty, false otherwise.
+#:   Defaults to current directory (^T.^t) if none is given.
 
-function dir-is-empty {
-	local D x
-	(($#==1))||		die 'dir-is-empty: Wants ONE directory name.'
-
-	D=${1%%+(/)}	# normalize dirname, removing any trailing slashes
-	[[ -d $D ]]|| die "^B$D^b is not a directory."
-	set -- "$D"/*
-	[[ $1 == */\* ]]
+needs bad-programmer
+function is-dir-empty {
+	local D
+	(($#>1))&&
+		bad-programmer "^T$0^t Requires no more than one (1) parameter."
+	D=${1:-.}
+	[[ -d $D ]]|| bad-programmer "$1 is not a directory."
+	set -- "$1"/{.,}*
+	! [[ -e $1 || -e $2 ]]
 }
 
-# Copyright © 2019 by Tom Davis <tom@greyshirt.net>.
+# alternate if set ?/* returns too many objects
+# [[ -n $(find "$1" -type d -prune -empty) ]]
+
+# Copyright © 2023 by Tom Davis <tom@greyshirt.net>.

@@ -8,7 +8,11 @@
 needs bad-programmer
 function is-dir-empty {
 	[[ -d ${1:?} ]]|| bad-programmer "$1 is not a directory."
-	[[ -n $(find "$1" -type d -prune -empty) ]]
+	set -- "$1"/{.,}*
+	! [[ -e $1 || -e $2 ]]
 }
+
+# alternate if set ?/* returns too many objects
+# [[ -n $(find "$1" -type d -prune -empty) ]]
 
 # Copyright © 2023 by Tom Davis <tom@greyshirt.net>.

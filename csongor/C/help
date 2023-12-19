@@ -132,6 +132,7 @@ i-can-haz-inet
 in-ancestor-path
 in-new-term
 integer
+is-dir-empty
 is-exclusive-lock-valid
 is-function-loaded
 is-known-host

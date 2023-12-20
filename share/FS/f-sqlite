@@ -7,7 +7,7 @@
 
 needs sqlite3
 function f-sqlite {
-	local db3 command
+	local db3 command stop
 	if [[ -f ${1:-} ]]; then
 		db3=$1; shift
 	else
@@ -18,8 +18,10 @@ function f-sqlite {
 			die "$posVar is not a file and there's no $sparkGlob."
 		  }
 	fi
+	stop=\;
 	command=$*
-	sqlite3 "$db3" ${command:+"${command%\;};"}
+	[[ $command == .* ]]|| stop=;
+	sqlite3 "$db3" ${command:+"${command%\;}${stop:-}"}
 }
 
 # Copyright © 2023 by Tom Davis <tom@greyshirt.net>.

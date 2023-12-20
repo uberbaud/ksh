@@ -20,7 +20,7 @@ function f-sqlite {
 	fi
 	stop=\;
 	command=$*
-	[[ $command == .* ]]|| stop=;
+	[[ $command == .* ]]&& stop=
 	sqlite3 "$db3" ${command:+"${command%\;}${stop:-}"}
 }
 

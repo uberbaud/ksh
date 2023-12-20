@@ -1,0 +1,25 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2023-12-20,18.06.28z/309935c>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^[^Udb3^u^] ^[^Ucommand^u ^Uwords^u ^S…^s^]
+#:   Opens ^Udb3^u if it's given, otherwise uses ^Tomenu^t ^O*^o^T.db^t^O?(^o^T3^t^^O)^o,
+#:   which will not even menuify if there's only once match.
+
+needs sqlite3
+function f-sqlite {
+	local db3 command
+	if [[ -f ${1:-} ]]; then
+		db3=$1; shift
+	else
+		db3=$(omenu *.db?(3)) || return
+		[[ -f $db3 ]]|| {
+			local sparkGlob='^O*^o^T.db^t^O?(^o^T3^t^^O)^o'
+			local posVar='^O$^o^V1^v'
+			die "$posVar is not a file and there's no $sparkGlob."
+		  }
+	fi
+	command=$*
+	sqlite3 "$db3" ${command:+"${command%\;};"}
+}
+
+# Copyright © 2023 by Tom Davis <tom@greyshirt.net>.

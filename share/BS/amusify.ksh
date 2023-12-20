@@ -68,7 +68,7 @@ function mk-mediainfo-output-template { # {{{1
 		bundle/album/%Album/Sort%
 		bundle/grouping/%Grouping%
 		bundle/grouping/%Part%
-		bundle/disks/%Part/%Part/Position_Total%
+		bundle/disks/%Part/Position_Total%
 		bundle/disknumber/%Part/Position%
 		bundle/tracks/%Track/Position_Total%
 		bundle/tracknumber/%Track/Position%
@@ -131,7 +131,8 @@ function do-safe-unzip { # {{{1
 } # }}}1
 function do-one-file { # {{{1
 	local MUSIC_FILE=$1
-	(do-steps) && print true >$fSTEPS
+	h3 "$MUSIC_FILE"
+	(do-steps)
 } # }}}1
 function do-one-item { # {{{1
 	local fsobj f REPLY
@@ -152,7 +153,7 @@ function do-one-item { # {{{1
 	fi
 } # }}}1
 function CleanUp { # {{{1
-	[[ -f $fSTEPS ]]&& mark-steps-complete
+	mark-steps-complete
 	if $debug || [[ -s $fERR ]]; then
 		warn "^RKept ^B$WORK_DIR^b.^r"
 		[[ -s $fERR ]]&& print '^RSee ^Berrors^b and ^BLOG^b.^r'
@@ -164,11 +165,9 @@ function CleanUp { # {{{1
 WORK_DIR=$(mktemp -dt @-XXXXXXXXX) || die "Could not ^Tmktemp -d^t."
 $debug && notify "Created ^B$WORK_DIR^b"
 fINFO="$WORK_DIR"/m.info
-fWAV="$WORK_DIR"/m.ogg
-fOGG="$WORK_DIR"/m.wav
+fOGG="$WORK_DIR"/m.ogg
 fLOG="$WORK_DIR"/LOG
 fERR="$WORK_DIR"/errors
-fSTEPS="$WORK_DIR"/stpes
 
 needs unzip mediainfo ffmpeg
 

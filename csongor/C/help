@@ -84,6 +84,7 @@ f-r
 f-raku
 f-rcctl
 f-reboot
+f-sqlite
 f-sqlite3
 f-syspatch
 f-tclsh

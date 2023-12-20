@@ -1,0 +1,11 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2023-12-20,03.58.50z/9618a7>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^G(no arguments)^g
+#:   Mark steps so that's not reported.
+
+function mark-steps-complete {
+	STEPS_DO_STEPS_WAS_CALLED=true
+}
+
+# Copyright © 2023 by Tom Davis <tom@greyshirt.net>.

@@ -7,14 +7,26 @@
 #:   If it is ^Tskip^t, ^Ucommand^u will not be performed. The default 
 #:   is ^Tdie^t.
 
+needs splitstr
 function + {
-	(($#>2))&& bad-programmer "Too many args to ^T+^t."
+	local step
+	(($#>2))&& bad-programmer 'Too many args to ^T+^t.'
+	(($#))||   bad-programmer 'Missing required parameter ^Ucommand^u.'
+	step=$1
 	action=${2:-die}
 	[[ $action == @(warn|die|false|skip) ]]||
 		bad-programmer	\
 			'2nd arg to ^T+^t must be ^Twarn^t, ^Tdie^t, ^Tfalse^t, or ^Tskip^t.'	\
 			"Found: ^U$action^u."
-	steps[STEPS_NEXT_ID]=${1:?}
+	set -- $(
+		splitstr \; "$step" cmds
+		for c in "${cmds[@]}"; do
+			c=${c##+( )} # remove leading white spaces
+			print -r -- "${c%% *}" # remove everything after the command
+		done
+	  )
+	needs "$@"
+	steps[STEPS_NEXT_ID]=$step
 	steps_action[STEPS_NEXT_ID]=$action
 	((++STEPS_NEXT_ID))
 }

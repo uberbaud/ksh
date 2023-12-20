@@ -7,7 +7,7 @@
 #:   Defaults to current directory (^T.^t) if none is given.
 
 needs bad-programmer
-function is-dir-empty {
+function dir-is-empty {
 	local D
 	(($#>1))&&
 		bad-programmer "^T$0^t Requires no more than one (1) parameter."

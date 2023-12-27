@@ -12,6 +12,7 @@ pre-prompt() {
 	[[ $- == *f* ]]&& setwarns="$setwarns,NOGLOB"
 	[[ $- == *u* ]]&& setwarns="$setwarns,NOUNSET"
 	[[ -n $setwarns ]]&& print "\033[48;5;214;38;5;238m${setwarns#,}\033[0m"
+
 }
 
 # Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

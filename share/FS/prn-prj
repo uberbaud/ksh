@@ -1,7 +1,7 @@
 # <@(#)tag:tw.csongor.greyshirt.net,2023-12-27,03.07.24z/3c2dee7>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^G(no arguments)^g
+#: FUNCTION ^[^Uprefix^u^]
 #:   Prints current project according to ^O$^o^VPWD^v if in a project file.
 
 function prn-prj {
@@ -16,7 +16,7 @@ function prn-prj {
 		sparkle-path "$(realpath "$P/PROJECT")"
 		die "$REPLY line 1 is not the ^Vsummary^v."
 	  }
-	print -r -- "${val%%:*}"
+	print -r -- "${1:-}${val%%:*}"
 }
 
 # Copyright © 2023 by Tom Davis <tom@greyshirt.net>.

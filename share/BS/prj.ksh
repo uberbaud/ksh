@@ -174,7 +174,11 @@ function show-project-name { # {{{1
 		P=${P%/*}
 		[[ -n $P ]]|| return
 	done
-	awk -F\| '/^summary / {print " "$2; nextfile}' "$P"/PROJECT
+	while IFS=' ' read key s val; do
+		[[ -n $key ]]|| return
+		[[ $key == summary ]]&& break
+	done <$P/PROJECT
+	print -r -- " $val"
 } # }}}1
 ### prj sub-commands
 function subcmd-find { # {{{1
@@ -215,11 +219,11 @@ function subcmd-inc { # {{{1
 
 	cat >&2 <<-===
 	 ┌────────────────────────────────────────────────────────────────────────
+	 │ summary: $summary
 	 │ alias:   $alias
 	 │ began:   $began
 	 │ clients: $clients
 	 │ type:    $type
-	 │ summary: $summary
 	 └────────────────────────────────────────────────────────────────────────
 	===
 
@@ -294,10 +298,10 @@ function subcmd-new { # {{{1
 	prjfile=$prjdir/PROJECT
 
 	cat >$prjfile <<-===
+	summary | $summary
 	clients | $clients
 	type    | $type
 	began   | $began
-	summary | $summary
 
 	===
 

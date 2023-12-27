@@ -7,7 +7,29 @@
 
 needs sqlite3
 function f-sqlite {
-	local db3 command stop
+	local db3 command stop flags i
+
+	i=0
+	while [[ ${1:-} == -* ]]; do
+		case ${1#-} in
+			A|cmd|init|maxsize|mmap|newline|nonce|nullvalue|separator|vfs)
+				flags[i++]=$1
+				flags[i++]=$2
+				shift 2
+				;;
+			lookaside|pagecache)
+				flags[i++]=$1
+				flags[i++]=$2
+				flags[i++]=$3
+				shift 3
+				;;
+			*)
+				flags[i++]=$1
+				shift
+				;;
+		esac
+	done
+
 	if [[ -f ${1:-} ]]; then
 		db3=$1; shift
 	else
@@ -21,7 +43,7 @@ function f-sqlite {
 	stop=\;
 	command=$*
 	[[ $command == .* ]]&& stop=
-	sqlite3 "$db3" ${command:+"${command%\;}${stop:-}"}
+	sqlite3 ${flags:+"${flags[@]}"} "$db3" ${command:+"${command%\;}${stop:-}"}
 }
 
 # Copyright © 2023 by Tom Davis <tom@greyshirt.net>.

@@ -10,7 +10,7 @@ function SQLifyOne {
 		warn "^V$1^v is not a valid variable name."
 		return 1
 	  }
-	eval "set -- '$1' '' \"\$$1\""
+	eval "set -- '$1' '' \"\${$1:-}\""
 	[[ -z $3 ]]&& { eval $1=NULL; return; }
 	while [[ $3 == *\'* ]]; do
 		set -- "$1" "$2${3%%\'*}''" "${3#*\'}"

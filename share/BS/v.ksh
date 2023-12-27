@@ -20,7 +20,7 @@ function usage { # {{{1
 	         Edits a file and handles VMS checkout/checkin.
 	         ^T-f^t  Force edit even if ^Ufile^u isn't text.
 	         ^T-k^t  On exit, runs:
-	             ^Tpkill -HUP -lf -- "^^watchfile -i ^Uwfid^u"^t
+	             ^Tpkill -HUP -lf -- "^^watchfile -i ^t^Uwfid^u^T"^t
 	       ^T${PGM}^t  ^[^T-f^t^] ^T=^t^Ucommand^u ^[^Umessage^u^]
 	         Edits a command in ^SPATH^s or a function in ^SFPATH^s.
 	         ^T-f^t  Force edit even if ^Ufile^u isn't text.

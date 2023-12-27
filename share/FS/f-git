@@ -6,21 +6,29 @@
 
 needs needs-cd
 function f-git {
-	local o subcmd
-	for o; do
-		[[ $o == -* ]]&& continue
-		subcmd=$o
-		break
+	local subcmd flags
+	integer i=0
+	while [[ ${1:-} == -* ]]; do
+		case ${1#-} in
+			c|C|-exec-path|-git-dir|-work-tree|-namespace|-config-env)
+				local flags[i++]=$1
+				local flags[i++]=$2
+				shift 2
+				;;
+			*)
+				local flags[i++]=$1
+				shift
+				;;
+		esac
 	done
-	if [[ $subcmd != clone ]]; then
-		command git "$@"
+	(($#))&& {
+		subcmd=${1:-}
+		shift
+	  }
+	if [[ $subcmd == clone ]]; then
+		warn 'Use ^Tgg-clone^t instead'
 	else
-		: ${BS:?}
-		eval $($BS/git-clone-wrapper.ksh "$@") || return
-		print -r "  WORKTREE_PATH=${WORKTREE_PATH-}"
-		print -r "  REPOSITORY_PATH=${REPOSITORY_PATH-}"
-		[[ -n ${WORKTREE_PATH-} ]]&&
-			needs-cd -or-warn -with-notice "$WORKTREE_PATH"
+		command git "${flags[@]}" $subcmd "$@"
 	fi
 }
 

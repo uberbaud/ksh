@@ -13,18 +13,18 @@ function f-sqlite {
 	while [[ ${1:-} == -* ]]; do
 		case ${1#-} in
 			A|cmd|init|maxsize|mmap|newline|nonce|nullvalue|separator|vfs)
-				flags[i++]=$1
-				flags[i++]=$2
+				local flags[i++]=$1
+				local flags[i++]=$2
 				shift 2
 				;;
 			lookaside|pagecache)
-				flags[i++]=$1
-				flags[i++]=$2
-				flags[i++]=$3
+				local flags[i++]=$1
+				local flags[i++]=$2
+				local flags[i++]=$3
 				shift 3
 				;;
 			*)
-				flags[i++]=$1
+				local flags[i++]=$1
 				shift
 				;;
 		esac

@@ -1,0 +1,20 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2023-12-27,22.51.43z/28a174e>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^G(no arguments)^g
+#:   Wrap gg-clone.ksh so we can do a ^Tcd^t.
+
+needs ${BS:?}/gg-clone.ksh
+function f-gg-clone {
+	eval "$(${BS:?}/gg-clone.ksh "$@")" || return
+	sparkle-path "${WORKTREE_PATH-}";	WORKTREE_PATH=$REPLY
+	sparkle-path "${REPOSITORY_PATH-}";	REPOSITORY_PATH=$REPLY
+	sparkle <<-===
+		  ^VWORKTREE_PATH^v^O=^o${WORKTREE_PATH-}
+		  ^VREPOSITORY_PATH^v^O=^o${REPOSITORY_PATH-}
+		===
+	[[ -n ${WORKTREE_PATH-} ]]&&
+		needs-cd -or-warn -with-notice "$WORKTREE_PATH"
+}
+
+# Copyright © 2023 by Tom Davis <tom@greyshirt.net>.

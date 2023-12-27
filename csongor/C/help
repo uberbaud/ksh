@@ -133,7 +133,6 @@ i-can-haz-inet
 in-ancestor-path
 in-new-term
 integer
-is-dir-empty
 is-exclusive-lock-valid
 is-function-loaded
 is-known-host
@@ -207,8 +206,8 @@ predefined-aliases
 present
 press-any-key
 print
-prj-name
 prn-cmd
+prn-prj
 project-name-from-path
 pwd
 qvis

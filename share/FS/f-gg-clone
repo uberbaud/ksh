@@ -6,12 +6,13 @@
 
 needs ${BS:?}/gg-clone.ksh
 function f-gg-clone {
+	local R W
 	eval "$(${BS:?}/gg-clone.ksh "$@")" || return
-	sparkle-path "${WORKTREE_PATH-}";	WORKTREE_PATH=$REPLY
-	sparkle-path "${REPOSITORY_PATH-}";	REPOSITORY_PATH=$REPLY
+	sparkle-path "${WORKTREE_PATH-}";	W=$REPLY
+	sparkle-path "${REPOSITORY_PATH-}";	R=$REPLY
 	sparkle <<-===
-		  ^VWORKTREE_PATH^v^O=^o${WORKTREE_PATH-}
-		  ^VREPOSITORY_PATH^v^O=^o${REPOSITORY_PATH-}
+		  ^VWORKTREE_PATH^v^O=^o${W-}
+		  ^VREPOSITORY_PATH^v^O=^o${R-}
 		===
 	[[ -n ${WORKTREE_PATH-} ]]&&
 		needs-cd -or-warn -with-notice "$WORKTREE_PATH"

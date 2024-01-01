@@ -71,6 +71,11 @@ $(TARGET): $(GENERATE) $(SHARED) Makefile
 	@echo $@           >>$(GIT_IGN)
 	@echo make.out     >>$(GIT_IGN)
 
+AS_PATH    = /home/apps
+as_1: $(AS_PATH)/last_added
+	@echo $@
+	@stest -d $(AS_PATH)/* | sed 's|^.*/||' >$@
+
 CABAL_AWK  = /^Commands:$$/ {p=1;next}
 CABAL_AWK += p && /^[^[:space:]]/ {exit}
 CABAL_AWK += p && $$1 ~ /^[a-z]/ {print $$1}
@@ -93,7 +98,7 @@ git_1: $(GIT_CONFIG)
 	@echo $@
 	@git help --all |awk '/^   [a-z-]+ / {print $$1}' >$@
 
-got_1:
+got_1: /usr/local/bin/got
 	@echo $@
 	@got -h 2>&1|awk -F': ' '/^commands: / {gsub(" ","\n",$$2);print $$2}' >$@
 
@@ -117,11 +122,11 @@ m_2: $(MAIL_UPDATED)
 	@echo $@
 	@$(MAIL_BIN) -ar >$@
 
-pijul_1:
+pijul_1: /home/tw/local/share/cargo/bin/pijul
 	@echo $@
 	@pijul -h | awk 'p && /^    [a-z]/ {print $$1} /^SUBCOMMANDS:/ {p=1}' >$@
 
-pkgcfg:
+pkgcfg: /usr/bin/pkg-config
 	@echo '$@ (pkg-config alias)'
 	@pkg-config -h|awk '/^--/ {print $$1}' >$@
 
@@ -142,7 +147,7 @@ scp: ssh
 	@echo $@
 	@ln -fs ssh scp
 
-sysctl:
+sysctl: /usr/sbin/sysctl
 	@echo $@
 	@sysctl >tmp.sysctl
 	@awk -F= '/^[^ \t]/ {print $$1}' tmp.sysctl >$@
@@ -152,13 +157,13 @@ rcctl_2: $(PKG_LOG)
 	@echo $@
 	@/bin/ls -1 /etc/rc.d >$@
 
-ts:
+ts: /home/tw/local/share/cargo/bin/tree-sitter
 	@echo $@
 	@tree-sitter -h >tmp.tree-sitter
 	@awk '/^SUBCOMMANDS:/ {p=1;next} p {print $$1}' tmp.tree-sitter >$@
 	@rm tmp.tree-sitter
 
-vmgr_1:
+vmgr_1: /home/tw/config/ksh/share/BS/vmgr.ksh
 	@echo $@
 	@vmgr cmdlist >$@
 

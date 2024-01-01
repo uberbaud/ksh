@@ -18,6 +18,7 @@ GRPNAME=usrapp
 APP_CLASS=app
 START_SCRIPT=start-app.ksh
 STARTER_BIN=/usr/local/bin/start
+fADDED=$APP_BASE/last_added
 logName='start-init-doas'
 NL='
 ' # end of NL assignment
@@ -311,6 +312,9 @@ function CleanUp { # {{{1'
 		cat - "$fTEMP" >>~/log/$logName.log
 	rm "$fTEMP"
 } # }}}1
+function note-new-user-was-created { # {{{1
+	date +'%Y-%m-%d %H:%M:%S %z' >$fADDED
+} # }}}1
 function main { # {{{1
 	needs-path -create -or-die "$HOLD/RCS"
 	needs-cd -or-die "$HOLD"
@@ -352,6 +356,7 @@ function main { # {{{1
 
 	create-app-starter
 	create-user-links
+	note-new-user-was-created
 
 } # }}}1
 

@@ -5,12 +5,14 @@
 set -o nounset;: ${FPATH:?Run from within KSH}
 
 needs desparkle die h1 needs-cd new-array notify splitstr subst-pathvars warn \
-		yes-or-no
+		yes-or-no needs-path
 
 new-array name dotf exec cmds haz
 
 B=$KDOTDIR/$HOST/B
+needs-path -or-die "$B"
 GITUP=$B/gitup.ksh
+GOT_UP=$B/got-up.ksh
 [[ -x $GITUP ]]||
 	die 'No ^S$B^s^T/gitup.ksh^t so using git pull.'
 
@@ -26,7 +28,7 @@ function @ { # {{{1
 #   name          dotf          exec      SUBCOMMANDS (cmds)
 @   Git           .git          $GITUP    simple
 @   Git+Modules   .gitmodules   $GITUP    modules
-@   Got           .got          $GITUP    simple
+@   Got           .got          $GOT_UP   simple
 @   Git           HEAD          $GITUP    simple
 @   Fossil        .fslckout     fossil    pull +AND+ co --latest
 @   Subversion    .svn          svn       update

@@ -1,0 +1,12 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2023-12-28,22.47.52z/40774ae>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^G(no arguments)^g
+#:   ^Tas-root su -l^t ^Uusr^u
+
+needs as-root
+function f-as {
+	as-root su -l "${1:?}"
+}
+
+# Copyright © 2023 by Tom Davis <tom@greyshirt.net>.

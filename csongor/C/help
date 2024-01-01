@@ -57,6 +57,7 @@ exec
 exit
 export
 f-R
+f-as
 f-b
 f-bc
 f-cd
@@ -68,6 +69,7 @@ f-espeak
 f-fc
 f-fortune
 f-fossil
+f-gg-clone
 f-git
 f-go
 f-halt

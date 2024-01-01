@@ -1,16 +1,18 @@
 # <@(#)tag:tw.csongor.greyshirt.net,2020-12-07,12.58.23z/4e92bbc>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^Ulooking_for^u
-#:   Is ^Ulooking_for^u in this, or any of the ancestor directories
-#:   of ^$^{^N2^n^S:-$^s^NPWD^n^}
+#: FUNCTION ^Ulooking_for^u ^= ^O$^o^VREPLY^v
+#:   Is ^Ulooking_for^u in this, or any of the ancestor directories of 
+#:   ^$^{^N2^n^S:-$^s^NPWD^n^}. The name of the found file (including 
+#:   the path) will be saved to ^O$^o^VREPLY^v
 
+needs realpath
 function in-ancestor-path {
 	local chkpath
 	: ${1:?Missing required parameter: lookingFor}
 	chkpath=$(realpath "${2:-$PWD}")
 	while [[ -n $chkpath ]]; do
-		[[ -e $chkpath/$1 ]]&& return 0
+		[[ -e $chkpath/$1 ]]&& REPLY=$chkpath/$1 return 0
 		chkpath=${chkpath%/*}
 	done
 	return 1

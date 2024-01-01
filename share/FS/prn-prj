@@ -4,16 +4,13 @@
 #: FUNCTION ^[^Uprefix^u^]
 #:   Prints current project according to ^O$^o^VPWD^v if in a project file.
 
+needs in-ancestor-path
 function prn-prj {
-	local P key s val
-	P=$PWD
-	while ! [[ -f $P/PROJECT ]]; do
-		P=${P%/*}
-		[[ -n $P ]]|| return
-	done
-	IFS=' ' read key s val <$P/PROJECT
+	local key s val REPLY
+	in-ancestor-path PROJECT || return
+	IFS=' ' read key s val <$REPLY
 	[[ $key == summary ]]|| {
-		sparkle-path "$(realpath "$P/PROJECT")"
+		sparkle-path "$REPLY"
 		die "$REPLY line 1 is not the ^Vsummary^v."
 	  }
 	print -r -- "${1:-}${val%%:*}"

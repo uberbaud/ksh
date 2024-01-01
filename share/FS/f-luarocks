@@ -5,7 +5,10 @@
 #:   Wrapper
 
 function f-luarocks {
-	/usr/local/bin/luarocks-5.1 "$@"
+	local pgm
+	[[ -e /usr/local/bin/luarocks-5.1 ]]&& pgm=/usr/local/bin/luarocks-5.1
+	[[ -e /usr/local/bin/luarocks ]]&& pgm=/usr/local/bin/luarocks
+	"$pgm" "$@"
 }
 
 # Copyright © 2022 by Tom Davis <tom@greyshirt.net>.

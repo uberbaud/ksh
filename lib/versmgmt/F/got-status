@@ -5,7 +5,24 @@
 #:   vmgr vms-cmd
 
 function got-status {
-	NOT-IMPLEMENTED
+	local file
+	file=${1:?}
+	set -- $(got status "$file")
+	(($#))|| {
+		if [[ -n $(got status -I "$file") ]]; then
+			STATUS=ignored
+		else
+			STATUS=ok
+		fi
+		return 0
+	  }
+	case ${1:?WHAT\?} in
+		\?) STATUS=untracked;	;;
+		M)	STATUS=modified;	;;
+		A)	STATUS=ok;			;;
+		D)	STATUS=ok;			;;
+		*)	STATUS=error;		;;
+	esac
 }
 
 # Copyright © 2023 by Tom Davis <tom@greyshirt.net>.

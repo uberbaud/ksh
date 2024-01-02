@@ -5,7 +5,7 @@
 #:   vmgr vms-cmd
 
 function got-checkout {
-	NOT-IMPLEMENTED
+	: # there is no file locking, got checkout is an entire branch
 }
 
 # Copyright © 2023 by Tom Davis <tom@greyshirt.net>.

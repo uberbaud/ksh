@@ -1,0 +1,20 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2024-01-02,02.25.20z/536b186>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^Ufile^u ^Utype^u ^Utext^u
+#:   Add a description or change log message to ^O$^o^VSYSDATA^v/versmgmt.db3.
+#:   Where ^Utype^u is ^TD^t for a description, and ^TL^t is a change 
+#:   log message.
+
+needs versmgmt-describe in-ancestor-path
+function got-describe {
+	local commit root
+	commit=$(
+		got info|awk -F': ' '/^work tree base commit/ {print $2;nextfile}'
+	  )
+	in-ancestor-path .got
+	root=${REPLY%.got}
+	versmgmt-describe "$commit" "${PWD#"$root"}/$1" "$2" "$3"
+}
+
+# Copyright © 2023 by Tom Davis <tom@greyshirt.net>.

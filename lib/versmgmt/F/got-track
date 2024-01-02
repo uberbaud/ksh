@@ -5,7 +5,10 @@
 #:   vmgr vms-cmd
 
 function got-track {
-	NOT-IMPLEMENTED
+	local file
+	file=${1:?}; shift
+	got add "$file"
+	got-describe "$file" D "$*"
 }
 
 # Copyright © 2023 by Tom Davis <tom@greyshirt.net>.

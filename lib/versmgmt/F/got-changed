@@ -5,7 +5,7 @@
 #:   vmgr vms-cmd
 
 function got-changed {
-	NOT-IMPLEMENTED
+	[[ -z $(got status ${1:?Missing file arg}) ]]
 }
 
 # Copyright © 2023 by Tom Davis <tom@greyshirt.net>.

@@ -1,0 +1,22 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2023-01-14,19.26.24z/2a359e8>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^[^Ufile name^u^]
+#:   Prints changes since last commit.
+
+needs versmgmt-changelog
+function got-changelog {
+	local commitid path_from_root
+	commitid=$(
+		got info|awk -F': ' '/^work tree base commit/ {print $2;nextfile}'
+	  )
+	[[ -n ${1:-} ]]&& {
+		local root
+		in-ancestor-path .got
+		root=${REPLY%.got}
+		path_from_root=${PWD#$root}/$1
+	  }
+	versmgmt-changelog "$commitid" ${path_from_root:+"$path_from_root"}
+}
+
+# Copyright © 2023 by Tom Davis <tom@greyshirt.net>.

@@ -5,7 +5,11 @@
 #:   vmgr vms-cmd
 
 function got-snap {
-	NOT-IMPLEMENTED
+	local fname
+	fname=${1:?Missing file_name}; shift
+	got-changed "$fname" || return
+	got add "$fname"
+	got-describe "$fname" L "$*"
 }
 
 # Copyright © 2023 by Tom Davis <tom@greyshirt.net>.

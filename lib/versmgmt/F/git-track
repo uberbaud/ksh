@@ -6,7 +6,7 @@
 
 needs git-describe 
 function git-track {
-	local file description
+	local file
 	file=${1:?}; shift
 	git add "$file"
 	git-describe "$file" D "$*"

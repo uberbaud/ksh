@@ -4,8 +4,9 @@
 #: FUNCTION ^G(no arguments)^g
 #:   Wrapper with bells
 
+needs as-root
 function f-reboot {
-	/usr/bin/doas /sbin/reboot
+	as-root /sbin/reboot
 }
 
 # Copyright © 2020 by Tom Davis <tom@greyshirt.net>.

@@ -2,7 +2,7 @@
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
 #: FUNCTION ^G(no arguments)^g
-#:   Wrapper with a doas
+#:   Wrapper with ^Tas-root^t
 
 needs as-root
 function f-halt {

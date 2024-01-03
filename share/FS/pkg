@@ -2,7 +2,7 @@
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
 #: FUNCTION ^Tadd^t^|^Tcheck^t^|^Tdelete^t^|^Scmd^s ^Uargs...^u
-#:   performs pkg_^Scmd^s, possibly using ^Tdoas^t, possibly logging the action.
+#:   performs pkg_^Scmd^s, possibly using ^Tas-root^t, possibly logging the action.
 #: FUNCTION ^Tgrep^t ^Uregex^u
 #: FUNCTION ^Tquery^t ^[^T-I^t^] ^Uregex^u
 #:   performs a ^Bperl5 regex^b search on the index file.
@@ -18,8 +18,8 @@
 #: FUNCTION ^Tdesc^t^|^Tinfo^t ^Uglobs_…^u
 #:   Shows the information page.
 
+needs cat die warn as-root
 function pkg {
-	needs cat die
 	(($#))|| set help
 	typeset osv=$(uname -r) record=false cmd=$1; shift
 	typeset bin=/usr/sbin/pkg_$cmd

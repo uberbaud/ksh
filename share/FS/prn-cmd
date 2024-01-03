@@ -9,7 +9,7 @@ function prn-cmd {
 	(($#))|| return
 	print -rn -- "[1m$1[22m"; shift
 	for a { print -rn -- " $U$a$u"; }
-	print '\033[0;39;49m'
+	print ' \033[0;39;49m'
 }
 
 # Copyright © 2020 by Tom Davis <tom@greyshirt.net>.

@@ -4,6 +4,7 @@
 #: FUNCTION ^[^Ton^t^|^Toff^t^]
 #:   Turn the TouchPad ^Ton^t or ^Toff^t
 
+needs as-root
 function pad {
 	local setting em norm
 	case ${1:-help} in
@@ -12,7 +13,7 @@ function pad {
 		*)		setting=help;	;;
 	esac
 	if [[ $setting != help ]]; then
-		/usr/bin/doas wsconsctl mouse.tp.disable=$setting >/dev/null
+		as-root wsconsctl mouse.tp.disable=$setting >/dev/null
 	else
 		em='\033[34m'
 		norm='\033[39m'

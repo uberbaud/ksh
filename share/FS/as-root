@@ -14,15 +14,9 @@ needs /usr/bin/doas prn-cmd
 function as-root {
 	# if we're not interactive, print what we're doing
 	[[ $- == *i* ]]|| {
-		tty=${TTY:+/dev/$TTY}
-		[[ -n $tty ]]|| { tty=$(/usr/bin/tty 2>/dev/null); }
-		[[ -n $tty ]]|| { tty="/dev/$(/bin/ps -otty= -p $$)"; }
-		[[ -n $tty ]]|| {
-			print 'Cannot write directly to terminal'
-			return 1
-		  }
-		{ print -n '\033[45;37mdoas>\033[49;35m '; prn-cmd "$@"; } >$tty
-	  }
+		print -n '\033[45;37mdoas>\033[43;30m '
+		prn-cmd "$@"
+	  } >/dev/${TTY:-tty}
 
 	/usr/bin/doas "$@"
 }

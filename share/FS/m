@@ -8,7 +8,7 @@ needs matching-commands gsub use-app-paths
 function m {
 	local m_cmds APP_PATH NL=${NL:-$(print)} PATH=$PATH FPATH=$FPATH
 	use-app-paths mail || die '^Buse-app-paths^b ^Vmail^v'
-	export MAIL_APP_PATH=$APP_PATH
+	MAIL_APP_PATH=$APP_PATH
 	m_cmds=$( matching-commands m-\*)
 	gsub m- '' "$m_cmds" m_cmds
 
@@ -17,6 +17,8 @@ function m {
 	gsub "$NL" '|' "$m_cmds" m_cmds
 	eval "[[ \$1 == @($m_cmds) ]]" ||
 		die "^B$1^b is not a valid ^Tm^t ^(^Imail^i^) sub-command."
+
+	export FPATH PATH MAIL_APP_PATH
 	m-"$@"
 }
 

@@ -7,7 +7,7 @@
 function m-get {
 	PRE_MAIL_PWD=${PRE_MAIL_PWD:-$PWD}
 	builtin cd ${XDG_PUBLICSHARE_DIR:?}/mail
-	${MAIL_APP_PATH:?}/B/m-get.ksh "$@"
+	${MAIL_APP_PATH:?}/B/_get.ksh "$@"
 }
 
 # Copyright © 2021 by Tom Davis <tom@greyshirt.net>.

@@ -5,7 +5,7 @@
 #:   Wrapper around $BS/m-done.ksh
 
 function m-done {
-	${MAIL_APP_PATH:?}/B/m-done.ksh "$@"
+	${MAIL_APP_PATH:?}/B/_done.ksh "$@"
 	[[ -n ${PRE_MAIL_PWD-} ]]&& {
 		builtin cd "$PRE_MAIL_PWD"
 		unset PRE_MAIL_PWD

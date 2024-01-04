@@ -52,7 +52,6 @@ function group { # {{{1
 } 2>/dev/null # }}}1
 function P { printf '      ^F{4}─^f %s\n' "$1" | sparkle >&2; }
 
-
 needs m-list-new m-msgcount mark pick
 if $DOWNLOAD; then
 	needs use-app-paths

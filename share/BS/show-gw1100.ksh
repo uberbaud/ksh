@@ -71,6 +71,9 @@ function main { # {{{1
 	fi
 } # }}}1
 
+needs i-can-haz-inet
+i-can-haz-inet || die "$REPLY"
+
 want_clear=false
 want_extremes=false
 while [[ ${1:-} == -* ]]; do

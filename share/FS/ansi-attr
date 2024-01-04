@@ -39,4 +39,4 @@ function ansi-attr {
 	print '  \033[47;30m   Note: E[8m is hidden text\033[0m'
 }
 
-# Copyright © 2017 by Tom Davis,,, <tom@greyshirt.net>.
+# Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

@@ -21,4 +21,4 @@ function log {
 	[[ -z $REPLY ]]
 }
 
-# Copyright © 2017 by Tom Davis,,, <tom@greyshirt.net>.
+# Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

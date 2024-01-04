@@ -8,7 +8,7 @@ function f-luarocks {
 	local pgm
 	[[ -e /usr/local/bin/luarocks-5.1 ]]&& pgm=/usr/local/bin/luarocks-5.1
 	[[ -e /usr/local/bin/luarocks ]]&& pgm=/usr/local/bin/luarocks
-	"$pgm" "$@"
+	"$pgm" --local "$@"
 }
 
 # Copyright © 2022 by Tom Davis <tom@greyshirt.net>.

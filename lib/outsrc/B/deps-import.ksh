@@ -101,7 +101,7 @@ function get-pkg-meta-files { # {{{1
 	  }
 
 } # }}}1
-function list-available-packages { # {{{1
+function list-pc-files { # {{{1
 	get-pkg-meta-files
 	for m in "${metafiles[@]}"; do
 		m=${m##*/}

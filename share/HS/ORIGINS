@@ -1,0 +1,13 @@
+^BORIGINS^b
+
+    The ^BORIGINS^b file is used to import dependency sources directly into 
+    a project. It is created and maintained with ^Tdeps-import^t.
+
+    ^BFORMAT^b
+
+    Comments are whole lines that begin with an octothorpe ^(^#^). Comment 
+    lines and empty lines are ignored.
+
+    All other lines consist of a ^Ilocal copy name^i, a single ^Itab^i 
+    character, and finally the ^Iorigin path and file^i.
+

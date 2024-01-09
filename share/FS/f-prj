@@ -1,7 +1,7 @@
 # <@(#)tag:tw.csongor.greyshirt.net,2023-10-05,20.16.43z/14d7e36>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^G(no arguments)^g
+#: FUNCTION
 #:   Wrapper around prj.ksh for ^Tcd^t.
 
 needs awk h3 tty $BS/prj.ksh
@@ -10,7 +10,9 @@ function f-prj {
 	X=${BS:?}/prj.ksh
 	CD=false
 
-	if [[ ${1:-} == @(-h|help) ]]; then
+	if (($#==0)); then
+		set -- ls
+	elif [[ ${1:-} == @(-h|help) ]]; then
 		"$X" -h
 		return
 	elif (($#)); then

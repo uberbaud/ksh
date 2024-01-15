@@ -26,7 +26,7 @@ export HOST=${HOSTNAME%%.*}
 export TERM
 
 export SYSLOCAL=/usr/local
-export URI_AUTHORITY='greyshirt.net'
+export URI_AUTHORITY='uberbaud.foo'
 
 # parse ENV to find out where we are
 KDOTDIR=${KDOTDIR:-$(dirname $(realpath -q "$ENV"))}
@@ -129,7 +129,11 @@ export HISTFILE=$fhist
 export HISTSIZE=8191
 export LOCALBIN=~/local/bin
 # C
-export CFLAGS='-Weverything -fdiagnostics-show-option -fcolor-diagnostics'
+cflags[0]=-W'everything'
+cflags[1]=-W'no-unsafe-buffer-usage'
+cflags[2]=-f'diagnostics-show-option'
+cflags[3]=-f'color-diagnostics'
+export CFLAGS="${cflags[*]}"
 export MAKECONF=${MAKECONF:-$xdgcfg/etc/ports-settings.mk}
 [[ -f $MAKECONF ]]|| unset MAKECONF
 USER_MK=$xdgcfg/etc/user.mk
@@ -341,12 +345,14 @@ alias prn="/usr/bin/printf '  \e[35m｢\e[39m%s\e[35m｣\e[39m\n'"
 		get-exclusive-lock -no-wait completion-make || {
 			wantRelease=false
 			warn 'using old completions'
+			return # from subshell
 		  }
 		make -k -C $KCOMPLETE >$KCOMPLETE/make.out
 		[[ -s $makeout ]]&& {
 			notify 'Recompiled completion modules:'
-			COLUMNS=${COLUMNS:-$(tput col)}
-			column -c $((COLUMNS-8)) $makeout|expand|sed -e 's/^/    /'
+			COLUMNS=${COLUMNS:-$(tput col 2>/dev/null)}
+			column ${COLUMNS:+-c $((COLUMNS-8))} $makeout |
+				expand| sed -e 's/^/    /'
 		  }
 		rm $makeout
 		$wantRelease &&

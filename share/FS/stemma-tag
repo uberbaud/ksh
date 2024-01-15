@@ -8,9 +8,8 @@ function stemma-tag {
 	local U M H D T a b c
 	U=${1:-$(id -un)}
 	M=${2:-$(uname -n)}; M=${M%.*}
-	H=${3:-${URI_AUTHORITY:-${EMAIL:-}}}
+	H=${3:-${URI_AUTHORITY:-${EMAIL:+${EMAIL#*@}}}}
 	[[ -n $H ]]|| die 'Neither ^VURI_AUTHORITY^v nor ^VEMAIL^v is set'
-	H=${H#*@}
 	if [[ -n ${4:-} && -n ${5:-} ]]; then
 		D=$4; T=$5
 	elif [[ -z ${4:-} && -z ${5:-} ]]; then

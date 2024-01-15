@@ -85,12 +85,13 @@ function X { # {{{1
 } # }}}1
 
 expire-old-mail
+D_TO=--delivered-to
 
 # X  Key    Pattern                        mailbox       message
 # ─ ─────  ─────────────────────────────  ────────────  ───────────────
   X -from  '@yt\.lan'                     yt.lan        '@yt.lan'
   X -from  'root@csongor\.lan'            root@csongor  '@csongor'
-  X -to    'bgumm102@gmail\.com'          notes         'Notes to Self'
+  X $D_TO  'bgumm102@gmail\.com'          notes         'Notes to Self'
   X -to    'source-changes@openbsd\.org'  obsd-cvs      'OpenBSD CVS'
   X -from  '@stackoverflow\.'             stackover     'Stack Overflow'
 CIP='alexepstein@industrialprogress.net'

@@ -64,7 +64,7 @@ function write-file { #{{{1
 		 |  and \$LDFLAGS and \$CFLAGS will be appended with that output.
 		 |     Files named in \$OBJS and found in \$OPATH will be added to \$LDLIBS.
 		 + ----------------------------------------------------------------------
-			# CC       = include-what-you-use
+		    # CC       = include-what-you-use
 		    # SRCPATH  = ${CURDIR:-}
 		    # OPATH    = ${OBJDIR:-}
 		    # OBJS     = ${OBJS:-my.o}

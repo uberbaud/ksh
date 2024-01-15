@@ -22,11 +22,8 @@ function usage {
 	exit 0
 } # }}}
 # process -options {{{1
-VERBOSE=false
 while getopts ':C:vh' Option; do
 	case $Option in
-		C)	spath=$OPTARG;													;;
-		v)	VERBOSE=true;													;;
 		h)	usage;															;;
 		\?)	die USAGE "Invalid option: ^B-$OPTARG^b.";						;;
 		\:)	die USAGE "Option ^B-$OPTARG^b requires an argument.";			;;
@@ -49,7 +46,7 @@ function update-file { # {{{1
 	  }
 } # }}}1
 function do-copies { # {{{1
-	[[ -s $1 ]]|| return 0
+	[[ -s ORIGINS ]]|| return 0
 	integer i=0 h=0 u=0
 	while IFS=$TAB read copy orig; do
 		((i++))
@@ -65,7 +62,7 @@ function do-copies { # {{{1
 		else
 			warn "SYNTAX ERROR: line $i, missing original file."
 		fi
-	done <$1
+	done <ORIGINS
 	return $errs
 } # }}}1
 function escape-ere-metachars { # {{{1
@@ -98,7 +95,7 @@ function main { # {{{1
 	set -A hFiles --
 	set -A updFiles --
 
-	do-copies "$1"
+	do-copies
 	((${updFiles[*]+1}))&& cvt-angles-to-quotes
 
 	return $errs
@@ -106,13 +103,9 @@ function main { # {{{1
 
 needs needs-file needs-path
 
-spath=${spath:-.}
-ofile="$spath/ORIGINS"
-needs-path -or-die "$spath"
-needs-file -or-die "$ofile"
-ofile=$(realpath "$ofile") || die "Weirdly ^Trealpath^t."
+needs-file -or-die ORIGINS
 TAB='	'
 
-main "$ofile"; exit
+main; exit
 
 # Copyright (C) 2024 by Tom Davis <tom@greyshirt.net>.

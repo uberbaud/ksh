@@ -108,7 +108,7 @@ set -x
 		fstype=${diskinfo#*: }
 	elif [[ $dc -eq 10 && ${diskinfo[7]#  } == i:* ]]; then
 		part=i
-		fstype=msdos
+		fstype=MSDOS
 	else
 		warn 'Too many drives, bailing.'
 		return 1

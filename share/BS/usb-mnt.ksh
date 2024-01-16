@@ -101,16 +101,20 @@ function mnt-drv {
 	label=${diskinfo[0]}
 	unset diskinfo[0]; set -A diskinfo -- "${diskinfo[@]}"
 	label=${label%%+([[:space:]])}
-	((${#diskinfo[*]}==1))|| {
-		warn 'Too many drives, bailing.' "${diskinfo[@]}"
+	integer dc=$((${#diskinfo[*]}==1))
+	if ((dc == 1)); then
+		part=${diskinfo%: *}
+		fstype=${diskinfo#*: }
+	elif [[ $dc -eq 10 && ${diskinfo[7]#  } == i:* ]]; then
+		part=i
+		fstype=msdos
+	else
+		warn 'Too many drives, bailing.'
 		return 1
-	  }
+	fi
 	gsub ' ' _ "$label" label
 
-	part=${diskinfo%: *}
-	fstype=${diskinfo#*: }
 	WANT_FSCK=true
-
 	mount-fs-ondev-at "$fstype" "$dev$part" /vol/"$label"
 
 	# rename mount point IF there's a non-empty devname.txt file

@@ -94,6 +94,7 @@ awkpgm=$(</dev/stdin) <<-\
 
 
 function mnt-drv {
+set -x
 	local dev diskinfo fstype id label namefile newlabel part
 	dev=$1
 	id=${2:-}

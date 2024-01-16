@@ -102,7 +102,7 @@ set -x
 	label=${diskinfo[0]}
 	unset diskinfo[0]; set -A diskinfo -- "${diskinfo[@]}"
 	label=${label%%+([[:space:]])}
-	integer dc=$((${#diskinfo[*]}==1))
+	integer dc=${#diskinfo[*]}
 	if ((dc == 1)); then
 		part=${diskinfo%: *}
 		fstype=${diskinfo#*: }

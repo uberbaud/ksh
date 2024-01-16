@@ -139,7 +139,7 @@ function main { # {{{1
 		disk-in-use "$d" && continue
 		desparkle "$d"
 		notify "Trying to mount ^B$REPLY^b."
-#		mnt-drv "${d%%:*}" "${d#:}"
+		mnt-drv "${d%%:*}" "${d#:}"
 	done
 } # }}}1
 

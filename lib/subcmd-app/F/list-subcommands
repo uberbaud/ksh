@@ -1,0 +1,20 @@
+# <@(#)tag:tw.csongor.uberbaud.foo,2024-01-15,20.14.40z/1a81b1c>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^[^Uadditional commands such as flags^u^]
+#:   Generalized subcmd finder/lister
+#:   Uses ^O$^o^Vfull_pgm^v, ^O$^o^VAPP_PATH^v^T/^t^O{^o^TB^t^O,^o^TF^t^O}^o
+#:     and optionally, ^O$^o^VSUBCMD_PREFIX^v, otherwise ^Tsubcmd-^t will be used
+#:     to identify functions or commands implementing subcommands.
+
+needs sed
+function list-subcommands {
+	local c prefix sedpgm
+	: ${full_pgm:?} ${APP_PATH:?}
+	prefix=${SUBCMD_PREFIX:-subcmd-}
+	sedpgm="/^function $prefix/{s/^function //;s/[[:space:]].*//;p;}"
+	set -s -- "$@" $(sed -nEe "$sedpgm") $(matching-commands "$prefix*")
+	for c { c=${c%.ksh}; print -r -- "${c#"$prefix"}"; }
+}
+
+# Copyright © 2024 by Tom Davis <tom@greyshirt.net>.

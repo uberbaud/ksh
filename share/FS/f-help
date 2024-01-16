@@ -1,8 +1,10 @@
 # <@(#)tag:csongor.greyshirt.net,2017-08-04:tw/19.39.13z/12a7e33>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
-#: FUNCTION ^Utopic^u
-#:   Shows help for KSH builtins or functions in ^SFPATH^s
+#: FUNCTION ^Utopic or file^u
+#:   Shows help for KSH builtins or functions in ^SFPATH^s or if
+#:   ^Utopic of file^u conatains a forward slash ^(^T/^t^), it is used
+#:   as the ^Ifunction^i or ^Ihelp file^i to process.
 
 function _show_function_help {
 	local awkpgm
@@ -24,6 +26,23 @@ function _show_function_help {
 	awk -v fn=${1##*/} "$awkpgm" "$1" | sparkle
 }
 
+function _show_helpfile_help {
+	local htmp pager SPARKLE_FORCE_COLOR
+	htmp=$(mktemp -t help-XXXXXXXX)
+	[[ -f $htmp ]]||
+		die UNAVAILABLE 'Could not ^Tmktemp^t'
+	sed -e '/^;/d' <$1 >$htmp
+	[[ -s $htmp ]]|| {
+		die UNAVAILABLE "^Tmktemp^t file ^B$htmp^b is empty."
+		rm -f "$htmp"
+	  }
+	[[ -t 1 ]]&& SPARKLE_FORCE_COLOR=true
+	pager=${PAGER:-less}
+	(($(wc -l <$htmp)<LINES))&& pager=cat
+	sparkle <$htmp | $pager
+	rm "$htmp"
+}
+
 function f-help {
 	local helpdir=${KDOTDIR:?}/share/HS
 	(($#))|| {(
@@ -32,6 +51,18 @@ function f-help {
 		printf '    %s\n' * |column
 	); return; }
 
+	# if the command line parameter is a specific file name WITH PATH
+	[[ $1 == */* && -f $1 ]]&& {
+		IFS= read ln <$1
+		if [[ $ln == \#* ]]; then
+			_show_function_help "$1"
+		else
+			_show_helpfile_help "$1"
+		fi
+		return
+	  }
+
+	# if we need to search for the file to show
 	: ${FPATH:?}
 	splitstr ':' "$FPATH" fpath
 	local p funcfile
@@ -41,22 +72,9 @@ function f-help {
 		[[ -f $p/amuse-$1 ]]&&	{ funcfile="$p/amuse-$1";	break; }
 	done
 	if [[ -n $funcfile ]]; then
-		_show_function_help "$funcfile" "$1"
-	elif   [[ -f $helpdir/$1 ]]; then
-		local htmp pager SPARKLE_FORCE_COLOR
-		htmp=$(mktemp -t help-XXXXXXXX)
-		[[ -f $htmp ]]||
-			die UNAVAILABLE 'Could not ^Tmktemp^t'
-		sed -e '/^;/d' <$helpdir/$1 >$htmp
-		[[ -s $htmp ]]|| {
-			die UNAVAILABLE "^Tmktemp^t file ^B$htmp^b is empty."
-			rm -f "$htmp"
-		  }
-		[[ -t 1 ]]&& SPARKLE_FORCE_COLOR=true
-		pager=${PAGER:-less}
-		(($(wc -l <$htmp)<LINES))&& pager=cat
-		sparkle <$htmp | $pager
-		rm "$htmp"
+		_show_function_help "$funcfile"
+	elif [[ -f $helpdir/$1 ]]; then
+		_show_helpfile_help "$helpdir/$1"
 	else
 		die "No help for [1m$1[22m"
 	fi

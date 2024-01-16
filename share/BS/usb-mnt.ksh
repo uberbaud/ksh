@@ -126,6 +126,22 @@ function mnt-drv {
 	  }
 
 } # }}}1
+function disk-in-use { # {{{1
+	for v in "${InUse[@]}"; do
+		[[ $1 == $v:* ]]&& return
+	done
+	false
+} # }}}1
+function main { # {{{1
+	splitstr , "$(sysctl -n hw.disknames)" disknames
+	set -A InUse -- $(df -P | awk "$AWKPGM")
+	for d in "${disknames[@]}"; do
+		disk-in-use "$d" && continue
+		desparkle "$d"
+		notify "Trying to mount ^B$REPLY^b."
+#		mnt-drv "${d%%:*}" "${d#:}"
+	done
+} # }}}1
 
 : ${USER:?}
 needs as-root awk df egrep gsub needs-path
@@ -135,17 +151,17 @@ fatopts="-t msdos -s -o rw,noexec,nosuid,-g=$USER,-u=$USER"
 cdopts="-t cd9660 -s -o rw,noexec,nosuid,-g"
 ntfsopts="-t ntfs"
 
-#function as-root { "$@"; }
-function main {
-	splitstr , "$(sysctl -n hw.disknames)" disknames
-	for d in "${disknames[@]}"; do
-		[[ $d == sd0:* ]]&& continue
-		desparkle "$d"
-		notify "Trying to mount ^B$REPLY^b."
-		mnt-drv "${d%%:*}" "${d#:}"
-	done
-}
+AWKPGM=$(</dev/stdin) <<-\===AWKPGM===
+	/^\// {
+		sub(/^\/dev\//,"",$1)
+		a[substr($1,1,3)]=1
+	  }
+	END {
+		for (v in a) print v
+	  }
+	===AWKPGM===
 
-main "$@"; exit
+
+main; exit
 
 # Copyright (C) 2017 by Tom Davis <tom@greyshirt.net>.

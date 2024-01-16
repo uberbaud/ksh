@@ -102,7 +102,7 @@ function mnt-drv {
 	unset diskinfo[0]; set -A diskinfo -- "${diskinfo[@]}"
 	label=${label%%+([[:space:]])}
 	((${#diskinfo[*]}==1))|| {
-		warn 'Too many drives, bailing.'
+		warn 'Too many drives, bailing.' "${diskinfo[@]}"
 		return 1
 	  }
 	gsub ' ' _ "$label" label

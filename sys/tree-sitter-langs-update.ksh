@@ -63,7 +63,7 @@ function update-repo { # {{{1
 function clone-repo { # {{{1
 	NEW_REPOS=${NEW_REPOS:+"$NEW_REPOS" }$1
 	notify "Cloning ^S$1^s."
-	f-git clone "$2"
+	gg-clone "$2"
 } # }}}1
 function compile-repo { # {{{1
 	needs-cd -or-die "$PWD/$1"

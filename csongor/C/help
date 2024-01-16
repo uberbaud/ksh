@@ -70,7 +70,6 @@ f-espeak
 f-fc
 f-fortune
 f-fossil
-f-gg-clone
 f-git
 f-go
 f-halt
@@ -117,6 +116,7 @@ geometry
 get-exclusive-lock
 get-unused-fds
 getopts
+gg-clone
 git-remote-links
 golang
 gsub

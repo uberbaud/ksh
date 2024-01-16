@@ -11,9 +11,10 @@
 
 
 needs /usr/bin/doas prn-cmd
-function as-root {
-	# if we're not interactive, print what we're doing
-	[[ $- == *i* ]]|| {
+as-root () {
+	# if we're not interactive or called from a function, print what 
+	# we're doing
+	[[ $- != *i* || $0 != ?(/bin/)ksh ]]&& {
 		print -n '\033[45;37mdoas>\033[43;30m '
 		prn-cmd "$@"
 	  } >/dev/${TTY:-tty}

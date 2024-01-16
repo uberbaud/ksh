@@ -1,0 +1,58 @@
+#!/bin/ksh
+# <@(#)tag:tw.csongor.uberbaud.foo,2024-01-16,20.27.15z/554b369>
+
+# vim: ft=ksh ts=4 tw=72 noexpandtab nowrap foldmethod=marker
+
+set -o nounset;: ${FPATH:?Run from within KSH}
+
+# Usage {{{1
+this_pgm=${0##*/}
+function usage {
+	desparkle "$this_pgm"
+	PGM=$REPLY
+	sparkle >&2 <<-\
+	===SPARKLE===
+	^F{4}Usage^f: ^T$PGM^t
+	         Format a ^BUSB stick^b with ^BFAT32^b.
+	       ^T$PGM -h^t
+	         Show this help message.
+	===SPARKLE===
+	exit 0
+} # }}}
+# process -options {{{1
+while getopts ':h' Option; do
+	case $Option in
+		h)	usage;															;;
+		\?)	die USAGE "Invalid option: ^B-$OPTARG^b.";						;;
+		\:)	die USAGE "Option ^B-$OPTARG^b requires an argument.";			;;
+		*)	bad-programmer "No getopts action defined for ^T-$Option^t.";	;;
+	esac
+done
+# remove already processed arguments
+shift $((OPTIND-1))
+# ready to process non '-' prefixed arguments
+# /options }}}1
+function do-fdisk-with-checks { # {{{1
+	#fdisk -yi -b\*@64:FAT32 "$DRV"
+	as-root fdisk -yi -b ${REPLY%% *}@${REPLY##* }:FAT32 $1
+} # }}}1
+function do-newfs-with-checks { # {{{1
+	as-root newfs_msdos -F32 -L"$2" ${1}i
+} # }}}1
+function main { # {{{1
+	local label
+	label=${1:?Missing drive label}
+	get-usb-hd-to-format "${2:-}"
+	DRV=$REPLY
+	no-existing-format $DRV ||
+		warnOrDie "^B$DRV^b is already formated."
+	get-partition-bounds $DRV
+	do-fdisk-with-checks $DRV
+	do-newfs-with-checks $DRV "$label"
+	$VERBOSE && show-fmt-results
+} #}}}1
+needs as-root
+
+main "$@"; exit
+
+# Copyright (C) 2024 by Tom Davis <tom@greyshirt.net>.

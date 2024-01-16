@@ -78,29 +78,34 @@ function mount-fs-ondev-at { # {{{1
 		*)		warn "Unknown type <^B$fstype^b>.";				;;
 	esac
 } # }}}1
-# mnt-drv and resources {{{1
-awkpgm=$(</dev/stdin) <<-\
-	\==AWKPGM==
-	function printname() {
-		if (label)		print label;
-		else if (disk)	print disk;
-		else			print "unknown"
-	}
-	/^disk: /		{disk=substr($0,7)}
-	/^label: /		{label=substr($0,8)}
-	/^$/			{printname()}
-	/^  [abd-p]:/	{print $1,$4}
-	==AWKPGM==
-
-
-function mnt-drv {
-set -x
+function simplify-disklabel { # {{{1
+	local awkpgm
+	awkpgm=$(</dev/stdin) <<-\
+		\==AWKPGM==
+		function printname() {
+			if (label)		print label;
+			else if (disk)	print disk;
+			else			print "unknown"
+		}
+		/^disk: /		{disk=substr($0,7)}
+		/^label: /		{label=substr($0,8)}
+		/^$/			{printname()}
+		/^  [abd-p]:/	{print $1,$4}
+		==AWKPGM==
+	as-root disklabel "$dev" | awk "$awkpgm"
+} # }}}1
+function mnt-drv { # {{{1
 	local dev diskinfo fstype id label namefile newlabel part
 	dev=$1
 	id=${2:-}
-	splitstr NL "$(as-root disklabel "$dev" | awk "${awkpgm[@]}")" diskinfo
+	splitstr NL "$(simplify-disklabel)" diskinfo
 	label=${diskinfo[0]}
-	unset diskinfo[0]; set -A diskinfo -- "${diskinfo[@]}"
+	unset diskinfo[0]
+	((${diskinfo[*]+1}))|| {
+		warn "^B$dev^b is not formated for ^IOpenBSD^i."
+		return
+	  }
+	set -A diskinfo -- "${diskinfo[@]}"
 	label=${label%%+([[:space:]])}
 	integer dc=${#diskinfo[*]}
 	if ((dc == 1)); then
@@ -137,9 +142,23 @@ function disk-in-use { # {{{1
 	done
 	false
 } # }}}1
+function hd-devs-in-use { # {{{1
+	local awkpgm
+	awkpgm=$(</dev/stdin) <<-\
+		\===AWKPGM===
+		/^\// {
+			sub(/^\/dev\//,"",$1)
+			a[substr($1,1,3)]=1
+	  	}
+		END {
+			for (v in a) print v
+	  	}
+		===AWKPGM===
+	df -P | awk "$awkpgm"
+} # }}}1
 function main { # {{{1
 	splitstr , "$(sysctl -n hw.disknames)" disknames
-	set -A InUse -- $(df -P | awk "$AWKPGM")
+	set -A InUse -- $(hd-devs-in-use)
 	for d in "${disknames[@]}"; do
 		disk-in-use "$d" && continue
 		desparkle "$d"
@@ -155,17 +174,6 @@ ffsopts='-t ffs -s -o rw,noexec,nodev,sync,softdep'
 fatopts="-t msdos -s -o rw,noexec,nosuid,-g=$USER,-u=$USER"
 cdopts="-t cd9660 -s -o rw,noexec,nosuid,-g"
 ntfsopts="-t ntfs"
-
-AWKPGM=$(</dev/stdin) <<-\===AWKPGM===
-	/^\// {
-		sub(/^\/dev\//,"",$1)
-		a[substr($1,1,3)]=1
-	  }
-	END {
-		for (v in a) print v
-	  }
-	===AWKPGM===
-
 
 main; exit
 

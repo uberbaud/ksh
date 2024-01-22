@@ -9,7 +9,7 @@ function needs-cd {
 	local or_what notice REPLY v r
 
 	# handle option flags
-	notice=false
+	notice=${VERBOSE:-false}
 	while (($#>1)); do
 		case $1 in
 			-or-warn)		or_what=warn;									;;

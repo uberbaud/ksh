@@ -1,0 +1,35 @@
+# <@(#)tag:tw.csongor.uberbaud.foo,2024-01-18,02.37.58z/2520c89>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+#---------------------------------------------------------------------------
+#: FUNCTION ^G(no arguments)^g
+#:   outsrc initialization function
+
+needs needs-cd
+function _init {
+	local flag w_notice cd_to_path
+	export VERBOSE=${VERBOSE:-false}
+	cd_to_path=
+
+	set -- "${argv[@]}"
+	while getopts ':vC:' flag; do
+		case $flag in
+			v)	VERBOSE=true;												;;
+			C)	cd_to_path=$OPTARG;											;;
+			\?)	break;														;;
+			\:)	die USAGE "flag ^B-$OPTARG^b requires an argument.";		;;
+			*)	bad-programmer "No ^Tgetopts^t ^Ucase^u for ^T-$flag^t.";	;;
+		esac
+	done
+	shift $((OPTIND-1))
+	set -A argv -- "$@"
+
+	[[ -n ${cd_to_path:-} ]]&& {
+		cd_to_path=$(realpath "$cd_to_path" 2>&1) ||
+			die "${cd_to_path#realpath: }"
+		needs-cd -or-die "$cd_to_path"
+	  }
+
+	SUBCMDS_ALIASES='-L:list-cmds'
+}
+
+# Copyright © 2024 by Tom Davis <tom@greyshirt.net>.

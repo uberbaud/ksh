@@ -20,9 +20,11 @@ function usage {
 	exit 0
 } # }}}
 # process -options {{{1
+warnOrDie=die
 while getopts ':h' Option; do
 	case $Option in
 		h)	usage;															;;
+		f)	warnOrDie=warn;													;;
 		\?)	die USAGE "Invalid option: ^B-$OPTARG^b.";						;;
 		\:)	die USAGE "Option ^B-$OPTARG^b requires an argument.";			;;
 		*)	bad-programmer "No getopts action defined for ^T-$Option^t.";	;;
@@ -36,18 +38,41 @@ function doit { # {{{1
 	h3 "$*"
 	"$@" || die "Could not ^T$*^t"
 } # }}}1
+function expect { # {{{1
+	[[ ${1:?} == *$2* ]]||
+		die '^Tgot info^t output has changed!' "expected ^V$2^v, got ^V$1^v."
+} # }}}1
 function main { # {{{1
-	local repo IFS=$IFS O
+	local repo IFS=$IFS O origin branch before after
 	O=$IFS
-	IFS=$NL
-	set -- $(got info) || return
-	IFS=$O
-	for info; do
-		[[ $info == repository:* ]]|| continue
-		repo=${info#repository: }
-	done
-	doit git -C "$repo" fetch --all
-	doit got update
+	IFS=$NL; set -- $(got info) || return; IFS=$O
+
+	expect "$1" tree:
+	expect "$2" base        && before=${2#*: }
+	expect "$3" prefix
+	expect "$4" branch      && branch=${4#*: }
+	expect "$5" UUID
+	expect "$6" repository: && repo=${6#*: }
+
+	origin=$(git -C "$repo" branch|awk '/\*/{print $2}')
+	doit git								\
+		-C "$repo"							\
+		fetch								\
+			--all --tags					\
+			--prune --prune-tags --force	\
+			--progress						\
+	|| warnOrDie "^Tgit^t did not complete. (^E$?^e)"
+
+	#doit got integrate $origin # only allows one integration
+	#doit got rebase $origin    # changes branch to $origin
+	doit got merge $origin
+
+	# Check whether the base commit changed
+	IFS=$NL; set -- $(got info) || die "Weirdness!"; IFS=$O
+	after=${2#*: }
+
+	notify "Base Commits" "before: $before" "after:  $after"
+	[[ $before != $after ]]
 } #}}}1
 
 NL='

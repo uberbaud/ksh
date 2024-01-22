@@ -1,7 +1,7 @@
 # <@(#)tag:tw.csongor.greyshirt.net,2021-10-29,00.59.44z/29cc894>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
-
-#: FUNCTION ^[^T-or-warn^t^|^T-or-die^t^|^T-or-false^t^] ^Uname^u
+#--------------------------------------------------------------------------
+#: FUNCTION ^[^T-or-warn^t^|^T-or-die^t^|^T-or-false^t^] ^Uname^u ^S[…^s ^UnameN^u^]
 #:   Sets ^VAPP_PATH^v to ^O$^o^VKDOTDIR^v^/^Blib^b/^Uname^u
 #:   Prefixes ^VPATH^v and ^VFPATH^v with ^O$^o^VAPP_PATH^v^T/^t^O{^o^TB^t^O,^o^TF^T^O}^o respectively, if they exist.
 #:   ^Twarn^ts, ^Tdie^ts (default), or returns ^Ifalse^i if ^Uname^u is 
@@ -9,9 +9,10 @@
 
 needs bad-programmer warnOrDie
 function use-app-paths {
-	local A I warnOrDie
+	local A I warnOrDie errs
 	warnOrDie=die	# default, will be reset in flag processing loop
 	while [[ ${1:-} == -* ]]; do
+		[[ $1 == -- ]]&& { shift; break; }
 		[[ $1 == -or-@(warn|die|false) ]]||
 			bad-programmer "Unknown option ^B$1^b."
 		warnOrDie=${1#-or-}
@@ -19,21 +20,25 @@ function use-app-paths {
 	done
 	I=lib
 	(($#))|| bad-programmer "^T$0^t: missing parameter ^Uname^u."
+
+	integer errs=0
 	while (($#)); do
 		A=${KDOTDIR:?}/$I/$1
-		[[ -d $A ]]|| {
+		if [[ -d $A ]]; then
+			[[ -d $A/F && :$FPATH: != *:$A/F:* ]]&&
+				FPATH=$A/F${FPATH:+:"$FPATH"}
+			[[ -d $A/B && :$PATH: != *:$A/B:* ]]&&
+				PATH=$A/B${PATH:+:"$PATH"}
+			[[ :${APP_PATH:-}: != *:$A:* ]]&&
+				APP_PATH=${APP_PATH:+$APP_PATH:}$A
+		else
 			FORCE_MSG=
 			warnOrDie "No private path ^O\$^o^VKDOTDIR^v^T/$I/^t^B$1^b."
-			continue
-		  }
-		[[ -d $A/F && :$FPATH: != *:$A/F:* ]]&&
-			FPATH=$A/F${FPATH:+:"$FPATH"}
-		[[ -d $A/B && :$PATH: != *:$A/B:* ]]&&
-			PATH=$A/B${PATH:+:"$PATH"}
-		[[ :${APP_PATH:-}: != *:$A:* ]]&&
-			APP_PATH=${APP_PATH:+$APP_PATH:}$A
+			((errs++))
+		fi
 		shift
 	done
+	return $errs
 }
 
 # Copyright © 2021 by Tom Davis <tom@greyshirt.net>.

@@ -5,7 +5,7 @@
 #:   Wrap gg-clone.ksh so we can do a ^Tcd^t.
 
 needs ${BS:?}/gg-clone.ksh
-function f-gg-clone {
+function gg-clone {
 	local R W
 	eval "$(${BS:?}/gg-clone.ksh "$@")" || return
 	sparkle-path "${WORKTREE_PATH-}";	W=$REPLY

@@ -1,13 +1,12 @@
 # <@(#)tag:csongor.greyshirt.net,2017-07-27:tw/03.54.08z/daff8>
-
-#: FUNCTION ^Ustr1^u ^[^Ustr…N^u^]
-#:   Double carets ( '^^' ^= '^^^^' ) concatenated command line parameters,
-#:   I.e. quote text for inclusion in a sparkle. Result ^= ^SREPLY^s
+#----------------------------------------------------------------------------
+#: FUNCTION ^Ustr1^u ^[^Uvar name^u^] ^= ^O${^o^V2^v^:^-^O${^o^VREPLY^v^O}}^o
+#:   Double carets ( '^^' ^= '^^^^' ), i.e. quote text for inclusion in a sparkle.
 
 function desparkle {
-	typeset -- t="$*" p=''
+	typeset -- t="$1" p=''
 	while [[ $t == *^* ]] { p=$p${t%%^*}^^; t=${t#*^}; }
-	REPLY=$p$t
+	eval ${2:-REPLY}=\$p\$t
 }
 
 # vim: ft=ksh ts=4

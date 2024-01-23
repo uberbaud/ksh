@@ -12,8 +12,11 @@ function usage {
 	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
-	^F{4}Usage^f: ^T$PGM^t
-	         Specially handle got/git /home/tw/local/share/repos connection.
+	^F{4}Usage^f: ^T$PGM^t ^[^Ufrom commit^u^]
+	         Fetch updates from the ^Bgit^b upstream into the local repository, then
+	         merge those updates into the local ^Bgot worktree^b.
+	           ^Ufrom commit^u  Get changes for the ^Bgot worktree^b from branch/tag/commit.
+	                        The default commit is the ^Iupstream current^i branch.
 	       ^T$PGM -h^t
 	         Show this help message.
 	===SPARKLE===
@@ -42,19 +45,21 @@ function expect { # {{{1
 	[[ ${1:?} == *$2* ]]||
 		die '^Tgot info^t output has changed!' "expected ^V$2^v, got ^V$1^v."
 } # }}}1
+function get-got-info { #{{{1
+	local IFS=$NL
+	set -A ${1:?} -- $(got info)
+} # }}}1
 function main { # {{{1
-	local repo IFS=$IFS O origin branch before after
-	O=$IFS
-	IFS=$NL; set -- $(got info) || return; IFS=$O
+	local repo from_commit branch before after
 
-	expect "$1" tree:
-	expect "$2" base        && before=${2#*: }
-	expect "$3" prefix
-	expect "$4" branch      && branch=${4#*: }
-	expect "$5" UUID
-	expect "$6" repository: && repo=${6#*: }
+	get-got-info info || return
+	expect "${info[0]}" tree:
+	expect "${info[1]}" base		&& before=${info[1]#*: }
+	expect "${info[2]}" prefix
+	expect "${info[3]}" branch		&& branch=${info[3]#*: }
+	expect "${info[4]}" UUID
+	expect "${info[5]}" repository:	&& repo=${info[5]#*: }
 
-	origin=$(git -C "$repo" branch|awk '/\*/{print $2}')
 	doit git								\
 		-C "$repo"							\
 		fetch								\
@@ -63,13 +68,15 @@ function main { # {{{1
 			--progress						\
 	|| warnOrDie "^Tgit^t did not complete. (^E$?^e)"
 
-	#doit got integrate $origin # only allows one integration
-	#doit got rebase $origin    # changes branch to $origin
-	doit got merge $origin
+	from_commit=${1:-$(git -C "$repo" branch|awk '/\*/{print $2}')}
+
+	#doit got integrate "$from_commit"  # only allows one integration
+	#doit got rebase "$from_commit"     # changes branch to $from_commit
+	doit got merge "$from_commit"
 
 	# Check whether the base commit changed
-	IFS=$NL; set -- $(got info) || die "Weirdness!"; IFS=$O
-	after=${2#*: }
+	get-got-info info || die "Weirdness!"
+	after=${info[1]#*: }
 
 	notify "Base Commits" "before: $before" "after:  $after"
 	[[ $before != $after ]]

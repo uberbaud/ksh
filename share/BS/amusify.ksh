@@ -4,6 +4,7 @@
 
 set -o nounset;: ${FPATH:?Run from within KSH}
 
+Q=6
 F='^F{0}'
 EDIT=${VISUAL:-${EDITOR:-vi}}
 NL='
@@ -110,8 +111,15 @@ function convert-to-ogg-if-not-already-ogg { # {{{1
 	egrep -q '^fmt/file/Ogg' "$fINF" && return
 
 	MUSIC_FILE_IS_OGG=false
+	new-array opts
+	+opts -i "$MUSIC_FILE"	# input file
+	+opts -vn				# don't include video
+	+opts -c:a libvorbis	# codec:audio
+	+opts -qscale:a $Q		# quality
+	+opts "$fOGG"			# ogg file name
+
 	[[ -f $fOGG ]]&& rm -f "$fOGG"
-	ffmpeg -i "$MUSIC_FILE" "$fOGG" >$fLOG 2>&1 || return
+	ffmpeg "${opts[@]}" >$fLOG 2>&1 || return
 	[[ -f $fOGG ]]
 } # }}}1
 function get-hash-name-from-ogg { # {{{1
@@ -361,7 +369,7 @@ TTY=${TTY:-$(tty)} || TTY=/dev/tty
 
 needs SQL SQLify						\
 	amuse:env bad-programmer			\
-	cksum ffmpeg mediainfo needs-file oggdec tr unzip
+	cksum ffmpeg mediainfo needs-file oggdec tr unzip new-array
 
 amuse:env || die "^Tamuse:env^t: $REPLY"
 DB=$AMUSE_DATA_HOME/amuse.db3

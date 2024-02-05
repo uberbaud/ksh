@@ -1,6 +1,6 @@
 # <@(#)tag:csongor.greyshirt.net,2017-08-04:tw/19.39.13z/12a7e33>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
-
+#========================================================================
 #: FUNCTION ^Utopic or file^u
 #:   Shows help for KSH builtins or functions in ^SFPATH^s or if
 #:   ^Utopic of file^u conatains a forward slash ^(^T/^t^), it is used
@@ -10,14 +10,16 @@ function _show_function_help {
 	local awkpgm
 	awkpgm=$(</dev/stdin) <<-\
 		\==AWK==
-			/^#:/	{p=1}
-			!p		{ next }
-			/^$/	{ nextfile }
-					{	sub( "FUNCTION", "^T"fn"^t" )
-						sub( /^#:/, " ")
-						print
-					  }
-			END		{
+			/^#::/		{ sub( /^#:: +/, "" ); dscr=$0 }
+			/^#:[^:]/	{p=1}
+			!p			{ next }
+			/^$/		{ nextfile }
+						{	sub( "FUNCTION", "^T"fn"^t" )
+							sub( "DE?SCR(IPTION)?", dscr )
+							sub( /^#:/, " ")
+							print
+						  }
+			END			{
 				if (p==0) {
 					printf "  No help in function ^B%s^b.\n", fn
 				  }

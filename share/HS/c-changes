@@ -49,6 +49,10 @@
     ^BSafer^b ^Tstrcat_s^t^^(^), ^Tstrncpy_s^t^(^), ^Tgets_s^t^(^), (removed 
         ^Tgets^t^(^)), and ^Tfopen_s^t^(^).
     ^Tfopen^t^(^) has exclusive create-and-open mode ("..x")
+    ^BCompound Literals^b Like anonymous structures in ^Bzig^b but also an 
+        initializer like C strings but with things other than ^Tchar^t, so
+            ^Tfloat *f = (float []){ 1.07, 1e3, 3.141592654 }^t
+        where f is a readonly value of three (3) floats.
 
 ^BC11 -> C17^b
 
@@ -61,6 +65,8 @@
     ^T<stdckdint.h>^t with macros ^Tckd_add^t to provide signed integer with 
     infinite range arithmetic simulation;
 
+    ^T<stdbit.h>^t with bit handling things.
+
     ^Tmemset_explicit^t to avoid optimizing out memory clearing code;
 
     ^Ttrue^t, ^Tfalse^t, and ^Tnullptr^t are language keywords,
@@ -72,6 +78,22 @@
     ^T={}^t syntax for zeroed local structs and variable-length arrays,
 
     ^T0b^t prefix for binary representation of numbers,
+
+    ^Tconstexpr^t compile time constant so that ^Tint a[^t^Vx^v^T]^t can be an array
+    instead of a ^IVLA^i if ^Vx^v is declared as ^Tconstexpr^t. Can also be
+    used on ^BCompound Literals^b.
+        ^Ttypedef struct crime { int criming; } crime;^t
+        ^Tconst crime crimes = (constexpr crime){ 11 };^t
+        ^Tint main (void) { return crimes.criming; }^t
+
+    ^BOptional comma variadic args comma^b in macros
+        ^T#define x(arg1, …) fn(arg1, __VA_OPT__(,) __VA_ARGS__)^t
+
+    ^BVariadic function with no required arg1^b
+        ^Tfn(...)^t
+
+    ^Btyped enumerations^b
+        ^Tenum e : uint8_t { x, y, z };^t
 
     ^WWARNING^w
     ^BC23^b redeclares ^Trealloc(^t^Up^u^T,0)^t from ^Ifrees and returns 

@@ -12,11 +12,11 @@ function usage {
 	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
-	^F{4}Usage^f: ^T$PGM^t ^[^Ufrom commit^u^]
+	^F{4}Usage^f: ^T$PGM^t ^[^Uref name^u^]
 	         Fetch updates from the ^Bgit^b upstream into the local repository, then
 	         merge those updates into the local ^Bgot worktree^b.
-	           ^Ufrom commit^u  Get changes for the ^Bgot worktree^b from branch/tag/commit.
-	                        The default commit is the ^Iupstream current^i branch.
+	           ^Uref name^u  Update the ^Bgot worktree^b to match a given ^Bbranch^b or ^Btag^b.
+	                     The default commit is the ^Iupstream current^i branch.
 	       ^T$PGM -h^t
 	         Show this help message.
 	===SPARKLE===
@@ -49,8 +49,19 @@ function get-got-info { #{{{1
 	local IFS=$NL
 	set -A ${1:?} -- $(got info)
 } # }}}1
+function latest-git-ref { # {{{1
+	local trunk ref_prefix
+	needs-cd -or-die "${2:?}"
+	[[ -f HEAD ]]|| ERRMSG='Bad repository format: no ^BHEAD^b.' return
+	ref_prefix='ref: '
+	trunk=$(<HEAD)
+	[[ $trunk == $ref_prefix* ]]||
+		ERRMSG="Bad HEAD format: not ^T$ref_prefix^t^O*^o." return
+	trunk=${trunk#ref: }
+	command git -C "$1" show-ref --head | awk "\$2 == "$trunk" {print \$1}"
+} # }}}1
 function main { # {{{1
-	local repo from_commit branch before after
+	local repo upto_ref branch before after
 
 	get-got-info info || return
 	expect "${info[0]}" tree:
@@ -68,17 +79,39 @@ function main { # {{{1
 			--progress						\
 	|| warnOrDie "^Tgit^t did not complete. (^E$?^e)"
 
-	from_commit=${1:-$(git -C "$repo" branch|awk '/\*/{print $2}')}
+	if [[ -n ${1:-} ]]; then
+		upto_ref=$(git -C "$repo" show-ref "$1") || {
+			desparkle "$1"
+			die "^V$REPLY^v is not a valid ^Btag^b or ^Bbranch^b."
+		  }
+		upto_ref=${upto_ref% *}
+	else
+		upto_ref=$(latest-git-ref "$repo") || die "$ERRMSG"
+	fi
 
-	#doit got integrate "$from_commit"  # only allows one integration
-	#doit got rebase "$from_commit"     # changes branch to $from_commit
-	doit got merge "$from_commit"
+	# return FALSE if there's no updating to do
+	[[ $upto_ref != $before ]]|| return
+
+	#----
+	# *different branch
+	#    ERRMSG: target commit is on a different branch
+	#    requires "$upto_ref" to be on the same branch
+	#----
+	doit got update -c "$upto_ref"
+	#doit got merge "$upto_ref"			# doesn't accept commit-ids
+	#doit got update -c "$upto_ref"		# *different branch
 
 	# Check whether the base commit changed
 	get-got-info info || die "Weirdness!"
 	after=${info[1]#*: }
 
-	notify "Base Commits" "before: $before" "after:  $after"
+	notify "Base Commits"	\
+		"before: $before"	\
+		"after:  $after"	\
+		"wanted: $upto_ref"
+
+	# return TRUE if an update occured, FALSE otherwise (SHOULD never 
+	# get here with FALSE, but maybe got update failed).
 	[[ $before != $after ]]
 } #}}}1
 

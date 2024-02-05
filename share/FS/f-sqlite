@@ -2,7 +2,7 @@
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
 #: FUNCTION ^[^Udb3^u^] ^[^Ucommand^u ^Uwords^u ^S…^s^]
-#:   Opens ^Udb3^u if it's given, otherwise uses ^Tomenu^t ^O*^o^T.db^t^O?(^o^T3^t^^O)^o,
+#:   Opens ^Udb3^u if it's given, otherwise uses ^Tomenu^t ^O*^o^T.db^t^O?(^o^T3^t^O)^o,
 #:   which will not even menuify if there's only once match.
 
 needs sqlite3

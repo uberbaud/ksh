@@ -4,7 +4,7 @@
 
 set -o nounset;: ${FPATH:?Run from within KSH}
 
-realbin=$(realbin "$0")
+realbin=$(realpath $(whence -p "$0"))
 shortcall=${0##*/};       shortcall=${shortcall%.*}
 shortbin=${realbin##*/};  shortbin=${shortbin%.*}
 appUser=''

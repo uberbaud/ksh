@@ -4,7 +4,9 @@
 
 set -o nounset;: ${FPATH:?Run from within KSH}
 
-REAL_NAME=subcmds_ctlr
+realbin=$(realpath $(whence -p "$0"))
+shortbin=${realbin##*/};	shortbin=${shortbin%.*}
+REAL_NAME=$shortbin
 CALLED_AS=${0##*/}
 
 this_pgm=${0##*/}
@@ -35,24 +37,27 @@ function usage { # {{{1
 	===SPARKLE===
 	exit 0
 } # }}}1
-function list-subcommands { # {{{1
-	local c p prefix sedpgm
+function mk-subcmds-list { # {{{1
+	local c s p prefix sedpgm
 	: ${APP_PATH:?}
 	prefix=${SUBCMDS_PREFIX:-subcmd-}
 	sedpgm="/^function $prefix/{s/^function //;s/[[:space:]].*//;p;}"
-	set -s --											\
+	set --												\
 		"$@"											\
 		${full_pgm:+$(sed -nEe "$sedpgm" "$full_pgm")}	\
 		$(matching-commands "$prefix*")
 
+	integer i=0
 	p=
 	for c; do
 		[[ $c == _init ]]&& continue # _init is reserved
-		c=${c#"$prefix"}; c=${c%.ksh}
-		[[ $c == $p ]]&& continue
-		print -r -- "$c"
-		p=$c
+		s=${c#"$prefix"}; s=${s%.ksh}
+		[[ $s == $p ]]&& continue
+		CMD_LIST[i]=$s
+		SUBCMDS_MAP[i++]="$s $c"
+		p=$s
 	done
+	set -A CMD_LIST -s -- "${CMD_LIST[@]}"
 } # }}}1
 function is-subcmd-valid { # {{{1
 	local c REPLY
@@ -111,7 +116,7 @@ function do-sub-command { # {{{1
 needs use-app-paths desparkle sed
 
 if [[ $CALLED_AS == $REAL_NAME ]]; then
-	[[ ${1} == @(-h|--help|help) ]]&& usage
+	[[ ${1:-} == @(-h|--help|help) ]]&& usage
 	(($#))||
 		die '^Uapp-name^u not give as parameter nor by ^Balias^b^/^Blink^b.'
 	APP=$1; shift
@@ -138,7 +143,10 @@ x=$(whence _init) && {
   }
 SC_PREF=${SUBCMDS_PREFIX:-subcmd-}
 process-subcmds-aliases
-set -A CMD_LIST -s -- $(list-subcommands help)
+
+set -A CMD_LIST
+set -A SUBCMDS_MAP
+mk-subcmds-list help
 
 subcmd=$1; shift
 [[ $subcmd == @(-h|--help) ]]&& subcmd=help

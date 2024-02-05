@@ -8,6 +8,7 @@ GENERATE   != sed -E -e '/^\#/d' $(.CURDIR)/GENERATE
 SHARED     != sed -E -e '/^\#/d' $(.CURDIR)/SHARED
 
 GIT_IGN     = .gitignore
+CARGO_BIN   = $(CARGO_HOME)/bin
 
 # ========================================================================
 # === DON'T DO ANYTHING IN SOME CASES ====================================
@@ -108,6 +109,10 @@ HELP_HCHG=$(KDOTDIR)/share/HS/.LAST_UPDATED
 help: $(HELP_FCHG) $(HELP_HCHG)
 	@$(HELP_UPBIN)
 
+jj_1: $(CARGO_BIN)/jj
+	@echo $@
+	@jj -h | awk 'p && /^$$/ {nextfile} p {print $$1} /^Commands:/ {p=1}' >$@
+
 PKG_LOG = $(HOME)/hold/$(OSREV)/pkg.log
 MAN_CONF = /etc/man.conf
 LIST_MAN_PAGES = $(KDOTDIR)/share/BS/list-man-pages.ksh
@@ -122,7 +127,7 @@ m_2: $(MAIL_UPDATED)
 	@echo $@
 	@$(MAIL_BIN) -ar >$@
 
-pijul_1: /home/tw/local/share/cargo/bin/pijul
+pijul_1: $(CARGO_BIN)/pijul
 	@echo $@
 	@pijul -h | awk 'p && /^    [a-z]/ {print $$1} /^SUBCOMMANDS:/ {p=1}' >$@
 
@@ -157,7 +162,7 @@ rcctl_2: $(PKG_LOG)
 	@echo $@
 	@/bin/ls -1 /etc/rc.d >$@
 
-ts: /home/tw/local/share/cargo/bin/tree-sitter
+ts: $(CARGO_BIN)/tree-sitter
 	@echo $@
 	@tree-sitter -h >tmp.tree-sitter
 	@awk '/^SUBCOMMANDS:/ {p=1;next} p {print $$1}' tmp.tree-sitter >$@

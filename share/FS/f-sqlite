@@ -35,7 +35,7 @@ function f-sqlite {
 	else
 		db3=$(omenu *.db?(3)) || return
 		[[ -f $db3 ]]|| {
-			local sparkGlob='^O*^o^T.db^t^O?(^o^T3^t^^O)^o'
+			local sparkGlob='^O*^o^T.db^t^O?(^o^T3^t^O)^o'
 			local posVar='^O$^o^V1^v'
 			die "$posVar is not a file and there's no $sparkGlob."
 		  }

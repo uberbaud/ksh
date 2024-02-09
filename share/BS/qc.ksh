@@ -11,16 +11,20 @@ function usage {
 	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
-	^F{4}Usage^f: ^T$PGM^t ^[^T-v^t^] ^[^T-p^t ^Upath^u^] ^[^T-n^t ^Uname^u^] ^[^Upkg-config names^u^]
-	         Opens a very simple C skeleton file in ^O\$^o^VVISUAL^v or ^O\$^o^VEDITOR^v,
-	         On every save ^Tmake^ts and runs it (saving an unchanged version
-	             will clear the ^Imake^i screen, and
-	         when the editor is exited, deletes the ^SC^s file.
-	         ^T-v^t       Increase verbosity.
-	         ^T-p^t ^Upath^u  Use ^Upath^u instead of ^O\$(^o^Tmktemp^t^O)^o. And do not delete
-	                  the source file or executable on editor exit.
-	         ^T-n^t ^Uname^u  Use this ^Uname^u instead of ^Ttest^t. If ^Uname^u contains a path
-	                  implies ^T-p^t with that path.
+	^F{4}Usage^f: ^T$PGM^t ^[^T-v^t^] ^[^Uname^u^] ^[^Upkg name^u ^S…^s^]
+	            Opens a simple C skeleton file in ^O\$^o^VVISUAL^v or ^O\$^o^VEDITOR^v.
+	         On every save, ^Tfuddle^t^G+^g^Brun^b it (saving an unchanged version
+	         will clear the screen before building).
+	            If ^Uname^u is given, that name will be used. If no ^Uname^u is
+	         given, ^Ttest.c^t will be created in a temporary directory which will
+	         be deleted on quiting the editor. If ^Uname^u does not have a suffix
+	         the extension ^T.c^t will be added. It is an error to give a ^Uname^u with
+	         a suffix other than ^T.c^t.
+	            Any ^Upkg name^us given will be placed in ^O$^o^VPACKAGES^v for ^Tfuddle^ting.
+	         If ^Uname^u is a valid installed ^Tpkg-config^t package, it will be
+	         interpreted as a ^Upkg name^u, adding a ^T.c^t suffix will prevent that.
+
+	             ^T-v^t       Increase verbosity.
 	       ^T$PGM -h^t
 	         Show this help message.
 	===SPARKLE===
@@ -30,10 +34,8 @@ function usage {
 verbose=false
 filename=
 pathname=
-while getopts ':n:p:vh' Option; do
+while getopts ':vh' Option; do
 	case $Option in
-		n)  filename=$OPTARG;												;;
-		p)  pathname=$OPTARG;												;;
 		v)	verbose=true;													;;
 		h)	usage;															;;
 		\?)	die USAGE "Invalid option: ^B-$OPTARG^b.";						;;
@@ -100,36 +102,49 @@ function write-file { #{{{1
 
 needs add-exit-actions build-and-run clearout needs-cd pkg-config use-app-paths
 use-app-paths build-tools
-needs get-build-paths show-bad-packages subst-pathvars
+needs get-build-paths subst-pathvars
 
-(($#))|| pkg-config --exists "$@" || show-bad-packages "$@"
+set -A PACKAGES --
+set -A BAD --
+integer i=0 b=0
+while (($#)); do
+	if pkg-config --exists "$1"; then
+		PACKAGES[i++]=$1
+	elif [[ -z $filename ]]; then
+		filename=$1
+	else
+		BAD[b++]=$1
+	fi
+	shift
+done
+((b))&& die 'Uninstalled or bad ^Bpkg-config^b packages:' "${BAD[@]}"
+
+get-build-paths "$PWD" # set before cd-ing somewhere else.
 
 if [[ -z ${filename-} ]]; then
 	filename=test
 elif [[ $filename == */* ]]; then
-	[[ -n ${pathname:-} ]]&&
-		die 'Used flags ^T-p^t and ^T-n^t with an included path.'
 	pathname=${filename%/*}
 	filename=${filename#"$pathname/"}
-else # -n with bare filename (no path)
+	needs-cd -or-die "$pathname"
+else
 	pathname=$PWD
 fi
 
 if [[ -z ${pathname:-} ]]; then
-	pathname=$(mktemp -d) || die 'Could not ^Tmktemp^t.'
+	pathname=$(mktemp -td qc.XXXXXXXXXX) || die 'Could not ^Tmktemp^t.'
 	needs-cd -or-die "$pathname"
 	add-exit-actions 'clearout'
-else
-	needs-cd -or-die "$pathname"
 fi
+
+[[ $filename == *.* && $filename != *.c ]]&&
+	die "Extension ^B${filename#*.}^b is not valid. Must be ^T.c^t if given."
 
 filename=${filename%.c}.c
 [[ -a $filename ]]&& {
 	sparkle-path "$PWD/$filename"
 	die "$REPLY already exists." "See: ^Tbuild-and-run -e^t"
   }
-
-get-build-paths "$pathname"
 
 write-file "$@" >$filename
 build-and-run -e "$filename"; exit

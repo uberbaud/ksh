@@ -4,6 +4,7 @@
 # vim: ft=ksh ts=4 tw=72 noexpandtab nowrap foldmethod=marker
 
 set -o nounset;: ${FPATH:?Run from within KSH}
+FAT32='0b'
 
 # Usage {{{1
 this_pgm=${0##*/}
@@ -34,7 +35,7 @@ shift $((OPTIND-1))
 # /options }}}1
 function do-fdisk-with-checks { # {{{1
 	#fdisk -yi -b\*@64:FAT32 "$DRV"
-	as-root fdisk -yi -b ${REPLY%% *}@${REPLY##* }:FAT32 $1
+	as-root fdisk -yi -b ${REPLY%% *}@${REPLY##* }:$FAT32 $1
 } # }}}1
 function do-newfs-with-checks { # {{{1
 	as-root newfs_msdos -F32 -L"$2" ${1}i

@@ -75,6 +75,7 @@ f-go
 f-halt
 f-help
 f-host
+f-img
 f-include-what-you-use
 f-locate
 f-luarocks

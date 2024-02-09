@@ -1,0 +1,21 @@
+# <@(#)tag:tw.csongor.uberbaud.foo,2024-02-07,02.50.58z/2796738>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+#---------------------------------------------------------------------------
+#: FUNCTION ^G(no arguments)^g
+#:   Show ImageMagick commands
+
+function f-img {
+	cat <<-===
+		animate
+		compare
+		composite
+		conjure
+		convert
+		display
+		identify
+		import
+		montage
+	===
+}
+
+# Copyright © 2024 by Tom Davis <tom@greyshirt.net>.

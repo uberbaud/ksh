@@ -149,6 +149,8 @@ export LUA_CPATH_5_3="$xdgdata/lua/5.3/?.so;;"
 export CARGO_HOME=$xdgdata/cargo
 export TEMPLATES_FOLDER=$xdgdata/templates
 export TMPDIR=$xdgcache/temp
+export TMUX_TMPDIR=$xdgcache/tmux
+[[ -d $TMUX_TMPDIR ]]|| mkdir -p "$TMUX_TMPDIR"
 export USRBIN=$HOME/bin/ksh
 export PERL_CPANM_HOME=$xdgdata/cpanm
 export PERL_UNICODE=AS

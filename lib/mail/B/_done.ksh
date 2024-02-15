@@ -99,6 +99,8 @@ CIP='alexepstein@industrialprogress.net'
   X -from  '@receipt\.lowes\.com'         receipts      "Lowe's Receipt"
   X -from  'permies@permies.com'          permies       "permies"
   X -from  '@paypal\.com'                 paypal        "paypal"
+TAXES='@efile\.jacksonhewitt\.com'
+  X -from  "$TAXES"                       taxes         "tax related"
 
 if Done; then
     print -u2 ' [34m>>>[0m No messages to [1mremove[0m.'

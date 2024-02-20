@@ -162,6 +162,10 @@ rcctl_2: $(PKG_LOG)
 	@echo $@
 	@/bin/ls -1 /etc/rc.d >$@
 
+tmux: /usr/bin/tmux
+	@echo $@
+	@tmux list-commands | awk '{print $$1}' >$@
+
 ts: $(CARGO_BIN)/tree-sitter
 	@echo $@
 	@tree-sitter -h >tmp.tree-sitter

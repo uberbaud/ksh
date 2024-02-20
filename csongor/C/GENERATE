@@ -14,5 +14,6 @@ rcctl_2
 scp
 ssh
 sysctl
+tmux
 ts
 vmgr_1

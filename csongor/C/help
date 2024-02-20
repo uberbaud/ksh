@@ -187,6 +187,7 @@ new-array
 newest
 nextfd
 nibble
+nl-to-cr
 nodark
 noglob
 nohup

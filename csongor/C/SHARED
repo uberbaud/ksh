@@ -1,8 +1,8 @@
 # files listed here will be linked from $KDOTDIR/share/C
 chflags
 dwmc_1
-getent_1
 fossil_1
+getent_1
 inc
 kill_1
 luarocks_1
@@ -13,6 +13,7 @@ pkg_1
 poco
 rcctl_1
 sndioctl
+tmux
 ts_1
 xev_1
 xev_2

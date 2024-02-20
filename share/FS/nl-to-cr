@@ -1,0 +1,18 @@
+# <@(#)tag:tw.csongor.uberbaud.foo,2024-02-20,01.48.20z/47ae5d7>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+#---------------------------------------------------------------------------
+#: FUNCTION ^G(no arguments)^g
+#:   Print each line on ^Sstdin^s over the last, not actually using an 
+#:   ^IASCII^i ^SCR^s, so buffered output still gets a ^Snewline^s.
+
+function nl-to-cr {
+	local c s r
+	c=$(print '\033[K')
+	r=$(print '\n\033[1F')
+	while IFS= read s; do
+		print -nr -- "$c$s$r"
+	done
+	print
+}
+
+# Copyright © 2024 by Tom Davis <tom@greyshirt.net>.

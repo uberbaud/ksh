@@ -1,10 +1,12 @@
 # files listed here will be linked from $KDOTDIR/share/C
 chflags
 fossil_1
+getent_1
 inc
 kill_1
 perlbrew
 pkg_1
 poco
 rcctl_1
-tmux
+ts_1
+zig_1

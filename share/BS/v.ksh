@@ -202,7 +202,7 @@ needs $ED
 needs	\
 	fast-crypt-hash file-is-valid-utf8 get-exclusive-lock needs-cd		\
 	needs-path release-exclusive-lock trackfile versmgmt-init warnOrDie	\
-	add-exit-actions filename-from-file-w-path
+	add-exit-actions filename-from-file-w-path highlight-udiff
 
 [[ -n ${kill_watch_file_id:-} ]]&& add-exit-actions kill-watch-file-with-id
 

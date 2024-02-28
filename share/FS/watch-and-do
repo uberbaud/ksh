@@ -26,7 +26,7 @@ function watch-and-do {
 		changed=$(watch-file -v ${watchList[*]:+"${watchList[@]}"}) || break
 		[[ $cmd == *%%* ]]|| cmd="$cmd %%"
 		gsub '%%' "\"\$changed\"" "$cmd" c
-		h3 "$c"
+		eval h3 "$c"
 		eval "$c" && continue
 		print -- '\033[48;5;175;31m['"$?"']\033[49;39m'
 	done

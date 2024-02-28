@@ -91,7 +91,12 @@ alias mathcow="cowmath"
 for i in ssh scp sftp rsync;	{ alias "$i=ssh-askfirst $i"; }
 # Make fully qualified known hosts into aliases for sshing to that host
 for i in $(grep '\.' $KU/C/ssh); do
-	alias "$i=\\in-new-term \\ssh-askfirst \\ssh \"$i\""
+	case $i in
+		@(sam.lan|uberbaud.@(foo|net)|yt.lan))
+			alias "$i=\\tmux-remote \"$i\""
+			;;
+		*) alias "$i=\\in-new-term \\ssh-askfirst \\ssh \"$i\""; ;;
+	esac
 done
 alias i-can-haz-inet='i-can-haz-inet;E=$?;print -r -- "  $REPLY";(return $E)&&:'
 for s in $(getent shells); do

@@ -22,7 +22,7 @@ function in-new-term {
 	cmdln[i++]=wait-before-leaving
 	for a { shquote "$a" cmdln[i++]; }
 	(SHORTWAIT=${SHORTWAIT:-1} "${x11term[@]}" "${cmdln[*]}" &) >>$log 2>&1
-	NEW_TERM_PID=$!
+	NEW_TERM_PID=${!:-}
 }
 
 # Copyright © 2021 by Tom Davis <tom@greyshirt.net>.

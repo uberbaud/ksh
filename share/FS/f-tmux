@@ -1,0 +1,13 @@
+# <@(#)tag:tw.csongor.uberbaud.foo,2024-02-21,18.49.29z/12830c3>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+#---------------------------------------------------------------------------
+#: FUNCTION
+#:     ^Ttmux^t wrapper, auto starts session ^O$^o^{^VSESSION_NAME^v^S:-^s^VHOST^v^} if ^VSESSION_NAME^v
+#:     is not set.
+
+function f-tmux {
+	(($#))|| set -- new-session -As "${SESSION_NAME:-${HOST:?}}"
+	command tmux "$@"
+}
+
+# Copyright © 2024 by Tom Davis <tom@greyshirt.net>.

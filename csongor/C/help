@@ -91,6 +91,7 @@ f-sqlite
 f-sqlite3
 f-syspatch
 f-tclsh
+f-tmux
 f-v
 f-which
 f-xxdiff

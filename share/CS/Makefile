@@ -145,7 +145,7 @@ ssh: $(SSH_HOSTS)
 	@echo $@
 	@awk '{print $$1}' $(SSH_HOSTS) >tmp.awk
 	@tr , '\n' <tmp.awk >tmp.tr
-	@awk '/^[a-z]+(\.[a-z]+)?$$/' tmp.tr >$@
+	@awk '/^[a-z]+(\.[a-z]+)?$$/' tmp.tr | sort -u >$@
 	@rm tmp.awk tmp.tr
 
 scp: ssh

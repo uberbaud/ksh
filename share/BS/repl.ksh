@@ -36,10 +36,10 @@ function usage {
 	exit 0
 } # }}}
 # process -options {{{1
-needs_build=true
+NEEDS_BUILD=true
 while getopts ':rh' Option; do
 	case $Option in
-		r)	needs_build=false;												;;
+		r)	NEEDS_BUILD=false;												;;
 		h)	usage;															;;
 		\?)	die USAGE "Invalid option: ^B-$OPTARG^b.";						;;
 		\:)	die USAGE "Option ^B-$OPTARG^b requires an argument.";			;;
@@ -53,7 +53,7 @@ shift $((OPTIND-1))
 function write-repl { # {{{1
 	local bang
 	typeset -l ext
-	$needs_build || bang=$(/usr/bin/which $LANG 2>/dev/null)
+	$NEEDS_BUILD || bang=$(/usr/bin/which $LANG 2>/dev/null)
 	ext=$(awk "/^$LANG[[:space:]]/ {print \$2}" "$EXTS")
 	[[ -n ext ]]|| ext=$LANG
 	cat <<-...
@@ -68,10 +68,7 @@ function write-repl { # {{{1
 		Everything after the four equals is ignored.
 		...
 } # }}}1
-function truthify { # {{{1
-	[[ -n ${1:-} ]]|| die "truthify: Missing parameter 1: ^Uvarname^u"
-	[[ $1 == [A-Za-z_]*([A-Za-z0-9_]) ]]||
-		die "truthify: ^Uvarname^u parameter is not a valid variable name."
+function _truthify_one { # {{{1
 	if [[ $1 == maybe ]]; then
 		typeset -l temp=$maybe
 		maybe=$temp
@@ -89,6 +86,16 @@ function truthify { # {{{1
 			;;
 	esac
 	[[ $1 == maybe ]]|| eval $1=$maybe
+} # }}}1
+function truthify { # {{{1
+	while (($#)); do
+		[[ $1 == [A-Za-z_]*([A-Za-z0-9_]) ]]|| {
+			desparkle "$1"
+			die "truthify: ^V$REPLY^v is not a valid variable name."
+		  }
+		_truthify_one "$1"
+		shift
+	done
 } # }}}1
 function main { # {{{1
 	[[ -s $REPL ]]||
@@ -111,7 +118,11 @@ EXTS=$CFGDIR/extensions
 needs-path -create -with-notice -or-die ./RCS
 needs-path -or-die "$CFGDIR"
 needs-file -or-die "$EXTS"
-$needs_build && {
+needs-file -or-die "$CFGDIR/$LANG.sh"
+. "$CFGDIR/$LANG.sh"
+
+truthify NEEDS_BUILD
+$NEEDS_BUILD && {
 	needs-file -or-die "$CFGDIR/$LANG.mk"
 	needs-path -create -with-notice -or-warn "${MAKEOBJDIR:-./obj}"
 }

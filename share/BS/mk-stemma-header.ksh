@@ -4,7 +4,7 @@
 
 set -o nounset;: ${FPATH:?Run from within KSH}
 
-U=; M=; H=; D=; T=
+U=; M=; H=; D=; T=; nlopt=
 # Usage {{{1
 typeset -- this_pgm=${0##*/}
 function usage {
@@ -12,9 +12,10 @@ function usage {
 	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
-	^F{4}Usage^f: ^T$PGM^t ^[^Uoptions^u^] ^[^Uprefix^u ^[^Usuffix^u^]^]
+	^F{4}Usage^f: ^T$PGM^t ^[^T-n^t^] ^[^Uoptions^u^] ^[^Uprefix^u ^[^Usuffix^u^]^]
 	         Make a ^Uwhat^u and ^URFC4151_tag^u compatible stemma
 	             ^I<marker+tag:user.machine.domain,date,timez/uniqrand>^i
+	             ^T-n^t                   Don't include a final newline.
 	             ^T-U^t ^Uuser^u          defaults to ^T\$(id -n)^t
 	             ^T-M^t ^Umachine_name^u  defaults to ^T\${\$(uname -m)%.*}^t
 	             ^T-H^t ^Udomain^u        defaults to ^T\${URI_AUTHORITY-\${EMAIL#*@}}^t
@@ -33,8 +34,9 @@ function bad_programmer {	# {{{2
   };	# }}}2
 TIMEGIVEN=false
 DATEGIVEN=false
-while getopts ':H:M:D:T:U:h' Option; do
+while getopts ':nH:M:D:T:U:h' Option; do
 	case $Option in
+		n)	nlopt=n;		;;
 		H)	[[ $OPTARG == [[:alnum:]]*(+([[:alnum:]-])[[:alnum:]])*(.[[:alnum:]]*(+([[:alnum:]-])[[:alnum:]])) ]]||
 				die "Bad URI character in host name."
 			H=$OPTARG
@@ -101,6 +103,6 @@ elif $TIMEGIVEN; then
 fi
 
 stemma=$(stemma-tag "$U" "$M" "$H" "$D" "$T")
-print -- "$pfx$stemma$sfx"
+print -r${nlopt:-} -- "$pfx$stemma$sfx"
 
 # Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

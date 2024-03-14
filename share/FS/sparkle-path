@@ -4,12 +4,12 @@
 #: FUNCTION ^Upath^u ^[^Usparkle code^u^] ^= ^O$^o^VREPLY^v
 #:   Returns a sparkle appropriate string for a path.
 #:   Path components are highlighted with the given ^Usparkle code^u, or
-#:     ^I^^B^i if not specified.
+#:     ^I^^T^i if not specified.
 
 needs desparkle gsub subst-pathvars
 function sparkle-path {
 	local v= r=
-	typeset -u S=${2:-B}	# starting sparkle code (default to 'B')
+	typeset -u S=${2:-T}	# starting sparkle code (default to 'T')
 	typeset -l -L1 E=$S		# ending sparkle code (lower cased start)
 	subst-pathvars "$1"
 	desparkle "$REPLY"

@@ -47,7 +47,7 @@ function get-header-assignments { # {{{1
 dryrun=false
 [[ ${1:-} == -h ]]&& usage
 
-needs needs-file header-line
+needs needs-file header-line needs-cd
 
 ERR_MISSING_SRC='Missing required parameter ^Uc source^u.'
 (($#))||	die "$ERR_MISSING_SRC"
@@ -77,6 +77,10 @@ else
 	source=${target%.*}.c
 fi
 needs-file -or-die "$source"
+[[ $target == */* ]]&& {
+	needs-cd -or-die -with-notice "${target%/*}"
+	target=${target##*/}
+  }
 
 # Remove from CFLAGS the bits we set in the heredoc makefile.
 [[ -n ${CFLAGS:-} ]]&& {
@@ -106,7 +110,7 @@ fi
 # Well then, do it.
 "$@" <<- ───────────
 	#${hhhSource-}
-	$(get-header-assignments <$source)
+	$(get-header-assignments <$target.c)
 
 	#${hhhStandard-}
 	# Show all the bits and do it in color.

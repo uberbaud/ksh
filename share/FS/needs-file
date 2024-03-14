@@ -24,7 +24,7 @@ function needs-file {
 	if [[ -a $2 ]]; then
 		msg="$REPLY exists but is not a file."
 	else
-		msg="No such file: $REPLY."
+		msg="No such file: $REPLY"
 	fi
 	$or_what "$msg"
 }

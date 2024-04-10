@@ -19,6 +19,7 @@ APP_CLASS=app
 START_SCRIPT=start-app.ksh
 STARTER_BIN=/usr/local/bin/start
 fADDED=$APP_BASE/last_added
+fLOGIN_CONF=/etc/login.conf.d/app
 logName='start-init-doas'
 NL='
 ' # end of NL assignment
@@ -93,6 +94,25 @@ function install-usrbin-start { # {{{1
 
 	@ install -o root -g bin -m 755 "$CFG/start" "$U"
 } # }}}1
+function create-login-class { # {{{1
+	local fTemp
+	[[ -f $fLOGIN_CONF ]]&& return
+
+	fTemp=/tmp/login-conf-app
+	cat >$fTemp <<-===
+		app:\\
+			:datasize-cur=1536M:\\
+			:datasize-max=infinity:\\
+			:maxproc-max=1024:\\
+			:maxproc-cur=384:\\
+			:ignorenologin:\\
+			:requirehome@:\\
+			:tc=default:
+		===
+		@ mv "$fTemp" "$fLOGIN_CONF"
+		@ chown root:wheel "$fLOGIN_CONF"
+		@ rm "$fTemp"
+} # }}}1
 function create-group-usrapp { # {{{1'
 	groupinfo -e "$GRPNAME" && return
 
@@ -110,26 +130,6 @@ function p3_copy_hold { # {{{1
 	# @ --
 	# @ h1 "Adding $1 to /etc/$2."
 	@ cp {"$PWD",/etc}/"$2"
-} # }}}1
-function create-login-class { # {{{1
-	egrep -q "^$APP_CLASS:" /etc/login.conf && return 0
-
-	hold_initialize login.conf
-	# we can't just cat because we need those tabs
-	>>login.conf sed -E -e 's/^\|//' <<-\
-	===
-		|$APP_CLASS:\\
-		|	:datasize-cur=1536M:\\
-		|	:datasize-max=infinity:\\
-		|	:maxproc-max=1024:\\
-		|	:maxproc-cur=384:\\
-		|	:ignorenologin:\\
-		|	:requirehome@:\\
-		|	:tc=default:
-	===
-	hold_ci login.conf
-
-	p3_copy_hold 'class app' login.conf
 } # }}}1
 function create-home-app { # {{{1
 	[[ -d $APP_BASE ]]&& return

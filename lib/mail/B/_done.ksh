@@ -96,7 +96,10 @@ D_TO=--delivered-to
   X -from  '@stackoverflow\.'             stackover     'Stack Overflow'
 CIP='alexepstein@industrialprogress.net'
   X -from  "$CIP"                         energy        'CIP'
-  X -from  '@receipt\.lowes\.com'         receipts      "Lowe's Receipt"
+  X -from  '@receipt\.lowes\.com'         receipts      "Lowe's receipt"
+SQR='messenger@messaging\.squareup\.com'
+  X -from  "$SQR"                         receipts      "Square receipt"
+  X -subj  'receipt'                      receipts      "other receipt"
   X -from  'permies@permies.com'          permies       "permies"
   X -from  '@paypal\.com'                 paypal        "paypal"
 TAXES='@efile\.jacksonhewitt\.com'

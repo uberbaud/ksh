@@ -6,18 +6,37 @@
 #:   ^GENVIRONMENT:^g
 #:       ^GUses^g
 #:           ^VX11TERM^v ^Gas the terminal program, ^Txterm^t ^Gif not set.^g
+#:           ^VX11TERM_CLASS^v ^Gfor the ^Ix11 window class^i, if set.^g
+#:           ^VX11TERM_NAME^v ^Gfor the ^Ix11 window name^i, if set.^g
 #:           ^VUSR_SH^v ^Gas the shell,^g
 #:           ^VSHELL^v ^Gif^g ^VUSR_SH^v ^Gis not set, or^g ^Tsh^t ^Gif neither is set.^g
 #:       ^GSets^g
 #:           ^VSHORTWAIT^v ^Gwill be set to^g ^O${^o^VSHORTWAIT^v^O:-^o^T1^t^O}^o^G and ^Iexported^i.^g
 #:           ^GSee also:^g ^Twait-before-leaving^t^G which uses^g ^VSHORTWAIT^v^G.^g
 
-needs ${X11TERM:-xterm} wait-before-leaving shquote
+needs ${X11TERM:=xterm} wait-before-leaving shquote
 function in-new-term {
-	local a i cmdln x11term IFS log
+	local a i cmdln x11term IFS log N C SH
 	IFS=' '
 	log=${HOME:?}/log/in-new-term.log
-	set -A x11term -- nohup ${X11TERM:-xterm} -e ${USR_SH:-"${SHELL:-sh}"} -c
+	type ${X11TERM:?} >/dev/null 2>&1 ||
+		die "^VX11TERM^v ^(^T$X11TERM^t^) is not a valid executable."
+	# set flag name for setting x11 window name and class
+	case ${X11TERM##*/} in
+		st)		N=n;	C=c;		;;
+		xterm)	N=name;	C=class;	;;
+		*)	[[ -n ${X11TERM_NAME:-} || -n ${X11TERM_CLASS:-} ]]&&
+				warn "Unhandled term."								\
+					"Cannot set window ^Tclass^t or ^Tname^t."		\
+					${X11TERM_NAME:+"Name: $X11TERM_NAME"}			\
+					${X11TERM_CLASS:+"Class: $X11TERM_CLASS"}
+			unset X11TERM_NAME X11TERM_CLASS
+			;;
+	esac
+	N=${X11TERM_NAME:+-$N $X11TERM_NAME}
+	C=${X11TERM_CLASS:+-$C $X11TERM_CLASS}
+	SH=${USR_SH:-"${SHELL:-sh}"}
+	set -A x11term -- nohup $X11TERM ${N:-} ${C:-} -e $SH -c
 	i=0
 	cmdln[i++]=wait-before-leaving
 	for a { shquote "$a" cmdln[i++]; }

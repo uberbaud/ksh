@@ -1,0 +1,11 @@
+# <@(#)tag:tw.csongor.uberbaud.foo,2024-03-21,02.19.33z/1ba5e1e>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+#---------------------------------------------------------------------------
+#: FUNCTION ^G(no arguments)^g
+#:   Send ^SSIGWINCH^s to ^O$^o^V$^v.
+
+function rewin {
+	kill -s WINCH $$
+}
+
+# Copyright © 2024 by Tom Davis <tom@greyshirt.net>.

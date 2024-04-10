@@ -9,7 +9,7 @@
                         ^G# $AUTHOR || fullname from passwd for id^g
     «[ORGANIZATION]» := 'Thomas Anderson'
                         ^G# $ORGANIZATION || $AUTHOR^g
-    «[COPYRIGHT]»    := 'Copyright © 1973 by Tom Anderson <tanderson@matrix.dev>.'
+    «[COPYRIGHT]»    := 'Copyright © 1973 by Tom Anderson <tanderson@matrix.foo>.'
                         ^G# Copyright © $YEAR by $ORGANIZATION <$EMAIL>^g
                         ^G# $EMAIL must be exported elsewhere^g
     «[IDENT]»        := '<@(#)tag:stemma/RFC4151 tag>'

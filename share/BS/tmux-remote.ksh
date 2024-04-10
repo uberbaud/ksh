@@ -49,6 +49,8 @@ function main { # {{{1
 			;;
 	esac
 	SESSION_NAME=${REMOTE%%.*}
+	X11TERM_CLASS=Tmux
+	X11TERM_NAME=tmux
 
 	in-new-term ssh-askfirst \
 		ssh -t "$REMOTE" "$tmux_bin" -2u new-session -As "$SESSION_NAME"

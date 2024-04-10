@@ -42,6 +42,12 @@ function app-framework-exists { # {{{1
 		return 3
 	  }
 
+	# does the 'app' login class exist?
+	[[ -f /etc/login.conf.d/app ]]|| {
+		warn "^S/etc/login.conf.d/app^s does not exist."
+		return 4
+	  }
+
 	return 0
 } # }}}1
 function setup-app-framework { # {{{1

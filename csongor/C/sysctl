@@ -102,6 +102,7 @@ kern.malloc.kmemstat.indirdep
 kern.malloc.kmemstat.VM_swap
 kern.malloc.kmemstat.UVM_amap
 kern.malloc.kmemstat.UVM_aobj
+kern.malloc.kmemstat.pinsyscall
 kern.malloc.kmemstat.USB
 kern.malloc.kmemstat.USB_device
 kern.malloc.kmemstat.USB_HC
@@ -406,6 +407,7 @@ machdep.forceukbd
 machdep.tscfreq
 machdep.invarianttsc
 machdep.pwraction
+machdep.retpoline
 ddb.radix
 ddb.max_width
 ddb.max_line
@@ -415,19 +417,6 @@ ddb.console
 ddb.log
 ddb.trigger
 vfs.mounts.ffs has 9 mounted instances
-vfs.ffs.max_softdeps
-vfs.ffs.sd_tickdelay
-vfs.ffs.sd_worklist_push
-vfs.ffs.sd_blk_limit_push
-vfs.ffs.sd_ino_limit_push
-vfs.ffs.sd_blk_limit_hit
-vfs.ffs.sd_ino_limit_hit
-vfs.ffs.sd_sync_limit_hit
-vfs.ffs.sd_indir_blk_ptrs
-vfs.ffs.sd_inode_bitmap
-vfs.ffs.sd_direct_blk_ptrs
-vfs.ffs.sd_dir_entry
-vfs.ffs.dirhash_dirsize
 vfs.ffs.dirhash_maxmem
 vfs.ffs.dirhash_mem
 vfs.nfs.iothreads

@@ -11,8 +11,9 @@ function usage {
 	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
-	^F{4}Usage^f: ^T$PGM^t
+	^F{4}Usage^f: ^T$PGM^t ^[^T-n^t^]
 	         Mount any unmounted but attached USB devices.
+	           ^T-n^t  Don't do otherwise automatic ^Bfsck^b.
 	       ^T$PGM -h^t
 	         Show this help message.
 	===SPARKLE===
@@ -23,8 +24,10 @@ function bad_programmer {	# {{{2
 	die 'Programmer error:'	\
 		"  No getopts action defined for [1m-$1[22m."
   };	# }}}2
-while getopts ':h' Option; do
+WANT_FSCK=true
+while getopts ':nh' Option; do
 	case $Option in
+		n)	WANT_FSCK=false;										;;
 		h)	usage;													;;
 		\?)	die "Invalid option: [1m-$OPTARG[22m.";				;;
 		\:)	die "Option [1m-$OPTARG[22m requires an argument.";	;;
@@ -120,7 +123,6 @@ function mnt-drv { # {{{1
 	fi
 	gsub ' ' _ "$label" label
 
-	WANT_FSCK=true
 	mount-fs-ondev-at "$fstype" "$dev$part" /vol/"$label"
 
 	# rename mount point IF there's a non-empty devname.txt file

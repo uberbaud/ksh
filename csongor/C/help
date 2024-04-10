@@ -227,6 +227,7 @@ release-exclusive-lock
 reshell
 resolve-alias
 return
+rewin
 roll
 rotate-logfiles
 ruler

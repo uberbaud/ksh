@@ -9,12 +9,24 @@
     Each declaration has the format:
         ^Ufiletype^u^T:^t^[^Umod1^u^] ^G# The colon ^Bis^b mandatory.^g
 
-    The first declaration sets the default ^Ufiletype^u if neither ^T-t^t nor
-    an extension is used. Additional declarations set a default ^Umod^u for
-    the given filetype.
+    The first declaration sets the default ^Ufiletype^u if neither ^T-t^t nor an
+    extension is used. Additional declarations set a default ^Umod^u for the
+    given filetype.
 
     ^BREDIRECT^b
 
-    A redirect file causes ^Tnew^t to create the file in an
-    ^Ualternate path^u, and then create a soft link from that file in this
+    A redirect file causes ^Tnew^t to create the file in an ^Ualternate path^u,
+    and then create a soft link (symlink) from that file in this
+    directory. A redirect ^T.new^t file contains exactly one (1) declaration
+    which begins with a ^T>^t (closed angle bracket or greater-than sign),
+    optionally followed by space or tab characters, and then the alternate
+    path, which may include shell style variables. Everything after the
+    ^T>^t and any white space is the alternate path including any octothorpe
+    and white space, so comments must be on other lines.
+
+    The redirect declaration has the format:
+        ^T>^t ^O$^o^VKDOTDIR^v^T/share/BS^t
+
+    The alternate path may be absolute or relative and the symlink will be
+    created with exactly that path.
 

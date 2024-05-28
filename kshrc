@@ -74,6 +74,7 @@ SYSDATA=$xdgdata/sysdata
 						F=$KU/F;				FS=$KS/FS
 						B=$KU/B					BS=$KS/BS
 												H=$KS/HS
+	L=$KDOTDIR/lib
 
 	[[ -d $KU ]]|| mkdir $KU
 	export FPATH=$F

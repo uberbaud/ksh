@@ -5,6 +5,10 @@
 set -o nounset;: ${FPATH:?Run from within KSH}
 
 UPPER_LIMIT=20
+LOGLEVEL=${LOGLEVEL:-1}
+work=${XDG_PUBLICSHARE_DIR:?}/mail
+export LOGLEVEL
+
 # Usage {{{1
 typeset -- this_pgm=${0##*/}
 function usage {
@@ -39,7 +43,7 @@ done
 shift $((OPTIND-1))
 # ready to process non '-' prefixed arguments
 # /options }}}1
-function tidy-repeat { # {{{1
+function tidy-repeat { # {{{108:00
 	local i n
 	# HTML Tidy // tidy-html5 5.7.24
 	# tidy's output is dependent on input features such as DOCTYPE and
@@ -86,17 +90,23 @@ function has-some-html { # {{{1
 
 needs tidy needs-cd needs-path
 
-work=${XDG_PUBLICSHARE_DIR:?}/mail
-
 needs-path -create -or-die "$work"
 needs-cd -or-die "$work"
-printf 'In \e[35m$XDG_CACHE_HOME/mail\e[39m\n'
+((LOGLEVEL > 1))&& {
+	needs sparkle-path
+	sparkle-path "$PWD"
+	print -r -- "$REPLY" | sparkle
+  }
 
 new-array parts
 
 mark=$(mktemp mark-XXXXXXXXX)
 
-mhstore "$@"
+if ((LOGLEVEL==0)); then
+	mhstore "$@" 2>/dev/null
+else
+	mhstore "$@"
+fi
 for f in *; do
 	[[ $f == $mark ]]&& continue	# skip mark
 	[[ $f -ot $mark ]]&& continue	# skip old files

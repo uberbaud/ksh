@@ -5,6 +5,9 @@
 #:   Wrapper around $BS/m-get.ksh
 
 function m-get {
+	((LOGLEVEL))&&
+		PREMAIL_LOGLEVEL=${PREMAIL_LOGLEVEL:-${LOGLEVEL:-}}
+	export LOGLEVEL=0
 	PRE_MAIL_PWD=${PRE_MAIL_PWD:-$PWD}
 	builtin cd ${XDG_PUBLICSHARE_DIR:?}/mail
 	${MAIL_APP_PATH:?}/B/_get.ksh "$@"

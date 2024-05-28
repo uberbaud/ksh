@@ -5,6 +5,7 @@
 set -o nounset;: ${FPATH:?Run from within KSH}
 
 DRYRUN=false
+LOGLEVEL=${LOGLEVEL:-2}
 
 # Usage {{{1
 typeset -- this_pgm=${0##*/}
@@ -15,7 +16,11 @@ function usage {
 	===SPARKLE===
 	^F{4}Usage^f: ^T${PGM}^t ^[^T-n^t^] ^Ufile^u ^[^Ufile2_...^u^]
 	         Open files with an appropriate app.
+	           ^T-v^t  Increase LOGLEVEL (more ^Iverbose^i).
+	           ^T-q^t  Decrease LOGLEVEL (^Iquieter^i).
 	           ^T-n^t  Show open commands, but don't do it.
+	         ^GUses files:^g ^O\$^o^VSYSDATA^v^T/mime.^t^O{^o^Ttypes^t^O,^o^Thandlers^t^O}^o
+	         ^GRespects environment:^g ^O\${^o^VLOGLEVEL^v^O:-^o^T2^t^O}^o
 	       ^T${PGM} -h^t
 	         Show this help message.
 	===SPARKLE===
@@ -26,9 +31,11 @@ function bad_programmer {	# {{{2
 	die 'Programmer error:'	\
 		"  No getopts action defined for [1m-$1[22m."
   };	# }}}2
-while getopts ':nh' Option; do
+while getopts ':nqvh' Option; do
 	case $Option in
 		n)	DRYRUN=true;											;;
+		q)	((LOGLEVEL--));											;;
+		v)	((LOGLEVEL++));											;;
 		h)	usage;													;;
 		\?)	die "Invalid option: [1m-$OPTARG[22m.";				;;
 		\:)	die "Option [1m-$OPTARG[22m requires an argument.";	;;
@@ -125,11 +132,12 @@ function open-one-file { # {{{1
 	n1="opening ^B$url^b (^S$filetype^s)"
 	n2="with ^T$filehandler^t."
 
-	if ((COLUMNS<${#n1}+1+${#n2})); then
-		notify "$n1" "    $n2"
-	else
-		notify "$n1 $n2"
-	fi
+	((LOGLEVEL > 1))&&
+		if ((COLUMNS<${#n1}+1+${#n2})); then
+			notify "$n1" "    $n2"
+		else
+			notify "$n1 $n2"
+		fi
 	exec-handler "$filehandler" "$file" ||
 		warn "Could not open ^B$file^b."
 } # }}}1

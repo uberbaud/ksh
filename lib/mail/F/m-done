@@ -10,6 +10,10 @@ function m-done {
 		builtin cd "$PRE_MAIL_PWD"
 		unset PRE_MAIL_PWD
 	  }
+	[[ -n ${PREMAIL_LOGLEVEL:-} ]]&& {
+		LOGLEVEL=$PREMAIL_LOGLEVEL
+		unset PREMAIL_LOGLEVEL
+	  }
 }
 
 # Copyright © 2021 by Tom Davis <tom@greyshirt.net>.

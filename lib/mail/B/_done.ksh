@@ -99,6 +99,7 @@ CIP='alexepstein@industrialprogress.net'
   X -from  '@receipt\.lowes\.com'         receipts      "Lowe's receipt"
 SQR='messenger@messaging\.squareup\.com'
   X -from  "$SQR"                         receipts      "Square receipt"
+  X -from  'app@clover\.com'              receipts      "Clover receipt"
   X -subj  'receipt'                      receipts      "other receipt"
   X -from  'permies@permies.com'          permies       "permies"
   X -from  '@paypal\.com'                 paypal        "paypal"

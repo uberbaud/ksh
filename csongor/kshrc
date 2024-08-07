@@ -74,6 +74,7 @@ export SUDO=/usr/bin/doas
 export SQLITE_LOADABLE_EXTENSION_PATH=$xdgdata/lib/sqlite3_le
 export TZ=EST5EDT
 
+alias qv='build-and-run -e'
 alias pkgcfg=pkg-config
 alias in-new-term='\in-new-term '
 alias lua=lua51

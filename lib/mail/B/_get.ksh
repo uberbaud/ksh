@@ -52,7 +52,7 @@ function group { # {{{1
 } 2>/dev/null # }}}1
 function P { printf '      ^F{4}─^f %s\n' "$1" | sparkle >&2; }
 
-needs m-list-new m-msgcount mark pick
+needs m-msgcount mark pick
 if $DOWNLOAD; then
 	needs use-app-paths
 	use-app-paths mail
@@ -89,8 +89,7 @@ group drgfly    --list-id 'dragonfly'
 group got       --list-id 'gameoftrees\.openbsd\.org'
 group qutebrw   --list-id 'qutebrowser\.lists\.qutebrowser\.org'
 group zig       --list-id '/ziglang\.lists\.sr\.ht'
-
-m-list-new
+group intrigue  -from     'newsletter@internationalintrigue\.io'
 
 GROUPMAIL=${MMH:?}/groupmail
 [[ -e $GROUPMAIL ]]&& { [[ -w $GROUPMAIL ]]|| chmod u+w "$GROUPMAIL"; }

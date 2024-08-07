@@ -1,0 +1,137 @@
+#!/bin/ksh
+# <@(#)tag:tw.csongor.uberbaud.foo,2024-07-23,03.07.26z/5cf85d8>
+# vim: ft=ksh ts=4 tw=72 noexpandtab nowrap foldmethod=marker
+
+set -o nounset;: ${FPATH:?Run from within KSH}
+
+CONTMSG='Press any key to continue.'
+MBOX=inbox
+SEQ='¬L'	# NOT messages in groups
+
+# Usage {{{1
+this_pgm=${0##*/}
+function usage {
+	desparkle "$this_pgm"
+	PGM=$REPLY
+	sparkle >&2 <<-\
+	===SPARKLE===
+	^F{4}Usage^f: ^T$PGM^t
+	         A CLI to process mail, cycling through all +^O$^o^VMBOX^v ^VSEQ^v messages
+	         ^GNote:^g ^VMBOX^v ^Gdefaults to^g ^Tinbox^t^G, and^g
+	               ^VSEQ^v ^Gdefaults to^g ^O¬^o^TL^t^G, or^g ^Ta^t ^Gif^g ^VMBOX^v ^Gis specified.^g
+	       ^T$PGM -h^t
+	         Show this help message.
+	===SPARKLE===
+	exit 0
+} # }}}
+# process -options {{{1
+while [[ ${1:-} == -* ]]; do
+	case ${1#-} in
+		-)	shift; break;										;;
+		h)	usage;												;;
+		*)	die USAGE "Invalid option: ^T$1^t.";				;;
+	esac
+	shift
+done
+# remove already processed arguments
+shift $((OPTIND-1))
+# ready to process non '-' prefixed arguments
+# /options }}}1
+function pause-for-key { forceline; press-any-key "$CONTMSG"; }
+function pause-warn { warn "$@"; print -n '     '; pause-for-key; }
+function revert-cursor-pos { ((${1:?}))&& print -n -- '\033['"$1"'A\033[J'; }
+function process-readkeys { # {{{1
+	local nm pid
+	read nm pid
+	[[ $nm == readkeys ]]|| die "Weirdness"
+	while read class val; do
+		[[ $class == c && $val == [$1] ]]|| continue
+		print "$val"
+		break
+	done
+	kill $pid
+} # }}}1
+function getkey { REPLY=$(readkeys | process-readkeys "$1"); }
+function msg-prev { ((MSG_NDX>0))&& ((MSG_NDX--)); }
+function msg-next { ((MSG_NDX++)); }
+function msg-show { show "${1:?}"; print -n '\033[A'; }
+function msg-webview { m-part "${1:?}"; }
+function msg-xplode { mhstore +$MBOX ${1:?}; }
+function msg-open-urls { # {{{1
+	typeset open
+	[[ -n ${BROWSER:-} ]]|| pause-warn '^O$^o^VBROWSER^v is not set.'
+
+	set -- $(show "$@" | egrep -o 'https?://[^[:space:]]+')
+	$BROWSER "$@" || for u { print -r -- "$u"; pause-warn 'Browser issue.'; }
+} # }}}1
+function set-actlist { # {{{1
+	local first rest action list
+	for action; do
+		rest=${action#?}
+		first=${action%"$rest"}
+		list="${list:+$list }^U^O$first^o$rest^u"
+	done
+	print -r -- "$list."
+} # }}}1
+function show-msg-info { # {{{1
+	scan +$MBOX -width 9999 -format scan.borders ${1:?}
+	print
+	notify "${ACTLIST:=$(
+		set-actlist prev next show webview 'open urls' xplode quit
+	  )}"
+	getkey pnNswoxq
+	case $REPLY in
+		p)	REPLY=prev;			;;
+		n)	REPLY=next;			;;
+		N)	REPLY=prev;			;; # undocumented but often used
+		s)	REPLY=show;			;;
+		w)	REPLY=webview;		;;
+		o)	REPLY=open-urls;	;;
+		x)	REPLY=xplode;		;;
+		q)	REPLY=quit;			;;
+		*)	bad-programmer "Unhandled action key ^B$REPLY%b.";	;;
+	esac
+} # }}}1
+function main { # {{{1
+	local ferrs
+	set -A msgs -- $(pick +$MBOX "$@") ||
+		die "Bad pick options."
+
+	integer xtrarows=0
+	integer MSG_NDX=0
+	while ((MSG_NDX<${#msgs[*]})); do
+		CUR_MSG_NUM=${msgs[MSG_NDX]}
+		revert-cursor-pos $xtrarows
+		show-msg-info $CUR_MSG_NUM
+		case $REPLY in
+			quit)		break;							;;
+			prev|next|show)	msg-$REPLY $CUR_MSG_NUM; xtrarows=0	;;
+			*)
+				ferrs=$CUR_MSG_NUM.out
+				msg-$REPLY $CUR_MSG_NUM 2>&1			|
+					fold -sw ${COLUMNS:=$(tput cols)}	|
+					tee $ferrs
+				xtrarows=$(wc -l <$ferrs)
+				((xtrarows>0))&& pause-for-key $((xtrarows++))
+				rm -f $ferrs
+				;;
+		esac
+		((xtrarows+=5)) # Add the height used by show-msg-info
+	done
+} # }}}1
+
+needs use-app-paths 
+use-app-paths mail || die '^Buse-app-paths^b ^Vmail^v'
+needs egrep fold forceline m-part mhstore pick press-any-key scan show tee
+
+if [[ $# -gt 0 && $1 == +* ]]; then
+	MBOX=${1#+}; shift
+	(($#))|| set -- a
+else
+	(($#))|| set -- "$SEQ"
+fi
+
+
+main "$@"; exit
+
+# Copyright (C) 2024 by Tom Davis <tom@greyshirt.net>.

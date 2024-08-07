@@ -147,6 +147,6 @@ filename=${filename%.c}.c
   }
 
 write-file "$@" >$filename
-build-and-run -e "$filename"; exit
+exec build-and-run -e "$filename"
 
 # Copyright (C) 2022 by Tom Davis <tom@greyshirt.net>.

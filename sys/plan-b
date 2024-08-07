@@ -104,10 +104,9 @@ function has-dow-passed {
 	have-x-days-passed $x
 }
 function has-dom-passed {
-	local year mon
-	typeset -Z2 dom=$1
-	year=${2%??}
-	mon=${2#$year}
+	typeset -i10 -Z2 dom=10#$1
+	typeset -i10	 year=10#${2%??}
+	typeset -i10 -Z2 mon=10#${2#$year}
 	((++mon>12))&& { ((year++)); mon=1; }
 	(($year$mon$dom <= TODAY))
 }

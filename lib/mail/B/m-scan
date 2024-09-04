@@ -107,7 +107,7 @@ function main { # {{{1
 			quit)		break;							;;
 			prev|next|show)	msg-$REPLY $CUR_MSG_NUM; xtrarows=0	;;
 			*)
-				ferrs=$CUR_MSG_NUM.out
+				ferrs=scan-$CUR_MSG_NUM.out
 				msg-$REPLY $CUR_MSG_NUM 2>&1			|
 					fold -sw ${COLUMNS:=$(tput cols)}	|
 					tee $ferrs

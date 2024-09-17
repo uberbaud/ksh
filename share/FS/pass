@@ -16,7 +16,7 @@
 #:
 #:   Scripts are located in ^U^O$^o^VKDOTDIR^v/share/BS^u
 
-needs ${KDOTDIR:?}/$HOST/B/pass-{gen,show}.ksh
+needs ${KDOTDIR:?}/$HOST/B/pass-{gen,show,ed,find,mail}.ksh
 function pass {
 	local which=gen
 	[[ $# -eq 1 && $1 != -* ]]&& which=show

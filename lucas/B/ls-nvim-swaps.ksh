@@ -1,0 +1,1 @@
+/home/tw/local/ksh/share/BS/ls-nvim-swaps.ksh

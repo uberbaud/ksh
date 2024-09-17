@@ -1,0 +1,1 @@
+/home/tw/local/ksh/share/BS/grab-git-directory.ksh

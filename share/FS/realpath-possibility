@@ -1,0 +1,54 @@
+# <@(#)tag:tw.lucas.uberbaud.foo,2024-09-16,20.07.55z/37b83b1>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+#---------------------------------------------------------------------------
+#: FUNCTION ^Upath^u ^[^Uvarname^u^] ^= ${2:-REPLY}
+#:   Like realpath but allows for possible to create bits on the end.
+#:   ^Uvarname^u is the name of the variable into which the result 
+#:   should be placed, defaults to ^VREPLY^v
+
+needs realpath splitstr
+function realpath-possibility {
+	[[ ${2:-} == cwd ]]|| local cwd; cwd=
+	[[ ${2:-} == abs ]]|| local abs; abs=
+	[[ ${2:-} == rel ]]|| local rel; rel=
+	[[ ${2:-} == sfx ]]|| local sfx; sfx=
+	: ${1:?}
+	[[ -e $1 ]]&& {
+		abs=$(realpath -q "$1")
+		eval ${2:-REPLY}=\$abs
+		return
+	  }
+	cwd=
+	[[ $1 == ./* ]]&& cwd=./
+	sfx=${1#./}
+	sfx=${sfx##*/?(.)./}
+	rel=${1%"$sfx"}
+	[[ -n $rel ]]&& {
+		abs=$(realpath -q "$cwd$rel")
+		[[ -n $abs ]]|| die "^T$cwd$rel^t is not a valid path."
+	  }
+	abs=$abs/${sfx#/}
+	[[ ${2:-} == t    ]]|| local t;		t=
+	[[ ${2:-} == p    ]]|| local p;		p=
+	[[ ${2:-} == okay ]]|| local okay;	okay=true
+	sfx=
+	local IFS=/
+	for p in $abs; do
+		$okay || { eval ${2:-REPLY}=; return 1; }
+		[[ -n $p ]]|| continue
+		# print "  p: $p, t: $t"
+		if [[ -d $t/$p ]]; then
+			t=$t/$p
+		elif [[ -e $p ]]; then
+			okay=false
+			t=$t/$p
+		else
+			sfx=${abs#"$t"}
+			break
+		fi
+	done
+
+	eval ${2:-REPLY}=\$t/\${sfx#/}
+}
+
+# Copyright © 2024 by Tom Davis <tom@greyshirt.net>.

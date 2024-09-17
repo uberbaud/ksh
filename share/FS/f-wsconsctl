@@ -1,0 +1,12 @@
+# <@(#)tag:tw.lucas.uberbaud.foo,2024-09-15,23.33.56z/392f0d2>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION
+#:   Wrapper
+
+needs as-root
+function f-wsconsctl {
+	as-root /sbin/wsconsctl "$@"
+}
+
+# Copyright © 2022 by Tom Davis <tom@greyshirt.net>.

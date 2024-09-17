@@ -7,6 +7,7 @@
 
 set -o nounset
 RLWRAP=/usr/local/bin/rlwrap
+needs $RLWRAP
 CMD=
 if [[ $* == *' -- '* ]]; then
 	last=false

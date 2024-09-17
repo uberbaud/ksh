@@ -1,0 +1,1 @@
+/home/tw/local/ksh/share/BS/dwm_dmenu_completion.ksh

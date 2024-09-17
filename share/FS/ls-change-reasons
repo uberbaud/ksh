@@ -1,0 +1,33 @@
+# <@(#)tag:tw.lucas.uberbaud.foo,2024-09-17,19.43.09z/54cf460>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+#---------------------------------------------------------------------------
+#: FUNCTION ^G(no arguments)^g
+#:   List standardized reasons for changes in RCS
+
+function ls-change-reasons {
+	local W LS BS DOC
+	LS='    '
+	BS=$LS'            '
+	W=$((${COLUMNS:-$(tput columns)}-8))
+	DOC=$(</dev/stdin) <<-===
+		@align       Standardize in some way.
+		@bell        Add new feature.
+		@debug       Fix bugs in code or documentation.
+		@embiggen    Increase robustness, security, or scalability.
+		@hackerdoc   Add/correct/clarify comments, identifiers, etc.
+		@implement   Flesh out implementation.
+		@morph       translate code language, repurpose.
+		@pref        Alter a superficial aspect. Eg: presentation or personalization.
+		@revert      Revert
+		@savepoint   Pause.
+		@tidy        Change spacing, prettify, conform to style guides, etc.
+		@tweak       Refactor, generalize, optimize, simplify, use new algorithm or paradigm.
+		@userdoc     Add/correct/clarify messages, man pages, or program output.
+		@workaround  Not quite a debug, but overcomes some issue.
+		===
+	print -r -- "$DOC"	|
+		fold -s -w "$W"	|
+		sed -Ee "/^[^@]/s/^/$BS/" -e "/^@/s//$LS/"
+}
+
+# Copyright © 2024 by Tom Davis <tom@greyshirt.net>.

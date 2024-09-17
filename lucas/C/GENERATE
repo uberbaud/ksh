@@ -1,0 +1,9 @@
+# Include files that need to be built on this machine
+help
+pkgcfg
+prj_1
+rcctl_2
+scp
+ssh
+sysctl
+tmux

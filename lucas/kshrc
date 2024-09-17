@@ -1,0 +1,152 @@
+# <@(#)tag:csongor.greyshirt.net,2017-08-11:tw/03.12.38z/32b357f>
+# ksh local profile
+# vim: ts=4 ft=ksh
+
+export IAM=tw:tom
+# special
+HOLD_SYSBASE=~/hold/$(uname -r)
+[[ -d $HOLD_SYSBASE ]]|| mkdir -p $HOLD_SYSBASE
+export GOT_AUTHOR='Tom Davis <tom@greyshirt.net>'
+export SM_SAVE_DIR=$XDG_STATE_HOME/xsessions
+# paths
+#export PERLBREW_ROOT=$xdgdata/perlbrew
+#export PERLBREW_HOME=$xdgcache/perlbrew
+#export PERLBREW_SKIP_INIT=''
+#export PERLBREW_CURRENT=$PERLBREW_ROOT/perls/current
+#export PERLBREW_LIB=$PERLBREW_CURRENT/lib
+export GOPATH=$xdgdata/go
+export JDK_PATH=$xdgdata/jdk-1.8.0/bin
+export OPAMROOT=$xdgcfg/opam
+opam_def=$OPAMROOT/default
+export OPAM_SWITCH_PREFIX=$opam_def
+opam_lib=$opam_def/lib
+opam_ocaml=$opam_lib/ocaml
+export CAML_LD_LIBRARY_PATH=$opam_lib/stublibs:$opam_ocaml/stublibs:$opam_ocaml
+export OCAML_TOPLEVEL_PATH=$opam_lib/toplevel
+unset opam_def opam_lib opam_ocaml
+
+export TCLLIBPATH=$xdgdata/tcl
+export RLWRAP_HOME=$xdgcfg/rlwrap
+export ROFFTOOLS_PATH=$xdgdata/heirloom-doctools/bin
+export PKG_CONFIG_PATH=$xdgcfg/pkgconfig
+
+# default apps
+export BROWSER="$(<$xdgcfg/etc/browser)"
+
+# mail
+export EMAIL='tom@greyshirt.net'
+export FETCHMAILHOME=$xdgcfg/mail
+export MAILCHECK=-1
+export MAILDROP=/var/mail/$USER
+export MAILPATH=''
+export MAIL_HOME=$xdgcfg/mail
+export MAILRC=$MAIL_HOME/mail.rc
+export MAIL_ALWAYS_XSCAN=true
+export MBOX=$MAIL_HOME/mbox
+#=== (M)MH
+export MMH=$xdgcfg/mmh
+MMH_BIN_PATH=/usr/local/mmh/bin
+
+# misc
+export CALENDAR_DIR=$xdgcfg/calendar
+export CVSROOT='anoncvs@anoncvs4.usa.openbsd.org:/cvs'
+export GNUPGHOME=$xdgdata/gnupg
+export GPG_AGENT=$SYSLOCAL/bin/gpg-agent
+export GTK_IM_MODULE=xim
+export KAKOUNE_POSIX_SHELL=/usr/local/bin/dash
+export LESSKEY=$xdgcfg/less/lesskey.compiled
+export PRINTER=poco
+export QT_IM_MODULE=xim
+export TCL_USE_VERSION=8.6
+export XCOMPOSEFILE=$xdgcfg/x11/Compose.tw
+export XDIALOG_NO_GMSGS=1	# Xdialog Gdk/GLib/Gtk will not g_log()
+export XMODIFIERS='@im=none'
+export dskBROWSER=1
+export dskWIDGIT=7
+export dskXAPP=6
+export me=$HOME/work/clients/me
+export X11TERM=st
+export LUCAS_XTERM_WINDOW_BG='#626262'
+export LUCAS_XTERM_WINDOW_FG='#dadada'
+export MANPAGER='nvim -M +Man!'
+export YT=AUDIODEVICE=snd@yt.lan/default
+export SUDO=/usr/bin/doas
+export SQLITE_LOADABLE_EXTENSION_PATH=$xdgdata/lib/sqlite3_le
+export TZ=EST5EDT
+
+alias qv='build-and-run -e'
+alias pkgcfg=pkg-config
+alias in-new-term='\in-new-term '
+alias lua=lua51
+alias pg=playground
+alias renet='doas /bin/sh /etc/netstart'
+alias s=show
+alias ts=tree-sitter
+# and some special love for amuse: bits
+amuse:create-cmd-wrappers
+
+# noglobs
+-no-globs cowmath math note
+alias mathcow="cowmath"
+# askfirst all commands that use ssh
+for i in ssh scp sftp rsync;	{ alias "$i=ssh-askfirst $i"; }
+# Make fully qualified known hosts into aliases for sshing to that host
+for i in $(grep '\.' $KU/C/ssh); do
+	case $i in
+		@(sam.lan|uberbaud.@(foo|net)|yt.lan))
+			alias "$i=\\tmux-remote \"$i\""
+			;;
+		*) alias "$i=\\in-new-term \\ssh-askfirst \\ssh \"$i\""; ;;
+	esac
+done
+alias i-can-haz-inet='i-can-haz-inet;E=$?;print -r -- "  $REPLY";(return $E)&&:'
+for s in $(getent shells); do
+	[[ $s == $SHELL ]]&& continue
+	alias ${s##*/}="reshell $s"
+done
+unset s
+VISED=/usr/local/bin/vis
+#[[ -x ${KDOTDIR:-}/share/BS/v.ksh ]]&&
+#	VISUAL=$KDOTDIR/share/BS/v.ksh
+
+
+LOGPS1='\n'\
+'%:KSH:% \D{%Y.%m.%d.%H.%M.%S.%z} \w\n'\
+'\[\e[33m\]['\
+'\[\e[32m\]$( local E=$?; ((E))|| print "ok" )'\
+'\[\e[48;5;224;31m\]$( local E=$?; ((E))&& print " $E " )'\
+'\[\e[0;33m\]]'\
+'\[\\e[0;34m\]\$'\
+'\[\e[0m\] '
+
+typeset -fu pre-prompt
+export PS1=\
+'\[\e[0m'\
+'$(pre-prompt)'\
+'\[\e[33m\]['\
+'\[\e[31m\]KSH '\
+'\[\e[32m\]\u'\
+'\[\e[33m\]@'\
+'\[\e[32m\]\h'\
+'\[\e[1;36m\]$(prn-prj " ") '\
+'\[\e[0;34m\]\W'\
+'\[\e[33m\]]'\
+'\[\e[48;5;175;31m\]$( local E=$?; ((E))&& print "[$E]" )'\
+'\[\e[0m\]\$ '
+
+E=''; R=''
+ps4a="$E[47;38;5;8m"
+ps4b="$E[47;33m"
+ps4c="$E[0;8m│$E[0m$E[K"
+PS4W=16
+#    |....+....0....+.|
+ps4p='                ' # the width of PS4W
+export PS4=\
+"$ps4a$ps4p$R"\
+'${0##*/}'\
+"$ps4b $E[\$(($PS4W-\${#LINENO}))G \$LINENO "\
+"$ps4c"
+
+#[[ -o login ]]&& PS1='[$$]\$ '
+
+true

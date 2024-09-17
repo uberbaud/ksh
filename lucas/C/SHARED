@@ -1,0 +1,14 @@
+# files listed here will be linked from $KDOTDIR/share/C
+chflags
+getent_1
+kill_1
+pkg_1
+poco
+rcctl_1
+sndioctl
+wsconsctl
+xev_1
+xev_2
+xfontsel
+xinput_1
+xinput_2

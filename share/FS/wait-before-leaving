@@ -21,7 +21,7 @@ function wait-before-leaving {
 		tail -f "$tempF" >&2 &
 		pidTail=$!
 		# ACTUAL COMMAND WE ARE RUNNING IN THE X11 TERMINAL WINDOW
-		SPARKLE_FORCE_COLOR=true "$@" 2>$tempF
+		SPARKLE_FORCE_COLOR=true "$@" 2>>$tempF
 		rc=$?
 		kill $pidTail
 

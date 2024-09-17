@@ -35,6 +35,7 @@ done
 shift $((OPTIND-1))
 # ready to process non '-' prefixed arguments
 # /options }}}1
+needs pass-find
 
 secrets=${XDG_DATA_HOME:?}/secrets
 [[ -d $secrets ]]|| die 'No secrets directory.'

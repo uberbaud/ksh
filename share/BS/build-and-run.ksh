@@ -104,11 +104,11 @@ function clear-screen { print -u2 '\033[H\033[2J\033[3J\033[H\c'; }
 function loop { #{{{1
 	local cksum_previous cksum_current UUID
 
-	needs cat-to-file fuddle pkill shquote subst-pathvars uuidgen watch-file
+	needs cat-to-file fuddle pkill shquote subst-pathvars uuid watch-file
 
 	subst-pathvars "$PWD" prnPathName
 
-	UUID=$(uuidgen) # so edit-c-file can signal ONLY THIS watch-file
+	UUID=$(uuid) # so edit-c-file can signal ONLY THIS watch-file
 	$DOEDIT && edit-c-file "$CFILE" &
 	cksum_previous=unedited
 	h3 "$prnPathName / $UUID"

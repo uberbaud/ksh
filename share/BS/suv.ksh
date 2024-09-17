@@ -56,21 +56,48 @@ function remove-lockfile { # {{{1
 	]]&& return 1
 	rm "$lockfile"
 } # }}}1
+function mv-old-rcs-vs { #{{{1
+	NOT-IMPLEMENTED -die
+	remove-old-RCS
+} # }}}1
+function softlink-or-die { # {{{1
+	local dRCS dLN
+	ln -s "$1" "$2" && return
+	sparkle-path "$1";		dRCS=$REPLY
+	sparkle-path "$2";		dLN=$REPLY
+	die "Could not ^Tln -s^t" "$dRCS" "$dLN"
+} # }}}1
 function mk-linked-rcs { # {{{1
-	local rcs_path link_to
-	rcs_path=$RCS_BASE$1
+	local common_rcs_subpath link_to REPLY
+	common_rcs_subpath=$RCS_BASE/${1#/}
 	link_to=$2/RCS
 
-	needs-path -create -or-die "$rcs_path"
-	needs-path -create -or-die "$link_to"
+	needs-path -create -or-die "$common_rcs_subpath"
 
-	ln -s "$rcs_path" "$link_to" ||
-		die "Could not ^Tln -s^t" "^U$rcs_path^u" "^U$link_to^u"
+	if [[ -h $link_to ]]; then
+		local RCS dLN dRCS dCMN
+		RCS=$(readlink $link_to)
+		[[ $RCS == $common_rcs_subpath ]]|| {
+			sparkle-path "$link_to";			dLN=$REPLY
+			sparkle-path "$RCS";				dRCS=$REPLY
+			sparkle-path "$common_rcs_subpath";	dCMN=$REPLY
+			die "$dLN ^Bexists^b but" "points to $dRCS" "instead of $dCMN"
+		  }
+	elif [[ -d $link_to ]]; then
+		mv-old-rcs-vs "$link_to" "$common_rcs_subpath"
+		softlink-or-die "$common_rcs_subpath" "$link_to"
+	elif [[ -e $link_to ]]; then
+		sparkle-path "$link_to"
+		die "File System Object $REPLY exists" "but is not a directory or link"
+	else
+		softlink-or-die "$common_rcs_subpath" "$link_to"
+	fi
 } # }}}1
 function main { # {{{1
 	holdbase=$HOLD_PATH/$(uname -r)/sys-files
+	workingpath=$holdbase/${filepath#/}
+	needs-path -create -or-die "$workingpath"
 
-	workingpath=$holdbase$filepath
 	[[ -d $workingpath/RCS ]]||
 		mk-linked-rcs "$filepath" "$workingpath"
 
@@ -188,7 +215,7 @@ file_or_error=$(realpath "$filename" 2>&1)
 
 filename=$file_or_error
 filepath=${filename%/*}
-[[ $filepath == $HOME* ]] &&
+[[ $filepath == $HOME?(/*) ]] &&
 	die "^T$PGM^t only works outside of ^S\$HOME^s." \
 		"Instead, use ^T:W^t inside ^Tvim^t (^Tv^t or ^Tnew^t)."
 notify "filepath: $filepath"
@@ -205,7 +232,7 @@ print $$>"$LOCKBASE/$lockfile"
 # WE HAVE A LOCK
 
 HOLD_PATH=$HOME/hold
-RCS_BASE=$HOLD_PATH/common-rcs/sys-files
+RCS_BASE=$HOLD_PATH/common-rcs
 needs-path -create -or-die "$RCS_BASE"
 
 

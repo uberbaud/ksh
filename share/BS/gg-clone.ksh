@@ -148,7 +148,7 @@ needs needs-path needs-cd new-array shquote
 	die 'Too many parameters.' \
 		'Expected only ^Uremote^u and optionally ^Urepo dir^u.'
 
-[[ $1 == @(http|https|ftp|ftps|git|ssh):* ]]||
+[[ $1 == @(@(http|https|ftp|ftps|ssh):|git@)* ]]||
 	die "Parameter does not appear to be a REPOSITORY_PATH name."
 repo=$1
 

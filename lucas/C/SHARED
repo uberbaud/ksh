@@ -2,6 +2,7 @@
 chflags
 getent_1
 kill_1
+m_1
 pkg_1
 poco
 rcctl_1

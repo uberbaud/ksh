@@ -58,8 +58,9 @@ function msg-show { show "${1:?}"; print -n '\033[A'; }
 function msg-webview { m-part "${1:?}"; }
 function msg-xplode { mhstore +$MBOX ${1:?}; }
 function msg-open-urls { # {{{1
-	typeset open
-	[[ -n ${BROWSER:-} ]]|| pause-warn '^O$^o^VBROWSER^v is not set.'
+	local u
+	[[ -n ${BROWSER:=$(<${XDG_CONFIG_HOME:?}/etc/browser)} ]]||
+		pause-warn '^O$^o^VBROWSER^v is not set.'
 
 	set -- $(show "$@" | egrep -o 'https?://[^[:space:]]+')
 	$BROWSER "$@" || for u { print -r -- "$u"; pause-warn 'Browser issue.'; }

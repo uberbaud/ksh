@@ -13,7 +13,7 @@ function usage {
 	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
-	^F{4}Usage^f: ^T$PGM^t ^Uremote^u ^[^Urepo dir^u^]
+	^F{4}Usage^f: ^T$PGM^t ^[^T-f^t^] ^Uremote^u ^[^Urepo dir^u^]
 	         ^Tgit clone^ts a bare repository into
 	             ^SREPOS_HOME^s/^Uhost/and/path/repo.git^u
 	         ^Tgot checkout^ts that repository into ^Urepo dir^u or a directory
@@ -21,6 +21,9 @@ function usage {
 	         ^GNote:^g ^T$PGM^t ^Goutputs the repository and worktree paths as^g
 	                  ^Gthe variables^g ^SWORKTREE_PATH^s ^Gand^g ^SREPOSITORY_PATH^s
 	                  ^Gin a form that can be^g ^Teval^t^Ged by the shell.^g
+
+	         ^T-f^t  Force using ^Uremote^u even if it doesn't ^Ilook^i like a
+	             remote repository name.
 	       ^T$PGM -h^t
 	         Show this help message.
 	===SPARKLE===
@@ -31,8 +34,10 @@ function bad_programmer {	# {{{2
 	die 'Programmer error:'	\
 		"  No getopts action defined for [1m-$1[22m."
   };	# }}}2
-while getopts ':h' Option; do
+warnOrDie=die
+while getopts ':fh' Option; do
 	case $Option in
+		f)	warnOrDie=warn;										;;
 		h)	usage;												;;
 		\?)	die "Invalid option: ^B-$OPTARG^b.";				;;
 		\:)	die "Option ^B-$OPTARG^b requires an argument.";	;;
@@ -98,7 +103,8 @@ function main { # {{{1
 	  }
 
 	# git bare repository directory
-	R=${repo##@(http|https|ftp|ftps|git|ssh):*(/)}
+	R=${repo##@(file|git|http|https|ssh):*(/)}	# handle std schema names
+	R=${R#*@}; R=${R%:*}						# handle ssh protocol name
 	REPOSITORY_PATH=$REPOS_HOME/$R
 	repo_base=${REPOSITORY_PATH%/*}
 	[[ -d $repo_base ]]|| {
@@ -142,15 +148,30 @@ function main { # {{{1
 
 } # }}}1
 
-needs needs-path needs-cd new-array shquote
+needs needs-path needs-cd new-array shquote warnOrDie
 (($#))|| die 'Missing required parameter ^Uremote^u'
 (($#<=2))||
 	die 'Too many parameters.' \
 		'Expected only ^Uremote^u and optionally ^Urepo dir^u.'
 
-[[ $1 == @(@(http|https|ftp|ftps|ssh):|git@)* ]]||
+if [[ $1 == @(http|https|ftp|ftps|ssh):* ]]; then	# std schema rep
+	repo=$1
+elif [[ -d $1 ]]; then								# local file
+	repo=file://$(realpath "$1")
+	warnOrDie "^Brepo^b is local" "Maybe use ^Tgit clone^t instead?"
+													# ssh as scp style
+elif [[ $1 == ?(+([!:/@])@)+(+([A-Za-z0-9-]).)+([A-Za-z0-9-]):* ]]; then
+	local f t
+	t=${1#*:}
+	f=${1%":$t"}
+	repo=ssh://$f/$t
+	warn "Converting ^Brepo^b from ^Bscp^b format to ^Bssh^b schema:"	\
+		"$1"	\
+		"$repo"
+	yes-or-no 'Is the new repo name correct' || die "Try again."
+else
 	die "Parameter does not appear to be a REPOSITORY_PATH name."
-repo=$1
+fi
 
 if [[ -n ${2-} ]]; then
 	newdir=$2

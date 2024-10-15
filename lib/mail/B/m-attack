@@ -5,8 +5,9 @@
 set -o nounset;: ${FPATH:?Run from within KSH}
 
 CONTMSG='Press any key to continue.'
-MBOX=inbox
-SEQ='¬L'	# NOT messages in groups
+DEFAULT_FLDR=inbox
+DEFAULT_SEQ='¬L'	# NOT messages in groups
+fERRs=.attack.out
 
 # Usage {{{1
 this_pgm=${0##*/}
@@ -40,29 +41,23 @@ shift $((OPTIND-1))
 function pause-for-key { forceline; press-any-key "$CONTMSG"; }
 function pause-warn { warn "$@"; print -n '     '; pause-for-key; }
 function revert-cursor-pos { ((${1:?}))&& print -n -- '\033['"$1"'A\033[J'; }
-function process-readkeys { # {{{1
-	local nm pid
-	read nm pid
-	[[ $nm == readkeys ]]|| die "Weirdness"
-	while read class val; do
-		[[ $class == c && $val == [$1] ]]|| continue
-		print "$val"
-		break
-	done
-	kill $pid
+function set-curmsg { # {{{1
+	local rc
+	CUR_MSG_NUM=$(pick +$FLDR MSGs:${1:?} -sequence c -list) 2>$fERRs.1
+	rc=$?; (($rc == 0 || $rc == 64))|| warn "$(<$fERRs)"
+	return $rc
 } # }}}1
-function getkey { REPLY=$(readkeys | process-readkeys "$1"); }
-function msg-prev { ((MSG_NDX>0))&& ((MSG_NDX--)); }
-function msg-next { ((MSG_NDX++)); }
-function msg-show { show "${1:?}"; print -n '\033[A'; }
-function msg-webview { m-part "${1:?}"; }
-function msg-xplode { mhstore +$MBOX ${1:?}; }
+function msg-prev { set-curmsg p; }
+function msg-next { set-curmsg n; }
+function msg-show { show +$FLDR ${1:?}; print -n '\033[A'; }
+function msg-webview { LOGLEVEL=0 m-part "${1:?}"; }
+function msg-xplode { mhstore +$FLDR ${1:?}; }
 function msg-open-urls { # {{{1
 	local u
 	[[ -n ${BROWSER:=$(<${XDG_CONFIG_HOME:?}/etc/browser)} ]]||
 		pause-warn '^O$^o^VBROWSER^v is not set.'
 
-	set -- $(show "$@" | egrep -o 'https?://[^[:space:]]+')
+	set -- $(show +$FLDR "$@" | egrep -o 'https?://[^[:space:]]+')
 	$BROWSER "$@" || for u { print -r -- "$u"; pause-warn 'Browser issue.'; }
 } # }}}1
 function set-actlist { # {{{1
@@ -75,7 +70,8 @@ function set-actlist { # {{{1
 	print -r -- "$list."
 } # }}}1
 function show-msg-info { # {{{1
-	scan +$MBOX -width 9999 -format scan.borders ${1:?}
+	scan +$FLDR -width 9999 -format scan.borders ${1:?} ||
+		warn "scan +$FLDR -width 9999 -format scan.borders ${1:?}"
 	print
 	notify "${ACTLIST:=$(
 		set-actlist prev next show webview 'open urls' xplode quit
@@ -94,44 +90,64 @@ function show-msg-info { # {{{1
 	esac
 } # }}}1
 function main { # {{{1
-	local ferrs
-	set -A msgs -- $(pick +$MBOX "$@") ||
-		die "Bad pick options."
+	mark +$FLDR "$@" -sequence MSGs 2>$fERRs.1 || {
+		#if [[ $(<$fERRs.1} == 
+		#	die "No messages in ^V$FLDR^v^:^V$*^v."
+		#else
+			die "Bad pick options." "+$FLDR" "$@"
+		#fi
+	  }
+
+	# save c in case we're doing other things elsewhere
+	typeset -i CUR_MSG_NUM=$(pick +$FLDR c 2>/dev/null)
+	((CUR_MSG_NUM))||
+		CUR_MSG_NUM=$(pick +$FLDR MSGs:f -sequence c -list 2>/dev/null)
 
 	integer xtrarows=0
-	integer MSG_NDX=0
-	while ((MSG_NDX<${#msgs[*]})); do
-		CUR_MSG_NUM=${msgs[MSG_NDX]}
+	while :; do
 		revert-cursor-pos $xtrarows
 		show-msg-info $CUR_MSG_NUM
 		case $REPLY in
 			quit)		break;							;;
-			prev|next|show)	msg-$REPLY $CUR_MSG_NUM; xtrarows=0	;;
+			prev|next|show)
+				msg-$REPLY $CUR_MSG_NUM || break
+				xtrarows=0
+				;;
 			*)
-				ferrs=scan-$CUR_MSG_NUM.out
 				msg-$REPLY $CUR_MSG_NUM 2>&1			|
 					fold -sw ${COLUMNS:=$(tput cols)}	|
-					tee $ferrs
-				xtrarows=$(wc -l <$ferrs)
+					tee $fERRs
+				xtrarows=$(wc -l <$fERRs)
 				((xtrarows>0))&& pause-for-key $((xtrarows++))
-				rm -f $ferrs
+				rm -f $fERRs
 				;;
 		esac
 		((xtrarows+=5)) # Add the height used by show-msg-info
 	done
+
+	mark +$FLDR -sequence MSGs -delete a
 } # }}}1
 
 needs use-app-paths 
 use-app-paths mail || die '^Buse-app-paths^b ^Vmail^v'
-needs egrep fold forceline m-part mhstore pick press-any-key scan show tee
+needs egrep fold forceline m-part mhstore pick press-any-key scan show tee mark
+
+[[ $* == ?*+* ]]&&
+	die "Bad parameter list, mailbox other than first."
 
 if [[ $# -gt 0 && $1 == +* ]]; then
-	MBOX=${1#+}; shift
+	FLDR=${1#+}; shift
 	(($#))|| set -- a
+elif (($#)); then
+	FLDR=$DEFAULT_FLDR
 else
-	(($#))|| set -- "$SEQ"
+	FLDR=$DEFAULT_FLDR
+	if pick +$FLDR $DEFAULT_SEQ:f >/dev/null 2>&1; then
+		set -- "$DEFAULT_SEQ"
+	else
+		set -- a
+	fi
 fi
-
 
 main "$@"; exit
 

@@ -39,6 +39,7 @@ function expire-old-mail { # {{{1
 	print -nu2 ' [34m>>>[0m [1mDeleting[0m old trash ... '
 	if pick -before -30 +deleted -seq expired 2>/dev/null; then
 		rmm -unlink expired
+		folder +deleted -pack -noverbose
 	else
 		print -- '^Gnothing to delete.^g' | sparkle
 	fi
@@ -46,8 +47,17 @@ function expire-old-mail { # {{{1
 function Done { # {{{1
 	[[ -z $(flist +inbox -sequence marked -fast -noshowzero) ]]
 } # }}}1
+function yOrN { # {{{1
+	local yorn REPLY
+	yorn='^G[^g^Ty^t^G,^g^Tn^t^G]^g'
+	print -rn -- "  ^B${1:?}^b $yorn^B?^b" | sparkle
+	getkey yYnY
+	print -r -- "$REPLY"
+	[[ $REPLY == [yY] ]]
+} # }}}1
 
-needs flist folder forceline mark pick refile rmm yes-or-no
+
+needs flist folder forceline mark pick refile rmm getkey
 
 # clean out groupmail list
 GROUPMAIL=${MMH:?}/groupmail
@@ -59,8 +69,6 @@ mark "$@" +inbox -sequence marked 2>/dev/null
 folder +inbox
 
 Done && { printf '  Nothing to do.\n'; return; }
-
-exec 3>${HOME:?}/log/msg-done
 
 local M='\e[34m' P=' >>>' C='\e[0m' B='\e[1m' S='\e[35m'
 
@@ -107,23 +115,21 @@ TAXES='@efile\.jacksonhewitt\.com'
   X -from  "$TAXES"                       taxes         "tax related"
 
 if Done; then
-    print -u2 ' [34m>>>[0m No messages to [1mremove[0m.'
+	notify 'No messages to ^Bremove^b.'
 else
-    print -u2 ' [34m>>>[0m [1mTrashing[0m everything else.'
+    notify '^BTrashing^b everything else.'
     refile marked -nolink -src +inbox +deleted
 fi
 
 MAILTEMP="${XDG_PUBLICSHARE_DIR:?}/mail"
 set -A files2delete "$MAILTEMP"/*
 if [[ $files2delete != *\* ]]; then
-    print -u2 ' [34m>>>[0;1m Cleaning[0m mail workshop.'
-    yes-or-no 'Delete the mail parts which maybe you'\''re using' &&
-        rm "${files2delete[@]}"
+    notify '^BCleaning mail workshop.'
+	yOrN 'Delete the mail parts which maybe you'\''re using' &&
+		rm "${files2delete[@]}"
 fi
 
 # the MMH `show` litters `mhpath +` with temp files, get rid of them
 rm -f $(mhpath +)/show?????? >/dev/null 2>&1
-
-exec 3>&-
 
 # Copyright (C) 2017 by Tom Davis <tom@greyshirt.net>.

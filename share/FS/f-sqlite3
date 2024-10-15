@@ -3,11 +3,16 @@
 
 #: FUNCTION ^S…^s
 #:   Wraps ^Tsqlite3^t to use defaults.
+#:   ^GUSES ENVIRONMENT VARIABLES:^g
+#:       ^O${^o^VSQLITE_BIN^v^O:-^o^T/usr/local/bin/sqlite3^t^O}^o^G, and^g
+#:       ^O${^o^VSQLITE_INIT^v^O-^U${^o^VXDG_CONFIG_HOME^v^O}^o^u^T/sqlite3/init.sql^t^O}^o
+#:       ^GNote:^g ^VSQLITE_BIN^v ^G^BMUST^b be the full path, and^g
+#:             ^G^VSQLITE_INIT^v ^G^BMAY^b be empty.^g
 
 needs needs-file
 function f-sqlite3 {
 	local SQLite3 fINIT
-	SQLite3=/usr/local/bin/sqlite3
+	SQLite3=${SQLITE_BIN:-/usr/local/bin/sqlite3}
 	fINIT=${SQLITE_INIT-${XDG_CONFIG_HOME:?}/sqlite3/init.sql}
 	
 	needs-file -or-die "$SQLite3"

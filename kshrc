@@ -73,6 +73,7 @@ SYSDATA=$xdgdata/sysdata
 	K=$KDOTDIR;			KU=$KDOTDIR/$HOST;		KS=$KDOTDIR/share
 						F=$KU/F;				FS=$KS/FS
 						B=$KU/B					BS=$KS/BS
+						C=$KU/C					CS=$KS/CS
 												H=$KS/HS
 	L=$KDOTDIR/lib
 
@@ -309,6 +310,7 @@ set --
 ############[ END FPATH SPECIALNESS ]#####################################
 
 alias cd='_u="$-"; set -u; f-cd'
+alias cdt='builtin cd "$(mktemp -d)"'
 alias cls='clear colorls $LS_OPTIONS'
 alias clear='f-clear '
 alias doas='doas '

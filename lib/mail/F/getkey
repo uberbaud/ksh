@@ -1,0 +1,24 @@
+# <@(#)tag:tw.lucas.uberbaud.foo,2024-10-01,12.42.55z/584a628>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+#---------------------------------------------------------------------------
+#: FUNCTION ^Ukey list^u ^[^Uvarname^u^]
+#:   Wait for specific key hits and return that in ^O${^o^V2^v^O:-^o^VREPLY^v^O}^o
+
+function process-readkeys {
+	local nm pid class val
+	read nm pid
+	[[ $nm == readkeys ]]|| die "Weirdness"
+	while read class val; do
+		[[ $class == c && $val == [$1] ]]|| continue
+		print "$val"
+		break
+	done
+	kill $pid
+}
+
+needs readkeys
+function getkey {
+	eval ${2:-REPLY}='$(readkeys | process-readkeys "${1:?}")'
+}
+
+# Copyright © 2024 by Tom Davis <tom@greyshirt.net>.

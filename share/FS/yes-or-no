@@ -7,16 +7,16 @@
 #:   ^GNote: ^Uquestion^u is^g ^Tsparkle^t^Gd.^g
 
 needs sparkle
-function yes-or-no {(
+function yes-or-no {
+	local tty
+	tty=/dev/${TTY:-tty}
 	(($#))|| set 'Yes or No'
 	typeset -l go_on='please'
-	tty=${TTY:+/dev/$TTY}
-	exec 3<>${tty:=$(tty)}
 	while [[ $go_on == !(y|yes|n|no) ]]; do
-		print -n -- "  $* [y,n]?\033[0m " | sparkle >&3
-		read -ru3 go_on
-	done
+		print -n -- "  $* [y,n]?\033[0m " | sparkle
+		read -r go_on
+	done <$tty >$tty 2>&1
 	[[ $go_on == y* ]]
-)}
+}
 
 # Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

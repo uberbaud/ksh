@@ -18,7 +18,7 @@ function m {
 	eval "[[ \$1 == @($m_cmds) ]]" ||
 		die "^B$1^b is not a valid ^Tm^t ^(^Imail^i^) sub-command."
 
-	export FPATH PATH MAIL_APP_PATH
+	export FPATH PATH MAIL_APP_PATH TTY
 	m-"$@"
 }
 

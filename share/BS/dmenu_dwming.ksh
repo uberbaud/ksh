@@ -132,19 +132,21 @@ function handle-cmd { # {{{
 	if [[ $req == !* ]]; then
 		cmd="${req#!*( )} $qARGS"
 	elif [[ $req == ,* ]]; then
-		cmd="lockdown z"
+		cmd="lockdown" "$args"
 	elif [[ " $newterm " == *" $req "* ]]; then
 		[[ $req == in-new-term ]]|| cmd='in-new-term '
-		cmd="${cmd:-}$req $qARGS"
+		cmd="${cmd:-}$req $args"
 	elif [[ " $starts " == *" $req "* ]]; then
 		cmd="start $req $qARGS"
 	elif [[ " $amuse " == *" $req "* ]]; then
 		cmd="amuse:send-cmd ${req#@}"
 	elif [[ " $others $web $x11 " == *" $req "* ]]; then
 		cmd="$req $qARGS"
+	elif [[ " $remote " == *" $req "* ]]; then
+		tmux-remote "$req"
 	else
-		local msg='Unknown `dmenu_dwming` Command'
-		cmd="Xdialog --title '$msg' --msgbox '$msg$NL$req '$qARGS 0 0"
+		local msg='Unknown `dmenu_dwming` command'
+		cmd="xnotify '$msg: $req'"
 	fi
 	ksh -c "$cmd" &
 } # }}}1
@@ -157,6 +159,7 @@ websearch='g a w amazon book cpan google imdb map synonyms translate wikipedia'
 x11='display ghb glxgears oclock showrgb soffice xcalc xclock xmag xwd'
 others='amuse weather wordnet wnb'
 web='h s http https www chrome surf'
+remote='sam.lan uberbaud.net uberbaud.foo yt.lan' 
 special=	# 'task'
 newterm='man in-new-term'
 
@@ -171,16 +174,19 @@ newterm='man in-new-term'
 	print -u2 -- "  amuse:     $amuse"
 	print -u2 -- "  web:       $web"
 	print -u2 -- "  special:   $special"
+	print -u2 -- "  remote:    $remote"
 	print -u2 -- "  newterm:   $newterm"
 	print -u2 -- "=============================="
   }
 
-[[ $cmdcache -ot $0 ]]&&
-	for w in '' $starts $websearch $others $x11 $amuse $web $special $newterm; do
-		print -r -- "$w";
+[[ $cmdcache -ot $0 ]]&& {
+	for w in '' \
+		$starts $websearch $others $x11 $amuse $web $special $remote $newterm
+	do
+		print -r -- "$w"
 	done | sort --unique >$cmdcache
+  }
 
-# { dmenu -dy "$dypgm '$cmdcache'" "$@" || print "ESC"; } | handle-cmd
 { dmenu "$@" <$cmdcache || print "ESC"; } | handle-cmd; exit
 
 

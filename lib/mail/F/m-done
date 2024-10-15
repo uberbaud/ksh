@@ -5,6 +5,7 @@
 #:   Wrapper around $BS/m-done.ksh
 
 function m-done {
+	[[ -n $TTY ]]&& export TTY
 	${MAIL_APP_PATH:?}/B/_done.ksh "$@"
 	[[ -n ${PRE_MAIL_PWD-} ]]&& {
 		builtin cd "$PRE_MAIL_PWD"

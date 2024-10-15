@@ -1,0 +1,14 @@
+# <@(#)tag:tw.lucas.uberbaud.foo,2024-09-24,17.18.19z/1eb0bc9>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+#---------------------------------------------------------------------------
+#: FUNCTION ^G…^g
+#:   Same as f-sqlite but encrypted
+
+needs f-sqlite
+function f-sqlcipher {
+	local SQLITE_BIN
+	SQLITE_BIN=/usr/local/bin/sqlcipher
+	f-sqlite "$@"
+}
+
+# Copyright © 2024 by Tom Davis <tom@greyshirt.net>.

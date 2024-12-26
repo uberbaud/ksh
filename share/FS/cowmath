@@ -10,11 +10,15 @@ function cowmath {
 	MSG='Moo?'
 	(($#))&& MSG="$* = $(print -- "$*"|bc 2>&1)"
 	integer E=$?
-	cowsay -- "$MSG" |
-		sed -E													\
-			-e 's/^ _+ $/[33m&[39m/'						\
-			-e 's/^<(.*)>$/[33m<[1;39m\1[22;33m>[39m/'	\
-			-e '/^ -+ $/,$s/.*/[33m&[39m/'
+	if [[ -t 1 ]]; then
+		cowsay -- "$MSG" |
+			sed -E													\
+				-e '/^ _+$/{s//[33m&[39m/;s/_/─/g;}'			\
+				-e 's/^<(.*)>$/[33m<[1;39m\1[22;33m>[39m/'	\
+				-e '/^ -+$/,${s/.*/[33m&[39m/;s/-/─/g;}'
+	else
+		cowsay -- "$MSG"
+	fi
 	return $E
 }
 

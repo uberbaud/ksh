@@ -52,7 +52,7 @@ function yOrN { # {{{1
 	yorn='^G[^g^Ty^t^G,^g^Tn^t^G]^g'
 	print -rn -- "  ^B${1:?}^b $yorn^B?^b" | sparkle
 	getkey yYnY
-	print -r -- "$REPLY"
+	print -r -- " $REPLY"
 	[[ $REPLY == [yY] ]]
 } # }}}1
 

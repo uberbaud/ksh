@@ -16,6 +16,20 @@
 
         ^Vn^v contains bytes read. Requires ^Nerr.h^n, ^Nfcntl.h^n, and ^Nunistd.h^n.
 
+    ^BDate/Time^b
+        ^T#include <sys/types.h>^t
+        ^T#include <time.h>^t
+
+        ^Tsize_t              sz;^t
+        ^Tchar                buf[32];^t
+        ^Tconst struct tm    *timeptr;^t
+        ^Ttime_t              now^t
+
+        ^Tnow = time(NULL);^t
+        ^Ttimeptr = localtime(&now);^t
+        ^Tsz = strftime(buf, sizeof(buf), "%Y-%m-%d", timeptr);^t
+        ^Tif (sz) puts(buf);^t
+
     ^BHandle Any Endian^b
         From little endian encoding:
           ^Ti = (data[0]<<0) | (data[1]<<8) | (data[2]<<16) | (data[3]<<24);^t

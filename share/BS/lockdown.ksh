@@ -47,7 +47,7 @@ needs apm get-exclusive-lock release-exclusive-lock log xlock
 LOCK=twScreenLock
 get-exclusive-lock -no-wait $LOCK
 
-log timesheet xlock begin || warn $REPLY
+log timesheet xlock begin || Warn $REPLY
 
 # opts: a negative number sets the maximum
 # OTHER GOOD MODES: eyes, goop

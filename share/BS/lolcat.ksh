@@ -73,7 +73,7 @@ while getopts ':c:is:tu:h' Option; do
 		s)	reqInt $Option shft $OPTARG;						;;
 		u)	reqInt $Option hue $OPTARG;							;;
 		t)	set -A colors $c2; C=${#colors[*]};					;;
-		h)	-usage $Usage;										;;
+		h)	usage;												;;
 		\?)	-die "Invalid option: '-$OPTARG'.";					;;
 		\:)	-die "Option '-$OPTARG' requires an argument.";		;;
 		*)	bad_programmer "$Option";							;;

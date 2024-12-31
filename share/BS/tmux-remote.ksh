@@ -1,6 +1,5 @@
 #!/bin/ksh
 # <@(#)tag:tw.csongor.uberbaud.foo,2024-02-27,01.50.40z/5f7511>
-
 # vim: ft=ksh ts=4 tw=72 noexpandtab nowrap foldmethod=marker
 
 set -o nounset;: ${FPATH:?Run from within KSH}
@@ -33,14 +32,14 @@ shift $((OPTIND-1))
 # ready to process non '-' prefixed arguments
 # /options }}}1
 function main { # {{{1
-	local tmux_bin obsd_path other_path
+	local tmux_bin obsd_path other_sys_path
 
 	obsd_path=/usr/bin
-	other_path=/usr/local/bin
+	other_sys_path=/usr/local/bin
 	case ${REMOTE:?} in
 		${HOSTNAME:?})	die "$REMOTE is not remote.";		;;
 		csongor.lan)	tmux_bin=$obsd_path/tmux;			;;
-		sam.lan)		tmux_bin=$other_path/tmux;			;;
+		sam.lan)		tmux_bin=$other_sys_path/tmux;		;;
 		uberbaud.foo)	tmux_bin=$obsd_path/tmux;			;;
 		uberbaud.net)	tmux_bin=$obsd_path/tmux;			;;
 		yt.lan)			tmux_bin=$obsd_path/tmux;			;;
@@ -63,8 +62,6 @@ needs in-new-term ssh-askfirst
 
 (($#))|| die 'Missing required parameter: ^Uhost^u.'
 (($#>1))&& die 'Too many parameters. Expected only one (1): ^Uhost^u.'
-
-typeset -ft in-new-term
 
 REMOTE=$1
 [[ $REMOTE == *.* ]]|| die "Remote is not fully qualified: ^V$REMOTE^v"

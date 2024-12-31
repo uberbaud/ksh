@@ -138,7 +138,7 @@ cflags[3]=-f'color-diagnostics'
 export CFLAGS="${cflags[*]}"
 export MAKECONF=${MAKECONF:-$xdgcfg/etc/ports-settings.mk}
 [[ -f $MAKECONF ]]|| unset MAKECONF
-USER_MK=$xdgcfg/etc/user.mk
+USER_MK=$xdgcfg/mk/user.mk
 export EXTRA_SYS_MK_INCLUDES="<$USER_MK>"
 [[ -f $USER_MK ]]|| unset EXTRA_SYS_MK_INCLUDES USER_MK
 # LUA 5.1

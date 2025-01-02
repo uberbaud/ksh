@@ -11,15 +11,23 @@ function usage {
 	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
-	^F{4}Usage^f: ^T${PGM}^t ^F{1}R^f ^F{2}G^f ^F{4}B^f
+	^F{4}Usage^f: ^T${PGM}^t ^[^T-alstxX^t^] ^F{1}R^f ^F{2}G^f ^F{4}B^f
 	         Outputs the 256 color number of the ^Brgb^b value.
 	         Each of the ^Brgb^b is a number between ^B0^b and ^B5^b.
-	       ^T${PGM}^t ^Ucolor-code^u
+	       ^T${PGM}^t ^[^T-alstxX^t^] ^Ucolor-code^u
 	         Outputs the ^BR^b ^BG^b ^BB^b of that ^Ucolor-code^u.
 	         Where color-code is a number between 0 and 255 inclusive.
-	       ^T${PGM}^t ^T#^t^Uhex-color^u
+	       ^T${PGM}^t ^[^T-alstxX^t^] ^T#^t^Uhex-color^u
 	         Outputs the ansi ^BR^b ^BG^b ^BB^b nearest to the full color
 	         ^Itrue color^i ^Uhex-color^u.
+	       ^GOUTPUT FORMAT FLAGS^g
+	         ^T-a^t  all (index hex R G B) on one line, easily parsed.
+	         ^T-l^t  default long detailed output format
+	         ^T-s^t  short output format (only shows RGB as 1-5 or ^T*^t)
+	         ^T-t^t  color table index format (only shows index as 0-255)
+	         ^T-x^t  hex RGB format (shows RGB as #rrggbb as [0-f]{6})
+	         ^T-X^t  hex RGB format (shows RGB as #rrggbb as [0-F]{6})
+	             ^GFormat flags are mutually exclusive. Last one wins.^g
 	       ^T${PGM} -h^t
 	         Show this help message.
 	===SPARKLE===
@@ -30,8 +38,15 @@ function bad_programmer {	# {{{2
 	die 'Programmer error:'	\
 		"  No getopts action defined for [1m-$1[22m."
   };	# }}}2
-while getopts ':h' Option; do
+SHOW=full
+while getopts ':ahlstxX' Option; do
 	case $Option in
+		a)	SHOW=all;												;;
+		l)	SHOW=full;												;;
+		s)	SHOW=short;												;;
+		t)	SHOW=clrtbl;											;;
+		x)	SHOW=hex;												;;
+		X)	SHOW=HEX;												;;
 		h)	usage;													;;
 		\?)	die "Invalid option: [1m-$OPTARG[22m.";				;;
 		\:)	die "Option [1m-$OPTARG[22m requires an argument.";	;;
@@ -122,11 +137,10 @@ function set-hex6 { # {{{1
 			typeset p=${palG[rG-232]}
 			HEX="#$p$p$p"
 		fi
-		set -A rgb -- '' '' '' "$HEX" "$ANSI"
 	else # it's a color, not grey
 		ANSI=$(((((rC*6)+gC)*6+bC)+16))
 		HEX="#${palX[rC]}${palX[gC]}${palX[bC]}"
-		set -A rgb -- $rC $gC $bC "$HEX" "$ANSI"
+		R=$rC; G=$gC; B=$bC
 	fi
 } # }}}1
 function set-hex3 { # {{{1
@@ -138,27 +152,25 @@ function set-hex3 { # {{{1
 	set-hex6 "#$r$r$g$g$b$b"
 } # }}}1
 function set-16-colors { # {{{1
-	local hex
 	warn 'The default pallette is often changed.' 'Therefore these are only approximations.'
 	case $1 in
-		 0) hex='#000000';		;;
-		 1) hex='#800000';		;;
-		 2) hex='#00cd00';		;;
-		 3) hex='#cdcd00';		;;
-		 4) hex='#1e90ff';		;;
-		 5) hex='#cd00cd';		;;
-		 6) hex='#00cdcd';		;;
-		 7) hex='#e5e5e5';		;;
-		 8) hex='#7f7f7f';		;;
-		 9) hex='#ff0000';		;;
-		10) hex='#00ff00';		;;
-		11) hex='#ffff00';		;;
-		12) hex='#5c5cff';		;;
-		13) hex='#ff00ff';		;;
-		14) hex='#00ffff';		;;
-		15) hex='#ffffff';		;;
+		 0) HEX='#000000';		;;
+		 1) HEX='#800000';		;;
+		 2) HEX='#00cd00';		;;
+		 3) HEX='#cdcd00';		;;
+		 4) HEX='#1e90ff';		;;
+		 5) HEX='#cd00cd';		;;
+		 6) HEX='#00cdcd';		;;
+		 7) HEX='#e5e5e5';		;;
+		 8) HEX='#7f7f7f';		;;
+		 9) HEX='#ff0000';		;;
+		10) HEX='#00ff00';		;;
+		11) HEX='#ffff00';		;;
+		12) HEX='#5c5cff';		;;
+		13) HEX='#ff00ff';		;;
+		14) HEX='#00ffff';		;;
+		15) HEX='#ffffff';		;;
 	esac
-	set -A rgb -- '' '' '' "$hex" "$1"
 } # }}}1
 function set-grey-scale { #{{{1
 	typeset hex
@@ -189,7 +201,6 @@ function set-grey-scale { #{{{1
 		255)	hex='ee';		;;
 	esac
 	HEX="#$hex$hex$hex"
-	set -A rgb -- '' '' '' "$HEX" "$1"
 } # }}}1
 function set-232-colors { # {{{1
 	typeset -i r=0 g=0 b=0 x=$(($1-16))
@@ -197,25 +208,50 @@ function set-232-colors { # {{{1
 	g=$((x%6));
 	r=$((x/6))
 	HEX="#${palX[r]}${palX[g]}${palX[b]}"
-	set -A rgb -- "$r" "$g" "$b" "$HEX" "$1"
+	R=$r; G=$g; B=$b
 } # }}}1
-needs figlet term-does-utf8 term-has-256-colors
+function show-all { print -r -- "$ANSI $HEX $R $G $B"; }
+function show-full { # {{{1
+	needs figlet term-does-utf8
+	splitstr NL "$(figlet "$ANSI")" fig
+
+	Latin='\0303\0211\0303\0247\0303\0276\0303\0260'
+	term-does-utf8 || Latin='\0311\0347\0376\0360'
+	Alpha="ABCDefgh$(print -- "$Latin")"
+
+	smA='\033[0m    \033[48;5;%dm            '
+	smB='\033[0m    \033[38;5;%dm%s'
+	smC='\033[0m     : %s\n'
+	showme="  $smA$smB$smC"
+
+	typeset -L 33 RGB="$R $G $B"
+	printf '%40s %s\n' "$RGB"                           "${fig[0]}"
+	printf "$showme" $ANSI $ANSI "$Alpha"		"${fig[1]}"
+	printf "$showme" $ANSI $ANSI '_0123456789-' "${fig[2]}"
+	printf "$showme" $ANSI $ANSI '!@#$%^&*([{|' "${fig[3]}"
+	printf '%17s %22s %s\n' "$ANSI $HEX" ':'   "${fig[4]}"
+} # }}}1
+function show-short { print -r -- "$R $G $B"; }
+function show-clrtbl { print -r -- "$ANSI"; }
+function show-HEX { print -r -- "$HEX"; }
+function show-hex { typeset -l x=$HEX; print -r -- "$x"; }
+needs term-has-256-colors
 term-has-256-colors ||
 	warn 'This terminal does not support 256 colors.'
 
+R=\*; G=\*; B=\*; ANSI=; typeset -u HEX=
 x3=[0-9a-fA-F][0-9a-fA-F][0-9a-fA-F]
 if (($#==1)); then
 	x=$1
 	if		[[ $x == \#$x3 ]];		then set-hex3 $1
 	elif	[[ $x == \#$x3$x3 ]];	then set-hex6 $1
 	elif	[[ $x == *[!0-9]* ]];	then std-die;
-	elif	((  0<=x && x< 16));	then set-16-colors $1
-	elif	(( 16<=x && x<232));	then set-232-colors $1
-	elif	((232<=x && x<256));	then set-grey-scale $1
+	elif	((  0<=x && x< 16));	then set-16-colors ${ANSI:=$1}
+	elif	(( 16<=x && x<232));	then set-232-colors ${ANSI:=$1}
+	elif	((232<=x && x<256));	then set-grey-scale ${ANSI:=$1}
 	else
 		std-die;
 	fi
-	set -- "${rgb[@]}"
 elif (($#==3)); then
 	for y; do
 		[[ $y == *[!0-9]* ]]&&	bad-color-die
@@ -225,26 +261,10 @@ elif (($#==3)); then
     R=$1 G=$2 B=$3
 	ANSI=$((16+(36*R)+(6*G)+B))
 	HEX="#${palX[R]}${palX[G]}${palX[B]}"
-	set -A rgb -- $R $G $B "$HEX" "$ANSI"
 else
 	std-die
 fi
 
-showme='  '\
-'\033[0m    \033[48;5;%dm            '\
-'\033[0m    \033[38;5;%dm%s'\
-'\033[0m     : %s\n'
-splitstr NL "$(figlet "${rgb[4]}")" fig
-
-Latin='\0303\0211\0303\0247\0303\0276\0303\0260'
-term-does-utf8 || Latin='\0311\0347\0376\0360'
-Alpha="ABCDefgh$(print -- "$Latin")"
-
-typeset -L 33 RGB="${rgb[0]:-*} ${rgb[1]:-*} ${rgb[2]:-*}"
-printf '%40s %s\n' "$RGB"                           "${fig[0]}"
-printf "$showme" ${rgb[4]} ${rgb[4]} "$Alpha"		"${fig[1]}"
-printf "$showme" ${rgb[4]} ${rgb[4]} '_0123456789-' "${fig[2]}"
-printf "$showme" ${rgb[4]} ${rgb[4]} '!@#$%^&*([{|' "${fig[3]}"
-printf '%17s %22s %s\n' "${rgb[4]} ${rgb[3]}" ':'   "${fig[4]}"
+show-$SHOW
 
 # Copyright (C) 2017 by Tom Davis <tom@greyshirt.net>.

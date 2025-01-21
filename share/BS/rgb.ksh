@@ -75,7 +75,8 @@ function bad-color-die { # {{{1
 } # }}}1
 set -A palA -- 00 32 65 99 CC FF # well distributed
 set -A palX -- 00 5F 87 AF D7 FF # xterm
-set -A palG -- 08 12 1c 26 30 3a 44 4e 58 62 6c 76 80 8a 94 9e a8 b2 bc c6 d0 da e4 ee
+set -A palG -- 08 12 1c 26 30 3a 44 4e 58 62 6c 76 80 8a \
+				94 9e a8 b2 bc c6 d0 da e4 ee # grayscale
 function tc→256c { # {{{1
 	typeset -i10 c=$1 C=0
 	# CLOSEST COLOR

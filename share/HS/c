@@ -43,5 +43,17 @@
             ^Tdefault^t^O:^o ^U…^u^O;^o
           ^O}^o
 
+    ^Bcleanup attribute^b
+
+        Extension supported by ^Iclang^i and ^IGCC^i. This attribute allows a
+        function to be run when a local variable goes out of scope. The
+        attribute takes the identifier of a function with a parameter type that
+        is a pointer to the type with the attribute.
+
+        ^T#define defer(F) __attribute__((cleanup(F)))^t
+        ^Tchar *x = NULL;^t
+        ^Tx = malloc(SOME_MACRO_SIZE);^t
+
   ^GSee also:^g ^Vhttps://jorenar.com/blog/less-known-c^v
+            ^Vc-attributes^v
 

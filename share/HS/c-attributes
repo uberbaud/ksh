@@ -1,0 +1,32 @@
+^BParticularly useful C Attributes^b
+
+    ^Bcleanup^b^O*^o
+
+        Marks a local variable. The attribute takes the identifier of a
+        function with a parameter type that is a pointer to the type with the
+        attribute. There is no way to retrieve the return value.
+
+        ^T#define defer(F) __attribute__((cleanup(F)))^t
+        ^Tchar *x = NULL;^t
+        ^Tx = malloc(SOME_MACRO_SIZE);^t
+
+    ^Bconstructor^b^[^O(^o^Uprecedence^u^O^)^o^]
+
+        Marks a function. ^Iconstructor^i functions are run ^Bbefore^b
+        ^Tmain^t. Optionally takes a non-negative integer constant between 101
+        and 65535 as a priority where lower values take precedence over higher
+        values. Constructors without a precedence have a precedence of 65535,
+        and in cases with tied precedences, the first encountered is run first.
+        Precedence values outside the 101-65535 cause undefined behavior.
+
+    ^Bdestructor^b^[^O(^o^Uprecedence^u^O^)^o^]
+
+        Marks a function to run ^Bafter^b ^Vmain^v has run ^Bor^b when ^Vexit^v
+        is called. Destructors are not called for other exits. Destructor
+        precedence is exactly opposite constructor (eg: highest first, last
+        encountered of a given priority executed first).
+
+
+    ^O*^o An ^Bextension^b to ^Istandard C^i which is supported by ^Iclang^i and ^IGCC^i.
+
+    ^GSee also:^g ^Vhttps://clang.llvm.org/docs/AttributeReference.html^v

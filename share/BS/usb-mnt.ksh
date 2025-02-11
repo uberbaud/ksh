@@ -11,9 +11,15 @@ function usage {
 	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
-	^F{4}Usage^f: ^T$PGM^t ^[^T-n^t^]
+	^F{4}Usage^f: ^T$PGM^t ^[^T-n^t^] ^[^Udev^u^]^[^T:^t^Upartition list^u^]^[^T/^t^Uname^u^] ^S…^s
 	         Mount any unmounted but attached USB devices.
-	           ^T-n^t  Don't do otherwise automatic ^Bfsck^b.
+	           ^T-f^t  Don't do otherwise automatic ^Bfsck^b.
+	         If ^Udev^u is given, only that drive will be mounted.
+	         ^Upartition list^u is a comma separated list of partitions to mount.
+	         ^Uname^u is the name of the directory in ^T/vol^t where the file system
+	         will be mounted. If ^Udev^u is not specified but a ^Upartition list^u, or
+	         ^Uname^u is given, and there is more than one unmounted drive, none
+	         will be mounted.
 	       ^T$PGM -h^t
 	         Show this help message.
 	===SPARKLE===
@@ -95,10 +101,12 @@ function simplify-disklabel { # {{{1
 		/^$/			{printname()}
 		/^  [abd-p]:/	{print $1,$4}
 		==AWKPGM==
-	as-root disklabel "$dev" | awk "$awkpgm"
+	as-root disklabel -P "$dev" | awk "$awkpgm"
 } # }}}1
 function mnt-drv { # {{{1
 	local dev diskinfo fstype id label namefile newlabel part
+	desparkle "$d"
+	notify "Trying to mount ^B$REPLY^b."
 	dev=$1
 	id=${2:-}
 	splitstr NL "$(simplify-disklabel)" diskinfo
@@ -114,15 +122,32 @@ function mnt-drv { # {{{1
 	if ((dc == 1)); then
 		part=${diskinfo%: *}
 		fstype=${diskinfo#*: }
+		[[ $part == ${PARTITION:-$part} ]]|| {
+			warn "^T-p $PARTITION^t given, but the only PARTITION is ^B$part^b."
+			return
+		  }
+		PARTITION=
+	elif [[ -n ${PARTITION} ]]; then
+		local p
+		part=
+		for p in "${diskinfo[@]}"; do
+			[[ ${p%: *} == $PARTITION ]]|| continue
+			part=$PARTITION
+			fstype=${p#*: }
+		done
+		[[ -n $part ]]||
+			warn "^T-p $PARTITION^t given but not found." "${diskinfo[@]}"
 	elif [[ $dc -eq 10 && ${diskinfo[7]#  } == i:* ]]; then
 		part=i
 		fstype=MSDOS
 	else
-		warn 'Too many drives, bailing.'
+		warn 'Too many drives, bailing.' "${diskinfo[@]}"
+		warn 'Use ^T-p^T ^Upartition^u to select a PARTITION to mount.'
 		return 1
 	fi
 	gsub ' ' _ "$label" label
 
+	label=$label${PARTITION:+_$PARTITION}
 	mount-fs-ondev-at "$fstype" "$dev$part" /vol/"$label"
 
 	# rename mount point IF there's a non-empty devname.txt file
@@ -158,24 +183,51 @@ function hd-devs-in-use { # {{{1
 		===AWKPGM===
 	df -P | awk "$awkpgm"
 } # }}}1
-function main { # {{{1
-	splitstr , "$(sysctl -n hw.disknames)" disknames
+function get-unmounted-devices { # {{{1
+	splitstr , "$(sysctl -n hw.disknames)" disknames list
 	set -A InUse -- $(hd-devs-in-use)
 	for d in "${disknames[@]}"; do
 		disk-in-use "$d" && continue
-		desparkle "$d"
-		notify "Trying to mount ^B$REPLY^b."
-		mnt-drv "${d%%:*}" "${d#:}"
+		list=${list:+"$list "}$d
 	done
+	print -n -- "${list:-}"
+} # }}}1
+function main { # {{{1
+	local O device plist mnt_name
+	splitstr , "$(sysctl -n hw.disknames)" drives
+
+	# If no drives were given, mount all unmounted drives
+	(($#))|| set -- $(list-unmounted-devices)
+
+	# for all given (if any) OR for all unmounted (if none given)
+	for O; do
+		device=${O%%[:/]*}
+		ensure-dev-name-is-valid "$device"
+		O=${O#"$device"}
+		[[ $O == :* ]]&& {
+			O=${O#:}
+			plist=${O%*/}
+			O=${O#"$plist"}
+		  }
+		[[ $O == /* ]]&& {
+			mnt_name=${O#/}
+		  }
+		mnt-drv "$device" "${plist:-}" "${mnt_name:-}"
+	done
+
 } # }}}1
 
 : ${USER:?}
-needs as-root awk df egrep gsub needs-path
+needs as-root awk df egrep gsub needs-path splitstr
 
 ffsopts='-t ffs -s -o rw,noexec,nodev,sync,softdep'
 fatopts="-t msdos -s -o rw,noexec,nosuid,-g=$USER,-u=$USER"
 cdopts="-t cd9660 -s -o rw,noexec,nosuid,-g"
 ntfsopts="-t ntfs"
+
+#		[[ $OPTARG == [abd-p] ]]||
+#			die "Invalid ^Upartition^u (valid ^O[^o^Tabd-p^t^O]^o)."
+#		PARTITION=${PARTITION:+$PARTITION }$OPTARG
 
 main; exit
 

@@ -23,6 +23,7 @@ function usage {
 	===SPARKLE===
 	^F{4}Usage^f: ^T$PGM^t ^[^T-d^t^]
 	         Create fetchmail and smtpd necessary files.
+	           ^T-v^t  Verbose
 	           ^T-d^t  Debug (dump database)
 	       ^T$PGM -h^t
 	         Show this help message.
@@ -35,9 +36,19 @@ function bad_programmer {	# {{{2
 		"  No getopts action defined for [1m-$1[22m."
   };	# }}}2
 DEBUG=false
-while getopts ':dh' Option; do
+VERBOSE=${VERBOSE:-false}
+if [[ $VERBOSE == 0 ]]; then
+	VERBOSE=false
+elif [[ $VERBOSE == +([0-9]) ]]; then
+	VERBOSE=true
+elif [[ $VERBOSE != @(true|false) ]]; then
+	warn 'Bad ^VVERBOSE^v value (^T$VERBOSE^t).' 'Setting to ^Ttrue^t.'
+	VERBOSE=true
+fi
+while getopts ':dvh' Option; do
 	case $Option in
 		d)	DEBUG=true; SQL_VERBOSE=true;						;;
+		v)	VERBOSE=true;										;;
 		h)	usage;												;;
 		\?)	die "Invalid option: ^B-$OPTARG^b.";				;;
 		\:)	die "Option ^B-$OPTARG^b requires an argument.";	;;
@@ -376,7 +387,7 @@ function create-one-fetchmail-file { # {{{1
 	local id usr pwd state host port sqlfields fopts outpath
 	id=${1:?Missing parameter _username_}
 	SQL <<-===SQLite===
-		SELECT username, password, state, host, port
+		SELECT username, password, state, host, port, provider
 		  FROM "account-services"
 		 WHERE protocol = 'imap'
 		   AND id = $id
@@ -385,11 +396,11 @@ function create-one-fetchmail-file { # {{{1
 	sql-want-one row account-services '-0-'
 	splitstr "${SQLSEP:?}" "$sqlreply" sqlfields
 	set -- "${sqlfields[@]}"
-	(($# == 5))|| {
+	(($# == 6))|| {
 		warn "Missing bits in ^Taccount-services^t for ^Vid^v ^O=^o ^T$id^t."
 		return
 	  }
-	usr=$1; pwd=$2; state=$3; host=$4; port=$5
+	usr=$1; pwd=$2; state=$3; host=$4; port=$5; provider=$6
 
 
 	SQL <<-===SQLite===
@@ -410,6 +421,8 @@ function create-one-fetchmail-file { # {{{1
 		*)		warn "Unknown mail download state: ^T$state^t.";	;;
 	esac
 
+	$VERBOSE &&
+		notify "Writing ^Bfetch rc^b: ^T$provider^t:^T$usr^T as ^T$state^t."
 	write-fetch-rc "$usr" "$pwd" "$host" "$port" "${fopts:-}" >$outpath/"$usr"
 	chmod 0600 $outpath/"$usr"
 

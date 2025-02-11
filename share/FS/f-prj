@@ -12,6 +12,9 @@ function f-prj {
 
 	if (($#==0)); then
 		set -- ls
+	elif [[ -n ${2:-} && ${1:-} == help ]]; then
+		"$X" "$@"
+		return
 	elif [[ ${1:-} == @(-h|help) ]]; then
 		"$X" -h
 		return

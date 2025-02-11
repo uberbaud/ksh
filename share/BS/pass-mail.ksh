@@ -11,9 +11,12 @@ function usage {
 	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
-	^F{4}Usage^f: ^T$PGM^t ^Uregex^u
+	^F{4}Usage^f: ^T$PGM^t ^Upattern^u
 	         List matching mail accounts and passwords for an account or
-	         an ^Tawk^t ^Uregex^u of one or more accounts.
+	         an ^BSQL^b ^TLIKE^t ^Upattern^u  of one or more accounts. If ^Upattern^u
+	         does not contain a ^'^T%^t^' or ^'^T?^t^' the pattern will be matched as
+	         ^T%^t^Upattern^u^T%^t. If ^Upattern^u begins with an exclaimation mark ^(^T!^t^),
+	         the search will be negated.
 	       ^T$PGM -h^t
 	         Show this help message.
 	===SPARKLE===
@@ -36,27 +39,37 @@ done
 shift $((OPTIND-1))
 # ready to process non '-' prefixed arguments
 # /options }}}1
+function do-query { # {{{1
+	if [[ -n $ACCT ]]; then
+		[[ $ACCT == *[\?%]* ]]|| ACCT="%$ACCT%"
+		SQLify ACCT
+	fi
+	WHERE=${ACCT:+ WHERE username ${NOT:-} LIKE $ACCT}
+	sqlite3 "$maildb" <<-===SQL===
+	.headers off
+	.mode column
+	SELECT username, password FROM accounts${WHERE:-};
+	===SQL===
+} # }}}1
+function main { # {{{1
+	local ACCT NOT
+	ACCT=${1:-}
+	[[ $ACCT == !* ]]&& {
+		ACCT=${ACCT#!}
+		NOT='NOT'
+	}
+	do-query | sed -Ee 's/^/  /'
+} # }}}1
 (($# > 1))&& die 'Too many arguments. Expected at most one (1).'
-ACCT=${1:-.}
 
-secrets=${XDG_DATA_HOME:?}/secrets
-[[ -d $secrets ]]|| die 'No secrets directory'
+needs needs-path needs-file sqlite3 SQLify
 
-mailaccts=$secrets/mail-accounts
-[[ -f $mailaccts ]]|| die 'Could not find ^Smail-accounts^s file.'
-[[ -r $mailaccts ]]|| die 'Can not read ^Smail-accounts^s file.'
+mailcfg=${XDG_CONFIG_HOME:?}/mail
+needs-path -or-die "$mailcfg"
 
-needs awk
+maildb=$mailcfg/mailcfg.db3
+needs-file -or-die "$maildb"
 
-AWKPGM=$(</dev/stdin) <<-\
-	==AWK==
-	/^[[;]/				{ next }			# skip comments and headers
-	/^[[:space:]]*$/	{ next }			# skip blank lines
-	/^\*/				{ sub( /./, "" ) }	# remove mark
-	# otherwise
-	/$ACCT/				{ print }
-	==AWK==
-
-awk "$AWKPGM" "$mailaccts"; exit
+main "$@"; exit
 
 # Copyright (C) 2021 by Tom Davis <tom@greyshirt.net>.

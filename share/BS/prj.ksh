@@ -188,7 +188,8 @@ function subcmd-find { # {{{1
 	case $# in
 		0)	warn "no match"; return;	;;
 		1)	D=${1%%\|*};				;;
-		*)	D=$(umenu "$@") || return
+		*)	needs umenu
+			D=$(umenu "$@") || return
 			D=${D%%\|*}
 			;;
 	esac
@@ -285,7 +286,7 @@ function subcmd-new { # {{{1
 	began=$(date -r $unixtm +'%Y-%m-%d %H:%M:%S %Z')
 	alias=$(compact-timestamp $(date -r $unixtm +'%Y %m %d %H %M %S'))
 	SQL "SELECT label || ': ' || descr FROM prj.\"types\";"
-	type=$(umenu "${sqlreply[@]}")
+	type=$(umenu "${sqlreply[@]}") || return
 	type=${type%:*}
 
 	SQL 'SELECT "name" FROM prj."clients";'

@@ -7,9 +7,10 @@ set -o nounset;: ${FPATH:?Run from within KSH}
 MARGIN=4
 nomail='\033[35mnone\033[39m'
 MAIL_CFG_DIR=${XDG_CONFIG_HOME:?}/mail
+this_pgm=${0##*/}
+LOGFILE=${this_pgm%%.*}
 
 # Usage {{{1
-this_pgm=${0##*/}
 function usage {
 	desparkle "$this_pgm"
 	PGM=$REPLY
@@ -17,14 +18,18 @@ function usage {
 	===SPARKLE===
 	^F{4}Usage^f: ^T$PGM^t
 	         Do downloads simulateously.
+	         ^T-l^t  Log to ^T$HOME/log/$LOGFILE^t.
 	       ^T$PGM -h^t
 	         Show this help message.
 	===SPARKLE===
 	exit 0
 } # }}}
 # process -options {{{1
-while getopts ':h' Option; do
+LOGIT=false
+[[ -n ${DEBUG:-} ]]&& LOGIT=true
+while getopts ':lh' Option; do
 	case $Option in
+		l)	LOGIT=true;														;;
 		h)	usage;															;;
 		\?)	die USAGE "Invalid option: ^B-$OPTARG^b.";						;;
 		\:)	die USAGE "Option ^B-$OPTARG^b requires an argument.";			;;
@@ -36,7 +41,9 @@ shift $((OPTIND-1))
 # ready to process non '-' prefixed arguments
 # /options }}}1
 function status-update { # {{{1
-	print -r -- "${1:?}	${2:?}	${3:?}"
+	: ${1:?} ${2:?} ${3:?}
+	$LOGIT && log $LOGFILE "$3"
+	print -r -- "$1	$2	$3"
 } # }}}1
 function do-one-acct { # {{{1
 	local T S A H a b c d e msg rc sGet sSkip
@@ -58,7 +65,7 @@ function do-one-acct { # {{{1
 		while IFS=' ()' read -r T a b S c d A e H; do
 			if [[ $T == reading* ]]; then
 				((got+=1))
-				status-update "$2" "$INFOPOS" "$got/$new"
+				msg="$got/$new"
 			elif [[ $A == $1 ]]; then
 				new=$((T-S))
 				if ((new)); then
@@ -66,12 +73,14 @@ function do-one-acct { # {{{1
 				else
 					msg=$nomail
 				fi
-				status-update "$2" "$INFOPOS" "$msg"
-			elif [[ $T == 'fetchmail: No mail for'* ]]; then
-				status-update "$2" "$INFOPOS" "$nomail"
+			elif [[ $T$a$b$S == 'fetchmail:Nomailfor' ]]; then
+				msg="$nomail"
+			elif [[ $T == fetchmail: ]]; then
+				msg="$a${b:+ $b}${S:+ $S}${c:+ $c}${d:+ $d}${A:+ $A}${e:+ $e}${H:+ $H}"
 			else
-				status-update 20 1 "$T $a $b $S $c $d $A $e $H"
+				msg="$T${a:+ $a}${b:+ $b}${S:+ $S}${c:+ $c}${d:+ $d}${A:+ $A}${e:+ $e}${H:+ $H}"
 			fi
+			status-update "$2" "$INFOPOS" "$msg"
 		done
 	status-update "$2" "$MARGIN" "$1"
 } # }}}1
@@ -84,6 +93,7 @@ function async-download { # {{{1
 	wait
 } # }}}1
 function main { # {{{1
+	$LOGIT && rotate-logfiles "$HOME/log/$LOGFILE"
 	async-download "$@" | while IFS='	' read -r ln col msg; do
 		print -- "\033[$((top+ln));${col}H$msg"
 	done
@@ -103,7 +113,8 @@ function setup-screen { # {{{1
 	INFOPOS=$((maxlen+(MARGIN*2)))
 } # }}}1
 
-needs needs-cd needs-file fetchmail i-can-haz-inet get-row-col use-app-paths
+needs needs-cd needs-file fetchmail i-can-haz-inet get-row-col use-app-paths \
+	rotate-logfiles log
 
 i-can-haz-inet || die "$REPLY"
 

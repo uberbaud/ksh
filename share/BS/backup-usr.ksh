@@ -24,6 +24,9 @@ desparkle "$backbase"
 backbaseD=$REPLY
 use_local_store=true
 
+NL='
+' # ^< capture newline
+
 # Usage {{{1
 typeset -- this_pgm=${0##*/}
 function usage {
@@ -82,7 +85,6 @@ new-array rsync_opts
 +rsync_opts --times				# preserve modification times
 +rsync_opts --group				# preserve groups
 +rsync_opts --owner				# preserve owners
-+rsync_opts --whole-file		# don't use delta-xfer (faster on local hd)
 
 function dieQuietly { #{{{1
 	$quiet && exit 1
@@ -91,7 +93,7 @@ function dieQuietly { #{{{1
 function Now { date -u +'%Y-%m-%d_%H:%M:%SZ'; }
 function do-rsync { # {{{1
 	notify 'BEGIN COPY'
-	rsync "${rsync_opts[@]}" "$@" "$realhome" "$backto"
+	rsync "${rsync_opts[@]}" "$@" "$REAL_HOME" "$backto"
 } # }}}1
 function initial-backup { # {{{1
 	set -A glob -- *
@@ -148,11 +150,8 @@ function backup-to-local { # {{{1
 	needs-path -create -or-die "$backbase"
 	$want_stop_after_mount && return
 
-	splitstr : "$(getent passwd $(id -un))"
-	readonly realhome=${reply[5]}
-	[[ -d $realhome ]]|| die "No HOME (^B$realhome^b) directory."
-
-	needs-cd -or-die "$realhome"
+	+rsync_opts --whole-file	# don't use delta-xfer (faster on local hd)
+	needs-cd -or-die "$REAL_HOME"
 
 	readonly timestamp=$(Now)
 	readonly backto="$backbase/$timestamp"
@@ -163,7 +162,7 @@ function backup-to-local { # {{{1
 
 	mkdir "$backto" || die 'Could not create backup directory.'
 	notify 'Creating subordinate directories.'
-	mkdir -p $backto/$realhome || die 'Could not create ^S$HOME^s in backup dir.'
+	mkdir -p $backto/$REAL_HOME || die 'Could not create ^S$HOME^s in backup dir.'
 
 	if [[ -a $backbase/current ]]; then
 		standard-backup
@@ -177,8 +176,20 @@ function backup-to-local { # {{{1
 	sync
 	notify 'Done.'
 } # }}}1
-
+function backup-to-lan { # {{{1
+	NOT-IMPLEMENTED -die
+} # }}}1
+function clean-home-dir { # {{{1
+	local IFS=$NL
+	set -- $(find $REAL_HOME -name \*.core)
+	(($#))&& rm -f "$@"
+} # }}}1
 function main { # {{{1
+	splitstr : "$(getent passwd $(id -un))"
+	readonly REAL_HOME=${reply[5]}
+	[[ -d $REAL_HOME ]]|| die "No HOME (^B$REAL_HOME^b) directory."
+
+	clean-home-dir
 	if $use_local_store; then
 		backup-to-local "$@"
 	else

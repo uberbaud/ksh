@@ -16,9 +16,8 @@
 #:
 #:   Scripts are located in ^U^O$^o^VKDOTDIR^v/share/BS^u
 
-needs ${KDOTDIR:?}/$HOST/B/pass-{gen,show,ed,find,mail}.ksh
 function pass {
-	local which=gen
+	local which=gen passcmd
 	[[ $# -eq 1 && $1 != -* ]]&& which=show
 	case ${1:-} in
 		-E)	which=ed; shift;					;;
@@ -34,7 +33,8 @@ function pass {
 			;;
 	esac
 
-	$KDOTDIR/$HOST/B/pass-$which.ksh "$@"
+	passcmd=pass-$which.ksh
+	(use-app-paths -or-die pass; needs $passcmd; $passcmd "$@")
 }
 
 # Copyright © 2020 by Tom Davis <tom@greyshirt.net>.

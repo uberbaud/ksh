@@ -1,0 +1,22 @@
+# <@(#)tag:tw.lucas.uberbaud.foo,2025-03-03,15.59.56z/4cb407>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+#---------------------------------------------------------------------------
+#: FUNCTION ^G(no arguments)^g
+#:   Wraps ^Tapropos^t with a pipe to less
+
+# -e | --quit-at-eof				# second time it gets there
+# -F | --quit-if-one-screen
+# -g | --hilite-search				# only highlight the *current* find
+# -i | --ignore-case				# use case only if some UPPER
+# -M | --LONG-PROMPT				# most verbose prompt
+# -R | --RAW-CONTROL-CHARS			# pass through ANSI color sequences
+# -S | --chop-long-lines
+# -s | --squeeze-blank-lines
+# -w | --hilite-unread
+# -X | --no-init					# don't clear screen or other stuff
+
+function f-apropos {
+	/usr/bin/apropos "$@" | LESS=-eFgiMRSswX ${PAGER:-less}
+}
+
+# Copyright © 2025 by Tom Davis <tom@greyshirt.net>.

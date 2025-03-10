@@ -35,13 +35,15 @@ done
 shift $((OPTIND-1))
 # ready to process non '-' prefixed arguments
 # /options }}}1
-needs pass-find
+needs pass-find.ksh
 
 secrets=${XDG_DATA_HOME:?}/secrets
 [[ -d $secrets ]]|| die 'No secrets directory.'
 
-domain=$(pass-find "$@") ||
-	die 'Did not find any matching domains.'
+set -- $(pass-find.ksh "$@")
+(($#))|| die 'Did not find any matching domains.'
+domain=$(umenu "$@") || exit
+
 notify "$domain"
 
 pwrec="$secrets/$domain.pwd"

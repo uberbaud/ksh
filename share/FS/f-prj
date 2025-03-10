@@ -25,10 +25,10 @@ function f-prj {
 	fi
 	cmd=$1; shift
 
-	[[ $cmd == cd ]]&& {
-		cmd=find
-		CD=true
-	  }
+	case $cmd in
+		cd)  cmd=find; CD=true;			;;
+		new) CD=true;					;;
+	esac
 
 	tty=$(tty)
 	if $CD; then

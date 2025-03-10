@@ -1,5 +1,5 @@
 #!/bin/ksh
-# <@(#)tag:csongor.greyshirt.net,2019-01-20:tw/20.01.57z/1765632>
+# <@(#)tag:csongor.greyshirt.net,2019-01-21:tw/06.25.20z/1191ef>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
 
 set -o nounset;: ${FPATH:?Run from within KSH}
@@ -12,7 +12,7 @@ function usage {
 	sparkle >&2 <<-\
 	===SPARKLE===
 	^F{4}Usage^f: ^T$PGM^t ^Udomain^u
-	         Find an existing password for a matching domain or unique
+	         Edit the password record for a matching domain or unique
 	         substring of a domain.
 	       ^T$PGM -h^t
 	         Show this help message.
@@ -37,20 +37,15 @@ shift $((OPTIND-1))
 # ready to process non '-' prefixed arguments
 # /options }}}1
 
-needs needs-cd
-
-(($#))|| die 'Expected one argument ^Uhostglob^u.'
-(($#==1))||	die 'Too many arguments. Expected ^Uhostglob^u.'
+edit=${VISUAL:-${EDITOR:?'Neither $VISUAL nor $EDITOR is defined.'}}
+needs "$edit" pass-find.ksh
 
 secrets=${XDG_DATA_HOME:?}/secrets
 [[ -d $secrets ]]|| die 'No secrets directory.'
-needs-cd -or-die "$secrets"
 
-set -- *"$1"*.pwd
-[[ $* == \**\*.pwd ]]&& exit 1
+domain=$(pass-find.ksh "$@") || die 'No matching ^Idomain^i found.'
 
-choice=$(umenu "$@")|| exit 1
+"$edit" "$secrets/$domain.pwd"
 
-print -- "${choice%.pwd}"
 
 # Copyright (C) 2019 by Tom Davis <tom@greyshirt.net>.

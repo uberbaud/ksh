@@ -47,11 +47,15 @@ function set-curmsg { # {{{1
 	rc=$?; (($rc == 0 || $rc == 64))|| warn "$(<$fERRs)"
 	return $rc
 } # }}}1
-function msg-prev { set-curmsg p && ((MSG_I--)); }
+function msg-prev { set-curmsg p && ((MSG_N--)); }
 function msg-next { set-curmsg n && ((MSG_N++)); }
 function msg-show { show +$FLDR ${1:?}; print -n '\033[A'; }
 function msg-webview { LOGLEVEL=0 m-part "${1:?}"; }
-function msg-xplode { mhstore +$FLDR ${1:?}; }
+function msg-xplode { # {{{1
+	mhstore +$FLDR ${1:?}
+	chmod g+r $1.*
+	chgrp usrapp $1.*
+} #}}}1
 function msg-open-urls { # {{{1
 	local u
 	[[ -n ${BROWSER:=$(<${XDG_CONFIG_HOME:?}/etc/browser)} ]]||
@@ -70,7 +74,7 @@ function set-actlist { # {{{1
 	print -r -- "$list."
 } # }}}1
 function show-msg-info { # {{{1
-	MSGPOS="($MSG_N/$MSGCOUNT)"
+	MSGPOS="($MSG_N/$MSGCOUNT - $((100*MSG_N/MSGCOUNT))%)"
 	scan +$FLDR -width 9999 -format scan.borders ${1:?} ||
 		warn "scan +$FLDR -width 9999 -format scan.borders ${1:?}"
 	print
@@ -107,7 +111,6 @@ function set-msgpos-vars { # {{{1
 	fi
 } # }}}1
 function main { # {{{1
-	export MSGPOS='(?/?)'
 	mark +$FLDR "$@" -sequence MSGs 2>$fERRs.1 || {
 		#if [[ $(<$fERRs.1} == 
 		#	die "No messages in ^V$FLDR^v^:^V$*^v."
@@ -123,8 +126,9 @@ function main { # {{{1
 
 	typeset -i MSGCOUNT MSG_N
 	set-msgpos-vars $FLDR MSGs
-	typeset -x -L$(((${#MSGCOUNT}*2)+3)) MSGPOS # max length of (n/all)
-
+	MSGPOS="($MSGCOUNT/$MSGCOUNT • 100%)"	# set to a value that will be 
+	typeset -xL MSGPOS						# the max length and use that 
+											# length for all values
 	integer xtrarows=0
 	while :; do
 		revert-cursor-pos $xtrarows

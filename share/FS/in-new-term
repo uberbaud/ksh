@@ -14,7 +14,7 @@
 #:           ^VSHORTWAIT^v ^Gwill be set to^g ^O${^o^VSHORTWAIT^v^O:-^o^T1^t^O}^o^G and ^Iexported^i.^g
 #:           ^GSee also:^g ^Twait-before-leaving^t^G which uses^g ^VSHORTWAIT^v^G.^g
 
-needs ${X11TERM:=xterm} wait-before-leaving shquote
+needs ${X11TERM:=xterm} wait-before-leaving shquote setsid
 function in-new-term {
 	local a i cmdln x11term IFS log N C SH
 	IFS=' '
@@ -36,11 +36,14 @@ function in-new-term {
 	N=${X11TERM_NAME:+-$N $X11TERM_NAME}
 	C=${X11TERM_CLASS:+-$C $X11TERM_CLASS}
 	SH=${USR_SH:-"${SHELL:-sh}"}
-	set -A x11term -- nohup $X11TERM ${N:-} ${C:-} -e $SH -c
+	set -A x11term -- setsid $X11TERM ${N:-} ${C:-} -e $SH -c
 	i=0
 	cmdln[i++]=wait-before-leaving
 	for a { shquote "$a" cmdln[i++]; }
-	(SHORTWAIT=${SHORTWAIT:-1} "${x11term[@]}" "${cmdln[*]}" &) >>$log 2>&1
+	(
+		trap '' INT HUP TSTP
+		SHORTWAIT=${SHORTWAIT:-1} "${x11term[@]}" "${cmdln[*]}" &
+	) >>$log 2>&1
 	NEW_TERM_PID=${!:-}
 }
 

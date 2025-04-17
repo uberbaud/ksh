@@ -76,7 +76,7 @@ function exec-handler { # {{{1
 	gsub \' "'\\''" "$arg"
 	gsub '%s' "'$REPLY'" "$cmd"
 	eval "set -- $REPLY"
-	$DRYRUN|| nohup "$@" </dev/null >>$HOME/log/open 2>&1 &
+	$DRYRUN|| setsid "$@" </dev/null >>$HOME/log/open 2>&1 &
 } # }}}1
 function open-one-file { # {{{1
 	REPLY=''

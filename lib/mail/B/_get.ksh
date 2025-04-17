@@ -68,7 +68,7 @@ if $DOWNLOAD; then
 
 	msgCount=$(from|wc -l)
 	((msgCount))&& {
-			notify 'Incorporating ^Slocal^s messages.'
+			notify 'Incorporating ^Blocal^b messages.'
 			inc -nochangecur >/dev/null
 		}
 

@@ -16,8 +16,9 @@ function usage {
 	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
-	^F{4}Usage^f: ^T${PGM}^t ^[^T-H^t^]
+	^F{4}Usage^f: ^T${PGM}^t ^[^T-n^t^] ^[^T-H^t^]
 	         save a mail part to disk and try to open it.
+	           ^T-n^t  Do not clean html files.
 	           ^T-H^t  Force type to ^Shtml^s.
 	       ^T${PGM} -h^t
 	         Show this help message.
@@ -30,8 +31,10 @@ function bad_programmer {	# {{{2
 		"  No getopts action defined for [1m-$1[22m."
   };	# }}}2
 forceHTML=false
-while getopts ':hH' Option; do
+cleanHtml=true
+while getopts ':nhH' Option; do
 	case $Option in
+		n)	cleanHtml=false;										;;
 		H)	forceHTML=true;											;;
 		h)	usage;													;;
 		\?)	die "Invalid option: [1m-$OPTARG[22m.";				;;
@@ -120,7 +123,7 @@ for f in *; do
 		mv "$f" "$H" && f=$H
 	fi
 	# fix all the Microsoft (et al.) broken html marked as xhtml
-	[[ $f == *.html ]]&& {
+	[[ $f == *.html &&  $cleanHtml == true ]]&& {
 		clean-html "$f"
 		has-some-html "$f" || {
 			warn "^B$f^b is empty."

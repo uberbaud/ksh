@@ -7,7 +7,7 @@ set -o nounset;: ${FPATH:?Run from within KSH}
 realbin=$(realpath $(whence -p "$0"))
 shortbin=${realbin##*/};	shortbin=${shortbin%.*}
 REAL_NAME=$shortbin
-CALLED_AS=${0##*/}
+CALLED_AS=${0##*/};			CALLED_AS=${CALLED_AS%.*}
 
 this_pgm=${0##*/}
 function usage { # {{{1

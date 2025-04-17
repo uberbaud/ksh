@@ -1,0 +1,25 @@
+^BBase32 notes^b
+
+    ^BAlphabet possiblilites^b
+        Use only lowercase (no shift needed, fewer visual conflicts). ¿Do
+        not use vowels so as not to make words? Symbols are chosen for 
+        visual reasons, up and down strokes only, visually distinct from
+        other characters in the alphabet. Two of them require a shift on
+        a keyboard, but tradeoffs.
+
+        ^Wa^wbcd^We^wfgh^Wi^wjk^El^emn^Wo^wpqrst^Wu^wvwxyz  ^V20 characters^v
+        ^E01^e23456789                  ^V 8 characters^v
+        =-:+                        ^V 4 characters^v
+
+    ^BUseful alphabet^b
+        b   c   d   f   g   h   j   k
+        m   n   p   q   r   s   t   v
+        w   x   y   z   2   3   4   5
+        6   7   8   9   =   -   :   +
+
+    ^BDisordered alphabet^b
+        ^G0^g h   ^G4^g k   ^G8^g -   ^G12^g 7   ^G16^g x   ^G20^g :   ^G24^g j   ^G28^g p
+        ^G1^g w   ^G5^g 8   ^G9^g m   ^G13^g r   ^G17^g 4   ^G21^g b   ^G25^g 3   ^G29^g s
+        ^G2^g 5   ^G6^g q  ^G10^g v   ^G14^g n   ^G18^g =   ^G22^g y   ^G26^g f   ^G30^g 6
+        ^G3^g d   ^G7^g z  ^G11^g 2   ^G15^g +   ^G19^g t   ^G23^g 9   ^G27^g g   ^G31^g c
+

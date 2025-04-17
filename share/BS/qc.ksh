@@ -80,6 +80,7 @@ function write-file { #{{{1
 		
 		#pragma clang diagnostic push
 		#pragma clang diagnostic ignored "-Wreserved-id-macro"
+		#pragma clang diagnostic ignored "-Wdocumentation"
 		#include <stdio.h>
 		#pragma clang diagnostic pop
 
@@ -146,7 +147,7 @@ filename=${filename%.c}.c
 	die "$REPLY already exists." "See: ^Tbuild-and-run -e^t"
   }
 
-write-file "$@" >$filename
+write-file "${PACKAGES[@]}" >$filename
 exec build-and-run -e "$filename"
 
 # Copyright (C) 2022 by Tom Davis <tom@greyshirt.net>.

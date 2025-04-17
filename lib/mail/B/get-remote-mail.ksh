@@ -131,7 +131,7 @@ needs-cd -or-die "fetchmail"
 setup-screen "$@"
 trap 'tput cnorm' EXIT
 tput civis
-h1 "Fetching remote mail"
+notify "Fetching ^Bremote^b mail"
 
 top=$(get-row-col)
 top=${top% *}

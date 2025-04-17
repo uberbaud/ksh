@@ -15,6 +15,7 @@ function wait-before-leaving {
 	tempF=$(mktemp) || die 'Could not ^Tmktemp^t.'
 	# Use a subshell to ensure removal of $tempF
 	(
+		trap '' INT HUP TSTP
 		rcIsZero=true; notTooSoon=true; noStderrWrites=true;
 		SHORTWAIT=${SHORTWAIT:-0}
 

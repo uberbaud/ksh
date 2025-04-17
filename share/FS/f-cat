@@ -1,0 +1,20 @@
+# <@(#)tag:tw.lucas.uberbaud.foo,2025-03-31,21.43.40z/4d9a693>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+#---------------------------------------------------------------------------
+#: FUNCTION ^[^Ufile^u^]
+#:   Simple shell version of ^Vcat^v, calls real ^Vcat^v for non-simple 
+#:   things, where simple means zero or one args where any arg is an 
+#:   existing file. If no arg is given, uses ^T/dev/stdout^t.
+#:       BUGS: Always prints a final newline, and elides any final 
+#:       string of newlines into one newline.
+
+function f-cat {
+	local F=${1:-/dev/stdout}
+	if [[ $# -lt 2 && -f $F ]]; then
+		print -r -- "$(<$F)"
+	else
+		/bin/cat "$@"
+	fi
+}
+
+# Copyright © 2025 by Tom Davis <tom@greyshirt.net>.

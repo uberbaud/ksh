@@ -1,0 +1,17 @@
+# <@(#)tag:tw.lucas.uberbaud.foo,2025-03-11,23.07.31z/3550175>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+#---------------------------------------------------------------------------
+#: FUNCTION ^[^T-^Ubcdflps^u^t^] ^[^Upath^u^] ^S[…]^s
+#:   list all files or other file types in ^Upath^us or current 
+#:   directory if no ^Upath^u is given. The optional type flag is the 
+#:   ^Tfile -type^t parameter prefixed with a dash ^(^T-^t^).
+
+needs /usr/bin/find
+function f-f {
+	local ftype
+	[[ ${1:-} == -[bcdflps] ]]&& { ftype=${1#-}; shift; }
+	(($#))|| set -- .
+	/usr/bin/find "$@" -type ${ftype:-f} | /usr/bin/column
+}
+
+# Copyright © 2025 by Tom Davis <tom@greyshirt.net>.

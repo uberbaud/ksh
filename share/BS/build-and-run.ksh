@@ -4,6 +4,12 @@
 
 set -o nounset;: ${FPATH:?Run from within KSH}
 
+trap 'print -u2 -- "  SIGHUP"'  HUP
+trap 'print -u2 -- "  SIGINT"'  INT
+trap 'print -u2 -- "  SIGTSTP"' TSTP
+trap 'print -u2 -- "  SIGINFO"' INFO
+trap 'print -u2 -- "  SIGQUIT"' QUIT
+
 NL='
 '
 # Usage {{{1
@@ -47,23 +53,37 @@ function first-time-get-set { # {{{1
 	showvar_fn=show-get-set
 } # }}}1
 function edit-c-file { #{{{1
-	local E F T Cmd2
+	local E F T Cmd2 N AllCmds
+	trap 'print -r -- edit-c-file' INT HUP QUIT TSTP
 	shquote "$1" F
-	E=${VISUAL:-${EDITOR:-vi}}
+	integer i=0
+	#Cmds[i++]='trap "" INT HUP QUIT TSTP'
+	#Cmds[i++]='stty isig ignbrk -brkint'
+	Cmds[i++]="${VISUAL:-${EDITOR:-vi}} $F"
+
 	[[ -e RCS/$F,v ]]&& {
-		co -l -q "$F"
+		co -l -q -f "$F"
 		T=$(mktemp)
-		Cmd2="rcsdiff '$F'; rlwrap -s 0 cat-to-file -p 'ci> ' '$T'"
+		Cmds[i++]="rcsdiff '$F'"
+		Cmds[i++]="rlwrap -s 0 cat-to-file -p 'ci> ' '$T'"
 	  }
 
-	${X11TERM:-xterm} -e ksh -c "$E $F${Cmd2:+; $Cmd2}" >/dev/null 2>&1
-	pkill -HUP -lf -- "^watch-file -i $UUID"
 	# For some reason, ci before kill makes kill not work
+	Cmds[i++]='pkill -HUP -lf -- "^watch-file -i $UUID"'
+
 	[[ -e RCS/$F,v ]]&& {
-		local rcsmsg='build-and-run'
-		[[ -f $T ]]&& { rcsmsg=$(<$T); rm "$T"; }
-		ci -u -q -m"${rcsmsg:-'~'}" "$F"
+		if [[ -f $T ]]; then
+			Cmds[i++]="ci -u -q -m\"\$(<$T)\" '$F'"
+			Cmds[i++]="rm '$T'"
+		else
+			Cmds[i++]="ci -u -q -m'build-and-run' '$F'"
+		fi
 	  }
+
+	AllCmds=$(IFS=\;; print -r -- "${Cmds[*]}")
+	print -r -- "${X11TERM:-xterm} -e ksh -c \"$AllCmds\"" >LOG
+	N=/dev/null
+	(setsid ${X11TERM:-xterm} -e ksh -c "$AllCmds" &) >$N 2>&1 <$N
 } #}}}1
 function make+run { # {{{1
 	local T rc
@@ -104,12 +124,13 @@ function clear-screen { print -u2 '\033[H\033[2J\033[3J\033[H\c'; }
 function loop { #{{{1
 	local cksum_previous cksum_current UUID
 
-	needs cat-to-file fuddle pkill shquote subst-pathvars uuid watch-file
+	needs cat-to-file fuddle shquote subst-pathvars
+	needs pkill setsid uuid watch-file
 
 	subst-pathvars "$PWD" prnPathName
 
 	UUID=$(uuid) # so edit-c-file can signal ONLY THIS watch-file
-	$DOEDIT && edit-c-file "$CFILE" &
+	$DOEDIT && (edit-c-file "$CFILE" &)
 	cksum_previous=unedited
 	h3 "$prnPathName / $UUID"
 	while watch-file -i "$UUID" "$CFILE" 2>/dev/null; do

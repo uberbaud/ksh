@@ -66,8 +66,8 @@ export dskWIDGIT=7
 export dskXAPP=6
 export me=$HOME/work/clients/me
 export X11TERM=st
-export LUCAS_XTERM_WINDOW_BG='#626262'
-export LUCAS_XTERM_WINDOW_FG='#dadada'
+export LUKAS_XTERM_WINDOW_BG='#626262'
+export LUKAS_XTERM_WINDOW_FG='#dadada'
 export MANPAGER='nvim -M +Man!'
 export YT=AUDIODEVICE=snd@yt.lan/default
 export SUDO=/usr/bin/doas

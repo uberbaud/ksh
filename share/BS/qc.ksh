@@ -147,7 +147,7 @@ filename=${filename%.c}.c
 	die "$REPLY already exists." "See: ^Tbuild-and-run -e^t"
   }
 
-write-file "${PACKAGES[@]}" >$filename
+write-file ${PACKAGES[*]:+"${PACKAGES[@]}"} >$filename
 exec build-and-run -e "$filename"
 
 # Copyright (C) 2022 by Tom Davis <tom@greyshirt.net>.

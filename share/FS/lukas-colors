@@ -4,9 +4,9 @@
 #: FUNCTION ^G(no arguments)^g
 #:   Set terminal to csongor colors.
 
-function lucas-colors {
-	local bg=${LUCAS_XTERM_WINDOW_BG:?}
-	local fg=${LUCAS_XTERM_WINDOW_FG:?}
+function lukas-colors {
+	local bg=${LUKAS_XTERM_WINDOW_BG:?}
+	local fg=${LUKAS_XTERM_WINDOW_FG:?}
 	set-colors-bg-fg "$bg" "$fg"
 }
 

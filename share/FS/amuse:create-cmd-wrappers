@@ -26,7 +26,7 @@ function amuse:create-cmd-wrappers {
 		name=${name%.ksh}
 		eval "function @$name { $cmd \"\$@\"; }"
 	done
-	function @play { vol >/dev/null; amuse:send-cmd play; }
+	function @play { volume >/dev/null; amuse:send-cmd play; }
 }
 
 # Copyright © 2019 by Tom Davis <tom@greyshirt.net>.

@@ -1,0 +1,11 @@
+# <@(#)tag:tw.lukas.uberbaud.foo,2025-07-03,20.48.10z/2ab6fea>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+#---------------------------------------------------------------------------
+#: FUNCTION ^G…^g
+#:   Wrapper
+
+function f-fw_update {
+	as-root /usr/sbin/fw_update "$@"
+}
+
+# Copyright © 2025 by Tom Davis <tom@greyshirt.net>.

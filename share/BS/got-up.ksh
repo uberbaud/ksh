@@ -5,6 +5,8 @@
 
 set -o nounset;: ${FPATH:?Run from within KSH}
 
+TAG_OR_BRANCH=
+
 # Usage {{{1
 this_pgm=${0##*/}
 function usage {
@@ -12,22 +14,33 @@ function usage {
 	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
-	^F{4}Usage^f: ^T$PGM^t ^[^Uref name^u^]
+	^F{4}Usage^f: ^T$PGM^t ^[^T-f^t^] ^[^T-n^t ^Uref name^u^]
 	         Fetch updates from the ^Bgit^b upstream into the local repository, then
 	         merge those updates into the local ^Bgot worktree^b.
-	           ^Uref name^u  Update the ^Bgot worktree^b to match a given ^Bbranch^b or ^Btag^b.
-	                     The default commit is the ^Iupstream current^i branch.
+	           ^T-f^t           Force update from local repository.
+	           ^T-n^t ^Uref name^u  Update the ^Bgot worktree^b to match a given ^Bbranch^b or ^Btag^b.
+	                        The default commit is the ^Iupstream current^i branch.
 	       ^T$PGM -h^t
 	         Show this help message.
 	===SPARKLE===
 	exit 0
 } # }}}
+function set-tag-or-branch { # {{{1
+	[[ -n ${TAG_OR_BRANCH:-} ]]&& {
+		msg="Will not overwrite previously set ^VTAG_OR_BRANCH^v"
+		old="old: ^T$tag_or_branch^t"
+		new="new: ^T$1^t"
+		die "$msg" "$old" "$new"
+	  }
+	TAG_OR_BRANCH=$1
+} # }}}1
 # process -options {{{1
 warnOrDie=die
-while getopts ':h' Option; do
+while getopts ':n:fh' Option; do
 	case $Option in
-		h)	usage;															;;
+		n)	set-tag-or-branch "$OPTARG";									;;
 		f)	warnOrDie=warn;													;;
+		h)	usage;															;;
 		\?)	die USAGE "Invalid option: ^B-$OPTARG^b.";						;;
 		\:)	die USAGE "Option ^B-$OPTARG^b requires an argument.";			;;
 		*)	bad-programmer "No getopts action defined for ^T-$Option^t.";	;;
@@ -51,25 +64,30 @@ function get-got-info { #{{{1
 } # }}}1
 function latest-git-ref { # {{{1
 	local trunk ref_prefix
-	needs-cd -or-die "${2:?}"
+	ERRMSG='CD error'
+	needs-cd -or-die "${1:?}"
 	[[ -f HEAD ]]|| ERRMSG='Bad repository format: no ^BHEAD^b.' return
 	ref_prefix='ref: '
 	trunk=$(<HEAD)
 	[[ $trunk == $ref_prefix* ]]||
 		ERRMSG="Bad HEAD format: not ^T$ref_prefix^t^O*^o." return
 	trunk=${trunk#ref: }
-	command git -C "$1" show-ref --head | awk "\$2 == "$trunk" {print \$1}"
+	command git -C "$1" show-ref --head |
+		awk -v t="$trunk" '$2 == t {print $1}'
 } # }}}1
 function main { # {{{1
 	local repo upto_ref branch before after
 
 	get-got-info info || return
-	expect "${info[0]}" tree:
-	expect "${info[1]}" base		&& before=${info[1]#*: }
-	expect "${info[2]}" prefix
-	expect "${info[3]}" branch		&& branch=${info[3]#*: }
-	expect "${info[4]}" UUID
-	expect "${info[5]}" repository:	&& repo=${info[5]#*: }
+	set -- "${info[@]}"
+	expect "$1" tree:							; shift
+	expect "$1" base		&& before=${1#*: }	; shift
+	expect "$1" prefix							; shift
+	expect "$1" branch		&& branch=${1#*: }	; shift
+	expect "$1" UUID							; shift
+	expect "$1" format							; shift
+	expect "$1" index							; shift
+	expect "$1" repository:	&& repo=${1#*: }	; shift
 
 	doit git								\
 		-C "$repo"							\
@@ -79,8 +97,8 @@ function main { # {{{1
 			--progress						\
 	|| warnOrDie "^Tgit^t did not complete. (^E$?^e)"
 
-	if [[ -n ${1:-} ]]; then
-		upto_ref=$(git -C "$repo" show-ref "$1") || {
+	if [[ -n ${TAG_OR_BRANCH:-} ]]; then
+		upto_ref=$(git -C "$repo" show-ref "$TAG_OR_BRANCH") || {
 			desparkle "$1"
 			die "^V$REPLY^v is not a valid ^Btag^b or ^Bbranch^b."
 		  }
@@ -118,6 +136,6 @@ function main { # {{{1
 NL='
 ' # capture a newline
 
-main "$@"; exit
+main; exit
 
 # Copyright (C) 2023 by Tom Davis <tom@greyshirt.net>.

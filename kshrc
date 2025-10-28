@@ -256,8 +256,9 @@ EDITOR=${EDITOR:-${VISUAL:-ed}}
 FCEDIT=${FCEDIT:-$EDITOR}
 export ${VISUAL:+VISUAL} EDITOR FCEDIT
 
-export CC="$(command -v clang)"
-export CXX="$(command -v clang++)"
+[[ -f $KU/make.conf ]]&& . $KU/make.conf
+export CC=${CC:-$(command -v clang)}
+export CXX=${CXX:-$(command -v clang++)}
 export PAGER=/usr/bin/less
 #export AUTOCONF_VERSION=$(
 #	/bin/ls /usr/local/bin/autoconf-*	|

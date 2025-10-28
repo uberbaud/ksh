@@ -1,0 +1,11 @@
+# <@(#)tag:tw.lukas.uberbaud.foo,2025-10-27,23.04.16z/598239f>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+#---------------------------------------------------------------------------
+#: FUNCTION ^G(no arguments)^g
+#:   Switch working directory to mail path.
+
+function m-cd {
+	builtin cd ${XDG_PUBLICSHARE_DIR:?}/mail
+}
+
+# Copyright © 2025 by Tom Davis <tom@greyshirt.net>.

@@ -29,9 +29,19 @@ function wait-before-leaving {
 		(($rc))&&				rcIsZero=false
 		((SECONDS>SHORTWAIT))||	notTooSoon=false
 		[[ -s $tempF ]]&& {
-			color='(?:\e\[|\x{9B})[0-9;]+m'
-			OSC='(?:\e\]|\x{9D}).*?(?:\e\\|\x{9C}|\x{07}|\x{0d})'
-			perl -i -pe "s/$color//g;s/$OSC//g" "$tempF"
+			local c i subst
+			set -A s --
+			integer i=0
+			s[i++]='(?:\e\[|\x{9B})[0-9;]+m'							# color
+			s[i++]='(?:\e\]|\x{9D}).*?(?:\e\\|\x{9C}|\x{07}|\x{0d})'	# OSC
+			s[i++]='\eP\+.*?\e\\'										# DSC
+			# NEOVIM attempts DSC (Device Control String) 'q4D73', to 
+			# set shifted numpad key 'D' behavior to emit 73 (';'?)
+			subst=
+			for c in "${s[@]}"; do
+				subst=${subst:+$subst;}s/$c//g
+			done
+			perl -i -pe "$subst" "$tempF"
 			[[ -s $tempF ]]&& noStderrWrites=false
 		}
 

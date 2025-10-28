@@ -5,10 +5,12 @@
 #:   List standardized reasons for changes in RCS
 
 function ls-change-reasons {
-	local W LS BS DOC
-	LS='    '
-	BS=$LS'            '
-	W=$((${COLUMNS:-$(tput columns)}-8))
+	local W LS BS DOC M
+	LS='    '				# left margin
+	BS=$LS'            '	# left margin PLUS width of terms
+	M=${#LS}				# left margin width (double for right and left)
+	W=$((${COLUMNS:-$(tput columns)}-(2*M)))
+	#	 v----------v width of term
 	DOC=$(</dev/stdin) <<-===
 		@align       Standardize in some way.
 		@bell        Add new feature.

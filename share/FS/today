@@ -6,9 +6,9 @@
 #:   ^T-u^t  Show the UTC version.
 
 function today {
-	(($#>1))&& die 'Too many arguments (at most "-u").'
+	(($#>1))&& die 'Too many arguments (at most ^T-u^t).'
 	(($#))&& {
-		[[ $1 == -u ]]|| die 'Unknown argument ("-u" or nothing)'
+		[[ $1 == -u ]]|| die 'Unknown argument (^T-u^t or nothing)'
 	}
 	date ${1:-} +'%Y-%m-%d'
 }

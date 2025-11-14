@@ -1,0 +1,62 @@
+# <@(#)tag:tw.lukas.uberbaud.foo,2025-11-12,01.01.47z/446de12>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+#---------------------------------------------------------------------------
+#: FUNCTION ^Uver_num^u^|^Tsystem^t^|^Tlatest^t^|^Tunset^t
+#:   Sets ^Tmake^t variables ^VAR^v, ^VAS^v, ^VCC^v, ^VCXX^v, ^VCPP^v, ^VLD^v, ^VNM^v, and ^VRANLIB^v
+#:   to the ^ILLVM^i ^Uver_num^u or to the ^Isystem default^i version, or the
+#:   ^Ilatest^i version installed. Or, ^Tunset^ts those variables so ^Tmake^t's
+#:   defaults are used.
+#:
+#:   ^GNOTE: This only works with ^ILLVM^i versions installed in^g
+#:         ^T/usr/local/bin^t ^Gnamed^g ^O*^o^T-^t^G^Uver_num^u as done by^g ^Tpkg_add^t^G.^t
+
+function use-llvm-version {
+	local BINPATH LLVM_VERSION ar as cc cx cp ld nm
+	(($#))|| die "^B$0^b: Missing required parameter ^Tversion^t"
+
+	[[ $1 == unset ]]&& {					# the literal value 'unset'
+		unset AR AS CC CXX CPP LD
+		return
+	  }
+
+	BINPATH=/usr/local/bin
+	if [[ $1 == @(system|default) ]]; then	# the value 'system' or 'default'
+		LLVM_VERSION=sysdefault
+	elif [[ $1 == @(highest|latest) ]]; then
+		local f v
+		LLVM_VERSION=0
+		set -- $BINPATH/clang-+([0-9])
+		# if there are no matches, use the system default
+		[[ $1 == *\* ]]&& { LLVM_VERSION=sysdefault; shift; }
+		for f; do
+			v=${f#*-}
+			((v>$LLVM_VERSION))&& LLVM_VERSION=$v
+		done
+	elif [[ $1 == [1-9]*([0-9]) ]]; then	# an ordinal
+		LLVM_VERSION=$1
+		[[ -x $BINPATH/clang-$LLVM_VERSION ]]||
+			die "^BLLVM^b version ^B$LLVM_VERSION^b is ^Wnot^w installed."
+	else									# anything else
+		die "^B$0^b: ^Uversion^u must be ^Ian ordinal^i or ^Tdefault^t."
+	fi
+
+	[[ $LLVM_VERSION == sysdefault ]]&& {
+		BINPATH=/usr/bin
+		LLVM_VERSION=''
+	  }
+
+	ar=$BINPATH/${LLVM_VERSION+llvm-}ar${LLVM_VERSION+-$LLVM_VERSION}
+	as=$BINPATH/${LLVM_VERSION+llvm-}as${LLVM_VERSION+-$LLVM_VERSION}
+	cc=$BINPATH/clang${LLVM_VERSION+-$LLVM_VERSION}
+	cx=$BINPATH/clang++${LLVM_VERSION+-$LLVM_VERSION}
+	cp=$BINPATH/clang-cpp${LLVM_VERSION+-$LLVM_VERSION}
+	ld=$BINPATH/ld.lld${LLVM_VERSION+-$LLVM_VERSION}
+	nm=$BINPATH/${LLVM_VERSION+llvm-}nm${LLVM_VERSION+-$LLVM_VERSION}
+	rl=$BINPATH/${LLVM_VERSION+llvm-}ranlib${LLVM_VERSION+-$LLVM_VERSION}
+
+	needs $ar $as $cc $cx $cp $ld
+	export AR=$ar AS=$as CC=$cc CXX=$cx CPP=$cp LD=$ld NM=$nm RANLIB=$rl
+
+}
+
+# Copyright © 2025 by Tom Davis <tom@greyshirt.net>.

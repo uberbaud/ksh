@@ -9,21 +9,18 @@ function f-prj {
 	local D P S X tty CD cmd
 	X=${BS:?}/prj.ksh
 	CD=false
+	D=$HOME/projects
 
-	if (($#==0)); then
-		set -- ls
-	elif [[ -n ${2:-} && ${1:-} == help ]]; then
-		"$X" "$@"
-		return
-	elif [[ ${1:-} == @(-h|help) ]]; then
-		"$X" -h
-		return
-	elif (($#)); then
-		"$X" -c "$1" || set -- cd "$@"
-	else
-		set -- curprj
+	if (($#==0)); then							# no args
+		cmd=ls									#	default to `ls`
+		[[ ${PWD#$D} != $PWD ]]&& cmd=curprj	#	unless in prj dir, then
+	elif [[ ${1:-} == @(-h|help) ]]; then		# help
+		cmd=help; shift
+	elif "$X" -c "$1"; then						# $1 is a valid sub-command
+		cmd=$1; shift
+	else										# try `cd`ing to $1
+		cmd=cd
 	fi
-	cmd=$1; shift
 
 	case $cmd in
 		cd)  cmd=find; CD=true;			;;
@@ -33,10 +30,9 @@ function f-prj {
 	tty=$(tty)
 	if $CD; then
 		P=$(TTY=$tty "$X" "$cmd" "$@") || return
-		D=$HOME/projects/$P
-		S=$(awk -F'\\\| *' '/^summary / {print $2}' "$D"/PROJECT)
+		S=$(awk -F'\\\| *' '/^summary / {print $2}' "$D/$P"/PROJECT)
 		h3 "$P / $S"
-		[[ -n $P ]]&& { cd "$D"; ls; }
+		[[ -n $P ]]&& { cd "$D/$P"; ls; }
 	else
 		TTY=$tty "$X" "$cmd" "$@"
 	fi

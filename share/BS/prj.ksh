@@ -155,14 +155,20 @@ function verify-type { # {{{1
 	warn "^T$type^t is not in ^Tprj.types^t." \
 		"Can be one of $tstr."
 } # }}}1
-function search-files { # {{{1
-	local findstr
-	awk -v fstr="$1" -f /dev/stdin $PRJFLDR/*/PROJECT <<-\
+function find-projects-matching { # {{{1
+	local outfmt
+	case $1 in
+		-long)	outfmt='%s|%s\n';				;;
+		-short)	outfmt='%s\n';					;;
+		*)		outfmt="ERROR outfmt: $1\\n";	;;
+	esac
+	
+	awk -v fstr="$2" -v fmt="$outfmt" -f /dev/stdin $PRJFLDR/*/PROJECT <<-\
 		===AWK===
 		BEGIN { FS = " +\\\\| +" }
 		\$1 == "summary" && \$2 ~ fstr {
 				n = split(FILENAME,y,"/");
-				print y[n-1]"|"\$2
+				printf fmt,y[n-1],\$2
 				nextfile
 			}
 		===AWK===
@@ -184,7 +190,7 @@ function show-project-name { # {{{1
 function subcmd-find { # {{{1
 	local IFS D
 	IFS=$NL
-	set -- $(search-files "$*")
+	set -- $(find-projects-matching -long "$*")
 	case $# in
 		0)	warn "no match"; return;	;;
 		1)	D=${1%%\|*};				;;
@@ -249,7 +255,8 @@ function show-project-summaries { # {{{1
 	fmt_raw='%s\t%s%s\n'
 	fmt_sprkld='  ^B^T%s^t ^N%s^n^b%s\n'
 	[[ ${1:-} == raw ]]&& fmt=$fmt_raw || fmt=$fmt_sprkld
-	awk -v fmt="$fmt" -f /dev/stdin $PRJFLDR/*/PROJECT <<-\
+	eval set -- \$PRJFLDR/$2/PROJECT
+	awk -v fmt="$fmt" -f /dev/stdin "$@" <<-\
 		\===AWK===
 		function prnsummary(s,n,y,i,nm) {
 				i = index($2,":")
@@ -267,8 +274,25 @@ function show-project-summaries { # {{{1
 			}
 		===AWK===
 } # }}}1
+function globbify { # {{{1
+	local IFS
+	IFS=,
+	case $# in
+		0)	REPLY=\*;		;;
+		1)	REPLY=$*;		;;
+		*)	REPLY="{$*}";	;;
+	esac
+} # }}}1
 function subcmd-ls { # {{{1
-	show-project-summaries "${1:-sparkle}" |sparkle
+	local m f i IFS=$IFS
+	f=sparkle
+	[[ ${1:-} == --@(raw|sparkle) ]]&& { f=${1#--}; shift; }
+	(($#))&& {
+		set -- $(find-projects-matching -short "$*")
+		(($#))||	{ warn "no match"; return; }
+	  }
+	globbify "$@"
+	show-project-summaries $f "$REPLY" |sparkle
 } # }}}1
 function subcmd-help { # {{{1
 	usage

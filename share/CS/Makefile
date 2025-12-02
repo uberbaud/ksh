@@ -166,10 +166,11 @@ tmux: /usr/bin/tmux
 	@echo $@
 	@tmux list-commands | awk '{print $$1}' >$@
 
-ts: $(CARGO_BIN)/tree-sitter
+ts_1: $(CARGO_BIN)/tree-sitter
 	@echo $@
 	@tree-sitter -h >tmp.tree-sitter
-	@awk '/^SUBCOMMANDS:/ {p=1;next} p {print $$1}' tmp.tree-sitter >$@
+	@awk '/^Commands:/ {p=1;next} p && /^$$/ {nextfile} p {print $$1}'  \
+		tmp.tree-sitter >$@
 	@rm tmp.tree-sitter
 
 vmgr_1: /home/tw/config/ksh/share/BS/vmgr.ksh

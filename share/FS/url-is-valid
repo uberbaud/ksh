@@ -1,0 +1,19 @@
+# <@(#)tag:tw.lukas.uberbaud.foo,2025-12-02,18.45.31z/1b4d858>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+#---------------------------------------------------------------------------
+#: FUNCTION ^[-or-warn^|-or-die^|-or-false^] ^Uurl^u
+#: Validate with `curl` that a url will work.
+
+needs setWarnOrDie warnOrDie curl
+function url-is-valid {
+	local rc
+	[[ ${1:-} == -* ]]&& {
+		setWarnOrDie "$1"
+		shift
+	  }
+	(($#))|| die 'Missing required parameter ^Uurl^u.'
+	rc=$(curl -LsIw "%{response_code}" --http2 "$1" --out-null
+	[[ $rc == 200 ]]|| warnOrDie "^B$1^b: ^B$rc^b"
+}
+
+# Copyright © 2025 by Tom Davis <tom@greyshirt.net>.

@@ -60,7 +60,9 @@ function edit-c-file { #{{{1
 	#Cmds[i++]='trap "" INT HUP QUIT TSTP'
 	#Cmds[i++]='stty isig ignbrk -brkint'
 	Cmds[i++]="${VISUAL:-${EDITOR:-vi}} $F"
-
+	# doesn't really matter where TRACKFILE is in the command stack as 
+	# long as the file $F exists when it's called.
+	[[ $F == */cache/* ]]|| Cmds[i++]="trackfile $F"
 	[[ -e RCS/$F,v ]]&& {
 		co -l -q -f "$F"
 		T=$(mktemp)

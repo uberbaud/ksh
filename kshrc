@@ -98,6 +98,12 @@ function -no-globs {
 ####### IMPORT LOCAL BITS
 [[ -f $KU/kshrc ]]&& . $KU/kshrc
 
+# user include and lib directories
+export USR_INCLUDE=${USR_INCLUDE:-$xdglocal/include}
+export USR_LIB=${USR_LIB:-$xdglocal/lib}
+[[ -d $USR_INCLUDE ]]	||	mkdir -p $USR_INCLUDE	|| unset USR_INCLUDE
+[[ -d $USR_LIB ]]		||	mkdir -p $USR_LIB		|| unset USR_LIB
+
 # special history file stuff
 histcache=$xdgcache/history
 [[ -d $histcache ]]|| mkdir -p $histcache

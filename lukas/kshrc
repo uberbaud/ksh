@@ -24,6 +24,8 @@ opam_ocaml=$opam_lib/ocaml
 export CAML_LD_LIBRARY_PATH=$opam_lib/stublibs:$opam_ocaml/stublibs:$opam_ocaml
 export OCAML_TOPLEVEL_PATH=$opam_lib/toplevel
 unset opam_def opam_lib opam_ocaml
+USR_INCLUDE=$xdglocal/c/api		# $K/ksh will `test -d` and `export`
+USR_LIB=$xdglocal/c/lib			# $K/ksh will `test -d` and `export`
 
 export TCLLIBPATH=$xdgdata/tcl
 export RLWRAP_HOME=$xdgcfg/rlwrap

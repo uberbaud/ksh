@@ -72,7 +72,7 @@ function write-file { #{{{1
 		    # OBJS     = ${OBJS:-my.o}
 		    # ^equivalent to: LDLIBS   += \$OPATH/my.o
 		    PACKAGES = notify_usr${*+ $*}
-		    CFLAGS  += -std=c17 -Wno-unsafe-buffer-usage
+		    CFLAGS  += -std=c17 -Wno-unsafe-buffer-usage -Wno-pre-c11-compat
 		 + -------------------------------------------------------------------- */
 
 		#include <notify_usr.h> /* sparkle(),message(),inform(),caution(),die() */

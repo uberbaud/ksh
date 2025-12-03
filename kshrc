@@ -136,21 +136,24 @@ export HISTCONTROL=ignoredups:ignorespace
 export HISTFILE=$fhist
 export HISTSIZE=8191
 export LOCALBIN=~/local/bin
-# C
-cflags[0]=-W'everything'
-cflags[1]=-W'no-unsafe-buffer-usage'
-cflags[2]=-f'diagnostics-show-option'
-cflags[3]=-f'color-diagnostics'
+#################################################################### C ###
+typeset -i i=0
+cflags[i++]=-W'everything'
+cflags[i++]=-W'no-unsafe-buffer-usage'	# main:argv[] is unsafe
+cflags[i++]=-f'diagnostics-show-option'
+cflags[i++]=-f'color-diagnostics'
 export CFLAGS="${cflags[*]}"
+unset i cflags
 export MAKECONF=${MAKECONF:-$xdgcfg/etc/ports-settings.mk}
 [[ -f $MAKECONF ]]|| unset MAKECONF
 USER_MK=$xdgcfg/mk/user.mk
 export EXTRA_SYS_MK_INCLUDES="<$USER_MK>"
 [[ -f $USER_MK ]]|| unset EXTRA_SYS_MK_INCLUDES USER_MK
-# LUA 5.1
+
+############################################################## LUA 5.1 ###
 export LUA_PATH='/usr/local/share/lua/5.1/?.lua;./?.lua;/usr/local/share/lua/5.1/?/init.lua;/usr/local/lib/lua/5.1/?.lua;/usr/local/lib/lua/5.1/?/init.lua;/home/tw/local/luarocks/share/lua/5.1/?.lua;/home/tw/local/luarocks/share/lua/5.1/?/init.lua'
 export LUA_CPATH='./?.so;/usr/local/lib/lua/5.1/?.so;/usr/local/lib/lua/5.1/loadall.so;/home/tw/local/luarocks/lib/lua/5.1/?.so'
-# LUA 5.3
+############################################################## LUA 5.3 ###
 # LUA wants SEMICOLON separated PATTERNS, empty item is default
 export LUA_PATH_5_3="$xdgdata/lua/5.3/?.lua;$xdgdata/lua/5.3/?/init.lua;;"
 export LUA_CPATH_5_3="$xdgdata/lua/5.3/?.so;;"
@@ -166,6 +169,7 @@ export PERLDOC='-MPod::Perldoc::ToTerm'
 export PERLDOC_SRC_PAGER=$VISUAL
 export PSQLRC=$xdgcfg/pg/psqlrc
 
+################################################################# PERL ###
 # have cpanm install things where we want them
 export USR_PLIB=$xdgdata/lib/perl5
 export PERL5LIB=$USR_PLIB
@@ -177,7 +181,8 @@ export PERL_MM_OPT="INSTALL_BASE=$xdgdata"
 export RAKULIB=$xdgdata/lib/raku
 export xRAKU_BASE=$xdgdata/rakudo
 
-####### SET PATH
+##########################################################################
+############################################################# SET PATH ###
 # sane start, but with installed (/usr/local) ahead of included (/usr/*)
 PATH=/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/X11R6/bin
 function wantpath { # {{{1

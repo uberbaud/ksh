@@ -1,0 +1,15 @@
+# <@(#)tag:tw.lukas.uberbaud.foo,2025-12-03,03.15.55z/5822455>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+#---------------------------------------------------------------------------
+#: FUNCTION
+#:   Wrap ^Tqc^t ^BOR^b ^Tbuild-and-run -e^t.
+
+function f-qc {
+	if [[ -n ${1:-} && -e ${1%.c}.c ]]; then
+		build-and-run -e "$@"
+	else
+		command qc "$@"
+	fi
+}
+
+# Copyright © 2025 by Tom Davis <tom@greyshirt.net>.

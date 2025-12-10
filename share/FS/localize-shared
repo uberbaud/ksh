@@ -13,15 +13,15 @@ function localize-shared {
 	F=$KDOTDIR/$HOST/F
 
 	REPLY=''
-	S=${1%.ksh}
 	if [[ -f $FS/$1 ]]; then
 		ln -fs "$FS/$1" "$F/$1"					|| rc=1
 		REPLY="\$FS/$1 linked to \$F/$1"
 	elif [[ -f $BS/${1%.ksh}.ksh ]]; then
+		S=${1%.ksh}
 		L=$B/$S.ksh
 		ln -fs "$BS/$S.ksh" "$L"				|| rc=1
-		ln -fs "$L" "$USRBIN/$S"				|| rc=1
-		REPLY="\$BS/$S.ksh linked to {\$B,\$USRBIN}/$S"
+		ln -fs "$L" "$USRBIN/$1"				|| rc=1
+		REPLY="\$BS/$S.ksh linked to {\$B,\$USRBIN}/$1"
 	else
 		REPLY='Could not find shared command file.'
 		rc=1

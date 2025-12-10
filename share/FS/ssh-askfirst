@@ -4,6 +4,7 @@
 #: FUNCTION ^Tssh^t^|^Tscp^t^|^Tsftp^t^|^Trsync^t ^[^Uuser^u^T@^t^]^Uhost^u ^[^Uargs_…^u^]
 #:   Use ssh agent and possibly a bit more.
 
+needs $HOST-colors
 function ssh-askfirst {
 	local cmdmsg='one of ^Bssh^b, ^Bscp^b, ^Bsftp^b, or ^Brsync^b'
 	(($#))|| die "Missing ^Tcmd^t, $cmdmsg."

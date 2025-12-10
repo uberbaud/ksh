@@ -1,14 +1,27 @@
 # <@(#)tag:tw.lukas.uberbaud.foo,2025-12-03,03.15.55z/5822455>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 #---------------------------------------------------------------------------
-#: FUNCTION
-#:   Wrap ^Tqc^t ^BOR^b ^Tbuild-and-run -e^t.
+#: FUNCTION ^[^T-e^t^] …
+#:   Wrap ^Tqc.ksh^t ^BOR^b ^Tbuild-and-run -e^t depending on whether 
+#:   ^T-e^t is the first argument passed.
+#:
+#: FUNCTION ^[^T-v^t^] ^[^Ufilename^u^ ^[^Upkg_name^u ^S…]^s^]
+#: 	 Wrap ^Tqc.ksh^t
+#:
+#: FUNCTION ^T-e^t ^[^Ufilename^u^]
+#: 	 Wrap ^Tbuild-and-run^t
 
 function f-qc {
-	if [[ -n ${1:-} && -e ${1%.c}.c ]]; then
-		build-and-run -e "$@"
+	if [[ ${1:-} == -e ]]; then
+		needs build-and-run
+		build-and-run "$@"
+	elif [[ ${1:-} == -h ]]; then
+		notify	'Use ^Thelp f-qc^t,'		\
+				' or ^T\qc.ksh -h^t,'		\
+				' or ^Tbuild-and-run -h^t.'
 	else
-		command qc "$@"
+		needs qc.ksh
+		qc.ksh "$@"
 	fi
 }
 

@@ -30,13 +30,14 @@ function f-fossil {
 	WORKTREE_PATH=$PWD/$workdir
 	REPOSITORY=$R/$F
 	export WORKTREE_PATH REPOSITORY
-	print -r "  WORKTREE_PATH=${WORKTREE_PATH-}"
-	print -r "  REPOSITORY=${REPOSITORY-}"
-
+	sparkle <<-===
+		  ^VWORKTREE_PATH^v^O=^o${WORKTREE_PATH-}
+		  ^VREPOSITORY^v^O=^o${REPOSITORY-}
+		===
 	needs-path -create -with-notice -or-die "$R"
 	fossil 								\
 		${common[*]:+"${common[@]}"}	\
-		--chdir "$REPOSITORY"			\
+		--chdir "$R"					\
 		clone							\
 		--no-open "$@" "$F"
 	fossil open --workdir "$WORKTREE_PATH" "$REPOSITORY"

@@ -1,0 +1,61 @@
+^Bgot tree^b
+
+    ^Btree^b ^[^T-iR^t^] ^[^T-c^t ^Ucommit^u^] ^[^T-r^t ^Urepository-path^u^] ^Up^u
+      (alias: tr)
+       Display a listing of files and directories at the specified
+       directory path in the repository.  Entries shown in this
+       listing may carry one of the following trailing annotations:
+    
+       @      entry is a symbolic link
+       /      entry is a directory
+       *      entry is an executable file
+       $      entry is a Git submodule
+    
+       Symbolic link entries are also annotated with the target path
+       of the link.
+    
+       If no path is specified, list the repository path corresponding
+       to the current directory of the work tree, or the root
+       directory of the repository if there is no work tree.
+    
+       The options for got tree are as follows:
+    
+       -c commit
+        List files and directories as they appear in the
+        specified commit.
+    
+        The expected argument is a commit ID, or a reference
+        name or a keyword which will be resolved to a commit
+        ID.  An abbreviated hash argument will be expanded to a
+        full commit ID automatically, provided the abbreviation
+        is unique.  The keywords ":base" and ":head" resolve to
+        the work tree's base commit and branch head,
+        respectively.  The former is only valid if invoked in a
+        work tree, while the latter will resolve to the tip of
+        the work tree's current branch if invoked in a work
+        tree, otherwise it will resolve to the repository's
+        HEAD reference.	Keywords and references may be
+        appended with ":+" or ":-" modifiers and an optional
+        integer N to denote the Nth descendant or antecedent by
+        first parent traversal, respectively; for example,
+        :head:-2 denotes the work tree branch head's 2nd
+        generation ancestor, and :base:+4 denotes the 4th
+        generation descendant of the work tree's base commit.
+        Similarly, spam:-3 will denote the 3rd generation
+        ancestor of the commit resolved by the "spam"
+        reference.  A ":+" or ":-" modifier without a trailing
+        integer has an implicit "1" appended (e.g., :base:+ is
+        equivalent to :base:+1).
+    
+       -i      Show object IDs of files (blob objects) and directories
+        (tree objects).
+    
+       -R      Recurse into sub-directories in the repository.
+    
+       -r repository-path
+        Use the repository at the specified path.  If not
+        specified, assume the repository is located at or above
+        the current working directory.  If this directory is a
+        got work tree, use the repository path associated with
+        this work tree.
+    

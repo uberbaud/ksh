@@ -1,0 +1,113 @@
+^Bgot log^b
+
+    ^Blog^b ^Up^u ^[^T-C^t ^Unumber^u^] ^[^T-c^t ^Ucommit^u^] ^[^T-l^t ^UN^u^] ^[^T-r^t ^Urepository-path^u^] ^[^T-S^t ^Usearch-pattern^u^] ^[^T-x^t ^Ucommit^u^] ^Up^u
+       Display history of a repository.	 If a path is specified, show
+       only commits which modified this path.  If invoked in a work
+       tree, the path is interpreted relative to the current working
+       directory, and the work tree's path prefix is implicitly
+       prepended.  Otherwise, the path is interpreted relative to the
+       repository root.
+    
+       The options for got log are as follows:
+    
+       -b      Display individual commits which were merged into the
+        current branch from other branches.  By default, got
+        log shows the linear history of the current branch
+        only.
+    
+       -C number
+        Set the number of context lines shown in diffs with -p.
+        By default, 3 lines of context are shown.
+    
+       -c commit
+        Start traversing history at the specified commit.  If
+        this option is not specified, default to the work
+        tree's current branch if invoked in a work tree, or to
+        the repository's HEAD reference.
+    
+        The expected commit argument is a commit ID, or a
+        reference name or a keyword which will be resolved to a
+        commit ID.  An abbreviated hash argument will be
+        expanded to a full commit ID automatically, provided
+        the abbreviation is unique.  The keywords ":base" and
+        ":head" resolve to the work tree's base commit and
+        branch head, respectively.  The former is only valid if
+        invoked in a work tree, while the latter will resolve
+        to the tip of the work tree's current branch if invoked
+        in a work tree, otherwise it will resolve to the
+        repository's HEAD reference.  Keywords and references
+        may be appended with ":+" or ":-" modifiers and an
+        optional integer N to denote the Nth descendant or
+        antecedent, respectively, by first parent traversal;
+        for example, :head:-2 denotes the HEAD reference's 2nd
+        generation ancestor, and :base:+4 denotes the 4th
+        generation descendant of the work tree's base commit.
+        Similarly, bar:+3 will denote the 3rd generation
+        descendant of the commit resolved by the "bar"
+        reference.  A ":+" or ":-" modifier without a trailing
+        integer has an implicit "1" appended (e.g., :base:+ is
+        equivalent to :base:+1).
+    
+       -d      Display diffstat of changes introduced in each commit.
+        Cannot be used with the -s option.  Implies the -P
+        option (diffstat displays a list of changed paths).
+    
+       -l N    Limit history traversal to a given number of commits.
+        If this option is not specified, a default limit value
+        of zero is used, which is treated as an unbounded
+        limit.  The GOT_LOG_DEFAULT_LIMIT environment variable
+        may be set to change this default value.
+    
+       -P      Display the list of file paths changed in each commit,
+        using the following status codes:
+    
+        M      modified file
+        D      file was deleted
+        A      new file was added
+        m      modified file modes (executable bit only)
+    
+        Cannot be used with the -s option.
+    
+       -p      Display the patch of modifications made in each commit.
+        If a path is specified, only show the patch of
+        modifications at or within this path.  Cannot be used
+        with the -s option.
+    
+       -R      Determine a set of commits to display as usual, but
+        display these commits in reverse order.
+    
+       -r repository-path
+        Use the repository at the specified path.  If not
+        specified, assume the repository is located at or above
+        the current working directory.  If this directory is a
+        got work tree, use the repository path associated with
+        this work tree.
+    
+       -S search-pattern
+        If specified, show only commits with a log message,
+        author name, committer name, or commit ID matched by
+        the extended regular expression search-pattern.	Lines
+        in committed patches will be matched if -p is
+        specified.  File paths changed by a commit will be
+        matched if -P is specified.  Regular expression syntax
+        is documented in re_format(7).
+    
+       -s      Display a short one-line summary of each commit,
+        instead of the default history format.  Cannot be used
+        together with the -p or -P option.
+    
+       -t      Display commits in topological order.  This option has
+        no effect without the -b option because a linear
+        history is sorted in topological order by definition.
+        Topological sorting is disabled by default because the
+        present implementation requires that commit history is
+        fully traversed before any output can be shown.
+    
+       -x commit
+        Stop traversing commit history immediately after the
+        specified commit has been traversed.  Like -c, the
+        expected commit argument is a commit ID, or a reference
+        name or a keyword which will be resolved to a commit
+        ID.  This option has no effect if the specified commit
+        is never traversed.
+    

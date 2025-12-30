@@ -1,0 +1,28 @@
+^Bgot init^b
+
+    ^Binit^b ^[^T-A^t ^Uhashing-algorithm^u^] ^[^T-b^t ^Ubranch^u^] ^Urepository-path^u
+       Create a new empty repository at the specified repository-path.
+    
+       After got init, the new repository must be populated before got
+       checkout can be used.  The got import command can be used to
+       populate the new repository with data from a local directory.
+       Alternatively, on a server running gotd(8), the new repository
+       can be made available to got(1) or git(1) clients by adding the
+       repository to gotd.conf(5) and restarting gotd(8).  Clients may
+       then clone the new repository from the server, populate the
+       cloned repository, and then populate the new repository on the
+       server via got send or git push.
+    
+       The options for got init are as follows:
+    
+       -A hashing-algorithm
+        Configure the repository's hashing-algorithm used for
+        the computation of Git object IDs.  Possible values are
+        sha1 (the default) or sha256.
+    
+       -b branch
+        Make the repository's HEAD reference point to the
+        specified branch instead of the default branch main.
+    
+       The got init command is equivalent to gotadmin init.
+    

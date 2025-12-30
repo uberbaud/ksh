@@ -1,0 +1,64 @@
+^Bgot checkout^b
+
+    ^Bcheckout^b ^[^T-Eq^t^] ^[^T-b^t ^Ubranch^u^] ^[^T-c^t ^Ucommit^u^] ^[^T-p^t ^Upath-prefix^u^] ^Urepository-path^u
+       [work-tree-path]
+      (alias: co)
+       Copy files from a repository into a new work tree.  Show the
+       status of each affected file, using the following status codes:
+    
+       A      new file was added
+       E      file already exists in work tree's meta-data
+    
+       If the work tree path is not specified, either use the last
+       component of repository path, or if a path prefix was specified
+       use the last component of path prefix.
+    
+       The options for got checkout are as follows:
+    
+       -b branch
+        Check out files from a commit on the specified branch.
+        If this option is not specified, a branch resolved via
+        the repository's HEAD reference will be used.
+    
+       -c commit
+        Check out files from the specified commit on the
+        selected branch.	 If this option is not specified, the
+        most recent commit on the selected branch will be used.
+    
+        The expected commit argument is a commit ID, or a
+        reference name or a keyword which will be resolved to a
+        commit ID.  An abbreviated hash argument will be
+        expanded to a full commit ID automatically, provided
+        the abbreviation is unique.  The keywords ":base" and
+        ":head" resolve to the repository's HEAD reference, or,
+        if the -b option is used, the head of the checked-out
+        branch.	Keywords and reference names may be appended
+        with ":+" or ":-" modifiers and an optional integer N
+        to denote the Nth descendant or antecedent by first
+        parent traversal, respectively; for example, :head:-2
+        denotes the work tree branch head's 2nd generation
+        ancestor, and foo:-3 will denote the 3rd generation
+        ancestor of the commit resolved by the "foo" reference.
+        If an integer does not follow the ":+" or ":-"
+        modifier, a "1" is implicitly appended (e.g., :head:-
+        is equivalent to :head:-1).
+    
+        If the specified commit is not contained in the
+        selected branch, a different branch which contains this
+        commit must be specified with the -b option.  If no
+        such branch is known, a new branch must be created for
+        this commit with got branch before got checkout can be
+        used.  Checking out work trees with an unknown branch
+        is intentionally not supported.
+    
+       -E      Proceed with the checkout operation even if the
+        directory at work-tree-path is not empty.  Existing
+        files will be left intact.
+    
+       -p path-prefix
+        Restrict the work tree to a subset of the repository's
+        tree hierarchy.	Only files beneath the specified
+        path-prefix will be checked out.
+    
+       -q      Silence progress output.
+    

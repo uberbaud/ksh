@@ -1,0 +1,90 @@
+^Bgot update^b
+
+    ^Bupdate^b ^[^T-q^t^] ^[^T-b^t ^Ubranch^u^] ^[^T-c^t ^Ucommit^u^] ^[^Upath^u ^S…^s^]
+      (alias: up)
+       Update an existing work tree to a different commit.  Change
+       existing files in the work tree as necessary to match file
+       contents of this commit.	 Preserve any local changes in the
+       work tree and merge them with the incoming changes.
+    
+       Files which already contain merge conflicts will not be updated
+       to avoid further complications.	Such files will be updated
+       when got update is run again after merge conflicts have been
+       resolved.  If the conflicting changes are no longer needed,
+       affected files can be reverted with got revert before running
+       got update again.
+    
+       Show the status of each affected file, using the following
+       status codes:
+    
+       U      file was updated and contained no local changes
+       G      file was updated and local changes were merged cleanly
+       C      file was updated and conflicts occurred during merge
+       D      file was deleted
+       d      file's deletion was prevented by local modifications
+       A      new file was added
+       ~      versioned file is obstructed by a non-regular file
+       !      a missing versioned file was restored
+       #      file was not updated because it contains merge conflicts
+       ?      changes destined for an unversioned file were not merged
+    
+       If no path is specified, update the entire work tree.
+       Otherwise, restrict the update operation to files at or within
+       the specified paths.  Each path is required to exist in the
+       update operation's target commit.  Files in the work tree
+       outside specified paths will remain unchanged and will retain
+       their previously recorded base commit.  Some got commands may
+       refuse to run while the work tree contains files from multiple
+       base commits.  The base commit of such a work tree can be made
+       consistent by running got update across the entire work tree.
+       Specifying a path is incompatible with the -b option.
+    
+       got update cannot update paths with staged changes.  If changes
+       have been staged with got stage, these changes must first be
+       committed with got commit or unstaged with got unstage.
+    
+       The options for got update are as follows:
+    
+       -b branch
+        Switch the work tree's branch reference to the
+        specified branch before updating the work tree.	This
+        option requires that all paths in the work tree are
+        updated.
+    
+        As usual, any local changes in the work tree will be
+        preserved.  This can be useful when switching to a
+        newly created branch in order to commit existing local
+        changes to this branch.
+    
+        Any local changes must be dealt with separately in
+        order to obtain a work tree with pristine file contents
+        corresponding exactly to the specified branch.  Such
+        changes could first be committed to a different branch
+        with got commit, or could be discarded with got revert.
+    
+       -c commit
+        Update the work tree to the specified commit.  If this
+        option is not specified, the most recent commit on the
+        work tree's branch will be used.
+    
+        The expected commit argument is a commit ID, or a
+        reference name or a keyword which will be resolved to a
+        commit ID.  An abbreviated hash argument will be
+        expanded to a full commit ID automatically, provided
+        the abbreviation is unique.  The keywords ":base" and
+        ":head" resolve to the work tree's base commit and
+        branch head, respectively.  Keywords and reference
+        names may be appended with ":+" or ":-" modifiers and
+        an optional integer N to denote the Nth descendant or
+        antecedent, respectively, by first parent traversal;
+        for example, :head:-2 denotes the work tree branch
+        head's 2nd generation ancestor, and :base:+4 denotes
+        the 4th generation descendant of the work tree's base
+        commit.	Similarly, foo:-3 will denote the 3rd
+        generation ancestor of the commit resolved by the "foo"
+        reference.  If an integer does not follow the ":+" or
+        ":-" modifier, a "1" is implicitly appended (e.g.,
+        :head:- is equivalent to :head:-1).
+    
+       -q      Silence progress output.
+    

@@ -1,0 +1,35 @@
+^Bgot unstage^b
+
+    ^Bunstage^b ^Up^u ^[^T-F^t ^Uresponse-script^u^] ^[^Upath^u ^S…^s^]
+      (alias: ug)
+       Merge staged changes back into the work tree and put affected
+       paths back into non-staged status.  If no path is specified,
+       unstage all staged changes across the entire work tree.
+       Otherwise, unstage changes at or within the specified paths.
+    
+       Show the status of each affected file, using the following
+       status codes:
+    
+       G      file was unstaged
+       C      file was unstaged and conflicts occurred during merge
+       !      changes destined for a missing file were not merged
+       D      file was staged as deleted and still is deleted
+       d      file's deletion was prevented by local modifications
+       ~      changes destined for a non-regular file were not merged
+    
+       The options for got unstage are as follows:
+    
+       -F response-script
+        With the -p option, read y, n, and q responses
+        line-by-line from the specified response-script file
+        instead of prompting interactively.
+    
+       -p      Instead of unstaging the entire content of a changed
+        file, interactively select or reject changes for
+        unstaging based on y (unstage change), n (keep
+        change staged), and q (quit unstaging this file)
+        responses.  If a file is staged in modified status,
+        individual patches derived from the staged file content
+        can be unstaged.	 Files staged in added or deleted
+        status may only be unstaged in their entirety.
+    

@@ -1,0 +1,37 @@
+^Bgot integrate^b
+
+    ^Bintegrate^b ^Ubranch^u
+      (alias: ig)
+       Integrate the specified branch into the work tree's current
+       branch.	Files in the work tree are updated to match the
+       contents on the integrated branch, and the reference of the
+       work tree's branch is changed to point at the head commit of
+       the integrated branch.
+    
+       Both branches can be considered equivalent after integration
+       since they will be pointing at the same commit.	Both branches
+       remain available for future work, if desired.  In case the
+       integrated branch is no longer needed it may be deleted with
+       got branch -d.
+    
+       Show the status of each affected file, using the following
+       status codes:
+    
+       U      file was updated
+       D      file was deleted
+       A      new file was added
+       ~      versioned file is obstructed by a non-regular file
+       !      a missing versioned file was restored
+    
+       got integrate will refuse to run if certain preconditions are
+       not met.	 Most importantly, the branch must have been rebased
+       onto the work tree's current branch with got rebase before it
+       can be integrated, in order to linearize commit history and
+       resolve merge conflicts.	 If the work tree contains multiple
+       base commits, it must first be updated to a single base commit
+       with got update.	 If changes have been staged with got stage,
+       these changes must first be committed with got commit or
+       unstaged with got unstage.  If the work tree contains local
+       changes, these changes must first be committed with got commit
+       or reverted with got revert.
+    

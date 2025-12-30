@@ -1,0 +1,103 @@
+^Bgot branch^b
+
+    ^Bbranch^b ^[^T-lnt^t^] ^[^T-c^t ^Ucommit^u^] ^[^T-d^t ^Uname^u^] ^[^T-r^t ^Urepository-path^u^] ^[^Uname^u^]
+      (alias: br)
+       Create, list, or delete branches.
+    
+       Local branches are managed via references which live in the
+       refs/heads/ reference namespace.	 The got branch command
+       creates references in this namespace only.
+    
+       When deleting branches, the specified name is searched in the
+       refs/heads reference namespace first.  If no corresponding
+       branch is found, the refs/remotes namespace will be searched
+       next.
+    
+       If invoked in a work tree without any arguments, print the name
+       of the work tree's current branch.
+    
+       If a name argument is passed, attempt to create a branch
+       reference with the given name.  By default the new branch
+       reference will point at the latest commit on the work tree's
+       current branch if invoked in a work tree, and otherwise to a
+       commit resolved via the repository's HEAD reference.
+    
+       If invoked in a work tree, once the branch was created
+       successfully switch the work tree's head reference to the newly
+       created branch and update files across the entire work tree,
+       just like got update -b name would do.  Show the status of each
+       affected file, using the following status codes:
+    
+       U      file was updated and contained no local changes
+       G      file was updated and local changes were merged cleanly
+       C      file was updated and conflicts occurred during merge
+       D      file was deleted
+       A      new file was added
+       ~      versioned file is obstructed by a non-regular file
+       !      a missing versioned file was restored
+    
+       The options for got branch are as follows:
+    
+       -c commit
+        Make a newly created branch reference point at the
+        specified commit.  The expected argument is a commit
+        ID, or a reference name or keyword which will be
+        resolved to a commit ID.	 An abbreviated hash argument
+        will be expanded to a full commit ID automatically,
+        provided the abbreviation is unique.  The keywords
+        ":base" and ":head" resolve to the work tree's base
+        commit and branch head, respectively.  The former is
+        only valid if invoked in a work tree, while the latter
+        will resolve to the tip of the work tree's current
+        branch if invoked in a work tree, otherwise it will
+        resolve to the repository's HEAD reference.  Keywords
+        and references may be appended with ":+" or ":-"
+        modifiers and an optional integer N to denote the Nth
+        descendant or antecedent by first parent traversal,
+        respectively; for example, :head:-2 denotes the work
+        tree branch head's 2nd generation ancestor, and
+        :base:+4 denotes the 4th generation descendant of the
+        work tree's base commit.	 Similarly, foobar:+3 will
+        denote the 3rd generation descendant of the commit
+        resolved by the "foobar" reference.  A ":+" or ":-"
+        modifier without a trailing integer has an implicit "1"
+        appended (e.g., :base:+ is equivalent to :base:+1).
+    
+       -d name
+        Delete the branch with the specified name from the
+        refs/heads or refs/remotes reference namespace.
+    
+        Only the branch reference is deleted.  Any commit,
+        tree, and blob objects belonging to the branch remain
+        in the repository and may be removed separately with
+        Git's garbage collector or gotadmin cleanup.
+    
+       -l      List all existing branches in the repository, including
+        copies of remote repositories' branches in the
+        refs/remotes/ reference namespace.
+    
+        If invoked in a work tree, the work tree's current
+        branch is shown with one of the following annotations:
+    
+        *      work tree's base commit and the base commit of
+        all tracked files matches the branch tip
+        ~      work tree comprises mixed commits or its base
+        commit is out-of-date
+    
+       -n      Do not switch and update the work tree after creating a
+        new branch.
+    
+       -r repository-path
+        Use the repository at the specified path.  If not
+        specified, assume the repository is located at or above
+        the current working directory.  If this directory is a
+        got work tree, use the repository path associated with
+        this work tree.
+    
+       -t      Sort listed branches by modification time (most
+        recently modified first) instead of sorting by
+        lexicographical order.  Branches in the refs/heads/
+        reference namespace are listed before branches in
+        refs/remotes/ regardless.  Use of this option
+        requires the -l option to be used as well.
+    

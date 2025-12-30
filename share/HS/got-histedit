@@ -1,0 +1,221 @@
+^Bgot histedit^b
+
+    ^Bhistedit^b ^Uc^u ^[^T-F^t ^Uhistedit-script^u^] ^Uc^u ^Ur^u
+      (alias: he)
+       Edit commit history between the work tree's current base commit
+       and the tip commit of the work tree's current branch.
+    
+       The got histedit command requires the GOT_AUTHOR environment
+       variable to be set, unless an author has been configured in
+       got.conf(5) or Git's user.name and user.email configuration
+       settings can be obtained from the repository's .git/config file
+       or from Git's global ~/.gitconfig configuration file.
+    
+       Before starting a histedit operation, the work tree's current
+       branch must be set with got update -b to the branch which
+       should be edited, unless this branch is already the current
+       branch of the work tree.	 The tip of this branch represents the
+       upper bound (inclusive) of commits touched by the histedit
+       operation.
+    
+       Furthermore, the work tree's base commit must be set with got
+       update -c to a point in this branch's commit history where
+       editing should begin.  This commit represents the lower bound
+       (non-inclusive) of commits touched by the histedit operation.
+    
+       Editing of commit history is controlled via a histedit script
+       which can be written in an editor based on a template, passed
+       on the command line, or generated with the -d, -e, -f, or -m
+       options.	 Quitting the editor without saving the file will
+       abort the histedit operation.
+    
+       The format of the histedit script is line-based.	 Each line in
+       the script begins with a command name, followed by whitespace
+       and an argument.	 For most commands, the expected argument is a
+       commit ID.  Any remaining text on the line is ignored.  Lines
+       which begin with the # character are ignored entirely.
+    
+       The available histedit script commands are as follows:
+    
+       pick commit
+       Use the specified commit as it is.
+       edit commit
+       Apply the changes from the specified commit, but then
+       interrupt the histedit operation for amending, without
+       creating a commit.  While the histedit operation is
+       interrupted arbitrary files may be edited, and commands
+       which manipulate the work tree can be used freely.  The
+       got add and got remove commands can be used to add new
+       files or remove existing ones.  The got revert -p
+       command can be used to eliminate arbitrary changes from
+       files in the work tree.  The got stage -p command may be
+       used to prepare a subset of changes for inclusion in the
+       next commit.  Finally, the got commit command can be
+       used to insert arbitrary commits into the edited
+       history.	Regular editing of history must eventually be
+       resumed by running got histedit -c.
+       fold commit
+       Combine the specified commit with the next commit listed
+       further below that will be used.
+       drop commit
+       Remove this commit from the edited history.
+       mesg commit
+       Open an editor to create a new log message for this
+       commit.
+    
+       Every commit in the history being edited must be mentioned in
+       the script.  Lines may be re-ordered to change the order of
+       commits in the edited history.  No commit may be listed more
+       than once.
+    
+       Edited commits are accumulated on a temporary branch which the
+       work tree will remain switched to throughout the entire
+       histedit operation.  Once history editing has completed
+       successfully, the temporary branch becomes the new version of
+       the work tree's branch and the work tree is automatically
+       switched to it.
+    
+       Old commits in their pre-histedit state are automatically
+       backed up in the refs/got/backup/histedit reference
+       namespace.  As long as these references are not removed older
+       versions of edited commits will remain in the repository and
+       can be viewed with the got histedit -l command.	Removal of
+       these references makes objects which become unreachable via any
+       reference subject to removal by Git's garbage collector or
+       gotadmin cleanup.
+    
+       While merging commits, show the status of each affected file,
+       using the following status codes:
+    
+       G      file was merged
+       C      file was merged and conflicts occurred during merge
+       !      changes destined for a missing file were not merged
+       D      file was deleted
+       d      file's deletion was prevented by local modifications
+       A      new file was added
+       ~      changes destined for a non-regular file were not merged
+       ?      changes destined for an unversioned file were not merged
+    
+       If merge conflicts occur, the histedit operation is interrupted
+       and may be continued once conflicts have been resolved.	If any
+       files with destined changes are found to be missing or
+       unversioned, or if files could not be deleted due to
+       differences in deleted content, the histedit operation will be
+       interrupted to prevent potentially incomplete changes from
+       being committed to the repository without user intervention.
+       The work tree may be modified as desired and the histedit
+       operation can be continued once the changes present in the work
+       tree are considered complete.  Alternatively, the histedit
+       operation may be aborted which will leave the work tree
+       switched back to its original branch.
+    
+       If a merge conflict is resolved in a way which renders the
+       merged change into a no-op change, the corresponding commit
+       will be elided when the histedit operation continues.
+    
+       got histedit will refuse to run if certain preconditions are
+       not met.	 If the work tree's current branch is not in the
+       refs/heads/ reference namespace, the history of the branch
+       may not be edited.  If the work tree contains multiple base
+       commits, it must first be updated to a single base commit with
+       got update.  If changes have been staged with got stage, these
+       changes must first be committed with got commit or unstaged
+       with got unstage.  If the work tree contains local changes,
+       these changes must first be committed with got commit or
+       reverted with got revert.  If the edited history contains
+       changes to files outside of the work tree's path prefix, the
+       work tree cannot be used to edit the history of this branch.
+    
+       The got update, got rebase, got merge, and got integrate
+       commands will refuse to run while a histedit operation is in
+       progress.  Other commands which manipulate the work tree may be
+       used, and the got commit command may be used to commit
+       arbitrary changes to the temporary branch while the histedit
+       operation is interrupted.
+    
+       The options for got histedit are as follows:
+    
+       -a      Abort an interrupted histedit operation.	 If this
+        option is used, no other command-line arguments are
+        allowed.
+    
+       -C      Allow a histedit operation to continue with files in
+        conflicted status.  This option should generally be
+        avoided, and can only be used with the -c option.
+    
+       -c      Continue an interrupted histedit operation.  If this
+        option is used, no other command-line arguments are
+        allowed except -C.
+    
+       -d      Drop all commits.  This option is a quick equivalent to
+        a histedit script which drops all commits.  The -d
+        option can only be used when starting a new histedit
+        operation.  If this option is used, no other command-
+        line arguments are allowed.
+    
+       -e      Interrupt the histedit operation for editing after
+        merging each commit.  This option is a quick equivalent
+        to a histedit script which uses the edit command for
+        all commits.  The -e option can only be used when
+        starting a new histedit operation.  If this option is
+        used, no other command-line arguments are allowed.
+    
+       -F histedit-script
+        Use the specified histedit-script instead of opening a
+        temporary file in an editor where a histedit script can
+        be written.
+    
+       -f      Fold all commits into a single commit.  This option is
+        a quick equivalent to a histedit script which folds all
+        commits, combining them all into one commit.  The -f
+        option can only be used when starting a new histedit
+        operation.  If this option is used, no other command-
+        line arguments are allowed.
+    
+       -l      Show a list of past histedit operations, represented by
+        references in the refs/got/backup/histedit reference
+        namespace.
+    
+        Display the author, date, and log message of each
+        backed up commit, the object ID of the corresponding
+        post-histedit commit, and the object ID of their common
+        ancestor commit.	 Given these object IDs, the got log
+        command with the -c and -x options can be used to
+        examine the history of either version of the branch,
+        and the got branch command with the -c option can be
+        used to create a new branch from a pre-histedit state
+        if desired.
+    
+        If a branch is specified, only show commits which at
+        some point in time represented this branch.  Otherwise,
+        list all backed up commits for any branches.
+    
+        If this option is used, got histedit does not require a
+        work tree.  None of the other options can be used
+        together with -l.
+    
+       -m      Edit log messages only.	This option is a quick
+        equivalent to a histedit script which edits only log
+        messages but otherwise leaves every picked commit as-
+        is.  The -m option can only be used when starting a new
+        histedit operation.  If this option is used, no other
+        command-line arguments are allowed.
+    
+       -X      Delete backups created by past histedit operations,
+        represented by references in the
+        refs/got/backup/histedit reference namespace.
+    
+        If a branch is specified, only delete backups which at
+        some point in time represented this branch.  Otherwise,
+        delete all references found within
+        refs/got/backup/histedit.
+    
+        Any commit, tree, tag, and blob objects belonging to
+        deleted backups remain in the repository and may be
+        removed separately with Git's garbage collector or
+        gotadmin cleanup.
+    
+        If this option is used, got histedit does not require a
+        work tree.  None of the other options can be used
+        together with -X.
+    

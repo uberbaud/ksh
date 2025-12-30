@@ -2,15 +2,16 @@
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
 #: FUNCTION ^G(no arguments)^g
-#:   Amuse utility. Does what it says.
+#:   Amuse utility. Puts just played (in ^Tplaying^t) at the HEAD of 
+#:   ^Tplayed.lst^t AND truncates ^Tplaying^t.
 
 function move-played-to-history {
-	local PlayedBuf PlayingBuf
+	local PlayedBuf PlayingBuf NL='
+'
 	PlayingBuf=$(<playing)
 	: >playing
-	PlayedBuf=$(<played.lst)
-	print -r -- "$PlayingBuf" >played.lst
-	print -r -- "$PlayedBuf" >>played.lst
+	PlayedBuf=$(head -n200 played.lst)
+	print -r -- "$PlayingBuf$NL$PlayedBuf" >played.lst
 }
 
 # Copyright © 2023 by Tom Davis <tom@greyshirt.net>.

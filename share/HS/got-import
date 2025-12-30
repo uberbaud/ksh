@@ -1,0 +1,47 @@
+^Bgot import^b
+
+    ^Bimport^b ^[^T-b^t ^Ubranch^u^] ^[^T-I^t ^Upattern^u^] ^[^T-m^t ^Umessage^u^] ^[^T-r^t ^Urepository-path^u^]
+       directory
+      (alias: im)
+       Create an initial commit in a repository from the file
+       hierarchy within the specified directory.  The created commit
+       will not have any parent commits, i.e. it will be a root
+       commit.	Also create a new reference which provides a branch
+       name for the newly created commit.  Show the path of each
+       imported file to indicate progress.
+    
+       The got import command requires the GOT_AUTHOR environment
+       variable to be set, unless an author has been configured in
+       got.conf(5) or Git's user.name and user.email configuration
+       settings can be obtained from the repository's .git/config file
+       or from Git's global ~/.gitconfig configuration file.
+    
+       The options for got import are as follows:
+    
+       -b branch
+        Create the specified branch.  If this option is not
+        specified, a branch corresponding to the repository's
+        HEAD reference will be used.  Use of this option is
+        required if the branch resolved via the repository's
+        HEAD reference already exists.
+    
+       -I pattern
+        Ignore files or directories with a name which matches
+        the specified pattern.  This option may be specified
+        multiple times to build a list of ignore patterns.  The
+        pattern follows the globbing rules documented in
+        glob(7).	 Ignore patterns which end with a slash, /,
+        will only match directories.
+    
+       -m message
+        Use the specified log message when creating the new
+        commit.	Without the -m option, got import opens a
+        temporary file in an editor where a log message can be
+        written.	 Quitting the editor without saving the file
+        will abort the import operation.
+    
+       -r repository-path
+        Use the repository at the specified path.  If not
+        specified, assume the repository is located at or above
+        the current working directory.
+    

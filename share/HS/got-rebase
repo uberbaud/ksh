@@ -1,0 +1,148 @@
+^Bgot rebase^b
+
+    ^Brebase^b ^Uc^u ^Uc^u ^Ur^u
+      (alias: rb)
+       Rebase commits on the specified branch onto the tip of the
+       current branch of the work tree.	 The branch must share common
+       ancestry with the work tree's current branch.  Rebasing begins
+       with the first descendant commit of the youngest common
+       ancestor commit shared by the specified branch and the work
+       tree's current branch, and stops once the tip commit of the
+       specified branch has been rebased.
+    
+       When got rebase is used as intended, the specified branch
+       represents a local commit history and may already contain
+       changes that are not yet visible in any other repositories.
+       The work tree's current branch, which must be set with got
+       update -b before starting the rebase operation, represents a
+       branch from a remote repository which shares a common history
+       with the specified branch but has progressed, and perhaps
+       diverged, due to commits added to the remote repository.
+    
+       Rebased commits are accumulated on a temporary branch which the
+       work tree will remain switched to throughout the entire rebase
+       operation.  Commits on this branch represent the same changes
+       with the same log messages as their counterparts on the
+       original branch, but with different commit IDs.	Once rebasing
+       has completed successfully, the temporary branch becomes the
+       new version of the specified branch and the work tree is
+       automatically switched to it.  If author information is
+       available via the GOT_AUTHOR environment variable, got.conf(5)
+       or Git's user.name and user.email configuration settings, this
+       author information will be used to identify the committer of
+       rebased commits.
+    
+       Old commits in their pre-rebase state are automatically backed
+       up in the refs/got/backup/rebase reference namespace.  As
+       long as these references are not removed older versions of
+       rebased commits will remain in the repository and can be viewed
+       with the got rebase -l command.	Removal of these references
+       makes objects which become unreachable via any reference
+       subject to removal by Git's garbage collector or gotadmin
+       cleanup.
+    
+       While rebasing commits, show the status of each affected file,
+       using the following status codes:
+    
+       G      file was merged
+       C      file was merged and conflicts occurred during merge
+       !      changes destined for a missing file were not merged
+       D      file was deleted
+       d      file's deletion was prevented by local modifications
+       A      new file was added
+       ~      changes destined for a non-regular file were not merged
+       ?      changes destined for an unversioned file were not merged
+    
+       If merge conflicts occur, the rebase operation is interrupted
+       and may be continued once conflicts have been resolved.	If any
+       files with destined changes are found to be missing or
+       unversioned, or if files could not be deleted due to
+       differences in deleted content, the rebase operation will be
+       interrupted to prevent potentially incomplete changes from
+       being committed to the repository without user intervention.
+       The work tree may be modified as desired and the rebase
+       operation can be continued once the changes present in the work
+       tree are considered complete.  Alternatively, the rebase
+       operation may be aborted which will leave branch unmodified and
+       the work tree switched back to its original branch.
+    
+       If a merge conflict is resolved in a way which renders the
+       merged change into a no-op change, the corresponding commit
+       will be elided when the rebase operation continues.
+    
+       got rebase will refuse to run if certain preconditions are not
+       met.  If the branch is not in the refs/heads/ reference
+       namespace, the branch may not be rebased.  If the work tree is
+       not yet fully updated to the tip commit of its branch, then the
+       work tree must first be updated with got update.	 If changes
+       have been staged with got stage, these changes must first be
+       committed with got commit or unstaged with got unstage.	If the
+       work tree contains local changes, these changes must first be
+       committed with got commit or reverted with got revert.  If the
+       branch contains changes to files outside of the work tree's
+       path prefix, the work tree cannot be used to rebase this
+       branch.
+    
+       The got update, got integrate, got merge, got commit, and got
+       histedit commands will refuse to run while a rebase operation
+       is in progress.	Other commands which manipulate the work tree
+       may be used for conflict resolution purposes.
+    
+       If the specified branch is already based on the work tree's
+       current branch, then no commits need to be rebased and got
+       rebase will simply switch the work tree to the specified branch
+       and update files in the work tree accordingly.
+    
+       The options for got rebase are as follows:
+    
+       -a      Abort an interrupted rebase operation.  If this option
+        is used, no other command-line arguments are allowed.
+    
+       -C      Allow a rebase operation to continue with files in
+        conflicted status.  This option should generally be
+        avoided, and can only be used with the -c option.
+    
+       -c      Continue an interrupted rebase operation.  If this
+        option is used, no other command-line arguments are
+        allowed except -C.
+    
+       -l      Show a list of past rebase operations, represented by
+        references in the refs/got/backup/rebase reference
+        namespace.
+    
+        Display the author, date, and log message of each
+        backed up commit, the object ID of the corresponding
+        post-rebase commit, and the object ID of their common
+        ancestor commit.	 Given these object IDs, the got log
+        command with the -c and -x options can be used to
+        examine the history of either version of the branch,
+        and the got branch command with the -c option can be
+        used to create a new branch from a pre-rebase state if
+        desired.
+    
+        If a branch is specified, only show commits which at
+        some point in time represented this branch.  Otherwise,
+        list all backed up commits for any branches.
+    
+        If this option is used, got rebase does not require a
+        work tree.  None of the other options can be used
+        together with -l.
+    
+       -X      Delete backups created by past rebase operations,
+        represented by references in the
+        refs/got/backup/rebase reference namespace.
+    
+        If a branch is specified, only delete backups which at
+        some point in time represented this branch.  Otherwise,
+        delete all references found within
+        refs/got/backup/rebase.
+    
+        Any commit, tree, tag, and blob objects belonging to
+        deleted backups remain in the repository and may be
+        removed separately with Git's garbage collector or
+        gotadmin cleanup.
+    
+        If this option is used, got rebase does not require a
+        work tree.  None of the other options can be used
+        together with -X.
+    

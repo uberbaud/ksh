@@ -1,0 +1,14 @@
+^Bgot info^b
+
+    ^Binfo^b ^[^Upath^u ^S…^s^]
+       Display meta-data stored in a work tree.	 See got-worktree(5)
+       for details.
+    
+       The work tree to use is resolved implicitly by walking upwards
+       from the current working directory.
+    
+       If one or more path arguments are specified, show additional
+       per-file information for tracked files located at or within
+       these paths.  If a path argument corresponds to the work tree's
+       root directory, display information for all tracked files.
+    

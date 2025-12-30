@@ -1,0 +1,135 @@
+^Bgot send^b
+
+    ^Bsend^b ^[^T-afqTv^t^] ^[^T-b^t ^Ubranch^u^] ^[^T-d^t ^Ubranch^u^] ^[^T-i^t ^Uidentity-file^u^] ^[^T-J^t ^Ujumphost^u^]
+       [-r repository-path] [-t tag] [remote-repository]
+      (alias: se)
+       Send new changes to a remote repository.	 If no
+       remote-repository is specified, origin will be used.  The
+       remote repository's URL is obtained from the corresponding
+       entry in got.conf(5) or Git's config file of the local
+       repository, as created by got clone.
+    
+       All objects corresponding to new changes will be written to a
+       temporary pack file which is then uploaded to the server.  Upon
+       success, references in the refs/remotes/ reference namespace
+       of the local repository will be updated to point at the commits
+       which have been sent.
+    
+       By default, changes will only be sent if they are based on up-
+       to-date copies of relevant branches in the remote repository.
+       If any changes to be sent are based on out-of-date copies or
+       would otherwise break linear history of existing branches, new
+       changes must be fetched from the server with got fetch and
+       local branches must be rebased with got rebase before got send
+       can succeed.  The -f option can be used to make exceptions to
+       these requirements.
+    
+       The options for got send are as follows:
+    
+       -a      Send all branches from the local repository's
+        refs/heads/ reference namespace.	 The -a option is
+        equivalent to listing all branches with multiple -b
+        options.	 Cannot be used together with the -b option.
+    
+       -b branch
+        Send the specified branch from the local repository's
+        refs/heads/ reference namespace.	 This option may be
+        specified multiple times to build a list of branches to
+        send.  If this option is not specified, default to the
+        work tree's current branch if invoked in a work tree,
+        or to the repository's HEAD reference.  Cannot be used
+        together with the -a option.
+    
+       -d branch
+        Delete the specified branch from the remote
+        repository's refs/heads/ reference namespace.  This
+        option may be specified multiple times to build a list
+        of branches to delete.
+    
+        Only references are deleted.  Any commit, tree, tag,
+        and blob objects belonging to deleted branches may
+        become subject to deletion by Git's garbage collector
+        running on the server.
+    
+        Requesting deletion of branches results in an error if
+        the server does not support this feature or disallows
+        the deletion of branches based on its configuration.
+    
+       -f      Attempt to force the server to overwrite existing
+        branches or tags in the remote repository, even when
+        got fetch followed by got rebase or got merge would
+        usually be required before changes can be sent.	The
+        server may reject forced requests regardless, depending
+        on its configuration.
+    
+        Any commit, tree, tag, and blob objects belonging to
+        overwritten branches or tags may become subject to
+        deletion by Git's garbage collector running on the
+        server.
+    
+        The refs/tags reference namespace is globally shared
+        between all repositories.  Use of the -f option to
+        overwrite tags is discouraged because it can lead to
+        inconsistencies between the tags present in different
+        repositories.  In general, creating a new tag with a
+        different name is recommended instead of overwriting an
+        existing tag.
+    
+        Use of the -f option is particularly discouraged if
+        changes being sent are based on an out-of-date copy of
+        a branch in the remote repository.  Instead of using
+        the -f option, new changes should be fetched with got
+        fetch and local branches should be rebased with got
+        rebase or merged with got merge, followed by another
+        attempt to send the changes.
+    
+        The -f option should only be needed in situations where
+        the remote repository's copy of a branch or tag is
+        known to be out-of-date and is considered disposable.
+        The risks of creating inconsistencies between different
+        repositories should also be taken into account.
+    
+       -i identity-file
+        Specify an identity-file, containing a private SSH key,
+        to use with SSH connections.  The same option will be
+        passed to ssh(1).
+    
+       -J jumphost
+        Specify a jumphost to use with SSH connections.	The
+        same option will be passed to ssh(1).
+    
+       -q      Suppress progress reporting output.  The same option
+        will be passed to ssh(1) if applicable.
+    
+       -r repository-path
+        Use the repository at the specified path.  If not
+        specified, assume the repository is located at or above
+        the current working directory.  If this directory is a
+        got work tree, use the repository path associated with
+        this work tree.
+    
+       -T      Attempt to send all tags from the local repository's
+        refs/tags/ reference namespace.	The -T option is
+        equivalent to listing all tags with multiple -t
+        options.	 Cannot be used together with the -t option.
+    
+       -t tag  Send the specified tag from the local repository's
+        refs/tags/ reference namespace, in addition to any
+        branches that are being sent.  The -t option may be
+        specified multiple times to build a list of tags to
+        send.  No tags will be sent if the -t option is not
+        used.
+    
+        Raise an error if the specified tag already exists in
+        the remote repository, unless the -f option is used to
+        overwrite the server's copy of the tag.	In general,
+        creating a new tag with a different name is recommended
+        instead of overwriting an existing tag.
+    
+        Cannot be used together with the -T option.
+    
+       -v      Verbose mode.  Causes got send to print debugging
+        messages to standard error output.  The same option
+        will be passed to ssh(1) if applicable.	Multiple -v
+        options increase the verbosity.	The maximum is 3.
+    

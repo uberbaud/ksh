@@ -1,0 +1,40 @@
+^Bgot blame^b
+
+    ^Bblame^b ^[^T-c^t ^Ucommit^u^] ^[^T-r^t ^Urepository-path^u^] ^Upath^u
+      (alias: bl)
+       Display line-by-line history of a file at the specified path.
+    
+       The options for got blame are as follows:
+    
+       -c commit
+        Start traversing history at the specified commit.  The
+        expected argument is a commit ID, or a reference name
+        or a keyword which will be resolved to a commit ID.  An
+        abbreviated hash argument will be expanded to a full
+        commit ID automatically, provided the abbreviation is
+        unique.	The keywords ":base" and ":head" resolve to
+        the work tree's base commit and branch head,
+        respectively.  The former is only valid if invoked in a
+        work tree, while the latter will resolve to the tip of
+        the work tree's current branch if invoked in a work
+        tree, otherwise it will resolve to the repository's
+        HEAD reference.	Keywords and references may be
+        appended with ":+" or ":-" modifiers and an optional
+        integer N to denote the Nth descendant or antecedent by
+        first parent traversal, respectively; for example,
+        :head:-2 denotes the work tree branch head's 2nd
+        generation ancestor, and :base:+4 denotes the 4th
+        generation descendant of the work tree's base commit.
+        Similarly, xyz:-5 will denote the 5th generation
+        ancestor of the commit resolved by the "xyz" reference.
+        A ":+" or ":-" modifier without a trailing integer has
+        an implicit "1" appended (e.g., :base:+ is equivalent
+        to :base:+1).
+    
+       -r repository-path
+        Use the repository at the specified path.  If not
+        specified, assume the repository is located at or above
+        the current working directory.  If this directory is a
+        got work tree, use the repository path associated with
+        this work tree.
+    

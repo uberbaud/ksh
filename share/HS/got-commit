@@ -1,0 +1,103 @@
+^Bgot commit^b
+
+    ^Bcommit^b ^[^T-CNnS^t^] ^[^T-A^t ^Uauthor^u^] ^[^T-F^t ^Upath^u^] ^[^T-m^t ^Umessage^u^] ^[^Upath^u ^S…^s^]
+      (alias: ci)
+       Create a new commit in the repository from changes in a work
+       tree and use this commit as the new base commit for the work
+       tree.  If no path is specified, commit all changes in the work
+       tree.  Otherwise, commit changes at or within the specified
+       paths.
+    
+       If changes have been explicitly staged for commit with got
+       stage, only commit staged changes and reject any specified
+       paths which have not been staged.
+    
+       got commit opens a temporary file in an editor where a log
+       message can be written unless the -m option is used or the -F
+       and -N options are used together.  Quitting the editor without
+       saving the file will abort the commit operation.
+    
+       Show the status of each affected file, using the following
+       status codes:
+    
+       M      modified file
+       D      file was deleted
+       A      new file was added
+       m      modified file modes (executable bit only)
+    
+       Files which are not part of the new commit will retain their
+       previously recorded base commit.	 Some got commands may refuse
+       to run while the work tree contains files from multiple base
+       commits.	 The base commit of such a work tree can be made
+       consistent by running got update across the entire work tree.
+    
+       The got commit command requires the GOT_AUTHOR environment
+       variable to be set, unless an author has been configured in
+       got.conf(5) or Git's user.name and user.email configuration
+       settings can be obtained from the repository's .git/config file
+       or from Git's global ~/.gitconfig configuration file.
+    
+       The options for got commit are as follows:
+    
+       -A author
+        Set author information in the newly created commit to
+        author.	This is useful when committing changes on
+        behalf of someone else.	The author argument must use
+        the same format as the GOT_AUTHOR environment variable.
+    
+        In addition to storing author information, the newly
+        created commit object will retain committer
+        information which is obtained, as usual, from the
+        GOT_AUTHOR environment variable, or got.conf(5), or Git
+        configuration settings.
+    
+       -C      Allow committing files in conflicted status.
+    
+        Committing files with conflict markers should generally
+        be avoided.  Cases where conflict markers must be
+        stored in the repository for some legitimate reason
+        should be very rare.  There are usually ways to avoid
+        storing conflict markers verbatim by applying
+        appropriate programming tricks.
+    
+       -F path
+        Use the prepared log message stored in the file found
+        at path when creating the new commit.  got commit opens
+        a temporary file in an editor where the prepared log
+        message can be reviewed and edited further if needed.
+        Cannot be used together with the -m option.
+    
+       -m message
+        Use the specified log message when creating the new
+        commit.	Cannot be used together with the -F option.
+    
+       -N      This option prevents got commit from opening the commit
+        message in an editor.  It has no effect unless it is
+        used together with the -F option and is intended for
+        non-interactive use such as scripting.
+    
+       -n      This option prevents got commit from generating a diff
+        of the to-be-committed changes in a temporary file
+        which can be viewed while editing a commit message.
+    
+       -S      Allow the addition of symbolic links which point
+        outside of the path space that is under version
+        control.	 By default, got commit will reject such
+        symbolic links due to safety concerns.  As a
+        precaution, got may decide to represent such a symbolic
+        link as a regular file which contains the link's target
+        path, rather than creating an actual symbolic link
+        which points outside of the work tree.  Use of this
+        option is discouraged because external mechanisms such
+        as make obj are better suited for managing symbolic
+        links to paths not under version control.
+    
+       got commit will refuse to run if certain preconditions are not
+       met.  If the work tree's current branch is not in the
+       refs/heads/ reference namespace, new commits may not be
+       created on this branch.	Local changes may only be committed if
+       they are based on file content found in the most recent commit
+       on the work tree's branch.  If a path is found to be out of
+       date, got update must be used first in order to merge local
+       changes with changes made in the repository.
+    

@@ -5,6 +5,8 @@
 set -o nounset;: ${FPATH:?Run from within KSH}
 typeset -R5 LINENO
 PS4='$LINENO | '
+NL='
+'
 
 # Usage {{{1
 typeset -- this_pgm=${0##*/}
@@ -46,8 +48,8 @@ use-app-paths amuse
 amuse:env || fullstop "$REPLY"
 : ${AMUSE_DATA_HOME:?} ${AMUSE_RUN_DIR:?}
 
-alias please-START-another-song='return 0'
-alias DONT-start-another-song='return 1'
+please_START_another_song=0
+DONT_start_another_song=1
 
 CONTINUE=true
 function kill-player { #{{{1
@@ -135,22 +137,22 @@ function docmd-again { #{{{1
 	print $((N+1)) >again
 	# we're MARKING it for replay, but we're in the middle of playing
 	# the song, so don't RESTART it.
-	DONT-start-another-song
+	return $DONT_start_another_song
 } #}}}1
 function docmd-final { #{{{1
 	print true >final
-	DONT-start-another-song
+	return $DONT_start_another_song
 } #}}}1
 function docmd-pause { #{{{1
 	kill-player
 	# don't restart THIS song
-	DONT-start-another-song
+	return $DONT_start_another_song
 } #}}}1
 function docmd-play { #{{{1
 	: >final
 	[[ -s player-pid && -z $(ps -p $(<player-pid) -ocommand=) ]]&&
 		: >player-pid
-	please-START-another-song
+	return $please_START_another_song
 } #}}}1
 function stop-song { #{{{1
 	kill-player
@@ -159,30 +161,30 @@ function stop-song { #{{{1
 function docmd-restart { #{{{1
 	docmd-again
 	stop-song
-	please-START-another-song
+	return $please_START_another_song
 } #}}}1
 function docmd-stop { #{{{1
 	stop-song
 	move-played-to-history
-	DONT-start-another-song
+	return $DONT_start_another_song
 } #}}}1
 function docmd-skip { #{{{1
 	docmd-stop
-	please-START-another-song
+	return $please_START_another_song
 } #}}}1
 function docmd-played { #{{{1
 	[[ -s final ]]&& {
 		: >final
-		DONT-start-another-song
+		return $DONT_start_another_song
 	  }
 
-	please-START-another-song
+	return $please_START_another_song
 } #}}}1
 function docmd-paused { #{{{1
-	DONT-start-another-song
+	return $DONT_start_another_song
 } #}}}1
 function docmd-no-op { #{{{1
-	DONT-start-another-song
+	return $DONT_start_another_song
 } #}}}1
 function click-control { # {{{1
 	 >/dev/null 2>&1 (
@@ -208,7 +210,7 @@ function set-audiodevice { # {{{1
 } # }}}1
 function docmd-changed-audev { # {{{1
 	set-audiodevice "$(<audiodevice)"
-	DONT-start-another-song
+	return $DONT_start_another_song
 } # }}}1
 function is-valid-cmd { # {{{1
 	[[ $1 == @(played|paused|no-op|changed-audev) ]] || is-valid-amuse-cmd "$1"

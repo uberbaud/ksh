@@ -1,0 +1,90 @@
+^Bgot cherrypick^b
+
+    ^Bcherrypick^b ^[^T-lX^t^] ^Uc^u
+      (alias: cy)
+       Merge changes from a single commit into the work tree.  The
+       specified commit should be on a different branch than the work
+       tree's base commit.
+    
+       The expected argument is a commit ID, or a reference name or
+       keyword which will be resolved to a commit ID.  An abbreviated
+       hash argument will be expanded to a full commit ID
+       automatically, provided the abbreviation is unique.  The
+       keywords ":base" and ":head" resolve to the work tree's base
+       commit and branch head, respectively.  Keywords and references
+       may be appended with ":+" or ":-" modifiers and an optional
+       integer N to denote the Nth descendant or antecedent by first
+       parent traversal, respectively; for example, :head:-2 denotes
+       the work tree branch head's 2nd generation ancestor, and
+       :base:+4 denotes the 4th generation descendant of the work
+       tree's base commit.  Similarly, barbaz:+3 will denote the 3rd
+       generation descendant of the commit resolved by the "barbaz"
+       reference.  A ":+" or ":-" modifier without a trailing integer
+       has an implicit "1" appended (e.g., :base:+ is equivalent to
+       :base:+1).
+    
+       Show the status of each affected file, using the following
+       status codes:
+    
+       G      file was merged
+       C      file was merged and conflicts occurred during merge
+       !      changes destined for a missing file were not merged
+       D      file was deleted
+       d      file's deletion was prevented by local modifications
+       A      new file was added
+       ~      changes destined for a non-regular file were not merged
+       ?      changes destined for an unversioned file were not merged
+    
+       The merged changes will appear as local changes in the work
+       tree, which may be viewed with got diff, amended manually or
+       with further got cherrypick commands, committed with got
+       commit.
+    
+       If invoked in a work tree where no rebase, histedit, or merge
+       operation is taking place, got cherrypick creates a record of
+       commits which have been merged into the work tree.  When a file
+       changed by got cherrypick is committed with got commit, the log
+       messages of relevant merged commits will then appear in the
+       editor, where the messages should be further adjusted to convey
+       the reasons for cherrypicking the changes.  Upon exiting the
+       editor, if the time stamp of the log message file is unchanged
+       or the log message is empty, got commit will fail with an
+       unmodified or empty log message error.
+    
+       If all the changes in all files touched by a given commit are
+       discarded, e.g. with got revert, this commit's log message
+       record will also disappear.
+    
+       got cherrypick will refuse to run if certain preconditions are
+       not met.	 If the work tree contains multiple base commits, it
+       must first be updated to a single base commit with got update.
+       If any relevant files already contain merge conflicts, these
+       conflicts must be resolved first.
+    
+       The options for got cherrypick are as follows:
+    
+       -l      Display a list of commit log messages recorded by
+        cherrypick operations, represented by references in the
+        refs/got/worktree reference namespace.  If a commit
+        is specified, only show the log message of the
+        specified commit.
+    
+        If invoked in a work tree, only log messages recorded
+        by cherrypick operations in the current work tree will
+        be displayed.  Otherwise, all commit log messages will
+        be displayed irrespective of the work tree in which
+        they were created.  This option cannot be used with -X.
+    
+       -X      Delete log messages created by previous cherrypick
+        operations, represented by references in the
+        refs/got/worktree reference namespace.  If a commit
+        is specified, only delete the log message of the
+        specified commit.
+    
+        If invoked in a work tree, only log messages recorded
+        by cherrypick operations in the current work tree will
+        be deleted.  Otherwise, all commit log messages will be
+        deleted irrespective of the work tree in which they
+        were created.  This option cannot be used with -l.
+    
+    

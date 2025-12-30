@@ -1,0 +1,104 @@
+^Bgot merge^b
+
+    ^Bmerge^b ^Uc^u ^Uc^u ^Ur^u
+      (alias: mg)
+       Merge the specified branch into the current branch of the work
+       tree.  If the branches have diverged, merge changes into the
+       work tree and create a merge commit.  Otherwise, if the
+       specified branch is already based on the work tree's current
+       branch, make the work tree's current branch equivalent to the
+       specified branch and update files in the work tree accordingly.
+    
+       Merge commits are commits based on multiple parent commits.
+       The tip commit of the work tree's current branch will be used
+       as the first parent.  The tip commit of the specified branch
+       will be used as the second parent.  The work tree's current
+       branch must be in the refs/heads/ reference namespace and can
+       be set with got update -b before starting the merge operation.
+    
+       No ancestral relationship between the two branches is required.
+       If the two branches have already been merged previously, only
+       new changes will be merged.
+    
+       It is not possible to create merge commits with more than two
+       parents.	 If more than one branch needs to be merged, then
+       multiple merge commits with two parents each can be created in
+       sequence.
+    
+       If a linear project history is desired, then use of got rebase
+       should generally be preferred over got merge.  However, even
+       strictly linear projects may require occasional merge commits,
+       for example in order to merge in new versions of third-party
+       code stored on vendor branches created with got import.
+    
+       While merging changes found on the branch into the work tree,
+       show the status of each affected file, using the following
+       status codes:
+    
+       U      file was updated
+       G      file was merged
+       C      file was merged and conflicts occurred during merge
+       !      changes destined for a missing file were not merged
+       D      file was deleted
+       d      file's deletion was prevented by local modifications
+       A      new file was added
+       ~      changes destined for a non-regular file were not merged
+       ?      changes destined for an unversioned file were not merged
+    
+       If merge conflicts occur, the merge operation is interrupted
+       and conflicts must be resolved before the merge operation can
+       continue.  If any files with destined changes are found to be
+       missing or unversioned, or if files could not be deleted due to
+       differences in deleted content, the merge operation will be
+       interrupted to prevent potentially incomplete changes from
+       being committed to the repository without user intervention.
+       The work tree may be modified as desired and the merge can be
+       continued once the changes present in the work tree are
+       considered complete.  Alternatively, the merge operation may be
+       aborted which will leave the work tree's current branch
+       unmodified.
+    
+       got merge will refuse to run if certain preconditions are not
+       met.  If the work tree's current branch is not in the
+       refs/heads/ reference namespace then the work tree must first
+       be switched to a branch in the refs/heads/ namespace with got
+       update -b.  If the work tree is not yet fully updated to the
+       tip commit of its branch, then the work tree must first be
+       updated with got update.	 If the work tree contains multiple
+       base commits, it must first be updated to a single base commit
+       with got update.	 If changes have been staged with got stage,
+       these changes must first be committed with got commit or
+       unstaged with got unstage.  If the work tree contains local
+       changes, these changes must first be committed with got commit
+       or reverted with got revert.  If the branch contains changes to
+       files outside of the work tree's path prefix, the work tree
+       cannot be used to merge this branch.
+    
+       The got update, got commit, got rebase, got histedit, got
+       integrate, and got stage commands will refuse to run while a
+       merge operation is in progress.	Other commands which
+       manipulate the work tree may be used for conflict resolution
+       purposes.
+    
+       The options for got merge are as follows:
+    
+       -a      Abort an interrupted merge operation.  If this option
+        is used, no other command-line arguments are allowed.
+    
+       -C      Allow a merge operation to continue with files in
+        conflicted status.  This option should generally be
+        avoided, and can only be used with the -c option.
+    
+       -c      Continue an interrupted merge operation.	 If this
+        option is used, no other command-line arguments are
+        allowed except -C.
+    
+       -M      Create a merge commit even if the branches have not
+        diverged.
+    
+       -n      Merge changes into the work tree as usual but do not
+        create a merge commit immediately.  The merge result
+        can be adjusted as desired before a merge commit is
+        created with got merge -c.  Alternatively, the merge
+        may be aborted with got merge -a.
+    

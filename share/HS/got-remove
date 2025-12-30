@@ -1,0 +1,28 @@
+^Bgot remove^b
+
+    ^Bremove^b ^[^T-fkR^t^] ^[^T-s^t ^Ustatus-codes^u^] ^Upath^u ^S…^s
+      (alias: rm)
+       Remove versioned files from a work tree and schedule them for
+       deletion from the repository in the next commit.
+    
+       The options for got remove are as follows:
+    
+       -f      Perform the operation even if a file contains local
+        modifications, and do not raise an error if a specified
+        path does not exist on disk.
+    
+       -k      Keep affected files on disk.
+    
+       -R      Permit recursion into directories.  If this option is
+        not specified, got remove will refuse to run if a
+        specified path is a directory.
+    
+       -s status-codes
+        Only delete files with a modification status matching
+        one of the single-character status codes contained in
+        the status-codes argument.  The following status codes
+        may be specified:
+    
+        M      modified file (this implies the -f option)
+        !      versioned file expected on disk but missing
+    

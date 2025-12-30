@@ -1,0 +1,134 @@
+^Bgot clone^b
+
+    ^Bclone^b ^[^T-almqv^t^] ^[^T-b^t ^Ubranch^u^] ^[^T-i^t ^Uidentity-file^u^] ^[^T-J^t ^Ujumphost^u^] ^[^T-R^t ^Ureference^u^] ^Urepository-URL^u ^Uc^u ^Ur^u
+      (alias: cl)
+       Clone a Git repository at the specified repository-URL into the
+       specified directory.  If no directory is specified, the
+       directory name will be derived from the name of the cloned
+       repository.  got clone will refuse to run if the directory
+       already exists.
+    
+       The repository-URL specifies a protocol scheme, a server
+       hostname, an optional port number separated from the hostname
+       by a colon, and a path to the repository on the server:
+       scheme://hostname:port/path/to/repository
+    
+       The following protocol schemes are supported:
+    
+       git    The Git protocol as implemented by the git-daemon(1)
+       server.  Use of this protocol is discouraged since it
+       supports neither authentication nor encryption.
+    
+       ssh    The Git protocol wrapped in an authenticated and
+       encrypted ssh(1) tunnel.	With this protocol the
+       hostname may contain an embedded username for ssh(1) to
+       use: user@hostname
+    
+       http   The smart Git HTTP protocol.  Not compatible with
+       servers using the dumb Git HTTP protocol.
+    
+       The smart Git HTTP protocol is supported by got clone
+       and got fetch, but not by got send.  Sending from a
+       repository cloned over HTTP will require use of a send
+       block in got.conf(5) to ensure that the ssh://
+       protocol will be used by got send.
+    
+       Use of this protocol is discouraged since it supports
+       neither authentication nor encryption.
+    
+       https  The smart Git HTTP protocol wrapped in SSL/TLS.
+    
+       Objects in the cloned repository are stored in a pack file
+       which is downloaded from the server.  This pack file will then
+       be indexed to facilitate access to the objects stored within.
+       If any objects in the pack file are stored in deltified form,
+       all deltas will be fully resolved in order to compute the ID of
+       such objects.  This can take some time.	More details about the
+       pack file format are documented in git-repository(5).
+    
+       got clone creates a remote repository entry in the got.conf(5)
+       and config files of the cloned repository to store the
+       repository-url and any branch or reference arguments for future
+       use by got fetch or git-fetch(1).
+    
+       The options for got clone are as follows:
+    
+       -a      Fetch all branches from the remote repository's
+        refs/heads/ reference namespace and set
+        fetch_all_branches in the cloned repository's
+        got.conf(5) file for future use by got fetch.  If this
+        option is not specified, a branch resolved via the
+        remote repository's HEAD reference will be fetched.
+        Cannot be used together with the -b option.
+    
+       -b branch
+        Fetch the specified branch from the remote repository's
+        refs/heads/ reference namespace.	 This option may be
+        specified multiple times to build a list of branches to
+        fetch.  If the branch corresponding to the remote
+        repository's HEAD reference is not in this list, the
+        cloned repository's HEAD reference will be set to the
+        first branch which was fetched.	If this option is not
+        specified, a branch resolved via the remote
+        repository's HEAD reference will be fetched.  Cannot be
+        used together with the -a option.
+    
+       -i identity-file
+        Specify an identity-file, containing a private SSH key,
+        to use with SSH connections.  The same option will be
+        passed to ssh(1).
+    
+       -J jumphost
+        Specify a jumphost to use with SSH connections.	The
+        same option will be passed to ssh(1).
+    
+       -l      List branches and tags available for fetching from the
+        remote repository and exit immediately.	Cannot be used
+        together with any of the other options except -q and
+        -v.
+    
+       -m      Create the cloned repository as a mirror of the
+        original repository.  This is useful if the cloned
+        repository will not be used to store locally created
+        commits.
+    
+        The repository's got.conf(5) and config files will be
+        set up with the mirror option enabled, such that got
+        fetch or git-fetch(1) will write incoming changes
+        directly to branches in the refs/heads/ reference
+        namespace, rather than to branches in the
+        refs/remotes/ namespace.	 This avoids the usual
+        requirement of having to run got rebase or got merge
+        after got fetch in order to make incoming changes
+        appear on branches in the refs/heads/ namespace.	 But
+        maintaining custom changes in the cloned repository
+        becomes difficult since such changes will be at risk of
+        being discarded whenever incoming changes are fetched.
+    
+       -q      Suppress progress reporting output.  The same option
+        will be passed to ssh(1) if applicable.
+    
+       -R reference
+        In addition to the branches and tags that will be
+        fetched, fetch an arbitrary reference from the remote
+        repository's refs/ namespace.  This option may be
+        specified multiple times to build a list of additional
+        references to fetch.  The specified reference may
+        either be a path to a specific reference, or a
+        reference namespace which will cause all references in
+        this namespace to be fetched.
+    
+        Each reference will be mapped into the cloned
+        repository's refs/remotes/ namespace, unless the -m
+        option is used to mirror references directly into the
+        cloned repository's refs/ namespace.
+    
+        got clone will refuse to fetch references from the
+        remote repository's refs/remotes/ or refs/got/
+        namespace.
+    
+       -v      Verbose mode.  Causes got clone to print debugging
+        messages to standard error output.  This option will be
+        passed to ssh(1) if applicable.	Multiple -v options
+        increase the verbosity.	The maximum is 3.
+    

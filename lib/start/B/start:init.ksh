@@ -174,7 +174,7 @@ function create-app-user { # {{{1
 } # }}}1
 function update-doas-conf { # {{{1'
 	local D A a B
-	D="permit nopass setenv { $KEEPENVS } $USRNAME as $APP cmd $STARTER_BIN"
+	D="permit nopass setenv { $KEEPENVS } $USRNAME as $APP"
 	egrep -q "^$D\$" /etc/doas.conf && return
 
 	hold_initialize doas.conf

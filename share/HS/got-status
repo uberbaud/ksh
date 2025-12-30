@@ -1,0 +1,62 @@
+^Bgot status^b
+
+    ^Bstatus^b ^[^T-I^t^] ^[^T-S^t ^Ustatus-codes^u^] ^[^T-s^t ^Ustatus-codes^u^] ^[^Upath^u ^S…^s^]
+      (alias: st)
+       Show the current modification status of files in a work tree,
+       using the following status codes:
+    
+       M      modified file
+       A      file scheduled for addition in next commit
+       D      file scheduled for deletion in next commit
+       C      modified or added file which contains merge conflicts
+       !      versioned file was expected on disk but is missing
+       ~      versioned file is obstructed by a non-regular file
+       ?      unversioned item not tracked by got
+       m      modified file modes (executable bit only)
+       N      non-existent path specified on the command line
+    
+       If no path is specified, show modifications in the entire work
+       tree.  Otherwise, show modifications at or within the specified
+       paths.
+    
+       If changes have been staged with got stage, staged changes are
+       shown in the second output column, using the following status
+       codes:
+    
+       M      file modification is staged
+       A      file addition is staged
+       D      file deletion is staged
+    
+       Changes created on top of staged changes are indicated in the
+       first column:
+    
+       MM     file was modified after earlier changes have been staged
+       MA     file was modified after having been staged for addition
+    
+       If the work tree contains the results of an interrupted got
+       rebase, got histedit, or got merge operation then display a
+       message which shows the branches involved.
+    
+       The options for got status are as follows:
+    
+       -I      Show unversioned files even if they match an ignore
+        pattern.	 See Ignore Patterns.
+    
+       -S status-codes
+        Suppress the output of files with a modification status
+        matching any of the single-character status codes
+        contained in the status-codes argument.	Any
+        combination of codes from the above list of possible
+        status codes may be specified.  For staged files,
+        status codes displayed in either column will be
+        matched.	 Cannot be used together with the -s option.
+    
+       -s status-codes
+        Only show files with a modification status matching any
+        of the single-character status codes contained in the
+        status-codes argument.  Any combination of codes from
+        the above list of possible status codes may be
+        specified.  For staged files, status codes displayed in
+        either column will be matched.  Cannot be used together
+        with the -S option.
+    

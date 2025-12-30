@@ -70,12 +70,12 @@ function main { # {{{1
 	for i in 8 9 21 51 52 53; do
 		printf "$FMT" $i $i "${a[i]}"
 	done
-	FMT=' %3d: \e[4;%d;5;12m %-10s \e[0m\n'
+	FMT=' %3d: \e[4:3;%d:5:12m %-10s \e[0m\n'
 	i=58
 	printf "$FMT" $i $i "${a[i]}"
 	# ========================================== end show attributes ===
-
-	print '  \033[47;30m   Note: E[8m is hidden text\033[0m'
+	FMT='                     '
+	print "$FMT"'\033[48;5;240;38;5;246m Note: E[8m is hidden text\033[0m'
 } #}}}1
 
 main "$@"; exit

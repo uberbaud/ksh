@@ -33,14 +33,23 @@ function pkg {
 		update|upgrade)
 			as-root pkg_add -u "$@";									;;
 		web|www)
-			warn "Use ^Tdesc^t or ^Tinfo^t sub-command.";					;;
+			warn "Use ^Tdesc^t or ^Tinfo^t sub-command.";				;;
 		desc|info)
 			needs w3m
-			typeset f u h F
+			typeset f u h F P noglob=false
+			needs-cd -or-die "$pkghome"/html
+			[[ $- == *f* ]]&& noglob=true
+			set +f
+			set -A h -- x
+			unset h[0]
 			for f in "$@"; do
-				for F in $pkghome/html/$f*; { h[${#h[*]}]="$F"; }
+				[[ $f != *\* ]]&& f="$f"'?(-+([!-]))'.html
+				set -A h -- "${h[@]}" $f
 			done
-			for u in "${h[@]}"; { w3m "$u"; }
+			eval set -- ${h[@]}
+			for u { w3m "$u"; }
+			$noglob && set -f
+			cd "$OLDPWD"
 			;;
 		grep|query)
 			local casen=true

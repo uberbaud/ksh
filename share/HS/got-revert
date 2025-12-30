@@ -1,0 +1,33 @@
+^Bgot revert^b
+
+    ^Brevert^b ^Up^u ^[^T-F^t ^Uresponse-script^u^] ^Upath^u ^S…^s
+      (alias: rv)
+       Revert any local changes in files at the specified paths in a
+       work tree.  File contents will be overwritten with those
+       contained in the work tree's base commit.  There is no way to
+       bring discarded changes back after got revert!
+    
+       If a file was added with got add, it will become an unversioned
+       file again.  If a file was deleted with got remove, it will be
+       restored.
+    
+       The options for got revert are as follows:
+    
+       -F response-script
+        With the -p option, read y, n, and q responses
+        line-by-line from the specified response-script file
+        instead of prompting interactively.
+    
+       -p      Instead of reverting all changes in files,
+        interactively select or reject changes to revert based
+        on y (revert change), n (keep change), and q
+        (quit reverting this file) responses.  If a file is in
+        modified status, individual patches derived from the
+        modified file content can be reverted.  Files in added
+        or deleted status may only be reverted in their
+        entirety.
+    
+       -R      Permit recursion into directories.  If this option is
+        not specified, got revert will refuse to run if a
+        specified path is a directory.
+    

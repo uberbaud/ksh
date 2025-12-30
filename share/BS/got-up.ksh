@@ -10,8 +10,7 @@ TAG_OR_BRANCH=
 # Usage {{{1
 this_pgm=${0##*/}
 function usage {
-	desparkle "$this_pgm"
-	PGM=$REPLY
+	desparkle "$this_pgm" PGM
 	sparkle >&2 <<-\
 	===SPARKLE===
 	^F{4}Usage^f: ^T$PGM^t ^[^T-f^t^] ^[^T-n^t ^Uref name^u^]

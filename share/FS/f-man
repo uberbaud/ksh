@@ -6,8 +6,14 @@
 
 needs in-new-term
 function f-man {
-	if [[ -t 1 ]]; then
+	local			newterm=false	# default
+	[[ -t 1 ]]&&	newterm=true	# stdout is tty
+	[[ ' '$* == *' '-*([alw])[cfhk]*([acfhklwCMmSs])' '* ]]&&
+					newterm=false	# flag no-pager
+	if $newterm; then
 		\in-new-term command man "$@"
+	elif [[ ' '$* == *' '-*([acfklw])h*([acfklwCMmSs])' '* ]]; then
+		command man "$@" | ul
 	else
 		command man "$@"
 	fi

@@ -50,6 +50,7 @@ export MMH=$xdgcfg/mmh
 MMH_BIN_PATH=/usr/local/mmh/bin
 
 # misc
+export BOOKSHELF=$HOME/docs/bookshelf
 export CALENDAR_DIR=$xdgcfg/calendar
 export CVSROOT='anoncvs@anoncvs4.usa.openbsd.org:/cvs'
 export GNUPGHOME=$xdgdata/gnupg

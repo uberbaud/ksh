@@ -10,7 +10,9 @@ FETCHMAIL_APP_ID=0
 FETCHMAIL_ID_FILE=$CFGDIR/fetchids
 FETCHMAIL_RC_DIR=$CFGDIR/fetchmail
 FETCHMAIL_SKIP_DIR=$FETCHMAIL_RC_DIR/SKIP
+# MMH:
 FETCHMAIL_MDA_CMD='/usr/local/mmh/bin/rcvstore +inbox'
+# NMH: FETCHMAIL_MDA_CMD='/usr/local/libexec/nmh/rcvstore +inbox'
 S_INCLUDE=0
 S_IGNORE=1
 

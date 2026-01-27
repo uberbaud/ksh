@@ -38,8 +38,6 @@ shift $((OPTIND-1))
 
 (($#))|| die 'Missing required parameter ^Umatch^u.'
 
-needs dialog
-
 [[ -f TODO ]]|| die 'No ^STODO^s file.'
 NL='
 ' # ^ capture the newline

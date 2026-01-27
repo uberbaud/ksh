@@ -47,7 +47,7 @@ function get-header-assignments { # {{{1
 dryrun=false
 [[ ${1:-} == -h ]]&& usage
 
-needs needs-file header-line needs-cd
+needs needs-file header-line needs-cd mk-watchlst
 
 ERR_MISSING_SRC='Missing required parameter ^Uc source^u.'
 (($#))||	die "$ERR_MISSING_SRC"
@@ -102,11 +102,14 @@ if $dryrun; then
 	hhhSource=$(header-line 67 ═ ╡ ╞ "$hhhSource ")
 	hhhStandard=$(header-line 67 ═ ╡ ╞ "$hhhStandard ")
 elif ((mkopt_count)); then
-	set $MAKE -f - "${mkopts[@]}" "$target"
+	set $MAKE -f - "${mkopts[@]}" all
 else
-	set $MAKE -f - "$target"
+	set $MAKE -f - all
 fi
 
+
+# STORE TAB IN VAR $T SO <<- WON'T SKIP IT
+T='	'
 # Well then, do it.
 "$@" <<- ───────────
 	#${hhhSource-}
@@ -131,6 +134,22 @@ fi
 	CFLAGS      +:= \$(PKG_CFLAGS)
 	LDFLAGS     +:= \$(PKG_LDFLAGS)
 	.endif
+
+	WATCHDIR    = \$(.CURDIR)/watch
+	SRC_DEPS  !!= egrep -v '^.*\.o\$\$' '\$(WATCHDIR)/$target.wlst'
+
+	all: watchfiles $target
+
+	watchfiles:
+	$T@CFLAGS='\$(CFLAGS)' mk-watchlst \$(.CURDIR)/$target.c \$(OBJS)
+
+	$target.o: \$(SRC_DEPS)
+	$T@\$(CC) \$(CFLAGS) -o $target.o -c \$(.CURDIR)/$target.c
+
+	$target: $target.o \$(OBJS)
+	$T@\$(CC) \$(CFLAGS) -o $target $target.o \$(LDFLAGS) \$(LDLIBS)
+
+	.PHONY: all watchfiles
 ───────────
 
 # Copyright (C) 2022 by Tom Davis <tom@greyshirt.net>.

@@ -123,8 +123,24 @@ function make+run { # {{{1
 	fi
 } # }}}1
 function clear-screen { print -u2 '\033[H\033[2J\033[3J\033[H\c'; }
+function do-watch { # {{{1
+	local uuid short
+
+	if [[ -s $fWATCH_LST ]]; then
+		set -- $(<$fWATCH_LST)
+	else
+		# use full path because make may be working from elsewhere
+		set -- $(realpath "$CFILE") ||
+			die "Could not ^Trealpath^t ^B$CFILE^b."
+	fi
+
+	short=
+	for f { short=${short:+$short }${f##*/}; }
+	h2 "watching: $short"
+	CHANGED=$(watch-file -i "$UUID" -v "$@")
+} # }}}1
 function loop { #{{{1
-	local cksum_previous cksum_current UUID
+	local cksum_previous cksum_current UUID watch_files
 
 	needs cat-to-file fuddle shquote subst-pathvars
 	needs pkill setsid uuid watch-file
@@ -135,20 +151,24 @@ function loop { #{{{1
 	$DOEDIT && (edit-c-file "$CFILE" &)
 	cksum_previous=unedited
 	h3 "$prnPathName / $UUID"
-	while watch-file -i "$UUID" "$CFILE" 2>/dev/null; do
+
+	while do-watch; do
 		[[ -f $CFILE ]]|| break
-		cksum_current=$(cksum "$CFILE")
-		[[ $cksum_current == $cksum_previous ]]&& clear-screen
+		[[ ${CHANGED##*/} == $CFILE ]]&& {
+			# clear on unchanged only if changed file is CFILE
+			cksum_current=$(cksum "$CFILE")
+			[[ $cksum_current == $cksum_previous ]]&& clear-screen
+			cksum_previous=$cksum_current
+		  }
 		# date is outside quotes to eliminate extra spaces
 		h3 "$prnPathName" / $(date +'%H:%M on %A, %B %e') / "$UUID"
 		make+run "$@"
-		cksum_previous=$cksum_current
 	done
 } #}}}1
 
 (($#))|| die 'Missing required argument ^Usrc^u.'
 
-needs h3 needs-cd rlwrap
+needs h3 needs-cd rlwrap needs-path
 
 # HANDLE VERBOSITY
 typeset -l verbose=${VERBOSE:-false}
@@ -168,6 +188,11 @@ filename=$1; shift
 
 EXE=${filename%.c}
 CFILE=$EXE.c
+fWATCH_LST=$EXE.wlst
+[[ -d watch ]]&& fWATCH_LST=watch/$fWATCH_LST
+touch "$fWATCH_LST"
+fWATCH_LST=$(realpath $fWATCH_LST) ||
+	die "Could not create ^B$fWATCH_LST^b."
 
 $MAIN "$@"; exit
 

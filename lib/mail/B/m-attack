@@ -8,6 +8,7 @@ CONTMSG='Press any key to continue.'
 DEFAULT_FLDR=inbox
 DEFAULT_SEQ='¬L'	# NOT messages in groups
 fERRs=.attack.out
+all=all	# mmh uses a
 
 # Usage {{{1
 this_pgm=${0##*/}
@@ -154,7 +155,7 @@ function main { # {{{1
 		((xtrarows+=5)) # Add the height used by show-msg-info
 	done
 
-	mark +$FLDR -sequence MSGs -delete a
+	mark +$FLDR -sequence MSGs -delete $all
 } # }}}1
 
 needs use-app-paths 
@@ -166,7 +167,7 @@ needs egrep fold forceline m-part mhstore pick press-any-key scan show tee mark
 
 if [[ $# -gt 0 && $1 == +* ]]; then
 	FLDR=${1#+}; shift
-	(($#))|| set -- a
+	(($#))|| set -- $all
 elif (($#)); then
 	FLDR=$DEFAULT_FLDR
 else
@@ -174,7 +175,7 @@ else
 	if pick +$FLDR $DEFAULT_SEQ:f >/dev/null 2>&1; then
 		set -- "$DEFAULT_SEQ"
 	else
-		set -- a
+		set -- $all
 	fi
 fi
 

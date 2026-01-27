@@ -101,13 +101,13 @@ function simplify-disklabel { # {{{1
 		/^$/			{printname()}
 		/^  [abd-p]:/	{print $1,$4}
 		==AWKPGM==
-	as-root disklabel -P "$dev" | awk "$awkpgm"
+	as-root disklabel "$dev" | awk "$awkpgm"
 } # }}}1
 function mnt-drv { # {{{1
 	local dev diskinfo fstype id label namefile newlabel part
-	desparkle "$d"
-	notify "Trying to mount ^B$REPLY^b."
 	dev=$1
+	desparkle "$dev" dDev
+	notify "Trying to mount ^B$dDev^b."
 	id=${2:-}
 	splitstr NL "$(simplify-disklabel)" diskinfo
 	label=${diskinfo[0]}
@@ -183,7 +183,7 @@ function hd-devs-in-use { # {{{1
 		===AWKPGM===
 	df -P | awk "$awkpgm"
 } # }}}1
-function get-unmounted-devices { # {{{1
+function list-unmounted-devices { # {{{1
 	splitstr , "$(sysctl -n hw.disknames)" disknames list
 	set -A InUse -- $(hd-devs-in-use)
 	for d in "${disknames[@]}"; do
@@ -191,6 +191,16 @@ function get-unmounted-devices { # {{{1
 		list=${list:+"$list "}$d
 	done
 	print -n -- "${list:-}"
+} # }}}1
+function ensure-dev-name-is-valid { # {{{1
+	local want dev duid drvstr
+	want=$1
+	for drvstr in ${drives[*]:+"${drives[@]}"}; do
+		dev=${drvstr%:*}
+		duid=${drvstr#$dev}; duid=${drvstr#:} # in two in case no :duid
+		[[ $want == $dev || $want == $duid ]]&& return
+	done
+	false
 } # }}}1
 function main { # {{{1
 	local O device plist mnt_name
@@ -202,7 +212,10 @@ function main { # {{{1
 	# for all given (if any) OR for all unmounted (if none given)
 	for O; do
 		device=${O%%[:/]*}
-		ensure-dev-name-is-valid "$device"
+		ensure-dev-name-is-valid "$device" || {
+			warn "Did not find mountable drive ^B$device^b"
+			continue
+		  }
 		O=${O#"$device"}
 		[[ $O == :* ]]&& {
 			O=${O#:}

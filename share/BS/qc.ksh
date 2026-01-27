@@ -48,13 +48,15 @@ shift $((OPTIND-1))
 # ready to process non '-' prefixed arguments
 # /options }}}1
 function write-file { #{{{1
-	local o objs OBJS
+	local o objs OBJS PREF1 PREFN
 	objs=$OBJDIR/*.o
 	[[ $objs == $OBJDIR/\*.o ]]|| for o in $objs; do
 		OBJS=${OBJS:+"$OBJS "}${o##*/}
 	done
 	subst-pathvars $CURDIR CURDIR
 	subst-pathvars $OBJDIR OBJDIR
+	PREF1='sparkle("^Nsynopsis^n^| ")'
+	PREFN='sparkle("        ^| ")'
 	cat <<-===
 		/* ----------------------------------------------------------------------
 		 | $(mk-stemma-header)
@@ -66,13 +68,14 @@ function write-file { #{{{1
 		 |  and \$LDFLAGS and \$CFLAGS will be appended with that output.
 		 |     Files named in \$OBJS and found in \$OPATH will be added to \$LDLIBS.
 		 + ----------------------------------------------------------------------
-		    # CC       = include-what-you-use
+			# CC       = include-what-you-use
 		    # SRCPATH  = ${CURDIR:-}
 		    # OPATH    = ${OBJDIR:-}
 		    # OBJS     = ${OBJS:-my.o}
-		    # ^equivalent to: LDLIBS   += \$OPATH/my.o
+			# ^added to LDLIBS as \$OPATH/my.o
 		    PACKAGES = notify_usr${*+ $*}
-		    CFLAGS  += -std=c17 -Wno-unsafe-buffer-usage -Wno-pre-c11-compat
+		    ALLOW    = pre-c23-compat pre-c11-compat unsafe-buffer-usage vla
+		    CFLAGS  += -std=c23 \$(ALLOW:S/^/-Wno-/)
 		 + -------------------------------------------------------------------- */
 
 		#include <notify_usr.h> /* sparkle(),message(),inform(),caution(),die() */
@@ -84,6 +87,10 @@ function write-file { #{{{1
 		#include <stdio.h>
 		#pragma clang diagnostic pop
 
+		#define SYNOPSIS \\
+		  "Purpose of ^T" __FILE__ "^t."
+		static void synop(void) { message($PREF1,$PREFN,SYNOPSIS); }
+
 		int
 		main(void)
 		{
@@ -92,6 +99,8 @@ function write-file { #{{{1
 		        off_t           size;
 		        unsigned char  *p;
 		    } x;
+
+		    synop();
 
 		    inform( "sizeof(^Vx^v): ^B%lu^b\n", sizeof(x) );
 

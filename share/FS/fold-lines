@@ -1,0 +1,17 @@
+# <@(#)tag:tw.lukas.uberbaud.foo,2026-01-08,18.25.01z/3461934>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+#---------------------------------------------------------------------------
+#: FUNCTION ^G(no arguments)^g
+#:   Fold lines on ^Istdin^i according to COLUMNS, indenting folded 
+#:   parts with four (4) spaces.
+
+function fold-lines {
+	local c mark indent unmark
+	c=${COLUMNS:-78}
+	mark='s/^/@/'			# mark line beginnings with a '@'
+	indent='/^@/!s/^/    /'	# indent unmarked
+	unmark='s/^@//'			# remove mark
+    sed "$mark" | fold -sw$((c-4)) | sed -Ee "$indent" -e "$unmark"
+}
+
+# Copyright © 2026 by Tom Davis <tom@greyshirt.net>.

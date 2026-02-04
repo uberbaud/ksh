@@ -4,14 +4,23 @@
 
 set -o nounset;: ${FPATH:?Run from within KSH}
 
+fDEP=.depend
+fSRC=
+fOUT=
 # Usage {{{1
 this_pgm=${0##*/}
 function usage {
 	desparkle "$this_pgm" PGM
 	sparkle >&2 <<-\
 	===SPARKLE===
-	^F{4}Usage^f: ^T$PGM^t
-	         Create a ^Tfuddle^t watch list.
+	^F{4}Usage^f: ^T$PGM^t ^[^T-n^t^|^T-d^t ^UdepFile^u^] ^[^T-w^t ^Uwatchlist^u^] ^T-s^t ^Usource^u ^[^UdepObjs^u ^S…^s^]
+	         Create a ^Tbuild-and-run^t watch list using the output of ^Tmkdep^t
+	         and the ^UdepObjs^u given on the command line.
+	           ^T-d^t ^UdepFile^u    Dependency file for ^Tmake^t, defaults to ^T.depend^t.
+	           ^T-n^t            Do ^BNOT^b write a dependency file.
+	           ^T-s^t ^Usource^u     The ^BC^b file to process.
+	           ^T-w^t ^Uwatchlist^u  The output file.
+	         ^GNote: Does not run^g ^Tmkdep^t^G.^g
 	       ^T$PGM -h^t
 	         Show this help message.
 	===SPARKLE===
@@ -19,9 +28,13 @@ function usage {
 } # }}}
 # process -options {{{1
 verbose=false
-while getopts ':hv' Option; do
+wantdep=true
+while getopts ':dn:s:w:h' Option; do
 	case $Option in
-		v)	verbose=true;													;;
+		d)	fDEP=$OPTARG;													;;
+		n)	wantdep=false;													;;
+		s)	fSRC=$OPTARG;													;;
+		w)	fOUT=$OPTARG;													;;
 		h)	usage;															;;
 		\?)	die USAGE "Invalid option: ^B-$OPTARG^b.";						;;
 		\:)	die USAGE "Option ^B-$OPTARG^b requires an argument.";			;;
@@ -33,39 +46,30 @@ shift $((OPTIND-1))
 # ready to process non '-' prefixed arguments
 # /options }}}1
 function main { # {{{1
-	$verbose && {
-		local dOUT
-		desparkle "$fOUT" dOUT
-		notify "fOUT ^= ^B$dOUT^b"
-	  }
-	mkdep -f "$fOUT" $CFLAGS -MM "$TARGET"
-	set -- $(<$fOUT) "$@"
-	for o; do
-		[[ $o == '\' ]]&& continue
-		[[ ${o%:} == $BASE.o ]]&& continue
-		print -r -- "${o%:}"
-	done | sort | uniq >$fOUT
+	local o obj d deps
+	exec 3>$fOUT
+	$wantdep && exec 4>$fDEP
+	# get the .o target to match against
+	fOBJ=${fSRC##*/}; fOBJ=${fOBJ%.c}.o
+	$CC ${CFLAGS:-} -MM -w $fSRC | while IFS=":$IFS" read obj deps; do
+		$wantdep && print -ru4 -- "$obj: $deps"
+		[[ $obj == $fOBJ ]]&& for d in $deps; do
+			print -ru3 -- "$d"
+		done
+	done
+	# print the other object files
+	for o { print -ru3 -- "$d"; }
+	exec 3>&-
+	$wantdep && exec 4>&-
 } #}}}1
 
-needs needs-file mkdep
+needs needs-file ${CC:=cc}
 
-(($#))|| die "Missing required parameter ^Utarget^u."
-TARGET=$1;	shift
-needs-file -or-die "$TARGET"
+[[ -n $fSRC ]]|| die "Missing required ^T-t^t parameter."
 
-[[ $TARGET == *.c ]]|| die "Expected target to be ^BC^b ^Isource code^i file."
+[[ -n $fOUT ]]|| fOUT=${fSRC%.c}.wlst
+touch "$fOUT" || die "Could not access ^B$fOUT^b."
 
-OUT=$(realpath "$TARGET")
-BASE=${OUT##*/}; BASE=${BASE%.c}
-pOUT=${OUT%/*}
-OUT=${OUT#$pOUT}; OUT=${OUT#/}
-fOUT=${OUT%.c}.wlst
-if [[ -d $pOUT/watch ]]; then
-	fOUT=$pOUT/watch/$fOUT
-else
-	fOUT=$pOUT/$fOUT
-fi
 
 main "$@"; exit
-
 # Copyright (C) 2026 by Tom Davis <tom@greyshirt.net>.

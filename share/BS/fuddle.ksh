@@ -5,6 +5,7 @@
 set -o nounset;: ${FPATH:?Run from within KSH}
 
 MAKE=/usr/bin/make
+watchdir=w
 
 WarnLevel=${WARN_LEVEL:-everything}
 # Usage {{{1
@@ -102,11 +103,12 @@ if $dryrun; then
 	hhhSource=$(header-line 67 ═ ╡ ╞ "$hhhSource ")
 	hhhStandard=$(header-line 67 ═ ╡ ╞ "$hhhStandard ")
 elif ((mkopt_count)); then
-	set $MAKE -f - "${mkopts[@]}" all
+	set $MAKE -f - "${mkopts[@]}"
 else
-	set $MAKE -f - all
+	set $MAKE -f -
 fi
 
+needs-path -create -or-die $watchdir
 
 # STORE TAB IN VAR $T SO <<- WON'T SKIP IT
 T='	'
@@ -135,21 +137,19 @@ T='	'
 	LDFLAGS     +:= \$(PKG_LDFLAGS)
 	.endif
 
-	WATCHDIR    = \$(.CURDIR)/watch
-	SRC_DEPS  !!= egrep -v '^.*\.o\$\$' '\$(WATCHDIR)/$target.wlst'
-
-	all: watchfiles $target
-
-	watchfiles:
-	$T@CFLAGS='\$(CFLAGS)' mk-watchlst \$(.CURDIR)/$target.c \$(OBJS)
-
-	$target.o: \$(SRC_DEPS)
-	$T@\$(CC) \$(CFLAGS) -o $target.o -c \$(.CURDIR)/$target.c
+	WLST = \$(.CURDIR)/${WATCHDIR:-w}/$target.wlst
+	SRC  = \$(.CURDIR)/$target.c
 
 	$target: $target.o \$(OBJS)
 	$T@\$(CC) \$(CFLAGS) -o $target $target.o \$(LDFLAGS) \$(LDLIBS)
 
-	.PHONY: all watchfiles
+	$target.o:
+	$T@\$(CC) \$(CFLAGS) -o $target.o -c \$(SRC)
+
+	watchlist: 
+	$T@CFLAGS='\$(CFLAGS)' mk-watchlst -w \$(WLST) -s \$(SRC) \$(OBJS)
+
+	.PHONY: watchlist
 ───────────
 
 # Copyright (C) 2022 by Tom Davis <tom@greyshirt.net>.

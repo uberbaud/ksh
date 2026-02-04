@@ -98,7 +98,7 @@ function main { # {{{1
 	WORKTREE_PATH=$PWD/$newdir
 	[[ -d $WORKTREE_PATH ]]|| {
 		needs-path -create -or-die "$WORKTREE_PATH"
-		shquote "$WORKTREE_PATH"
+		sparkle-path "$WORKTREE_PATH"
 		+remove_on_die "rmdir $REPLY"
 	  }
 
@@ -109,7 +109,7 @@ function main { # {{{1
 	repo_base=${REPOSITORY_PATH%/*}
 	[[ -d $repo_base ]]|| {
 		needs-path -create -or-die "$repo_base"
-		shquote "$repo_base"
+		sparkle-path "$repo_base"
 		+remove_on_die "rmdir $REPLY"
 	  }
 
@@ -118,7 +118,7 @@ function main { # {{{1
 	R=${R##*/}
 	do-git-clone-or-update "$repo" "$R" >&2 ||
 		die "^Tgit clone --bare^t ^B$repo^b"
-	shquote "$REPOSITORY_PATH"
+	sparkle-path "$REPOSITORY_PATH"
 	+remove_on_die "rm -rf $REPLY"
 
 	needs-cd -or-die "$R"
@@ -168,7 +168,6 @@ elif [[ $1 == ?(+([!:/@])@)+(+([A-Za-z0-9-]).)+([A-Za-z0-9-]):* ]]; then
 	warn "Converting ^Brepo^b from ^Bscp^b format to ^Bssh^b schema:"	\
 		"$1"	\
 		"$repo"
-	yes-or-no 'Is the new repo name correct' || die "Try again."
 else
 	die "Parameter does not appear to be a REPOSITORY_PATH name."
 fi

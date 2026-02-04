@@ -88,8 +88,10 @@ function write-file { #{{{1
 		#pragma clang diagnostic pop
 
 		#define SYNOPSIS \\
-		  "Purpose of ^T" __FILE__ "^t."
-		static void synop(void) { message($PREF1,$PREFN,SYNOPSIS); }
+		  "Purpose of ^T" __FILE_NAME__ "^t."
+		#define PREF1 $PREF1
+		#define PREFN $PREFN
+		static void synop(void) { message(PREF1,PREFN,SYNOPSIS); }
 
 		int
 		main(void)

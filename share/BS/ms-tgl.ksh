@@ -28,13 +28,13 @@ function is-mouse-enabled { # {{{1
 	(($1))
 } # }}}
 function park-mouse { # {{{1
-	local IFS=x
-	set -- $(xrandr | awk '/\*/ {print $1;nextfile}')
-	xdotool mousemove ${1:-0} ${2:-0}
+	local WIDTH HEIGHT
+	eval $(xdotool getdisplaygeometry --shell)
+	xdotool mousemove ${WIDTH:-0} ${HEIGHT:-0}
 } # }}}1
 (($#))&& usage;
 
-needs awk xdotool xinput xrandr
+needs awk xdotool xinput
 
 if is-mouse-enabled; then
 	do_thing=disable

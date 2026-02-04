@@ -8,7 +8,7 @@ CONTMSG='Press any key to continue.'
 DEFAULT_FLDR=inbox
 DEFAULT_SEQ='¬L'	# NOT messages in groups
 fERRs=.attack.out
-all=all	# mmh uses a
+all=a	# mmh uses a, nmh uses all
 
 # Usage {{{1
 this_pgm=${0##*/}

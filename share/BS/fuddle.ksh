@@ -5,7 +5,6 @@
 set -o nounset;: ${FPATH:?Run from within KSH}
 
 MAKE=/usr/bin/make
-watchdir=w
 
 WarnLevel=${WARN_LEVEL:-everything}
 # Usage {{{1
@@ -108,7 +107,7 @@ else
 	set $MAKE -f -
 fi
 
-needs-path -create -or-die $watchdir
+needs-path -create -or-die ${WATCHDIR:=w}
 
 # STORE TAB IN VAR $T SO <<- WON'T SKIP IT
 T='	'
@@ -137,7 +136,7 @@ T='	'
 	LDFLAGS     +:= \$(PKG_LDFLAGS)
 	.endif
 
-	WLST = \$(.CURDIR)/${WATCHDIR:-w}/$target.wlst
+	WLST = \$(.CURDIR)/$WATCHDIR/$target.wlst
 	SRC  = \$(.CURDIR)/$target.c
 
 	$target: $target.o \$(OBJS)

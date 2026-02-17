@@ -380,7 +380,7 @@ function write-fetch-rc { # {{{1
 		     port     $port
 		     username '$usr'
 		     password '$pwd'
-		$(for o in $fopts; do print "     $o"; done)
+		$(for o in $fopts; do print "     $o"; done | sed -Ee '/=/s// /')
 		     mda      "$FETCHMAIL_MDA_CMD"
 		===
 

@@ -277,14 +277,14 @@ export PAGER=/usr/bin/less
 #		sort -nr						|
 #		head -n 1
 #  )
-export AUTOCONF_VERSION=2.71
+export AUTOCONF_VERSION=2.72
 #export AUTOMAKE_VERSION=$(
 #	/bin/ls /usr/local/bin/automake-*	|
 #		awk -F- '{print $NF}'			|
 #		sort -nr						|
 #		head -n 1
 #)
-export AUTOMAKE_VERSION=1.16
+export AUTOMAKE_VERSION=1.18
 # misc
 export CLICOLOR=1
 export COLORTERM=truecolor

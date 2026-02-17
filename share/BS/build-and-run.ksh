@@ -89,7 +89,7 @@ function edit-c-file { #{{{1
 } #}}}1
 function make+run { # {{{1
 	local T rc
-	h3 "make/fuddle $EXE"
+	h3 "fuddle >> $EXE"
 	fuddle $TARGETS "$CFILE" || return
 
 	[[ -f obj/$EXE ]]&& EXE=obj/$EXE
@@ -140,8 +140,24 @@ function do-watch { # {{{1
 	h2 "watching: $short"
 	CHANGED=$(watch-file -i "$UUID" -v "$@")
 } # }}}1
+function init-fWATCH_LST { # {{{1
+	local c w
+
+	# from fuddle makefile
+	# WLST = \$(.CURDIR)/${WATCHDIR:-w}/$target.wlst
+
+	c=$(realpath .) || die "^WWeirdly^w, could not ^Trealpath .^t"
+
+	w=$c/${WATCHDIR:-w}
+	needs-path -create -or-die "$w"
+	fWATCH_LST=$w/$EXE.wlst
+
+	# fuddle [make args] source
+	fuddle watchlist "$CFILE"
+
+} # }}}1
 function loop { #{{{1
-	local cksum_previous cksum_current UUID watch_files obj
+	local cksum_previous cksum_current UUID
 
 	needs cat-to-file fuddle shquote subst-pathvars
 	needs pkill setsid uuid watch-file
@@ -152,9 +168,8 @@ function loop { #{{{1
 	$DOEDIT && (edit-c-file "$CFILE" &)
 	cksum_previous=unedited
 
-	needs-path -create -or-die "$watchdir"
-	# fuddle [make args] source
-	fuddle watchlist "$CFILE"
+	init-fWATCH_LST
+
 	h3 "$prnPathName / $UUID"
 
 	TARGETS="watchlist $EXE"
@@ -194,12 +209,6 @@ filename=$1; shift
 
 EXE=${filename%.c}
 CFILE=$EXE.c
-fWATCH_LST=$EXE.wlst
-watchdir=${WATCHDIR:-w}
-[[ -d $watchdir ]]&& fWATCH_LST=$watchdir/$fWATCH_LST
-touch "$fWATCH_LST"
-fWATCH_LST=$(realpath $fWATCH_LST) ||
-	die "Could not create ^B$fWATCH_LST^b."
 
 TARGETS=$EXE
 $MAIN "$@"; exit

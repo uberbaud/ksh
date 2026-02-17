@@ -112,7 +112,7 @@ function write-file { #{{{1
 	===
 } # }}}1
 
-needs add-exit-actions build-and-run clearout needs-cd pkg-config use-app-paths
+needs build-and-run clearout needs-cd pkg-config use-app-paths
 use-app-paths build-tools
 needs get-build-paths subst-pathvars
 
@@ -146,7 +146,7 @@ fi
 if [[ -z ${pathname:-} ]]; then
 	pathname=$(mktemp -td qc.XXXXXXXXXX) || die 'Could not ^Tmktemp^t.'
 	needs-cd -or-die "$pathname"
-	add-exit-actions 'clearout'
+	trap clearout EXIT
 fi
 
 [[ $filename == *.* && $filename != *.c ]]&&
@@ -159,6 +159,6 @@ filename=${filename%.c}.c
   }
 
 write-file ${PACKAGES[*]:+"${PACKAGES[@]}"} >$filename
-exec build-and-run -e "$filename"
+build-and-run -e "$filename"
 
 # Copyright (C) 2022 by Tom Davis <tom@greyshirt.net>.

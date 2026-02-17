@@ -6,17 +6,20 @@ set -o nounset;: ${FPATH:?Run from within KSH}
 
 needs needs-path
 
+set -A gdups -- make {,s}diff diff3 {,e,f}grep m4
+
 P=${XDG_DATA_HOME:?}/gnu-tools
 
 # PROCESS OPTIONS # {{{1
 VERBOSE=true
 SKIP_RESHELL=false
+HELP=false
 while [[ ${1:-} == -* ]]; do
 	case $1 in
-		-q) VERBOSE=false;					;;
-		-n) SKIP_RESHELL=true;				;;
-		-h)	set -- HELP;					;;
-		*)  die "Unknown flag: ^B$1^b.";	;;
+		-q)			VERBOSE=false;					;;
+		-n)			SKIP_RESHELL=true;				;;
+		-h|--help)	break;							;;
+		*)			die "Unknown flag: ^B$1^b.";	;;
 	esac
 	shift
 done
@@ -27,15 +30,18 @@ this_pgm=${0##*/}
 	desparkle "$this_pgm"
 	PGM=$REPLY
 	sparkle-path "$P"
+	dGNU_PATH=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
 	^F{4}Usage^f: ^T$PGM^t ^[^T-q^t^]
-	         Create links for g{diff,deff3,make,sdiff} in $REPLY, and
-	         Start a new shell with $REPLY prepended to ^O\$^o^VPATH^v.
+	         Create links for any GNU version of
+	           ^B${gdups[@]}^b
+	         in $dGNU_PATH, and
+	         Start a new shell with $dGNU_PATH prepended to ^O\$^o^VPATH^v.
 	           so that, for instance, ^Tmake^t runs ^Tgmake^t.
 	           ^T-q^t  Don\'t print header message.
 	           ^T-n^t  Don\'t start a new shell.
-	       ^T$PGM -h^t
+	       ^T$PGM -h^t^|^Thelp^t
 	         Show this help message.
 	===SPARKLE===
 	exit 1
@@ -74,7 +80,7 @@ function show-message { # {{{1
 function make-gnu-links { # {{{1
 	needs-path -create -or-die "$P"
 	typeset -i founds
-	for c in make {,s}diff diff3 {,e,f}grep; do
+	for c in "${gdups[@]}"; do
 		g=$(whence -p g$c) || {
 			warn "Could not find ^Tg$c^t." "skipping"
 			continue

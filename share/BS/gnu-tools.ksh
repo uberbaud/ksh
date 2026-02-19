@@ -26,9 +26,8 @@ done
 # }}}1
 # USAGE {{{1
 this_pgm=${0##*/}
+desparkle "$this_pgm"; PGM=$REPLY
 (($#))&& {
-	desparkle "$this_pgm"
-	PGM=$REPLY
 	sparkle-path "$P"
 	dGNU_PATH=$REPLY
 	sparkle >&2 <<-\
@@ -59,7 +58,7 @@ function show-message { # {{{1
 		NORM=''
 	fi
 
-	print -n -- "$INFO"
+	print -nu2 -- "$INFO"
 	cat >&2 <<-===
 		# On OpenBSD, \`make\` is the bsd make, and GNU's make is a second class
 		# citizen. In some cases (for instance where a subsidary make file is
@@ -74,7 +73,7 @@ function show-message { # {{{1
 		# Obviously, the best thing would be to fix the subsidary makefile to
 		# use a variable \$(MAKE) which can point to either name for GNU make.
 		===
-	print -- "$NORM"
+	print -u2 -- "$NORM"
 
 } # }}}1
 function make-gnu-links { # {{{1
@@ -106,7 +105,7 @@ function reshell_with_the_goods { # {{{1
 	N=$ESC[0m
 	I=$ESC[36m
 	
-	cat <<-===
+	cat >&2 <<-===
 		$W
 		Starting new shell ($I$S$W)
 		$W  with $N$P
@@ -123,5 +122,12 @@ function reshell_with_the_goods { # {{{1
 $VERBOSE		&& show-message
 make-gnu-links	|| die "Did not link any of the GNU tools." "quitting"
 $SKIP_RESHELL	|| reshell_with_the_goods
+$SKIP_RESHELL	&&
+	if test -t 1; then
+		warn "You must prepend ^B$P^b to PATH for this to work." \
+			 "You can run ^TPATH=\$($PGM -n -q)^t to do that."
+	else
+		print "$P:$PATH"
+	fi
 
 # Copyright (C) 2021 by Tom Davis <tom@greyshirt.net>.

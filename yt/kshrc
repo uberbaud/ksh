@@ -2,6 +2,7 @@
 # ksh local profile
 # vim: ts=4 ft=ksh
 
+export LSCOLORS=HxfxchahBxEhDhBDBgHcHd
 export PRINTER=poco
 export ABDUCO_CMD=/bin/ksh
 
@@ -16,11 +17,14 @@ export PKG_PATH
 export TZ=EST5EDT
 export PKG_CONFIG_PATH=$XDG_CONFIG_HOME/pkgconfig
 
-eval "$(env -i perl -I$HOME/perl5/lib/perl5 -Mlocal::lib)"
+p5lib=${xdglocal:-$HOME}/perl5/lib/perl5
+[[ -d p5lib ]]&&
+	eval "$(env -i perl -I"$p5lib" -Mlocal::lib)"
 
 typeset -fu pre-prompt
 export PS1=\
 '$(pre-prompt)'\
+'\[\e[48;2;108;95;40m'\
 '\[\e[33m\]['\
 '\[\e[31m\]KSH '\
 '\[\e[32m\]\u'\

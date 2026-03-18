@@ -75,7 +75,7 @@ function write-file { #{{{1
 			# ^added to LDLIBS as \$OPATH/my.o
 		    PACKAGES = notify_usr${*+ $*}
 		    ALLOW    = pre-c23-compat pre-c11-compat unsafe-buffer-usage vla
-		    CFLAGS  += -std=c23 \$(ALLOW:S/^/-Wno-/)
+		    CFLAGS  += -std=c23
 		 + -------------------------------------------------------------------- */
 
 		#include <notify_usr.h> /* sparkle(),message(),inform(),caution(),die() */

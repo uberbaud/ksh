@@ -10,9 +10,10 @@
 #:           ^VX11TERM_NAME^v ^Gfor the ^Ix11 window name^i, if set.^g
 #:           ^VUSR_SH^v ^Gas the shell,^g
 #:           ^VSHELL^v ^Gif^g ^VUSR_SH^v ^Gis not set, or^g ^Tsh^t ^Gif neither is set.^g
+#:           ^VSHORTWAIT^v ^Gfor^g ^Twait-before-leaving^t
 #:       ^GSets^g
-#:           ^VSHORTWAIT^v ^Gwill be set to^g ^O${^o^VSHORTWAIT^v^O:-^o^T1^t^O}^o^G and ^Iexported^i.^g
-#:           ^GSee also:^g ^Twait-before-leaving^t^G which uses^g ^VSHORTWAIT^v^G.^g
+#:           ^VNEW_TERM_PID^v ^GThe PID of the new terminal process.^g
+#:                        ^GDefaults to^g ^T1^t ^Gif not set.^g
 
 needs ${X11TERM:=xterm} wait-before-leaving shquote setsid
 function in-new-term {

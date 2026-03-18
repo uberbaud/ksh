@@ -112,6 +112,7 @@ function make+run { # {{{1
 
 		8>&1 9>&2 T=$( (time ./"$EXE" "$@" 1>&8 2>&9 8>&- 9>&-) 2>&1)
 
+		forceline
 		h3 "$EXE completed // rc = $?"
 		eval $(resize)
 		typeset -L$COLUMNS L=' '
@@ -160,7 +161,7 @@ function loop { #{{{1
 	local cksum_previous cksum_current UUID
 
 	needs cat-to-file fuddle shquote subst-pathvars
-	needs pkill setsid uuid watch-file
+	needs pkill setsid uuid watch-file forceline
 
 	subst-pathvars "$PWD" prnPathName
 

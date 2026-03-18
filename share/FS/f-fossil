@@ -35,12 +35,12 @@ function f-fossil {
 		  ^VREPOSITORY^v^O=^o${REPOSITORY-}
 		===
 	needs-path -create -with-notice -or-die "$R"
-	fossil 								\
+	command fossil 						\
 		${common[*]:+"${common[@]}"}	\
 		--chdir "$R"					\
 		clone							\
 		--no-open "$@" "$F"
-	fossil open --workdir "$WORKTREE_PATH" "$REPOSITORY"
+	command fossil open --workdir "$WORKTREE_PATH" "$REPOSITORY"
 	needs-cd -or-die "$workdir"
 
 }

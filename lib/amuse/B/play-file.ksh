@@ -10,6 +10,7 @@ print -- 0 >timeplayed
 #======================================[ heavy lifter ]===============#
 play-one-ogg "$2" ${3:-} 1>paused-at 2>>$fLOG 3>timeplayed &
 #=====================================================================#
+doas renice -n -5 -p $!
 print $! >player-pid
 wait $! || action=paused
 : >player-pid

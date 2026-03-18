@@ -13,7 +13,7 @@ function usage {
 	PGM=$REPLY
 	sparkle >&2 <<-\
 	===SPARKLE===
-	^F{4}Usage^f: ^T$PGM^t ^[^T-f^t^] ^Uremote^u ^[^Urepo dir^u^]
+	^F{4}Usage^f: ^T$PGM^t ^[^T-f^t^] ^[^T-x^t^|^Uremote^u ^[^Urepo dir^u^]^]
 	         ^Tgit clone^ts a bare repository into
 	             ^SREPOS_HOME^s/^Uhost/and/path/repo.git^u
 	         ^Tgot checkout^ts that repository into ^Urepo dir^u or a directory
@@ -22,6 +22,7 @@ function usage {
 	                  ^Gthe variables^g ^SWORKTREE_PATH^s ^Gand^g ^SREPOSITORY_PATH^s
 	                  ^Gin a form that can be^g ^Teval^t^Ged by the shell.^g
 
+	         ^T-x^t  Use ^Txput^t if ^O$^o^V1^v is not a url.
 	         ^T-f^t  Force using ^Uremote^u even if it doesn't ^Ilook^i like a
 	             remote repository name.
 	       ^T$PGM -h^t
@@ -35,8 +36,10 @@ function bad_programmer {	# {{{2
 		"  No getopts action defined for [1m-$1[22m."
   };	# }}}2
 warnOrDie=die
-while getopts ':fh' Option; do
+makeXputClone=false
+while getopts ':xfh' Option; do
 	case $Option in
+		x)	makeXputClone=true;									;;
 		f)	warnOrDie=warn;										;;
 		h)	usage;												;;
 		\?)	die "Invalid option: ^B-$OPTARG^b.";				;;
@@ -88,6 +91,50 @@ function do-git-clone-or-update { # {{{1
 		command git clone --bare "$remote" "$baredir" >&2 ||
 			"Could not clone."
 	fi
+} # }}}1
+function is-valid-url { # {{{1
+	: ${1:?Bad programmer: $0: missing parameter 1}
+
+	#===============================================# std schema rep?
+	[[ $1 == @(http|https|ftp|ftps|ssh):* ]]&&	{
+		REPLY=$1
+		return 0
+	  }
+
+	#===============================================# local file ?
+	[[ -d $1 ]]&& {
+		REPLY=file://$(realpath "$1")
+		warnOrDie "^Brepo^b is local" "Maybe use ^Tgit clone^t instead?"
+		return 0
+	  }
+
+	#===============================================# ssh as scp style?
+	[[ $1 == ?(+([!:/@])@)+(+([A-Za-z0-9-]).)+([A-Za-z0-9-]):* ]]&& {
+		local f t
+		t=${1#*:}
+		f=${1%":$t"}
+		REPLY=ssh://$f/$t
+		warn "Converting ^Brepo^b from ^Bscp^b format to ^Bssh^b schema:"	\
+			"$1"	\
+			"$REPLY"
+		return 0
+	  }
+
+	#===============================================# not valid
+	return 1
+} # }}}1
+function use-xput-for-remote { # {{{1
+	needs xput
+	REPLY=$(xput)
+	REPLY=${REPLY%/}
+	[[ $REPLY == *[/.]github.com/* ]]&& REPLY=${REPLY%.git}.git
+	is-valid-url "$REPLY" ||
+		die "^Txput^t output does not appear to be a remote url."
+	notify "Using ^Txput^t output for ^Irepo^i." "$REPLY"
+	$makeXputClone || {
+		warn "Use ^T-x^t to actually make the ^Iclone^i."
+		exit
+	  }
 } # }}}1
 function main { # {{{1
 	local R repo repo_base newdir
@@ -149,25 +196,16 @@ function main { # {{{1
 } # }}}1
 
 needs needs-path needs-cd new-array shquote warnOrDie
-(($#))|| die 'Missing required parameter ^Uremote^u'
+(($#))|| { use-xput-for-remote; set -- "$REPLY" "$@"; }
 (($#<=2))||
 	die 'Too many parameters.' \
 		'Expected only ^Uremote^u and optionally ^Urepo dir^u.'
 
-if [[ $1 == @(http|https|ftp|ftps|ssh):* ]]; then	# std schema rep
-	repo=$1
-elif [[ -d $1 ]]; then								# local file
-	repo=file://$(realpath "$1")
-	warnOrDie "^Brepo^b is local" "Maybe use ^Tgit clone^t instead?"
-													# ssh as scp style
-elif [[ $1 == ?(+([!:/@])@)+(+([A-Za-z0-9-]).)+([A-Za-z0-9-]):* ]]; then
-	local f t
-	t=${1#*:}
-	f=${1%":$t"}
-	repo=ssh://$f/$t
-	warn "Converting ^Brepo^b from ^Bscp^b format to ^Bssh^b schema:"	\
-		"$1"	\
-		"$repo"
+if is-valid-url "$1"; then
+	repo=$REPLY
+elif (($#==1)) && use-xput-for-remote; then
+	set -- 'unshifted' "$1" # use $1 as newdir
+	repo=$REPLY
 else
 	die "Parameter does not appear to be a REPOSITORY_PATH name."
 fi

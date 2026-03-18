@@ -1,0 +1,1 @@
+/home/tw/local/ksh/share/BS/clang-tidy-w-env.ksh

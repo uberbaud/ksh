@@ -51,8 +51,12 @@ function main { # {{{1
 	X11TERM_CLASS=Tmux
 	X11TERM_NAME=tmux
 
+	# We're using in-new-term, so skip INFO messages that pause the 
+	# screen at the end of a session with output to stderr
+	quiet='-o LogLevel=ERROR' # Don't report login/connection status
+
 	in-new-term ssh-askfirst \
-		ssh -t "$REMOTE" "$tmux_bin" -2u new-session -As "$SESSION_NAME"
+		ssh $quiet -t "$REMOTE" "$tmux_bin" -2u new-session -As "$SESSION_NAME"
 	#   ^^^ ssh is a parameter to ssh-askfirst and cannot be a path to
 	#       the ssh executable
 

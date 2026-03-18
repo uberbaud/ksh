@@ -1,0 +1,15 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2023-12-27,03.07.24z/3c2dee7>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION
+#:   Prints current project description according to ^O$^o^VPWD^v, if in 
+#:   a project file.
+
+needs in-ancestor-path
+function prn-prj-description {
+	local REPLY
+	in-ancestor-path PROJECT &&
+		print -r -- "$(<$REPLY)"
+}
+
+# Copyright © 2026 by Tom Davis <tom@greyshirt.net>.

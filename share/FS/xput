@@ -7,9 +7,11 @@
 #:      Buffer defaults to ^Bclipboard^b.
 
 function xput {
-	[[ $1 == @(primary|secondary|clipboard|) ]]||
+	local clip
+	clip=${1:-clipboard}
+	[[ $clip == @(primary|secondary|clipboard|) ]]||
 		die 'Unknown X selection buffer name.'
-	xclip -selection "${1:-clipboard}" -out
+	xclip -selection "$clip" -out
 }
 
 # Copyright © 2017 by Tom Davis <tom@greyshirt.net>.

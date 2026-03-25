@@ -349,6 +349,7 @@ function noglob {
 # ====================================================== END: NOGLOB ===
 
 alias p='_p $# "$@"'
+alias foreach='_foreach $# "$@"'
 alias pass=' pass' # don't put in history
 alias prn="/usr/bin/printf '  \e[35m｢\e[39m%s\e[35m｣\e[39m\n'"
 [[ -x /usr/local/bin/rlwrap ]]&&

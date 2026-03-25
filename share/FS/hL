@@ -1,0 +1,13 @@
+# <@(#)tag:tw.lukas.uberbaud.foo,2026-03-24,17.21.27z/14ffffb>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+#---------------------------------------------------------------------------
+#: FUNCTION ^Ulabel^u
+#:   wrap header-line with unicode lines
+
+function hL {
+	local C
+	C=${COLUMNS:-80}
+	header-line $((C-2)) ─ ┤ ├ " $* "
+}
+
+# Copyright © 2026 by Tom Davis <tom@greyshirt.net>.

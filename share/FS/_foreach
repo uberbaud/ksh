@@ -1,0 +1,49 @@
+# <@(#)tag:tw.csongor.greyshirt.net,2022-06-06,16.46.23z/442551>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+
+#: FUNCTION ^O$^o^V#^v ^T"^t^O$^o^V@^v^T"^t ^U^Bcmd^b^u ^Ucmdargs^u
+#:   Using ^O$^o^V1^v as the argument count, performs ^Ucmd cmdargs^u 
+#:   with each of the ^Uarg^us in turn.
+#:
+#:   It is an error to call FUNCTION with fewer than ^O$^o^V1^v^T+1^t 
+#:   arguments, or with ^O$^o^V1^v not a number.
+#:
+#:   The ^Ucmdarg^u ^T%%^t will be replaced with the actual looping 
+#:   variable. If ^T%%^t is not specfied, the looping variable will be 
+#:   added as the last ^Ucmdarg^u.
+#:
+#: ^GNOTE: Set^g ^VVERBOSE^v ^Gto ^T1^t for visual separation of commands,^g
+#:         ^Gor ^T2^t to see command.^g
+#:
+#: ^GUse:^g ^Talias foreach='^tFUNCTION ^O$^o^V#^v "^O$^o^V@^v"^T'^t
+
+needs hL prn-cmd
+function _foreach {
+	local n m p x o F A v
+	v=${VERBOSE:-0}
+	[[ $v == +([0-9]) ]]||
+		{ warn "^VVERBOSE^v should be a number ^T0^t^-^T2^t.";  v=0; }
+	m='See ^Thelp ^B_p^b^t'
+	[[ ${1:?} == +([0-9]) ]]|| bad-programmer "$m"
+	# get arg count
+	n=$1; shift
+	(($#<n))&& bad-programmer "Fewer parameters than expected." "$m"
+	[[ ${#n} -eq 0 ]]&& die "Missing ^Uargs^u to loop over."
+	# save args to array p
+	x=0
+	while ((x<n)); do local p[x++]=$1; shift; done
+	(($#))|| die 'Missing commands to perform.'
+	# find the %% arg
+	x=0; while (($#)); do [[ $1 == %% ]]&& break; local F[x++]=$1; shift; done
+	(($#))&& shift # move past %% if any
+	x=0; while (($#)); do local A[x++]=$1; shift; done
+	# do the work!
+	for o in "${p[@]}"; do
+		((v>0))&& hL "$o"
+		set -- "${F[@]}" "$o" ${A[*]:+"${A[@]}"}
+		((v>1))&&  prn-cmd "$@"
+		"$@"
+	done
+}
+
+# Copyright © 2022 by Tom Davis <tom@greyshirt.net>.

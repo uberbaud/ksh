@@ -1,0 +1,12 @@
+# <@(#)tag:tw.lukas.uberbaud.foo,2026-03-30,06.22.14z/70874a>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+#---------------------------------------------------------------------------
+#: FUNCTION ^G(no arguments)^g
+#:   ^Tmcd^t with ^T-R^t, (^Tmkdir RCS^t)
+
+needs mcd
+function mcdr {
+	mcd -R "$@"
+}
+
+# Copyright © 2026 by Tom Davis <tom@greyshirt.net>.

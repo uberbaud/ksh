@@ -11,10 +11,9 @@ function mcd {
 		shift
 	  }
 	(($#==1))|| die 'Too many arguments.'
-	mkdir -p "$1"
-	cd "$1" || return
-	$wantRCS || return 0
-	mkdir RCS
+	mkdir -p ${1:?Missing required parameter NEW DIRECTORY}
+	builtin cd "$1" || return
+	$wantRCS && mkdir RCS
   }
 
 # vim: ft=ksh ts=4

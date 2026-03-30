@@ -67,6 +67,7 @@ function write-file { #{{{1
 		 |     The variable \$PACKAGES, if not empty, will be fed to \`pkg-config\`
 		 |  and \$LDFLAGS and \$CFLAGS will be appended with that output.
 		 |     Files named in \$OBJS and found in \$OPATH will be added to \$LDLIBS.
+		 |     Warnings in \$NOWARN will be turned off.
 		 + ----------------------------------------------------------------------
 			# CC       = include-what-you-use
 		    # SRCPATH  = ${CURDIR:-}
@@ -74,7 +75,7 @@ function write-file { #{{{1
 		    # OBJS     = ${OBJS:-my.o}
 			# ^added to LDLIBS as \$OPATH/my.o
 		    PACKAGES = notify_usr${*+ $*}
-		    ALLOW    = pre-c23-compat pre-c11-compat unsafe-buffer-usage vla
+		    NOWARN   = pre-c23-compat pre-c11-compat unsafe-buffer-usage vla
 		    CFLAGS  += -std=c23
 		 + -------------------------------------------------------------------- */
 

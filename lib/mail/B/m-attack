@@ -165,6 +165,7 @@ needs egrep fold forceline m-part mhstore pick press-any-key scan show tee mark
 [[ $* == ?*+* ]]&&
 	die "Bad parameter list, mailbox other than first."
 
+
 if [[ $# -gt 0 && $1 == +* ]]; then
 	FLDR=${1#+}; shift
 	(($#))|| set -- $all
@@ -172,8 +173,8 @@ elif (($#)); then
 	FLDR=$DEFAULT_FLDR
 else
 	FLDR=$DEFAULT_FLDR
-	if pick +$FLDR $DEFAULT_SEQ:f >/dev/null 2>&1; then
-		set -- "$DEFAULT_SEQ"
+	if pick +$FLDR ${SEQ:=DEFAULT_SEQ}:f >/dev/null 2>&1; then
+		set -- "$SEQ"
 	else
 		set -- $all
 	fi

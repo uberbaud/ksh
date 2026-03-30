@@ -119,7 +119,7 @@ T='	'
 	#${hhhStandard-}
 	# Show all the bits and do it in color.
 	CFLAGS += -W$WarnLevel -fdiagnostics-show-option -fcolor-diagnostics
-	CFLAGS += \$(ALLOW:S/^/-Wno-/)
+	CFLAGS += \$(NOWARN:S/^/-Wno-/)
 
 	# handle OPATH/OBJS
 	.if defined(OPATH) && !empty(OPATH)

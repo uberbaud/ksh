@@ -1,19 +1,12 @@
 # <@(#)tag:csongor.greyshirt.net,2017-08-11:tw/19.05.36z/4b3dca2>
 
-#: FUNCTION ^[^T-R^t^] ^Unew_directory^u
+#: FUNCTION ^Unew_directory^u
 #:   ^Tmkdir -p^t ^Unew_path^u, and then ^Tcd^t there.
-#:       ^T-R^t    Create a subdirectory ^BRCS^b in the new directory.
 
 function mcd {
-	local wantRCS=false
-	[[ ${1:?Missing required parameter NEW DIRECTORY} == -R ]]&& {
-		wantRCS=true
-		shift
-	  }
+	: ${1:?Missing required parameter NEW DIRECTORY}
 	(($#==1))|| die 'Too many arguments.'
-	mkdir -p ${1:?Missing required parameter NEW DIRECTORY}
-	builtin cd "$1" || return
-	$wantRCS && mkdir RCS
+	mkdir -p "$1" && builtin cd "$1" || return
   }
 
 # vim: ft=ksh ts=4

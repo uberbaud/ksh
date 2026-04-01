@@ -173,10 +173,16 @@ elif (($#)); then
 	FLDR=$DEFAULT_FLDR
 else
 	FLDR=$DEFAULT_FLDR
-	if pick +$FLDR ${SEQ:=DEFAULT_SEQ}:f >/dev/null 2>&1; then
+	if pick +$FLDR ${SEQ:=$DEFAULT_SEQ}:f >/dev/null 2>&1; then
 		set -- "$SEQ"
-	else
+	elif [[ $SEQ == ¬* ]]; then
+		# If a sequence is empty, it doesn't exist, so its opposite 
+		# (eg: ¬L) would be all, so do that.
 		set -- $all
+	else
+		# the sequence doesn't exist and isn't the complement of 
+		# a sequence, which is a problem
+		die DATAERR "Bad message list: ^B$SEQ^b"
 	fi
 fi
 

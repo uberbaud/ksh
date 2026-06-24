@@ -32,42 +32,52 @@ shift $((OPTIND-1))
 # ready to process non '-' prefixed arguments
 # /options }}}1
 function main { # {{{1
-	local tmux_bin obsd_path other_sys_path
+	local remote_tmux_bin obsd_path other_sys_path
 
 	obsd_path=/usr/bin
 	other_sys_path=/usr/local/bin
 	case ${REMOTE:?} in
-		${HOSTNAME:?})	die "$REMOTE is not remote.";		;;
-		csongor.lan)	tmux_bin=$obsd_path/tmux;			;;
-		sam.lan)		tmux_bin=$other_sys_path/tmux;		;;
-		uberbaud.foo)	tmux_bin=$obsd_path/tmux;			;;
-		uberbaud.net)	tmux_bin=$obsd_path/tmux;			;;
-		yt.lan)			tmux_bin=$obsd_path/tmux;			;;
+		${HOSTNAME:?})	die "$REMOTE is not remote.";			;;
+		csongor.lan)	remote_tmux_bin=$obsd_path/tmux;		;;
+		sam.lan)		remote_tmux_bin=$other_sys_path/tmux;	;;
+		uberbaud.foo)	remote_tmux_bin=$obsd_path/tmux;		;;
+		uberbaud.net)	remote_tmux_bin=$obsd_path/tmux;		;;
+		yt.lan)			remote_tmux_bin=$obsd_path/tmux;		;;
 		*)
-			die "Remote host $REMOTE is not provisioned."
+			die "Remote host ^T$REMOTE^t is not provisioned."
 			;;
 	esac
 	SESSION_NAME=${REMOTE%%.*}
 	X11TERM_CLASS=Tmux
 	X11TERM_NAME=tmux
 
-	# We're using in-new-term, so skip INFO messages that pause the 
-	# screen at the end of a session with output to stderr
-	quiet='-o LogLevel=ERROR' # Don't report login/connection status
+	set -- opts; integer i=0; add-opts() { for o { opts[i++]=$o; }; }
+	#-----------------------------------------------[ SSH-ASKFIRST OPTS ]---
+	add-opts ssh				# ssh is a parameter to ssh-askfirst and 
+								# cannot be a path to the ssh executable
+	#--------------------------------------------------------[ SSH OPTS ]---
+	add-opts -o LogLevel=ERROR	# Don't report login/connection status
+	add-opts -t					# force pseudo-terminal allocation
+	add-opts "$REMOTE"			# remote host
+	add-opts "$remote_tmux_bin"	# path to tmux executable ON REMOTE
+	#-------------------------------------------------------[ TMUX OPTS ]---
+	add-opts -2					# assume terminal supports 256 colors
+	add-opts -u					# use UTF-8
+	add-opts new-session		# tmux command
+	add-opts -A					# create OR attach to existing $SESSION_NAME
+	add-opts -s "$SESSION_NAME"	# use session name
 
-	in-new-term ssh-askfirst \
-		ssh $quiet -t "$REMOTE" "$tmux_bin" -2u new-session -As "$SESSION_NAME"
-	#   ^^^ ssh is a parameter to ssh-askfirst and cannot be a path to
-	#       the ssh executable
+	export QUIETLY=true
+	in-new-term ssh-askfirst "${opts[@]}"
 
 } #}}}1
 
-needs in-new-term ssh-askfirst
+needs in-new-term ssh-askfirst use-app-paths
 
 (($#))|| die 'Missing required parameter: ^Uhost^u.'
 (($#>1))&& die 'Too many parameters. Expected only one (1): ^Uhost^u.'
 
-REMOTE=$1
+export REMOTE=$1
 [[ $REMOTE == *.* ]]|| die "Remote is not fully qualified: ^V$REMOTE^v"
 
 main; exit

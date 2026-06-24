@@ -113,6 +113,9 @@ function set-msgpos-vars { # {{{1
 		MSGCOUNT=0
 	fi
 } # }}}1
+function set-msg-viewed { # {{{1
+	mark +inbox ${1:?Missing msg number} -sequence viewed -add -nozero
+} # }}}1
 function main { # {{{1
 	mark +$FLDR "$@" -sequence MSGs 2>$fERRs.1 || {
 		#if [[ $(<$fERRs.1} == 
@@ -135,15 +138,16 @@ function main { # {{{1
 	while :; do
 		revert-cursor-pos $xtrarows
 		show-msg-info $CUR_MSG_NUM
+		xtrarows=0
 		case $REPLY in
-			quit)
-				break
-				;;
-			prev|next|show)
+			quit) break ;;
+			prev|next) msg-$REPLY $CUR_MSG_NUM || break; ;;
+			show)
+				set-msg-viewed $CUR_MSG_NUM
 				msg-$REPLY $CUR_MSG_NUM || break
-				xtrarows=0
 				;;
 			*)
+				set-msg-viewed $CUR_MSG_NUM
 				msg-$REPLY $CUR_MSG_NUM 2>&1			|
 					fold -sw ${COLUMNS:=$(tput cols)}	|
 					tee $fERRs

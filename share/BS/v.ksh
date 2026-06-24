@@ -139,6 +139,7 @@ function init-or-sync-then-checkout { #{{{1
 	$vms-checkout "$filename"
 } # }}}1
 function vms-checkout-all { # {{{1
+	local FOREACH_VMS
 	VMSes=
 	HAS_VERSMGMT=false
 
@@ -188,8 +189,9 @@ function main { # {{{1
 		elif [[ -n $ciMsg ]]; then
 			warn 'Supplied a ^Blog^b message, but there'\''s no ^IVMS^i.'
 		fi
-	elif [[ -n $ciMsg ]]; then
-		warn 'Supplied a ^Blog^b message, but there were no changes made.'
+	else
+		[[ -n $ciMsg ]]&&
+			warn 'Supplied a ^Blog^b message, but there were no changes made.'
 		versmgmt-apply reshelve "$f_name"
 	fi
 

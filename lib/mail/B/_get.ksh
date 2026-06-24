@@ -53,9 +53,13 @@ function group { # {{{1
 function P { printf '      ^F{4}─^f %s\n' "$1" | sparkle >&2; }
 
 needs m-msgcount mark pick
+
 if $DOWNLOAD; then
-	needs use-app-paths
+	needs use-app-paths  i-can-haz-inet
+	i-can-haz-inet || die "$REPLY"
 	use-app-paths mail
+
+	# do `needs` for parts in mail app path
 	needs inc get-remote-mail.ksh
 
 	tput clear

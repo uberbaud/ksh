@@ -4,21 +4,16 @@
 #: FUNCTION ^Ukey list^u ^[^Uvarname^u^]
 #:   Wait for specific key hits and return that in ^O${^o^V2^v^O:-^o^VREPLY^v^O}^o
 
-function process-readkeys {
-	local nm pid class val
-	read nm pid
-	[[ $nm == readkeys ]]|| die "Weirdness"
-	while read class val; do
-		[[ $class == c && $val == [$1] ]]|| continue
-		print "$val"
-		break
-	done
-	kill $pid
-}
-
-needs readkeys
+needs read-one-key
 function getkey {
-	eval ${2:-REPLY}='$(readkeys | process-readkeys "${1:?}")'
+	local keylist varname
+	keylist=${1:?Missing keylist parameter}
+	varname=${2:-REPLY}
+	set -- $(read-one-key)
+	while [[ $1-$2 != c-[$keylist] ]]; do
+		set -- $(read-one-key)
+	done
+	eval $varname=\$2
 }
 
 # Copyright © 2024 by Tom Davis <tom@greyshirt.net>.

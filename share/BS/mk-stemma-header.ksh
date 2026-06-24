@@ -14,8 +14,8 @@ function usage {
 	===SPARKLE===
 	^F{4}Usage^f: ^T$PGM^t ^[^T-n^t^] ^[^Uoptions^u^] ^[^Uprefix^u ^[^Usuffix^u^]^]
 	         Make a ^Uwhat^u and ^URFC4151_tag^u compatible stemma
-	             ^I<marker+tag:user.machine.domain,date,timez/uniqrand>^i
-	             ^T-n^t                   Don't include a final newline.
+	             ^I<marker+tag:user@machine.domain,date:timez#uniqrand>^i
+	             ^T-n^t               Don't include a final newline.
 	             ^T-U^t ^Uuser^u          defaults to ^T\$(id -n)^t
 	             ^T-M^t ^Umachine_name^u  defaults to ^T\${\$(uname -m)%.*}^t
 	             ^T-H^t ^Udomain^u        defaults to ^T\${URI_AUTHORITY-\${EMAIL#*@}}^t

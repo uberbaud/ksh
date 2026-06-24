@@ -44,7 +44,7 @@ function SQL {
 		get-unused-fds 2 SQLFD
 		readonly SQLFD
 		coproc-w-fds ${SQLFD[0]} ${SQLFD[1]}	\
-			sqlite3 -noheader -batch -list -separator "$SQLSEP"
+			sqlite3 -noheader -batch -list -separator "$SQLSEP" 2>>~/log/SQL.log
 		readonly SQLPID=$!
 
 		add-exit-actions "(trap '' PIPE; print -u${SQLFD[1]} '.quit')"

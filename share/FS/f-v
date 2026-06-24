@@ -7,7 +7,7 @@
 needs find-function resolve-alias shquote in-new-term
 function f-v {
 	local o opts i=0 cmdexp filexp edit ecmd
-	edit=$HOME/bin/ksh/v
+	edit=${USRBIN:?}/v
 
 	# NO parameters, so short circuit all the others
 	(($#))|| { \in-new-term "$edit"; return; }

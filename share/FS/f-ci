@@ -1,0 +1,17 @@
+# <@(#)tag:tw@lukas.uberbaud.foo,2026-06-23:04.10.35z/3fa56d8>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+#---------------------------------------------------------------------------
+#: FUNCTION ^G(ci arguments)^g
+#:   wrapper around ci with rcsdiff and -u
+
+needs needs-file
+function f-ci {
+	local file
+	(($#))|| die "Missing required parameter: file"
+	for file { :; }
+	needs-file -or-die "$file"
+	command rcsdiff -q "$file"
+	command ci -q -u "$@"
+}
+
+# Copyright © 2026 by Tom Davis <tom@greyshirt.net>.

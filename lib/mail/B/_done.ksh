@@ -55,9 +55,32 @@ function yOrN { # {{{1
 	print -r -- " $REPLY"
 	[[ $REPLY == [yY] ]]
 } # }}}1
+function recored-viewed-and-skipped-froms { # {{{1
+	local fviewed fskipped fnul view_list form
+	needs-path -create -with-notice -or-warn ${1:?} || return
+	form=scan.email-froms
+	fviewed=$1/froms-viewed.lst
+	fskipped=
+	fnul=/dev/null
+	view_list=true
+	# save email addresses specifically marked as viewed
+	scan +inbox -form $form viewed 2>$fnul >>$fviewed ||
+		view_list=false
+	# mark everything in the list L so they don't appear in skipped
+	mark +inbox L -sequence viewed -add -nozero 2>$fnul &&
+		view_list=true
+	# finally, put those not marked viewed nor in L
+	if $view_list; then
+		scan +inbox -form $form ¬viewed	>>$1/froms-skipped.lst
+	else
+		scan +inbox -form $form a >>$1/froms-skipped.lst
+	fi
+} # }}}1
 
+needs flist folder forceline mark pick refile rmm getkey needs-path
 
-needs flist folder forceline mark pick refile rmm getkey
+MAILTEMP="${XDG_PUBLICSHARE_DIR:?}/mail"
+recored-viewed-and-skipped-froms $MAILTEMP/work
 
 # clean out groupmail list
 GROUPMAIL=${MMH:?}/groupmail
@@ -121,13 +144,12 @@ else
     refile marked -nolink -src +inbox +deleted
 fi
 
-MAILTEMP="${XDG_PUBLICSHARE_DIR:?}/mail"
-set -A files2delete "$MAILTEMP"/*
-if [[ $files2delete != *\* ]]; then
+set -A files2delete "$MAILTEMP"/+([0-9.]).@(html?(.err)|plain)
+[[ $files2delete == *@* ]]|| {
     notify '^BCleaning mail workshop.'
 	yOrN 'Delete the mail parts which maybe you'\''re using' &&
 		rm "${files2delete[@]}"
-fi
+}
 
 # the MMH `show` litters `mhpath +` with temp files, get rid of them
 rm -f $(mhpath +)/show?????? >/dev/null 2>&1

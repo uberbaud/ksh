@@ -5,11 +5,14 @@
 #:   Waits for ANY key press.
 #:   ^VREPLY^v is set to the ^Bkey-class-char^b and the ^Bkey-name^b.
 
-needs readkeys
+needs read-one-key
 function press-any-key {
+	REPLY=
+
 	print -- ${1:-Press ANY key.}
-	REPLY=$(set -e; readkeys|
-			(read n pid;read class key;kill -HUP $pid;print -r "$class-$key"))
+	set -- $(read-one-key 2>&1) || { warn "$*"; return; }
+
+	REPLY=$1-$2
 }
 
 # Copyright © 2022 by Tom Davis <tom@greyshirt.net>.

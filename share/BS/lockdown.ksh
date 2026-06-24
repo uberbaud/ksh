@@ -73,7 +73,7 @@ xlock "${opts[@]}" &
 xlock_pid=$!
 
 [[ -x /usr/bin/sudo ]]&&	/usr/bin/sudo -K	# revoke sudo persistance
-[[ -x /usr/bin/ssh-add ]]&&	/usr/bin/ssh-add -D	# clear ssh keys
+#[[ -x /usr/bin/ssh-add ]]&&	/usr/bin/ssh-add -D	# clear ssh keys
 (amuse:send-cmd pause)	# stop the music
 sync					# if the battery runs out while we're hibernating
 

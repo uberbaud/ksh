@@ -3,8 +3,13 @@
 #: FUNCTION
 #:   Wrapper for the ^Tgo^t command, necessary to actually ^Tcd^t.
 #:   Use ^Tgo -h^t for help
+#:   If ^Uwhere^u begins with a comma ('^,') we ^Tprj cd ^Uwhere^u^t.
 
 function f-go {
+	[[ ${1:-} == ,* ]]&& {
+		prj cd "${1#,}"
+		return
+	  }
 	local cmd=$($LOCALBIN/b-go -x "$@")
 	[[ $cmd == cd\ *pwd ]]&&
 		cmd="builtin $cmd;ls-todos -H"

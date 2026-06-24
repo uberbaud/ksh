@@ -41,7 +41,7 @@ function in-new-term {
 	i=0
 	cmdln[i++]=wait-before-leaving
 	for a { shquote "$a" cmdln[i++]; }
-	(
+	: 'subshell encloses `trap`'; (
 		trap '' INT HUP TSTP
 		SHORTWAIT=${SHORTWAIT:-1} "${x11term[@]}" "${cmdln[*]}" &
 	) >>$log 2>&1

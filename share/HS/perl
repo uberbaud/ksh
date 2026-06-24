@@ -1,0 +1,31 @@
+^BPERL REFERENCE DOCS^b
+
+    aix             docstyle        iol             perf            style
+    amiga           dsc             ipc             plan9           sub
+    android         dtrace          irix            pod             syn
+    api             ebcdic          jp              podspec         synology
+    apio            embed           ko              podstyle        thrtut
+    artistic        experiment      lexwarn         policy          tie
+    book            filter          linux           port            toc
+    boot            fork            locale          pragma          todo
+    bot             form            lol             qnx             tooc
+    bs2000          freebsd         macosx          re              toot
+    call            func            mod             reapi           trap
+    cheat           git             modinstall      rebackslash     tru64
+    class           glossary        modlib          recharclass     tw
+    classguts       gov             modstyle        ref             unicode
+    clib            gpl             mroapi          reftut          unicook
+    cn              guts            newmod          reguts          uniintro
+    community       hack            number          repository      uniprops
+    cygwin          hacktips        obj             requick         unitut
+    data            hacktut         ootut           reref           util
+    dbmfilter       haiku           op              retut           var
+    debguts         hist            openbsd         riscos          vms
+    debtut          hpux            opentut         run             vos
+    debug           hurd            os2             sec             win32
+    deprecation     intern          os390           secpolicy       xs
+    diag            interp          os400           solaris         xstut
+    doc             intro           packtut         source          xstypemap
+
+    ^GNOTE: delta and faq are docs not listed here.^g
+    ^NPATH^n^G: /usr/libdata/perl5/pod^g

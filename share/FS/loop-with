@@ -1,0 +1,15 @@
+# <@(#)tag:tw@lukas.uberbaud.foo,2026-05-14:21.23.50z/5daca7>
+# vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
+#---------------------------------------------------------------------------
+#: FUNCTION ^Ucmd^u ^[^Uarg1^u ^S…]^s
+#:   loop a cmd
+
+function loop-with {
+	whence ${1:?} >/dev/null || die "^T$1^t is not a valid command."
+	while :; do
+		("$@")
+		(($?>127)) && break # exit on signals
+	done
+}
+
+# Copyright © 2026 by Tom Davis <tom@greyshirt.net>.

@@ -55,7 +55,7 @@ function yOrN { # {{{1
 	print -r -- " $REPLY"
 	[[ $REPLY == [yY] ]]
 } # }}}1
-function recored-viewed-and-skipped-froms { # {{{1
+function record-viewed-and-skipped-froms { # {{{1
 	local fviewed fskipped fnul view_list form
 	needs-path -create -with-notice -or-warn ${1:?} || return
 	form=scan.email-froms
@@ -76,11 +76,20 @@ function recored-viewed-and-skipped-froms { # {{{1
 		scan +inbox -form $form a >>$1/froms-skipped.lst
 	fi
 } # }}}1
+function update-batch-file { # {{{1
+	local batch bfile n
+	bfile=$MAILTEMP/.batch
+	[[ -f $bfile ]]|| return
+	batch=$(<$bfile)
+	[[ -n $batch ]]|| return
+	n=${batch##*([a-z])}
+	print -r -- "${batch%%$n}$((++n))" >$bfile
+} # }}}1
 
 needs flist folder forceline mark pick refile rmm getkey needs-path
 
 MAILTEMP="${XDG_PUBLICSHARE_DIR:?}/mail"
-recored-viewed-and-skipped-froms $MAILTEMP/work
+record-viewed-and-skipped-froms $MAILTEMP/work
 
 # clean out groupmail list
 GROUPMAIL=${MMH:?}/groupmail
@@ -147,10 +156,19 @@ fi
 set -A files2delete "$MAILTEMP"/+([0-9.]).@(html?(.err)|plain)
 [[ $files2delete == *@* ]]|| {
     notify '^BCleaning mail workshop.'
-	yOrN 'Delete the mail parts which maybe you'\''re using' &&
-		rm "${files2delete[@]}"
+	rm "${files2delete[@]}"
 }
 
+notify '^BCleaning web mail^b (^Imailreader^i) ^Bfiles not in use.^b'
+clean-web-mail.pl # refreshes json files
+
+# `m get` only needs a new prefix if we're reusing message numbers, 
+# which only happens if we've `m done`ed. This is `m done`, so do it now 
+# because how would `m get` know.
+notify '^BUpdating ^S.batch^s file.^b'
+update-batch-file # increment trailing number for next get
+
+notify '^BCleaning ^Ishow^i working files in ^Imhpath^i.^b'
 # the MMH `show` litters `mhpath +` with temp files, get rid of them
 rm -f $(mhpath +)/show?????? >/dev/null 2>&1
 

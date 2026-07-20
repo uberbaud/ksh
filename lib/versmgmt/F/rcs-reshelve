@@ -2,14 +2,10 @@
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
 #: FUNCTION ^Ufile name^u
-#:   reshelves, checks-in, resets a checked-out file that wasn't 
-#:   changed.
+#:   reshelves (checks-in): resets a checked-out but unchanged file.
 
 function rcs-reshelve {
-	pwd
-	print -n 'co: '; ls -l ./"${1:?}"
     command ci -q -j -u ./"${1:?}"
-	print -n 'ci: '; ls -l ./"${1:?}"
 }
 
 # Copyright © 2023 by Tom Davis <tom@greyshirt.net>.

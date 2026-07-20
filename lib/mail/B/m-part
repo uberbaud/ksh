@@ -46,50 +46,6 @@ done
 shift $((OPTIND-1))
 # ready to process non '-' prefixed arguments
 # /options }}}1
-function tidy-repeat { # {{{108:00
-	local i n
-	# HTML Tidy // tidy-html5 5.7.24
-	# tidy's output is dependent on input features such as DOCTYPE and
-	# the html namespace declarations, so we repeat the process until
-	# the output is consistent.
-	i=0
-	while ((i<$UPPER_LIMIT)); do
-		n=$((i+1))
-		tidy -config ${MMH:?}/tidy.cfg --error-file $n.err $i.html > $n.html
-		cmp -s $i.html $n.html && break
-		((i++))
-	done
-	REPLY=$n
-} # }}}1
-function clean-html {( # {{{1
-	local file tdir ferr fhtml
-	file=$(realpath "${1:?}")
-	tdir=$(mktemp -d)
-	needs-cd -or-die $tdir
-	ln "$file" 0.html	|| die "Could not ^Tln^t to ^S$file^s."
-	tidy-repeat
-	((REPLY))&& {
-		fhtml=$REPLY.html
-		print "$(<$fhtml)" >$file
-		for ferr in *.err; do
-			print -r -- "### $ferr ###"
-			print -r -- "$(<$ferr)"
-			print
-		done >$file.err
-	  }
-	if ((REPLY < UPPER_LIMIT)); then
-		rm *.{html,err}
-		rmdir "$PWD"	|| die "Could not ^Trmdir^t ^S$PWD^s."
-	else
-		warn "^Ttidy^ ran ^B$REPLY^b times without standardizing"	\
-			 "Did ^Enot^e ^Trmdir^t ^S$PWD^s"
-	fi
-)} # }}}1
-function has-some-html { # {{{1
-	x=$(w3m ${1:?}|tr -d [[:space:]]|wc -c) ||
-		die "A suffusion of yellow."
-	((x))
-} # }}}1
 
 needs tidy needs-cd needs-path
 
@@ -123,13 +79,8 @@ for f in *; do
 		mv "$f" "$H" && f=$H
 	fi
 	# fix all the Microsoft (et al.) broken html marked as xhtml
-	[[ $f == *.html &&  $cleanHtml == true ]]&& {
+	[[ $f == *.html &&  $cleanHtml == true ]]&&
 		clean-html "$f"
-		has-some-html "$f" || {
-			warn "^B$f^b is empty."
-			continue
-		  }
-	}
 	chmod a+r "$f"
 	+parts "$f"
 done

@@ -9,6 +9,7 @@ DEFAULT_FLDR=inbox
 DEFAULT_SEQ='¬L'	# NOT messages in groups
 fERRs=.attack.out
 all=a	# mmh uses a, nmh uses all
+webMailStore=/var/www/htdocs/twSite/mailstore
 
 # Usage {{{1
 this_pgm=${0##*/}
@@ -48,10 +49,96 @@ function set-curmsg { # {{{1
 	rc=$?; (($rc == 0 || $rc == 64))|| warn "$(<$fERRs)"
 	return $rc
 } # }}}1
+function list-msgs { # {{{1
+	local f
+	for f in $webMailStore/$PREFIX-[1-9]*([0-9]).*html; do
+		[[ $f == *\** ]]&& break
+		f=${f##*/???+([0-9])-}
+		f=${f%.html}
+		print -r -- "$f"
+	done | sort -n
+} # }}}1
+function print-tag-file-pair { # {{{1
+	local b
+	# $work and $common defined in calling function amalgamate-lists 
+	b=${1#"$work/"}; b=${b%"$common"}
+	print -r -- "    \"$b\": $(<$1)${2:+,}"
+} # }}}1
+function amalgamate-lists { # {{{1
+	local work common s
+	work=$webMailStore/work/
+	common=-msg-list.json
+	print -r -- '{'
+	print -r -- "  \"newest\": \"$PREFIX\","
+	print -r -- '  "batches": {'
+	set -- $work/*-msg-list.json
+	[[ $1 == \**\* ]]|| { # matches found? 
+		# trailing commas are not allowed in json, so treat the last 
+		# specially (not in the while loop)
+		while (($#>1)); do
+			print-tag-file-pair "$1" print-comma
+			shift
+		done
+		print-tag-file-pair "$1" # dont-print-comma (no $2)
+	  }
+	print -r -- '  }'
+	print -r -- '}'
+} # }}}1
+function make-for-browser-reader { # {{{1
+	local webmsg
+	webmsg=$PREFIX-$1
+	cp "${1:?}" "$webMailStore"/$webmsg
+	chmod a+r "$webMailStore/$webmsg"
+
+	set -- $(list-msgs)
+	local l m
+	for m { l=${l:+$l,}\"$m\"; }
+	print -r -- "[$l]" > $webMailStore/work/$PREFIX-msg-list.json
+	amalgamate-lists >$webMailStore/msg-list.json
+} #}}}1
 function msg-prev { set-curmsg p && ((MSG_N--)); }
 function msg-next { set-curmsg n && ((MSG_N++)); }
 function msg-show { show +$FLDR ${1:?}; }
-function msg-webview { LOGLEVEL=0 m-part ${OPT:-} "${1:?}"; }
+function convert-text-to-html { # {{{1
+	cat <<-.
+	<!DOCTYPE html>
+	<html lang="en">
+	<head><meta charset="utf-8"><title>msg ${file%%.*}</title></head>
+	<body>
+	.
+	cmark <$1
+	print -- '</body>\n</html>'
+
+} # }}}1
+function msg-webview { # {{{1
+	local num resp file parts html cleanit
+	num=${1:?}
+	[[ $num == [1-9]*([0-9]) ]]|| {
+		warn "Bad msg number: $num"
+		return
+	  }
+	parts=" $(mhlist +$FLDR $num|egrep -o 'text/[a-z-]+'|tr \\n ' ')"
+	cleanit=false
+	if [[ $parts == *\ text/html\ * ]]; then
+		resp=$(mhstore +$FLDR -type text/html "$num" 2>&1)
+		[[ $resp == storing* ]]|| { warn "$resp"; return; }
+		file=${resp##* }
+		[[ ${OPT:-} == -n ]]|| cleanit=true
+	elif [[ $parts == *\ text/plain\ * ]]; then
+		resp=$(mhstore +$FLDR  -type text/plain "$num" 2>&1)
+		[[ $resp == storing* ]]|| { warn "$resp"; return; }
+		file=${resp##* }
+		html=${file%.*}.html
+		convert-text-to-html "$file" >$html
+		file=$html
+	else
+		warn 'No html or plain text parts in msg.'
+		return
+	fi
+	needs-file -or-warn "$file" || return
+	$cleanit && clean-html "$file"
+	make-for-browser-reader "$file"
+} # }}}1
 function msg-xplode { # {{{1
 	mhstore +$FLDR ${1:?}
 	chmod g+r $1.*
@@ -189,6 +276,10 @@ else
 		die DATAERR "Bad message list: ^B$SEQ^b"
 	fi
 fi
+
+PREFIX=$(<.batch) 2>/dev/null
+
+# typeset -ft msg-webview
 
 main "$@"; exit
 

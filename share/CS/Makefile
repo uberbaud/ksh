@@ -109,6 +109,11 @@ HELP_HCHG=$(KDOTDIR)/share/HS/.LAST_UPDATED
 help: $(HELP_FCHG) $(HELP_HCHG)
 	@$(HELP_UPBIN)
 
+HSAVEDATCTL_BIN = $(KDOTDIR)/share/BS/httpd-savedat-ctl.ksh
+httpd-savedat-ctl: $(HSAVEDATCTL_BIN)
+	@echo $@
+	@$(HSAVEDATCTL_BIN) commands >$@
+
 jj_1: $(CARGO_BIN)/jj
 	@echo $@
 	@jj -h | awk 'p && /^$$/ {nextfile} p {print $$1} /^Commands:/ {p=1}' >$@

@@ -2,7 +2,7 @@
 # <@(#)tag:tw.csongor.greyshirt.net,2021-05-26,00.51.28z/23242a3>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
 
-set -o nounset;: ${FPATH:?Run from within KSH}
+set -o nounset;: "${FPATH:?Run from within KSH}"
 
 realbin=$(realpath $(whence -p "$0"))
 shortcall=${0##*/};       shortcall=${shortcall%.*}

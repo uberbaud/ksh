@@ -2,7 +2,7 @@
 # <@(#)tag:tw.lukas.uberbaud.foo,2025-12-16,14.32.30z/265e266>
 # vim: ft=ksh ts=4 tw=72 noexpandtab nowrap foldmethod=marker
 
-set -o nounset;: ${FPATH:?Run from within KSH}
+set -o nounset;: "${FPATH:?Run from within KSH}"
 
 # Usage {{{1
 this_pgm=${0##*/}

@@ -2,7 +2,7 @@
 # <@(#)tag:tw.csongor.uberbaud.foo,2024-01-23,18.49.07z/34fff3a>
 # vim: ft=ksh ts=4 tw=72 noexpandtab nowrap foldmethod=marker
 
-set -o nounset;: ${FPATH:?Run from within KSH}
+set -o nounset;: "${FPATH:?Run from within KSH}"
 
 Q=6
 
@@ -29,7 +29,7 @@ while getopts ':q:h' Option; do
 		q)	Q=$OPTARG;														;;
 		h)	usage;															;;
 		\?)	die USAGE "Invalid option: ^B-$OPTARG^b.";						;;
-		\:)	die USAGE "Option ^B-$OPTARG^b requires an argument.";			;;
+		:)	die USAGE "Option ^B-$OPTARG^b requires an argument.";			;;
 		*)	bad-programmer "No getopts action defined for ^T-$Option^t.";	;;
 	esac
 done

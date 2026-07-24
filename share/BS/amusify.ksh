@@ -2,7 +2,7 @@
 # <@(#)tag:tw.csongor.greyshirt.net,2020-01-17,22.30.55z/32551f0>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
 
-set -o nounset;: ${FPATH:?Run from within KSH}
+set -o nounset;: "${FPATH:?Run from within KSH}"
 
 Q=6
 F='^F{0}'
@@ -36,7 +36,7 @@ while getopts ':dDh' Option; do
 		d)	debug=true;													;;
 		D)	debug=true; SQL_VERBOSE=true;								;;
 		\?)	die "Invalid option: ^B-$OPTARG^b.";						;;
-		\:)	die "Option ^B-$OPTARG^b requires an argument.";			;;
+		:)	die "Option ^B-$OPTARG^b requires an argument.";			;;
 		*)	bad-programmer "Undefined getopts action: ^B$Option^b.";	;;
 	esac
 done

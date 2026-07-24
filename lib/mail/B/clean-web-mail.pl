@@ -81,7 +81,7 @@ sub maxtag ($a,$b) { # {{{1
     return $b if $b_pre gt $a_pre;
     # $a_pre and $b_pre are equal;
     return $a if $a_num > $b_num;
-    return $b if $b_num > $b_num;
+    return $b if $b_num > $a_num;
     # should never be here
     bleat("tags ^T%s^t and ^T%s^t are unexpectedly equal.", $a, $b);
     return $a; # either would do, they're the same!

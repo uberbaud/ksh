@@ -1,8 +1,11 @@
 #!/bin/ksh
 # <@(#)tag:tw.csongor.greyshirt.net,2019-12-03,21.31.29z/287b41f>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
+# shellcheck disable=SC2086,SC2329,SC2178,SC2128
+# 									^		^
+# Apparently ShellCheck thinks typeset -L creates an array
 
-set -o nounset;: ${FPATH:?Run from within KSH}
+set -o nounset;: "${FPATH:?Run from within KSH}"
 
 TAB='	'
 CONTINUE=true
@@ -61,13 +64,13 @@ function usage {
 # process -options {{{1
 function bad_programmer {	# {{{2
 	die 'Programmer error:'	\
-		"  No getopts action defined for [1m-$1[22m."
+		"  No getopts action defined for ^B-$1^b."
   };	# }}}2
 while getopts ':h' Option; do
 	case $Option in
 		h)	usage;												;;
 		\?)	die "Invalid option: ^B-$OPTARG^b.";				;;
-		\:)	die "Option ^B-$OPTARG^b requires an argument.";	;;
+		:)	die "Option ^B-$OPTARG^b requires an argument.";	;;
 		*)	bad_programmer "$Option";							;;
 	esac
 done
@@ -126,7 +129,7 @@ function update-time-remaining { # {{{1
 function update-time-notime { :; }
 function update-time-none { :; }
 function update-time { # {{{1
-	local O=0 P p t
+	local P
 
 	[[ -s playing ]] || return
 
@@ -190,20 +193,20 @@ function update-screen { # {{{1
 	print -u2 -- "         rowPLAYING: $rowPLAYING"
 	print -u2 -- "          rowSTATUS: $rowSTATUS"
 
-	local i id song dtenths
+	local i song
 	i=$lastRowPLAYED
 	while ((i)); do
 		((i--))
-		IFS=$TAB read -r id song dtenths || song=''
+		IFS=$TAB read -r _ song _ || song=''
 		BUFFER[i]="$song"
 	done <played.lst
-	IFS=$TAB read -r id song DURATION <playing
+	IFS=$TAB read -r _ song DURATION <playing
 	DSEC=${DURATION%?}
 	DHMS=$(s2hms ${DSEC:-0})
 	BUFFER[rowPLAYING-1]="$song"
 	i=$((rowPLAYING-1))
 	while ((++i<LINES)); do
-		IFS=$TAB read -r id song dtenths || song=''
+		IFS=$TAB read -r _ song _ || song=''
 		BUFFER[i]="$song"
 	done <song.lst
 
@@ -211,7 +214,7 @@ function update-screen { # {{{1
 	typeset status
 	print -n -- "$colorPlayed"
 	i=0
-	while ((i<$lastRowPLAYED)); do
+	while ((i<lastRowPLAYED)); do
 		L=${BUFFER[i]:-\~}
 		((i++))
 		print -n -- "\033[$i;1H $L "

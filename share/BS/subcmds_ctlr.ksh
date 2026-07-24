@@ -2,7 +2,7 @@
 # <@(#)tag:tw.csongor.uberbaud.foo,2024-01-17,18.01.42z/4bbc549>
 # vim: ft=ksh ts=4 tw=72 noexpandtab nowrap foldmethod=marker
 
-set -o nounset;: ${FPATH:?Run from within KSH}
+set -o nounset;: "${FPATH:?Run from within KSH}"
 
 realbin=$(realpath $(whence -p "$0"))
 shortbin=${realbin##*/};	shortbin=${shortbin%.*}

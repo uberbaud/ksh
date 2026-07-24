@@ -2,7 +2,7 @@
 # <@(#)tag:csongor.greyshirt.net,2017-08-11:tw/04.49.36z/23cefa>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
 
-set -o nounset; : ${FPATH:?Run from within KSH}
+set -o nounset; : "${FPATH:?Run from within KSH}"
 needs date
 
 typeset -- calOpts='' daysAfter=1 daysBefore=0
@@ -39,7 +39,7 @@ while getopts ':wyA:B:h' Option; do
 		B)	daysBefore=$OPTARG;										;;
 		h)	usage;													;;
 		\?)	die USAGE "Invalid option: ^B-$OPTARG^b.";				;;
-		\:)	die USAGE "Option ^B-$OPTARG^b requires an argument.";	;;
+		:)	die USAGE "Option ^B-$OPTARG^b requires an argument.";	;;
 		*)	bad-programmer "No getopts defined for ^T$Option^t.";	;;
 	esac
 done
@@ -105,9 +105,9 @@ t=${months%$MON*}
 typeset -Z 2 MM=$(((${#t}/4)+1)) DOM
 ((YEAR<1970))&& {
 	printf "\e[48;5;222m%${COLUMNS}s\r %s\e[49m\n"	\
-	'' 'WARNING: [1mcalendar[22m can'\''t deal with years before [1m1970[22m'		\
-	'' "         So for events, we're using [1m1970[22m instead of [1m$YEAR[22m."	\
-	'' "         The calendar itself uses [1m$YEAR[22m."
+	'' 'WARNING: ^Bcalendar^b can'\''t deal with years before ^B1970^b'		\
+	'' "         So for events, we're using ^B1970^b instead of ^B$YEAR^b."	\
+	'' "         The calendar itself uses ^B$YEAR^b."
 	YEAR=1970
 }
 useDate="$YEAR$MM$DOM"
@@ -135,9 +135,9 @@ for ln in "${calevs[@]}"; do
 	[[ ${tuple[0]:-} == $expectday ]]|| {
 		expectday=${tuple[0]}
 		case "$expectday" in
-			"$TODAY")		+evlist '[1m   today[22m';		;;
-			"$TOMORROW")	+evlist '[1m   tomorrow[22m';	;;
-			*)				+evlist "[1m   $expectday[22m";	;;
+			"$TODAY")		+evlist '^B   today^b';		;;
+			"$TOMORROW")	+evlist '^B   tomorrow^b';	;;
+			*)				+evlist "^B   $expectday^b";	;;
 		esac
 	  }
 	# remove extraneous spaces

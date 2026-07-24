@@ -2,7 +2,7 @@
 # <@(#)tag:tw.yt.greyshirt.net,2022-08-10,02.45.15z/16438fe>
 # vim: ft=ksh ts=4 tw=72 noexpandtab nowrap foldmethod=marker
 
-set -o nounset;: ${FPATH:?Run from within KSH}
+set -o nounset;: "${FPATH:?Run from within KSH}"
 
 BASE=httpd-savedat
 SCRIPT=~/bin/perl/$BASE.pl

@@ -2,7 +2,7 @@
 # <@(#)tag:tw.csongor.greyshirt.net,2021-11-25,00.38.27z/363e098>
 # vim: ft=ksh ts=4 tw=72 noexpandtab nowrap foldmethod=marker
 
-set -o nounset;: ${FPATH:?Run from within KSH}
+set -o nounset;: "${FPATH:?Run from within KSH}"
 
 BS=${KDOTDIR:?}/share/BS
 TRAPSIGS='EXIT HUP INT QUIT TRAP BUS TERM'
@@ -40,7 +40,7 @@ while getopts ':m:t:h' Option; do
 		t)	DSCR=$OPTARG;													;;
 		h)	usage;															;;
 		\?)	die USAGE "Invalid option: ^B-$OPTARG^b.";						;;
-		\:)	die USAGE "Option ^B-$OPTARG^b requires an argument.";			;;
+		:)	die USAGE "Option ^B-$OPTARG^b requires an argument.";			;;
 		*)	bad-programmer "No getopts action defined for ^T-$Option^t.";	;;
 	esac
 done

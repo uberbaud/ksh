@@ -1,7 +1,7 @@
 #!/bin/ksh
 # <@(#)tag:tw.csongor.greyshirt.net,2019-11-08,00.17.58z/4dbb98e>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
-set -o nounset;: ${FPATH:?Run from within KSH}
+set -o nounset;: "${FPATH:?Run from within KSH}"
 
 : ${XDG_DOCUMENTS_DIR:?}
 initialURL="file://$XDG_DOCUMENTS_DIR/presentations/uberbaud-logo.html"
@@ -37,7 +37,7 @@ function usage {
 # process -options {{{1
 function bad_programmer {	# {{{2
 	die 'Programmer error:'	\
-		"  No getopts action defined for [1m-$1[22m."
+		"  No getopts action defined for ^B-$1^b."
   };	# }}}2
 while getopts ':knh' Option; do
 	case $Option in
@@ -45,7 +45,7 @@ while getopts ':knh' Option; do
 		n)	want_2nd_display=false;								;;
 		h)	usage;												;;
 		\?)	die "Invalid option: ^B-$OPTARG^b.";				;;
-		\:)	die "Option ^B-$OPTARG^b requires an argument.";	;;
+		:)	die "Option ^B-$OPTARG^b requires an argument.";	;;
 		*)	bad_programmer "$Option";							;;
 	esac
 done

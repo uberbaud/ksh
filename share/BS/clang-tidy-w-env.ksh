@@ -2,7 +2,7 @@
 # <@(#)tag:tw.lukas.uberbaud.foo,2026-03-09,21.11.29z/5ac73f1>
 # vim: ft=ksh ts=4 tw=72 noexpandtab nowrap foldmethod=marker
 
-set -o nounset;: ${FPATH:?Run from within KSH}
+set -o nounset;: "${FPATH:?Run from within KSH}"
 
 function with-var-name { # {{{1
 	local VNAME

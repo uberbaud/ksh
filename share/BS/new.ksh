@@ -2,7 +2,7 @@
 # <@(#)tag:tw.csongor.greyshirt.net,2023-01-16,21.33.46z/59d92b2>
 # vim: ft=ksh ts=4 tw=72 noexpandtab nowrap foldmethod=marker
 
-set -o nounset;: ${FPATH:?Run from within KSH}
+set -o nounset;: "${FPATH:?Run from within KSH}"
 use-app-paths new
 
 FILEARG=
@@ -77,7 +77,7 @@ while getopts ':fnt:xz:TVX:hHN' Option; do
 		V)	exec show-new-help.ksh AUTOMAGICAL_VARIABLES;					;;
 		X)	NOT-IMPLEMENTED -die "^V$Option^v option";						;;
 		\?)	die USAGE "Invalid option: ^B-$OPTARG^b.";						;;
-		\:)	die USAGE "Option ^B-$OPTARG^b requires an argument.";			;;
+		:)	die USAGE "Option ^B-$OPTARG^b requires an argument.";			;;
 		*)	bad-programmer "No getopts action defined for ^T-$Option^t.";	;;
 	esac
 done

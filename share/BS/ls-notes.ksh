@@ -2,7 +2,7 @@
 # <@(#)tag:csongor.greyshirt.net,2017-11-20:tw/19.26.21z/8485b8>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
 
-set -o nounset;: ${FPATH:?Run from within KSH}
+set -o nounset;: "${FPATH:?Run from within KSH}"
 DEPO="NOTES"
 SUFFIX=".note"
 

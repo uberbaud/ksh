@@ -2,7 +2,7 @@
 # <@(#)tag:tw.csongor.greyshirt.net,2021-10-15,23.05.23z/5819158>
 # vim: ft=ksh ts=4 tw=72 noexpandtab nowrap foldmethod=marker
 
-set -o nounset;: ${FPATH:?Run from within KSH}
+set -o nounset;: "${FPATH:?Run from within KSH}"
 
 LOG=~/log/panera-eLarn.log
 TAB='	' # < capture tab
@@ -36,7 +36,7 @@ function usage {
 # process -options {{{1
 function bad_programmer { # {{{2
 	die 'Programmer error:'	\
-		"  No getopts action defined for [1m-$1[22m."
+		"  No getopts action defined for ^B-$1^b."
 } # }}}2
 while getopts ':nh' Option; do
 	case $Option in
@@ -44,7 +44,7 @@ while getopts ':nh' Option; do
 		u)	DOUNSET=true; DRYRUN=true;							;;
 		h)	usage;												;;
 		\?)	die "Invalid option: ^B-$OPTARG^b.";				;;
-		\:)	die "Option ^B-$OPTARG^b requires an argument.";	;;
+		:)	die "Option ^B-$OPTARG^b requires an argument.";	;;
 		*)	bad_programmer "$Option";							;;
 	esac
 done

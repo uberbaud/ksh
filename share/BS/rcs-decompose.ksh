@@ -2,7 +2,7 @@
 # <@(#)tag:tw.csongor.greyshirt.net,2021-11-25,02.04.21z/328488b>
 # vim: ft=ksh ts=4 tw=72 noexpandtab nowrap foldmethod=marker
 
-set -o nounset;: ${FPATH:?Run from within KSH}
+set -o nounset;: "${FPATH:?Run from within KSH}"
 
 exec 3>>~/log/RCS-rlog-exceptions
 SEP=$(print '\035')
@@ -86,7 +86,7 @@ while getopts ':h' Option; do
 	case $Option in
 		h)	usage;															;;
 		\?)	die USAGE "Invalid option: ^B-$OPTARG^b.";							;;
-		\:)	die USAGE "Option ^B-$OPTARG^b requires an argument.";				;;
+		:)	die USAGE "Option ^B-$OPTARG^b requires an argument.";				;;
 		*)	bad-programmer "No getopts action defined for ^T-$Option^t."	;;
 	esac
 done

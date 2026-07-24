@@ -2,7 +2,7 @@
 # <@(#)tag:csongor.greyshirt.net,2018-01-27:tw/19.38.04z/32d5e9a>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
 
-set -o nounset;: ${FPATH:?Run from within KSH}
+set -o nounset;: "${FPATH:?Run from within KSH}"
 
 # Usage {{{1
 typeset -- this_pgm=${0##*/}
@@ -25,7 +25,7 @@ function usage {
 # process -options {{{1
 function bad_programmer {	# {{{2
 	die 'Programmer error:'	\
-		"  No getopts action defined for [1m-$1[22m."
+		"  No getopts action defined for ^B-$1^b."
   };	# }}}2
 ins=true; outs=false
 while getopts ':aoh' Option; do
@@ -33,8 +33,8 @@ while getopts ':aoh' Option; do
 		a)	ins=true; outs=true;									;;
 		o)	ins=false; outs=true;									;;
 		h)	usage;													;;
-		\?)	die "Invalid option: [1m-$OPTARG[22m.";				;;
-		\:)	die "Option [1m-$OPTARG[22m requires an argument.";	;;
+		\?)	die "Invalid option: ^B-$OPTARG^b.";				;;
+		:)	die "Option ^B-$OPTARG^b requires an argument.";	;;
 		*)	bad_programmer "$Option";								;;
 	esac
 done

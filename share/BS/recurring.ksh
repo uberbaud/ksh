@@ -2,7 +2,7 @@
 # <@(#)tag:csongor.greyshirt.net,2018-07-08:tw/03.54.41z/19af785>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
 
-set -o nounset;: ${FPATH:?Run from within KSH}
+set -o nounset;: "${FPATH:?Run from within KSH}"
 
 # Usage {{{1
 typeset -- this_pgm=${0##*/}
@@ -29,7 +29,7 @@ while getopts ':exh' Option; do
 		x)	ALT=true;														;;
 		h)	usage;															;;
 		\?)	die "Invalid option: ^B-$OPTARG^b.";							;;
-		\:)	die "Option ^B-$OPTARG^b requires an argument.";				;;
+		:)	die "Option ^B-$OPTARG^b requires an argument.";				;;
 		*)	bad-programmer "No getopts action defined for ^T-$Option^t.";	;;
 	esac
 done

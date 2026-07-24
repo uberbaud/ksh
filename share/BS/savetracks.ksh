@@ -29,13 +29,13 @@ function usage {
 # process -options {{{1
 function bad_programmer {	# {{{2
 	die 'Programmer error:'	\
-		"  No getopts action defined for [1m-$1[22m."
+		"  No getopts action defined for ^B-$1^b."
   };	# }}}2
 while getopts ':h' Option; do
 	case $Option in
 		h)	usage;													;;
-		\?)	die "Invalid option: [1m-$OPTARG[22m.";				;;
-		\:)	die "Option [1m-$OPTARG[22m requires an argument.";	;;
+		\?)	die "Invalid option: ^B-$OPTARG^b.";				;;
+		:)	die "Option ^B-$OPTARG^b requires an argument.";	;;
 		*)	bad_programmer "$Option";								;;
 	esac
 done

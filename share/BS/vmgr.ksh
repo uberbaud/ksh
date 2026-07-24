@@ -2,7 +2,7 @@
 # <@(#)tag:tw.csongor.greyshirt.net,2023-01-04,03.05.19z/21ab967>
 # vim: ft=ksh ts=4 tw=72 noexpandtab nowrap foldmethod=marker
 
-set -o nounset;: ${FPATH:?Run from within KSH}
+set -o nounset;: "${FPATH:?Run from within KSH}"
 
 set -A CMDLIST -- changed changelog checkout diff snap status track vmslist
 set -A ALTLIST -- cmdlist help

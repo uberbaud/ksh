@@ -2,7 +2,7 @@
 # <@(#)tag:tw.csongor.greyshirt.net,2021-11-03,16.23.56z/22e02e2>
 # vim: ft=ksh ts=4 tw=72 noexpandtab nowrap foldmethod=marker
 
-set -o nounset;: ${FPATH:?Run from within KSH}
+set -o nounset;: "${FPATH:?Run from within KSH}"
 
 warnOrDie=die
 new-array xwd_opts
@@ -58,7 +58,7 @@ while getopts ':fhdi:n:rbqs' Option; do
 		s)	+xwd_opts -screen;												;;
 		# ERRORS
 		\?)	die "Invalid option: ^B-$OPTARG^b.";							;;
-		\:)	die "Option ^B-$OPTARG^b requires an argument.";				;;
+		:)	die "Option ^B-$OPTARG^b requires an argument.";				;;
 		*)	bad-programmer "No getopts action defined for ^T-$Option^t."	;;
 	esac
 done

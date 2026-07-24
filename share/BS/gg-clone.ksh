@@ -2,7 +2,7 @@
 # <@(#)tag:tw.csongor.greyshirt.net,2023-12-27,22.40.47z/5861ee1>
 # vim: ft=ksh ts=4 tw=72 noexpandtab nowrap foldmethod=marker
 
-set -o nounset;: ${FPATH:?Run from within KSH}
+set -o nounset;: "${FPATH:?Run from within KSH}"
 
 TRAPSIGS='EXIT HUP INT QUIT TRAP BUS TERM'
 
@@ -33,7 +33,7 @@ function usage {
 # process -options {{{1
 function bad_programmer {	# {{{2
 	die 'Programmer error:'	\
-		"  No getopts action defined for [1m-$1[22m."
+		"  No getopts action defined for ^B-$1^b."
   };	# }}}2
 warnOrDie=die
 makeXputClone=false
@@ -43,7 +43,7 @@ while getopts ':xfh' Option; do
 		f)	warnOrDie=warn;										;;
 		h)	usage;												;;
 		\?)	die "Invalid option: ^B-$OPTARG^b.";				;;
-		\:)	die "Option ^B-$OPTARG^b requires an argument.";	;;
+		:)	die "Option ^B-$OPTARG^b requires an argument.";	;;
 		*)	bad_programmer "$Option";							;;
 	esac
 done

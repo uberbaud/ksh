@@ -2,7 +2,7 @@
 # <@(#)tag:csongor.greyshirt.net,2017-11-07:tw/19.07.07z/2de0306>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
 
-set -o nounset;: ${FPATH:?Run from within KSH}
+set -o nounset;: "${FPATH:?Run from within KSH}"
 
 needs desparkle die h1 needs-cd new-array notify splitstr subst-pathvars warn \
 		yes-or-no needs-path
@@ -71,15 +71,15 @@ function usage {
 VERBOSE=false
 function bad_programmer {	# {{{2
 	die 'Programmer error:'	\
-		"  No getopts action defined for [1m-$1[22m."
+		"  No getopts action defined for ^B-$1^b."
   };	# }}}2
 while getopts ':Dvh' Option; do
 	case $Option in
 		v)	VERBOSE=true;											;;
 		D)	printf "%s\n" "${dotf[@]}" |sort; return 0;				;;
 		h)	usage;													;;
-		\?)	die "Invalid option: [1m-$OPTARG[22m.";				;;
-		\:)	die "Option [1m-$OPTARG[22m requires an argument.";	;;
+		\?)	die "Invalid option: ^B-$OPTARG^b.";				;;
+		:)	die "Option ^B-$OPTARG^b requires an argument.";	;;
 		*)	bad_programmer "$Option";								;;
 	esac
 done

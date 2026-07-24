@@ -60,7 +60,7 @@ while getopts ':hR:L:k' Option; do
 		k)	keep=true;											;;
 		h)	usage;												;;
 		\?)	die "Invalid option: ^B-$OPTARG^b.";				;;
-		\:)	die "Option ^B-$OPTARG^b requires an argument.";	;;
+		:)	die "Option ^B-$OPTARG^b requires an argument.";	;;
 		*)	bad_programmer "$Option";							;;
 	esac
 done
@@ -269,7 +269,7 @@ $i_am_the_remote && { # {{{1
 tmppath=''; rlst=''; llst='';
 $i_am_the_local && { # {{{1
 
-	: ${FPATH:?Run from within KSH}
+	: "${FPATH:?Run from within KSH}"
 	needs ssh-add scp ssh f-host
 
 	(($#))||	die 'Missing required argument ^Uhost:path^u.'

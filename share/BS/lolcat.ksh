@@ -2,7 +2,7 @@
 # <@(#)tag:csongor.greyshirt.net,2017-08-11:tw/20.32.03z/32e3d26>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
 
-set -o nounset;: ${FPATH:?Run from within KSH} ${COLUMNS:=$(tput cols)}
+set -o nounset;: "${FPATH:?Run from within KSH}" ${COLUMNS:=$(tput cols)}
 
 # The $colors array was generated using the formula
 #   16 + (36*R) + (6*G) + B
@@ -64,7 +64,7 @@ function usage {
 # process -options {{{1
 function bad_programmer {	# {{{2
 	die 'Programmer error:'	\
-		"  No getopts action defined for [1m-$1[22m."
+		"  No getopts action defined for ^B-$1^b."
   };	# }}}2
 while getopts ':c:is:tu:h' Option; do
 	case $Option in
@@ -75,7 +75,7 @@ while getopts ':c:is:tu:h' Option; do
 		t)	set -A colors $c2; C=${#colors[*]};					;;
 		h)	usage;												;;
 		\?)	-die "Invalid option: '-$OPTARG'.";					;;
-		\:)	-die "Option '-$OPTARG' requires an argument.";		;;
+		:)	-die "Option '-$OPTARG' requires an argument.";		;;
 		*)	bad_programmer "$Option";							;;
 	esac
 done

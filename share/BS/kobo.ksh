@@ -2,7 +2,7 @@
 # <@(#)tag:tw.csongor.uberbaud.foo,2024-08-08,02.07.16z/44b0345>
 # vim: ft=ksh ts=4 tw=72 noexpandtab nowrap foldmethod=marker
 
-set -o nounset;: ${FPATH:?Run from within KSH}
+set -o nounset;: "${FPATH:?Run from within KSH}"
 
 BOOKSHELF=${HOME:?}/docs/bookshelf/epub
 dKOBO=/vol/kobo
@@ -26,7 +26,7 @@ while getopts ':h' Option; do
 	case $Option in
 		h)	usage;															;;
 		\?)	die USAGE "Invalid option: ^B-$OPTARG^b.";						;;
-		\:)	die USAGE "Option ^B-$OPTARG^b requires an argument.";			;;
+		:)	die USAGE "Option ^B-$OPTARG^b requires an argument.";			;;
 		*)	bad-programmer "No getopts action defined for ^T-$Option^t.";	;;
 	esac
 done

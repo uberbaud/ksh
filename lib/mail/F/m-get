@@ -2,25 +2,40 @@
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab
 
 #: FUNCTION ^G(no arguments)^g
-#:   Wrapper around $BS/m-get.ksh
+#:   Wrapper around ${MAIL_APP_PATH:?}/B/_get.ksh "$@"
 
-function create-batch-file {
-	local tag
+function generate-tag {
 	set -A alph -- a b d e f g h j k m n o p q r s t w y z
 	set -- $(date -u +'%y %j')
-	tag=${alph[$1%20]}${alph[$2/20]}${alph[$2%20]}
-	print -r -- "${tag}0" >.batch
+	REPLY=${alph[$1%20]}${alph[$2/20]}${alph[$2%20]}
+}
+
+function update-prefix-and-file {
+	generate-tag					# sets REPLY
+	if [[ -s .batch ]]; then
+		local oldprefix tag num
+		oldprefix=$(<.batch)
+		num=${oldprefix#???}
+		tag=${oldprefix%"$num"}
+		# REPLY is from generate-tag, missing num (0)
+		#   if old and new are the same use the already incremented 
+		#   oldprefix, plus don't update .batch
+		[[ $tag == $REPLY ]]&& PREFIX=$oldprefix return
+	fi
+	PREFIX=${REPLY}0			# from generate-tag, missing num (0)
+	print -r -- "$PREFIX" >.batch
 }
 
 function m-get {
+	local REPLY
 	((LOGLEVEL))&&
 		PREMAIL_LOGLEVEL=${PREMAIL_LOGLEVEL:-${LOGLEVEL:-}}
 	export LOGLEVEL=0
 	PRE_MAIL_PWD=${PRE_MAIL_PWD:-$PWD}
 	builtin cd ${XDG_PUBLICSHARE_DIR:?}/mail
-	[[ -s .batch ]]|| create-batch-file # don't if non-empty file exists
+	update-prefix-and-file
 	${MAIL_APP_PATH:?}/B/_get.ksh "$@"
-	PREFIX=$(<.batch)
 }
+
 
 # Copyright © 2021 by Tom Davis <tom@greyshirt.net>.

@@ -2,7 +2,7 @@
 # <@(#)tag:tw.csongor.greyshirt.net,2022-04-13,16.01.27z/4c3f9b8>
 # vim: ft=ksh ts=4 tw=72 noexpandtab nowrap foldmethod=marker
 
-set -o nounset;: ${FPATH:?Run from within KSH}
+set -o nounset;: "${FPATH:?Run from within KSH}"
 
 SCANNER_DEVICE='Brother, DS-740D' # needs regex escapes if any
 USB=
@@ -27,7 +27,7 @@ while getopts ':h' Option; do
 	case $Option in
 		h)	usage;															;;
 		\?)	die USAGE "Invalid option: ^B-$OPTARG^b.";						;;
-		\:)	die USAGE "Option ^B-$OPTARG^b requires an argument.";			;;
+		:)	die USAGE "Option ^B-$OPTARG^b requires an argument.";			;;
 		*)	bad-programmer "No getopts action defined for ^T-$Option^t.";	;;
 	esac
 done

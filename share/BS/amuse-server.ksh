@@ -1,12 +1,11 @@
 #!/bin/ksh
+# shellcheck disable=SC2329,SC2016,SC2086
 # <@(#)tag:tw.csongor.greyshirt.net,2019-11-27,14.59.56z/4646335>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
 
-set -o nounset;: ${FPATH:?Run from within KSH}
+set -o nounset;: "${FPATH:?Run from within KSH}"
 typeset -R5 LINENO
 PS4='$LINENO | '
-NL='
-'
 
 # Usage {{{1
 typeset -- this_pgm=${0##*/}
@@ -25,13 +24,13 @@ function usage {
 # process -options {{{1
 function bad_programmer {	# {{{2
 	fullstop 'Programmer error:'	\
-		"  No getopts action defined for [1m-$1[22m."
+		"  No getopts action defined for ^B-$1^b."
   };	# }}}2
 while getopts ':h' Option; do
 	case $Option in
 		h)	usage;													;;
 		\?)	fullstop "Invalid option: -$OPTARG.";					;;
-		\:)	fullstop "Option -$OPTARG requires an argument.";		;;
+		:)	fullstop "Option -$OPTARG requires an argument.";		;;
 		*)	bad_programmer "$Option";								;;
 	esac
 done
@@ -46,7 +45,7 @@ needs use-app-paths amuse:env get-exclusive-lock fpop play-one-ogg \
 use-app-paths amuse
 
 amuse:env || fullstop "$REPLY"
-: ${AMUSE_DATA_HOME:?} ${AMUSE_RUN_DIR:?}
+: "${AMUSE_DATA_HOME:?}" "${AMUSE_RUN_DIR:?}"
 
 please_START_another_song=0
 DONT_start_another_song=1
@@ -54,8 +53,8 @@ DONT_start_another_song=1
 CONTINUE=true
 function kill-player { #{{{1
 	[[ -s player-pid ]]|| return
-	kill -HUP $(<player-pid) # -pid sends to group
-	wait $FN_PLAY_PID
+	kill -HUP "$(<player-pid)" # -pid sends to group
+	wait "$FN_PLAY_PID"
 	: >final	# final, we're stopping immediately, not finishing
 				# the song, which is the purpose of final
 } #}}}1
@@ -72,12 +71,13 @@ function hCleanUp	{ #{{{1
 function file-from-id { # {{{1
 	local F P
 	SQL "SELECT pcm_sha384b FROM files WHERE id = $1;"
+	# shellcheck disable=SC2154		# assigned in SQL
 	F=${sqlreply[0]#?}
 	P=${sqlreply[0]%"$F"}
 	REPLY="$AMUSE_DATA_HOME/$P/$F.oga"
 } # }}}1
 function get-random-song  { #{{{1
-	local song id
+	local id
 	[[ -s random ]]|| return 1
 	SQL <<-==SQLITE==
 		SELECT
@@ -93,13 +93,14 @@ function get-random-song  { #{{{1
 			)
 		;
 	==SQLITE==
+	# shellcheck disable=SC2181		# heredoc+||return confuses things
 	(($?))&& return 1			# would be Programmer's Fault, never expected
-	song=${sqlreply[0]:-}
-	[[ -n $song ]]|| return 1	# should never happen, but just in case.
-	print -r -- "$song"
+	id=${sqlreply[0]:-}
+	[[ -n $id ]]|| return 1	# should never happen, but just in case.
+	print -r -- "$id"
 } #}}}1
 function play-next-song { #{{{1
-	local N amuse_id song startpos
+	local N amuse_id startpos
 	[[ -s player-pid ]]&& return 1
 
 	# keep or put next song in playing
@@ -124,8 +125,10 @@ function play-next-song { #{{{1
 		{ fpop song.lst || get-random-song; } >playing || return 1
 		startpos=
 	fi
-	read amuse_id the_rest <playing
+	# shellcheck disable=SC2034		# the_rest isn't wanted
+	read -r amuse_id the_rest <playing
 	file-from-id "$amuse_id"
+	# shellcheck disable=SC2086		# quotes would be a BUG for startpos
 	play-file.ksh ${vAUDEV:-snd/0} "$REPLY" $startpos &
 	FN_PLAY_PID=$!
 
@@ -150,6 +153,7 @@ function docmd-pause { #{{{1
 } #}}}1
 function docmd-play { #{{{1
 	: >final
+	# shellcheck disable=SC2046
 	[[ -s player-pid && -z $(ps -p $(<player-pid) -ocommand=) ]]&&
 		: >player-pid
 	return $please_START_another_song
@@ -187,17 +191,17 @@ function docmd-no-op { #{{{1
 	return $DONT_start_another_song
 } #}}}1
 function click-control { # {{{1
-	 >/dev/null 2>&1 (
-		local CONTINUE=true
-		trap CONTINUE=false HUP INT QUIT TERM
-		while $CONTINUE; do
+	(
+		proceed=true
+		trap proceed=false HUP INT QUIT TERM
+		while $proceed; do
 			/usr/bin/aucat ${vAUDEV:+-f "${vAUDEV}"} -i /dev/zero &
 			AUCAT_PID=$!
 			wait $AUCAT_PID
 		done
 		# wait will return on signals, so aucat may still be running
 		kill $AUCAT_PID
-	)
+	) >/dev/null 2>&1
 } # }}}1
 function set-audiodevice { # {{{1
 	vAUDEV=${1:?}
@@ -218,7 +222,7 @@ function is-valid-cmd { # {{{1
 function notify-subscribers { # {{{1
 	local file pid signal subtype
 	subtype=$1
-	for file in subs-$subtype/+([0-9]); do
+	for file in "subs-$subtype"/+([0-9]); do
 		[[ -f $file ]]|| continue
 		pid=${file##*/}
 		signal=$(<$file)
@@ -293,11 +297,12 @@ builtin cd "$AMUSE_RUN_DIR" ||
 get-exclusive-lock -no-wait server-lock "$AMUSE_RUN_DIR" ||
 	fullstop 'amuse-server is already running'
 
+# shellcheck disable=SC2046
 [[ -s server-pid && -n $(ps -p $(<server-pid) -ocommand=) ]]&&
 	fullstop 'amuse-server is already running (2)'
 print -- $$ >server-pid
 
-[[ -a sigpipe ]]&& rm -f sigpipe
+[[ -e sigpipe ]]&& rm -f sigpipe
 mkfifo sigpipe || fullstop 'Is server already running?'
 
 : >final
@@ -306,6 +311,7 @@ touch random		# don't change it, just make sure it exists
 touch audiodevice	# don't change it, just make sure it exists
 set-audiodevice "$(<audiodevice)"
 
+# shellcheck disable=SC2034		# SQLSEP used in function SQL
 SQLSEP='	'
 SQL "ATTACH '$AMUSE_DATA_HOME/amuse.db3' AS amuse;"
 

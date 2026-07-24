@@ -3,7 +3,7 @@
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
 
 exec 2>>~/log/dmenu_dwming.log
-set -o nounset;: ${FPATH:?Run from within KSH}
+set -o nounset;: "${FPATH:?Run from within KSH}"
 
 cmdcache=${XDG_CACHE_HOME:-"$HOME/.cache"}/wdm-dmenu-cmds
 BROWSER=$(<$XDG_CONFIG_HOME/etc/browser)

@@ -2,7 +2,7 @@
 # <@(#)tag:tw.csongor.greyshirt.net,2020-09-14,13.17.17z/31deee3>
 # vim: filetype=ksh tabstop=4 textwidth=72 noexpandtab nowrap
 
-set -o nounset;: ${FPATH:?Run from within KSH}
+set -o nounset;: "${FPATH:?Run from within KSH}"
 
 # `sndioctl` expects a level in the range of 0 to 1 inclusive, however
 # internally it seems (based on previous documentation) that it is using
@@ -40,7 +40,7 @@ function usage {
 USE_LOCAL_DEVICE=false
 function bad_programmer {	# {{{2
 	die 'Programmer error:'	\
-		"  No getopts action defined for [1m-$1[22m."
+		"  No getopts action defined for ^B-$1^b."
   };	# }}}2
 while getopts ':lmrth' Option; do
 	case $Option in
@@ -50,7 +50,7 @@ while getopts ':lmrth' Option; do
 		r)	set reload;											;;
 		h)	usage;												;;
 		\?)	die "Invalid option: ^B-$OPTARG^b.";				;;
-		\:)	die "Option ^B-$OPTARG^b requires an argument.";	;;
+		:)	die "Option ^B-$OPTARG^b requires an argument.";	;;
 		*)	bad_programmer "$Option";							;;
 	esac
 done

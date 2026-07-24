@@ -45,7 +45,7 @@ while getopts ':fk:h' Option; do
 		h)	usage;												;;
 		k)	kill_watch_file_id=$OPTARG;							;;
 		\?)	die "Invalid option: ^B-$OPTARG^b.";				;;
-		\:)	die "Option ^B-$OPTARG^b requires an argument.";	;;
+		:)	die "Option ^B-$OPTARG^b requires an argument.";	;;
 		*)	bad_programmer "$Option";							;;
 	esac
 done
